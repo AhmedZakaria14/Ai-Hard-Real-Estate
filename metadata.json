@@ -1,0 +1,6 @@
+{
+  "name": "HARD Real Estate",
+  "description": "HARD Group Corporate Portal, Real Estate Platform, HARD Contracting & Construction, and HARD HVAC Maintenance featuring bilingual quote calculation, efficiency incentives, seasonal checklists, and CMS.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
