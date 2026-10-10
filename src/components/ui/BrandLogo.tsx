@@ -1,5 +1,6 @@
 import React from 'react';
 import { Language } from '../../types';
+import { useSiteSettings } from '../../context/SiteSettingsContext';
 
 interface BrandLogoProps {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -8,6 +9,7 @@ interface BrandLogoProps {
   variant?: 'light' | 'dark';
   className?: string;
   isIconOnly?: boolean;
+  sector?: 'portal' | 'realestate' | 'construction' | 'hvac';
 }
 
 export function BrandLogo({
@@ -17,7 +19,16 @@ export function BrandLogo({
   variant = 'dark',
   className = '',
   isIconOnly = false,
+  sector = 'realestate',
 }: BrandLogoProps) {
+  let settings;
+  try {
+    const { getEffectiveSettings } = useSiteSettings();
+    settings = getEffectiveSettings(sector);
+  } catch (e) {
+    settings = null;
+  }
+
   // Dimension and typography presets
   const sizeMap = {
     xs: { h: 'h-8 sm:h-9', textClass: 'text-sm', subTextClass: 'text-[9px]' },
@@ -30,16 +41,39 @@ export function BrandLogo({
   const currentSize = sizeMap[size] || sizeMap.md;
   const isAr = language === 'ar';
 
+  const logoSrc = settings
+    ? variant === 'light'
+      ? settings.logoUrlLight || '/logo.svg'
+      : settings.logoUrlDark || '/logo.svg'
+    : '/logo.svg';
+
+  const brandName = settings
+    ? isAr
+      ? settings.siteName?.ar || 'هارد للعقارات'
+      : settings.siteName?.en || 'HARD REAL ESTATE'
+    : isAr
+    ? 'هارد للعقارات'
+    : 'HARD REAL ESTATE';
+
+  const tagline = settings
+    ? isAr
+      ? settings.tagline?.ar || 'تسويق ووساطة عقارية فاخرة'
+      : settings.tagline?.en || 'Marketing & Luxury Brokerage'
+    : isAr
+    ? 'تسويق ووساطة عقارية فاخرة'
+    : 'Marketing & Luxury Brokerage';
+
   return (
     <div className={`flex items-center gap-3 select-none ${className}`}>
-      {/* Official HARD Real Estate Emblem */}
+      {/* Official Emblem */}
       <div className={`relative shrink-0 ${currentSize.h} flex items-center justify-center transition-transform duration-200 group-hover:scale-105`}>
         <img
-          src="/logo.svg"
-          alt="HARD Real Estate"
+          src={logoSrc}
+          alt={brandName}
           className={`${currentSize.h} w-auto object-contain shrink-0 drop-shadow-xs`}
           loading="eager"
           decoding="async"
+          onError={(e: any) => { e.target.src = '/logo.svg'; }}
         />
       </div>
 
@@ -52,21 +86,7 @@ export function BrandLogo({
                 variant === 'light' ? 'text-white' : 'text-slate-900'
               }`}
             >
-              {isAr ? (
-                <>
-                  <span className="text-sky-600 font-black">هارد</span>{' '}
-                  <span className={variant === 'light' ? 'text-slate-100' : 'text-slate-800'}>
-                    للعقارات
-                  </span>
-                </>
-              ) : (
-                <>
-                  <span className="text-sky-600 font-black tracking-tight">HARD</span>{' '}
-                  <span className={variant === 'light' ? 'text-slate-100' : 'text-slate-800'}>
-                    REAL ESTATE
-                  </span>
-                </>
-              )}
+              {brandName}
             </span>
           </div>
           <span
@@ -74,7 +94,7 @@ export function BrandLogo({
               variant === 'light' ? 'text-sky-300/80' : 'text-slate-500'
             }`}
           >
-            {isAr ? 'تسويق ووساطة عقارية فاخرة' : 'Marketing & Luxury Brokerage'}
+            {tagline}
           </span>
         </div>
       )}

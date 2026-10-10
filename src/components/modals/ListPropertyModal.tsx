@@ -12,8 +12,10 @@ import {
   FileText,
 } from 'lucide-react';
 import { Language } from '../../types';
-import { useData } from '../../context/DataContext';
+import { FormAttachmentMeta } from '../../types/firestore-schema';
+import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSubmissionService';
 import { GoogleMapPickerModal } from './GoogleMapPickerModal';
+import { FileUploadZone } from '../forms/FileUploadZone';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 
@@ -34,7 +36,6 @@ export function ListPropertyModal({
   language,
 }: ListPropertyModalProps) {
   const isAr = language === 'ar';
-  const { submitLead } = useData();
 
   // Primary Intent State
   const [userRole, setUserRole] = useState<UserRole>('owner');
@@ -54,6 +55,7 @@ export function ListPropertyModal({
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const [attachments, setAttachments] = useState<FormAttachmentMeta[]>([]);
 
   // Map Modal State
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
@@ -142,43 +144,40 @@ export function ListPropertyModal({
     }
 
     try {
-      const result = await submitLead({
+      const result = await submitCustomerForm({
+        formType: userRole === 'owner' ? 'list_property' : 'property_inquiry',
+        sector: 'realestate',
         name: fullName.trim(),
         email: email.trim(),
         phone: phone.trim(),
-        inquiry_type: inquiryTypeLead,
-        recipient_email: 'info@hardgp.com',
+        language,
         message: messagePayload,
-        source: userRole === 'owner' ? 'Owner Listing Portal' : 'Property Search Request Portal',
-        metadata: {
+        attachments,
+        details: {
           userRole,
           intentLabel,
           propertyType,
           propertyTypeLabel: propTypeLabel,
-          // Explicitly sanitize inputs to prevent stale hidden field data from leaking across intent switches
           mapAddress: userRole === 'owner' && addressMethod === 'map' ? mapAddress : '',
           shortAddress: userRole === 'owner' && addressMethod === 'short' ? shortAddress : '',
           propertyDescription: userRole === 'seeker' ? propertyDescription : '',
           ownerOfferType: userRole === 'owner' ? ownerOfferType : undefined,
           seekerOfferType: userRole === 'seeker' ? seekerOfferType : undefined,
-          targetEmail: 'info@hardgp.com',
-          recipientEmail: 'info@hardgp.com',
         },
       });
 
-      setReferenceId(result.lead.id);
+      setReferenceId(result.trackingCode);
       setSubmittedRole(userRole);
       setSubmittedIntentLabel(intentLabel);
       setSubmittedPropertyTypeLabel(propTypeLabel);
       setSubmitted(true);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to submit property listing/request', err);
-      const fallbackRef = `REQ-${Math.floor(100000 + Math.random() * 900000)}`;
-      setReferenceId(fallbackRef);
-      setSubmittedRole(userRole);
-      setSubmittedIntentLabel(intentLabel);
-      setSubmittedPropertyTypeLabel(propTypeLabel);
-      setSubmitted(true);
+      if (err instanceof FormValidationError) {
+        setContactError(Object.values(err.fieldErrors).join(' '));
+      } else {
+        setContactError(err?.message || (isAr ? 'فشل إرسال الطلب. يرجى إعادة المحاولة.' : 'Failed to submit request. Please retry.'));
+      }
     } finally {
       setSubmitting(false);
     }
@@ -673,6 +672,25 @@ export function ListPropertyModal({
                 </div>
               </div>
             )}
+
+            {/* Private Attachment Upload (Title Deeds, Photos, Building Plans) */}
+            <div className="border-t border-slate-100 pt-4">
+              <FileUploadZone
+                uploadSessionId="list-property-modal"
+                attachments={attachments}
+                onChange={setAttachments}
+                isAr={isAr}
+                label={
+                  userRole === 'owner'
+                    ? isAr
+                      ? 'مستندات العقار والصور (اختياري: الصك، الكروكي، الصور)'
+                      : 'Property Documents & Photos (Optional: Title Deed, Site Plan, Photos)'
+                    : isAr
+                    ? 'المستندات الداعمة (اختياري)'
+                    : 'Supporting Documents (Optional)'
+                }
+              />
+            </div>
 
             {/* ========================================================================= */}
             {/* SHARED SECTION: NAME, PHONE, EMAIL (Preserved across role switching)     */}

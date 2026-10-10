@@ -14,9 +14,9 @@ import { useHVAC } from '../context/HVACContext';
 import { T, pick } from '../translations';
 
 export function HVACHero() {
-  const { language, isAr, services, openQuoteDialog, openBookingModal } = useHVAC();
+  const { language, isAr, services, serviceAreas, heroContent, openQuoteDialog, openBookingModal } = useHVAC();
 
-  const [selectedCity, setSelectedCity] = useState('khobar');
+  const [selectedCity, setSelectedCity] = useState(serviceAreas[0]?.id || 'khobar');
   const [customCity, setCustomCity] = useState('');
   const [selectedService, setSelectedService] = useState('');
 
@@ -115,9 +115,9 @@ export function HVACHero() {
                       onChange={(e) => setSelectedCity(e.target.value)}
                       className="w-full ps-9 pe-8 py-2.5 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 cursor-pointer"
                     >
-                      {T.citiesList.map((city) => (
+                      {serviceAreas.filter((c) => c.active).map((city) => (
                         <option key={city.id} value={city.id}>
-                          {pick(city, language)}
+                          {isAr ? city.cityNameAr : city.cityNameEn} ({city.responseTimeMin} {isAr ? 'دقيقة' : 'min'})
                         </option>
                       ))}
                     </select>

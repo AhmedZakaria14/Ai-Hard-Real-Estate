@@ -1,172 +1,297 @@
 {
   "entities": {
-    "User": {
-      "title": "User Profile",
-      "description": "Admin and editor user credentials and permissions",
+    "AdminProfile": {
+      "title": "Admin User Profile",
+      "description": "Administrator and editor profiles with Role-Based Access Control (RBAC)",
       "type": "object",
       "properties": {
         "uid": { "type": "string" },
         "email": { "type": "string" },
         "displayName": { "type": "string" },
         "role": { "type": "string", "enum": ["superadmin", "admin", "editor"] },
+        "allowedSectors": { "type": "array" },
+        "isActive": { "type": "boolean" },
         "createdAt": { "type": "string" }
       },
       "required": ["uid", "email", "role"]
     },
+    "SiteSettings": {
+      "title": "Global Site Settings",
+      "description": "Site-wide configuration, branding, SEO defaults, and contact details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "schemaVersion": { "type": "string" },
+        "sector": { "type": "string" },
+        "siteName": { "type": "object" },
+        "contactEmail": { "type": "string" },
+        "supportPhone": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "sector", "siteName"]
+    },
     "Property": {
       "title": "Real Estate Property",
-      "description": "Real estate properties for sale or rent",
+      "description": "Real estate listings with localization, specs, and publication status",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
         "title": { "type": "object" },
         "description": { "type": "object" },
         "price": { "type": "number" },
-        "currency": { "type": "string" },
-        "location": { "type": "object" },
-        "type": { "type": "string" },
-        "status": { "type": "string" },
-        "specs": { "type": "object" },
-        "features": { "type": "array" },
-        "images": { "type": "array" },
-        "isPublished": { "type": "boolean" },
-        "draft": { "type": "object" },
+        "propertyType": { "type": "string" },
+        "publicationStatus": { "type": "string", "enum": ["draft", "published", "archived"] },
         "updatedAt": { "type": "string" }
       },
-      "required": ["id", "price", "type", "status"]
+      "required": ["id", "price", "propertyType", "publicationStatus"]
     },
-    "ConstructionProject": {
-      "title": "Construction Project",
-      "description": "Commercial and residential construction developments",
+    "Project": {
+      "title": "Development & Construction Project",
+      "description": "Off-plan, residential, and commercial construction projects",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
         "title": { "type": "object" },
-        "description": { "type": "object" },
         "category": { "type": "string" },
-        "location": { "type": "object" },
-        "status": { "type": "string" },
-        "specs": { "type": "object" },
-        "gallery": { "type": "array" },
-        "isPublished": { "type": "boolean" },
-        "draft": { "type": "object" },
+        "completionPercentage": { "type": "number" },
+        "publicationStatus": { "type": "string" },
         "updatedAt": { "type": "string" }
       },
-      "required": ["id", "category", "status"]
+      "required": ["id", "category", "publicationStatus"]
     },
-    "HVACService": {
-      "title": "HVAC Service",
-      "description": "Heating, ventilation, and air conditioning service package",
+    "TeamMember": {
+      "title": "Team Member Profile",
+      "description": "Executive leadership and staff profiles with sector scope and verification metadata",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
-        "title": { "type": "object" },
-        "description": { "type": "object" },
-        "category": { "type": "string" },
-        "features": { "type": "array" },
-        "pricing": { "type": "object" },
-        "isPublished": { "type": "boolean" },
-        "draft": { "type": "object" },
-        "updatedAt": { "type": "string" }
-      },
-      "required": ["id", "category"]
-    },
-    "SiteContent": {
-      "title": "Site Content Section",
-      "description": "CMS manageable site content section for portal, real estate, construction, and HVAC",
-      "type": "object",
-      "properties": {
-        "sectionId": { "type": "string" },
+        "name": { "type": "object" },
+        "role": { "type": "object" },
         "sector": { "type": "string" },
-        "published": { "type": "object" },
-        "draft": { "type": "object" },
-        "updatedAt": { "type": "string" },
-        "updatedBy": { "type": "string" }
+        "order": { "type": "number" },
+        "status": { "type": "string" }
       },
-      "required": ["sectionId", "sector"]
+      "required": ["id", "name", "role", "sector", "order", "status"]
     },
-    "BlogPost": {
-      "title": "Blog Article",
-      "description": "News and educational articles across real estate, construction, and HVAC",
+    "Testimonial": {
+      "title": "Client Testimonial & Success Story",
+      "description": "Client reviews with sector assignment, rating, deal highlights, and audit evidence",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
-        "slug": { "type": "string" },
-        "title": { "type": "object" },
-        "excerpt": { "type": "object" },
-        "content": { "type": "object" },
-        "category": { "type": "string" },
-        "image": { "type": "string" },
-        "author": { "type": "string" },
-        "isPublished": { "type": "boolean" },
-        "draft": { "type": "object" },
-        "updatedAt": { "type": "string" }
+        "name": { "type": "object" },
+        "quote": { "type": "object" },
+        "rating": { "type": "number" },
+        "sector": { "type": "string" },
+        "status": { "type": "string" }
       },
-      "required": ["id", "slug", "category"]
+      "required": ["id", "name", "quote", "sector", "status"]
+    },
+    "Faq": {
+      "title": "Frequently Asked Question",
+      "description": "Reusable bilingual Q&A items mapped across sector divisions",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "question": { "type": "object" },
+        "answer": { "type": "object" },
+        "sector": { "type": "string" },
+        "order": { "type": "number" },
+        "status": { "type": "string" }
+      },
+      "required": ["id", "question", "answer", "sector", "status"]
+    },
+    "Office": {
+      "title": "Office Location & Branch",
+      "description": "Corporate headquarters and regional office locations",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "object" },
+        "city": { "type": "object" },
+        "sector": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["id", "name", "city", "sector", "status"]
+    },
+    "Certification": {
+      "title": "Official Accreditation & License",
+      "description": "Quality certifications, REGA/MOMRAH licenses, and ISO standards",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "object" },
+        "issuer": { "type": "object" },
+        "sector": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["id", "title", "issuer", "sector", "status"]
+    },
+    "Statistic": {
+      "title": "Key Business Metric & Claim",
+      "description": "Enterprise achievement statistics and verified volume metrics",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "value": { "type": "string" },
+        "label": { "type": "object" },
+        "sector": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["id", "value", "label", "sector", "status"]
+    },
+    "PartnerBrand": {
+      "title": "Partner Brand Alliance",
+      "description": "Strategic partner logos and vendor affiliations",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "object" },
+        "logoUrl": { "type": "string" },
+        "sector": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["id", "name", "logoUrl", "sector", "status"]
     },
     "Lead": {
-      "title": "Customer Lead / Request",
-      "description": "Customer inquiry, booking, or request submission",
+      "title": "Private Operational Lead",
+      "description": "Customer inquiry and quote request submission",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
         "trackingCode": { "type": "string" },
-        "name": { "type": "string" },
+        "fullName": { "type": "string" },
         "email": { "type": "string" },
         "phone": { "type": "string" },
         "sector": { "type": "string" },
-        "type": { "type": "string" },
-        "details": { "type": "object" },
         "status": { "type": "string" },
         "createdAt": { "type": "string" }
       },
-      "required": ["id", "name", "email", "sector"]
+      "required": ["id", "fullName", "email", "sector"]
     },
-    "Subscriber": {
-      "title": "Newsletter Subscriber",
-      "description": "Subscriber email address",
+    "AppointmentRequest": {
+      "title": "Property Viewing & HVAC Appointment Request",
+      "description": "Private appointment requests with requested/confirmed time windows, staff assignment, and audit trail",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
-        "email": { "type": "string" },
-        "source": { "type": "string" },
+        "trackingCode": { "type": "string" },
+        "appointmentType": { "type": "string" },
+        "sector": { "type": "string" },
+        "preferredDate": { "type": "string" },
+        "preferredTimeWindow": { "type": "string" },
+        "localTimezone": { "type": "string" },
+        "isConfirmed": { "type": "boolean" },
+        "customerName": { "type": "string" },
+        "customerEmail": { "type": "string text" },
+        "customerPhone": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "rescheduled", "completed", "cancelled"] },
         "createdAt": { "type": "string" }
       },
-      "required": ["id", "email"]
+      "required": ["id", "trackingCode", "appointmentType", "sector", "preferredDate", "customerName", "customerEmail", "status"]
+    },
+    "FormAttachment": {
+      "title": "Private Form Attachment",
+      "description": "Private property photos, floor plans, and supporting document uploads linked to form submissions",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "submissionId": { "type": "string" },
+        "fileName": { "type": "string" },
+        "fileSizeBytes": { "type": "number" },
+        "mimeType": { "type": "string" },
+        "downloadToken": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending_submission", "attached", "abandoned"] },
+        "uploadedAt": { "type": "string" }
+      },
+      "required": ["id", "fileName", "fileSizeBytes", "mimeType", "downloadToken", "status", "uploadedAt"]
+    },
+    "AuditEvent": {
+      "title": "Security & Audit Log Event",
+      "description": "Operational audit log for CMS operations and admin changes",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "eventType": { "type": "string" },
+        "actorUid": { "type": "string" },
+        "actorEmail": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "eventType", "actorUid"]
     }
   },
   "firestore": {
-    "/users/{userId}": {
-      "schema": { "$ref": "#/entities/User" },
-      "description": "User profile and permissions"
+    "/admin_profiles/{profileId}": {
+      "schema": { "$ref": "#/entities/AdminProfile" },
+      "description": "Admin user profiles and RBAC settings"
+    },
+    "/site_settings/{settingId}": {
+      "schema": { "$ref": "#/entities/SiteSettings" },
+      "description": "Global and sector site configurations"
+    },
+    "/navigation/{navId}": {
+      "description": "Header and footer navigation trees"
+    },
+    "/sectors/{sectorId}": {
+      "description": "Group sectors definitions and metadata"
+    },
+    "/pages/{pageId}": {
+      "description": "Page hierarchy and section references"
+    },
+    "/sections/{sectionId}": {
+      "description": "Modular page section contents"
     },
     "/properties/{propertyId}": {
       "schema": { "$ref": "#/entities/Property" },
-      "description": "Real estate properties collection"
+      "description": "Real estate property listings"
     },
-    "/construction_projects/{projectId}": {
-      "schema": { "$ref": "#/entities/ConstructionProject" },
-      "description": "Construction projects collection"
+    "/projects/{projectId}": {
+      "schema": { "$ref": "#/entities/Project" },
+      "description": "Construction and off-plan projects"
     },
-    "/hvac_services/{serviceId}": {
-      "schema": { "$ref": "#/entities/HVACService" },
-      "description": "HVAC service catalog collection"
+    "/team_members/{memberId}": {
+      "schema": { "$ref": "#/entities/TeamMember" },
+      "description": "Executive and staff team profiles"
     },
-    "/site_content/{sectionId}": {
-      "schema": { "$ref": "#/entities/SiteContent" },
-      "description": "CMS site content sections"
+    "/testimonials/{testimonialId}": {
+      "schema": { "$ref": "#/entities/Testimonial" },
+      "description": "Client reviews and testimonials"
     },
-    "/blog_posts/{postId}": {
-      "schema": { "$ref": "#/entities/BlogPost" },
-      "description": "Blog and insights articles"
+    "/faqs/{faqId}": {
+      "schema": { "$ref": "#/entities/Faq" },
+      "description": "Frequently asked questions"
+    },
+    "/offices/{officeId}": {
+      "schema": { "$ref": "#/entities/Office" },
+      "description": "Office locations and contact info"
+    },
+    "/certifications/{certId}": {
+      "schema": { "$ref": "#/entities/Certification" },
+      "description": "Accreditations and quality licenses"
+    },
+    "/statistics/{statId}": {
+      "schema": { "$ref": "#/entities/Statistic" },
+      "description": "Key business statistics and claims"
+    },
+    "/partners/{partnerId}": {
+      "schema": { "$ref": "#/entities/PartnerBrand" },
+      "description": "Strategic partner brands and logos"
     },
     "/leads/{leadId}": {
       "schema": { "$ref": "#/entities/Lead" },
-      "description": "Customer inquiries and viewing requests"
+      "description": "Customer leads and inquiries"
     },
-    "/subscribers/{subscriberId}": {
-      "schema": { "$ref": "#/entities/Subscriber" },
-      "description": "Newsletter subscribers"
+    "/appointment_requests/{appointmentId}": {
+      "schema": { "$ref": "#/entities/AppointmentRequest" },
+      "description": "Property viewing and HVAC appointment requests"
+    },
+    "/form_attachments/{attachmentId}": {
+      "schema": { "$ref": "#/entities/FormAttachment" },
+      "description": "Private uploads for form submissions (property photos, plans, documents)"
+    },
+    "/audit_events/{eventId}": {
+      "schema": { "$ref": "#/entities/AuditEvent" },
+      "description": "Security audit logs"
     }
   }
 }

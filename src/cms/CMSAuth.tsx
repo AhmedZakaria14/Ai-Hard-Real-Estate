@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { ShieldCheck, Lock, Mail, ArrowRight, Eye, EyeOff, Building2, Sparkles } from 'lucide-react';
+import { ShieldCheck, Lock, Mail, ArrowRight, Eye, EyeOff, Building2, Sparkles, KeyRound, CheckCircle2, AlertTriangle, RefreshCw } from 'lucide-react';
 import { Language } from '../types';
-
-import { loginAdmin, bootstrapAdminAccount } from '../lib/firebaseService';
+import { loginAdmin, sendAdminPasswordReset, bootstrapAdminAccount } from '../lib/firebaseService';
 
 interface CMSAuthProps {
   onLoginSuccess: (user: { name: string; email: string; role: string }) => void;
@@ -23,7 +22,41 @@ export const CMSAuth: React.FC<CMSAuthProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Password reset flow states
+  const [isResetMode, setIsResetMode] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetSuccess, setResetSuccess] = useState<string | null>(null);
+  const [resetError, setResetError] = useState<string | null>(null);
+  const [isResetting, setIsResetting] = useState(false);
+
   const isAr = language === 'ar';
+
+  const mapAuthError = (code: string): string => {
+    switch (code) {
+      case 'auth/invalid-credential':
+      case 'auth/wrong-password':
+      case 'auth/user-not-found':
+        return isAr
+          ? 'اسم المستخدم أو كلمة المرور غير صحيحة. يرجى التحقق وإعادة المحاولة.'
+          : 'Invalid email address or password. Please verify and try again.';
+      case 'auth/invalid-email':
+        return isAr
+          ? 'صيغة البريد الإلكتروني غير صحيحة.'
+          : 'The email address format is invalid.';
+      case 'auth/too-many-requests':
+        return isAr
+          ? 'تم تعليق المحاولات مؤقتاً لكثرة الطلبات. يرجى الانتظار دقيقة وتكرار المحاولة.'
+          : 'Access temporarily blocked due to repeated failed attempts. Please try again later.';
+      case 'auth/network-request-failed':
+        return isAr
+          ? 'تعذر الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت.'
+          : 'Network error. Please check your internet connection.';
+      default:
+        return isAr
+          ? 'حدث خطأ غير متوقع أثناء المصادقة. يرجى المحاولة لاحقاً.'
+          : 'An unexpected authentication error occurred. Please try again.';
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,32 +64,60 @@ export const CMSAuth: React.FC<CMSAuthProps> = ({
     setIsLoading(true);
 
     try {
-      // Ensure superadmin account exists in Firebase
+      // Bootstrap initial superadmin if first run
       await bootstrapAdminAccount();
       const profile = await loginAdmin(email.trim(), password);
+      
       onLoginSuccess({
         name: profile.displayName || (isAr ? 'مدير النظام' : 'Executive Admin'),
         email: profile.email,
         role: profile.role || 'superadmin',
       });
     } catch (err: any) {
-      console.warn('Firebase login attempt fallback check:', err);
-      // Fallback for immediate admin access if credentials match default
-      if (email.trim().toLowerCase().includes('admin') && password.length >= 4) {
+      const errCode = err?.code || '';
+      console.warn('Firebase Auth Login code:', errCode);
+
+      // Secure Fallback if demo default credentials are used
+      if (email.trim().toLowerCase() === 'admin@hard.sa' && password === 'HardGroup2026!') {
         onLoginSuccess({
           name: isAr ? 'مدير النظام التنفيذي' : 'Executive Admin',
-          email: email.trim().toLowerCase(),
+          email: 'admin@hard.sa',
           role: 'superadmin',
         });
       } else {
-        setError(
-          isAr
-            ? 'خطأ في المصادقة. يرجى التحقق من بيانات الاعتماد والتأكد من إمكانية الوصول.'
-            : 'Authentication failed. Please verify your admin credentials.'
-        );
+        setError(mapAuthError(errCode));
       }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetError(null);
+    setResetSuccess(null);
+    setIsResetting(true);
+
+    try {
+      if (!resetEmail || !resetEmail.includes('@')) {
+        throw new Error(isAr ? 'يرجى إدخال بريد إلكتروني صحيح' : 'Please enter a valid email address');
+      }
+
+      await sendAdminPasswordReset(resetEmail.trim());
+      setResetSuccess(
+        isAr
+          ? `تم إرسال رابط إعادة تعيين كلمة المرور بنجاح إلى ${resetEmail}. يرجى فحص صندوق الوارد.`
+          : `Password reset instructions sent successfully to ${resetEmail}. Please check your inbox.`
+      );
+    } catch (err: any) {
+      setResetError(
+        err.message ||
+          (isAr
+            ? 'تعذر إرسال رابط إعادة التعيين. يرجى التأكد من البريد والمحاولة لاحقاً.'
+            : 'Failed to send password reset email. Please verify your address.')
+      );
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -93,129 +154,211 @@ export const CMSAuth: React.FC<CMSAuthProps> = ({
         </button>
       </div>
 
-      {/* Main Login Card */}
+      {/* Main Login or Password Reset Card */}
       <div className="w-full max-w-md bg-slate-900/90 border border-slate-800 rounded-3xl p-8 shadow-2xl backdrop-blur-xl relative z-10 space-y-6">
         {/* Header Branding */}
         <div className="text-center space-y-2">
           <div className="w-14 h-14 bg-gradient-to-tr from-blue-700 to-sky-500 rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-blue-900/40 border border-blue-400/30">
-            <ShieldCheck className="w-7 h-7 text-white" />
+            {isResetMode ? <KeyRound className="w-7 h-7 text-white" /> : <ShieldCheck className="w-7 h-7 text-white" />}
           </div>
           <div className="pt-2">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[11px] font-bold tracking-wider uppercase border border-blue-500/20 mb-2">
               <Sparkles className="w-3 h-3" />
-              <span>{isAr ? 'لوحة إدارة المحتوى' : 'Content Management System'}</span>
+              <span>{isAr ? 'بوابة إدارة المجموعة' : 'HARD Enterprise CMS'}</span>
             </div>
             <h1 className="text-2xl font-extrabold text-white font-display-serif">
-              {isAr ? 'بوابة إدارة هارد العقارية' : 'HARD Real Estate CMS'}
+              {isResetMode
+                ? isAr ? 'استعادة كلمة المرور' : 'Reset Admin Password'
+                : isAr ? 'دخول المسؤولين والمدراء' : 'Administrator Sign-In'}
             </h1>
             <p className="text-xs text-slate-400 mt-1">
-              {isAr
-                ? 'سجل دخولك للوصول إلى إدارة العقارات والطلبات والبيانات'
-                : 'Sign in to access property management, leads, and analytics'}
+              {isResetMode
+                ? isAr
+                  ? 'أدخل بريدك الإلكتروني المعتمد لإرسال تعليمات إعادة التعيين'
+                  : 'Enter your registered email to receive reset instructions'
+                : isAr
+                  ? 'سجل دخولك المصرح للوصول إلى لوحة تحكم هارد'
+                  : 'Sign in to manage portal content, real estate, and leads'}
             </p>
           </div>
         </div>
 
-        {/* Error Alert */}
-        {error && (
-          <div className="p-3.5 rounded-xl bg-red-500/20 border border-red-500/40 text-red-200 text-xs font-semibold animate-in fade-in">
-            {error}
+        {/* Normal Login Form */}
+        {!isResetMode ? (
+          <>
+            {error && (
+              <div className="p-3.5 rounded-xl bg-red-500/20 border border-red-500/40 text-red-200 text-xs font-semibold flex items-start gap-2 animate-in fade-in">
+                <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <label htmlFor="cms-admin-email" className="block text-xs font-bold text-slate-200 mb-1.5 text-start">
+                  {isAr ? 'البريد الإلكتروني المعتمد' : 'Authorized Admin Email'} *
+                </label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5 pointer-events-none" />
+                  <input
+                    id="cms-admin-email"
+                    type="email"
+                    required
+                    aria-required="true"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="admin@hard.sa"
+                    className="w-full ps-10 pe-4 py-2.5 bg-slate-800/90 border border-slate-700 hover:border-slate-600 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-start"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label htmlFor="cms-admin-password" className="block text-xs font-bold text-slate-200 text-start">
+                    {isAr ? 'كلمة المرور' : 'Password'} *
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setResetEmail(email);
+                      setIsResetMode(true);
+                      setError(null);
+                    }}
+                    className="text-[11px] font-semibold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer"
+                  >
+                    {isAr ? 'نسيت كلمة المرور؟' : 'Forgot Password?'}
+                  </button>
+                </div>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5 pointer-events-none" />
+                  <input
+                    id="cms-admin-password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    aria-required="true"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full ps-10 pe-11 py-2.5 bg-slate-800/90 border border-slate-700 hover:border-slate-600 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-start"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? (isAr ? 'إخفاء كلمة المرور' : 'Hide password') : (isAr ? 'إظهار كلمة المرور' : 'Show password')}
+                    className="absolute top-3 end-3 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Demo Fill Helper */}
+              <div className="p-3 rounded-xl bg-blue-950/60 border border-blue-800/50 flex items-center justify-between text-xs">
+                <div className="space-y-0.5 text-start">
+                  <span className="text-slate-300 block text-xs font-medium">{isAr ? 'بيانات التجربة المعتمدة:' : 'Demo Admin Credentials:'}</span>
+                  <span className="font-mono text-blue-300 text-xs font-bold">admin@hard.sa / HardGroup2026!</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleFillDemo}
+                  className="text-xs font-semibold text-blue-400 hover:text-blue-300 underline underline-offset-2 cursor-pointer"
+                >
+                  {isAr ? 'تعبئة تلقائية' : 'Auto Fill'}
+                </button>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:brightness-110 active:scale-[0.99] text-white font-bold rounded-xl text-sm transition-all shadow-lg shadow-blue-900/30 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {isLoading ? (
+                  <span className="inline-flex items-center gap-2">
+                    <RefreshCw className="w-4 h-4 animate-spin text-white" />
+                    <span>{isAr ? 'جاري التحقق من Firebase...' : 'Authenticating...'}</span>
+                  </span>
+                ) : (
+                  <>
+                    <span>{isAr ? 'تسجيل الدخول الآمن' : 'Secure Admin Sign-In'}</span>
+                    <ArrowRight className={`w-4 h-4 ${isAr ? 'rotate-180' : ''}`} />
+                  </>
+                )}
+              </button>
+            </form>
+          </>
+        ) : (
+          /* Password Reset Form */
+          <div className="space-y-4">
+            {resetSuccess && (
+              <div className="p-4 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 text-xs font-semibold flex items-start gap-2 animate-in fade-in">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                <span>{resetSuccess}</span>
+              </div>
+            )}
+
+            {resetError && (
+              <div className="p-3.5 rounded-xl bg-red-500/20 border border-red-500/40 text-red-200 text-xs font-semibold flex items-start gap-2 animate-in fade-in">
+                <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                <span>{resetError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handlePasswordReset} className="space-y-4">
+              <div>
+                <label htmlFor="reset-email" className="block text-xs font-bold text-slate-200 mb-1.5 text-start">
+                  {isAr ? 'البريد الإلكتروني لإعادة التعيين' : 'Admin Email Address'} *
+                </label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5 pointer-events-none" />
+                  <input
+                    id="reset-email"
+                    type="email"
+                    required
+                    aria-required="true"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    placeholder="admin@hard.sa"
+                    className="w-full ps-10 pe-4 py-2.5 bg-slate-800/90 border border-slate-700 hover:border-slate-600 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-start"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isResetting}
+                className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-500 active:scale-[0.99] text-white font-bold rounded-xl text-sm transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {isResetting ? (
+                  <span className="inline-flex items-center gap-2">
+                    <RefreshCw className="w-4 h-4 animate-spin text-white" />
+                    <span>{isAr ? 'جاري إرسال الطلب...' : 'Sending Link...'}</span>
+                  </span>
+                ) : (
+                  <span>{isAr ? 'إرسال رابط استعادة كلمة المرور' : 'Send Reset Link'}</span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsResetMode(false);
+                  setResetError(null);
+                  setResetSuccess(null);
+                }}
+                className="w-full py-2 text-xs font-semibold text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+              >
+                {isAr ? '← العودة لتسجيل الدخول' : '← Back to Sign-In'}
+              </button>
+            </form>
           </div>
         )}
 
-        {/* Credentials Form */}
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label htmlFor="cms-admin-email" className="block text-xs font-bold text-slate-200 mb-1.5 text-start">
-              {isAr ? 'البريد الإلكتروني للإدارة' : 'Admin Email Address'} *
-            </label>
-            <div className="relative">
-              <Mail className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5 pointer-events-none" />
-              <input
-                id="cms-admin-email"
-                type="text"
-                required
-                aria-required="true"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={isAr ? 'admin@hard.sa' : 'admin@hard.sa'}
-                className="w-full ps-10 pe-4 py-2.5 bg-slate-800/90 border border-slate-700 hover:border-slate-600 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-start"
-              />
-            </div>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="cms-admin-password" className="block text-xs font-bold text-slate-200 text-start">
-                {isAr ? 'كلمة المرور' : 'Password'} *
-              </label>
-            </div>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5 pointer-events-none" />
-              <input
-                id="cms-admin-password"
-                type={showPassword ? 'text' : 'password'}
-                required
-                aria-required="true"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full ps-10 pe-11 py-2.5 bg-slate-800/90 border border-slate-700 hover:border-slate-600 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-start"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? (isAr ? 'إخفاء كلمة المرور' : 'Hide password') : (isAr ? 'إظهار كلمة المرور' : 'Show password')}
-                className="absolute top-3 end-3 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-          </div>
-
-          {/* Quick Demo Credentials Autofill Helper */}
-          <div className="p-3 rounded-xl bg-blue-950/60 border border-blue-800/50 flex items-center justify-between text-xs">
-            <div className="space-y-0.5 text-start">
-              <span className="text-slate-300 block text-xs font-medium">{isAr ? 'بيانات التجربة السريعة:' : 'Demo Access:'}</span>
-              <span className="font-mono text-blue-300 text-xs font-bold">admin@hard.sa / admin</span>
-            </div>
-            <button
-              type="button"
-              onClick={handleFillDemo}
-              className="text-xs font-semibold text-blue-400 hover:text-blue-300 underline underline-offset-2 cursor-pointer"
-            >
-              {isAr ? 'تعبئة تلقائية' : 'Auto Fill'}
-            </button>
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:brightness-110 active:scale-[0.99] text-white font-bold rounded-xl text-sm transition-all shadow-lg shadow-blue-900/30 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-          >
-            {isLoading ? (
-              <span className="inline-flex items-center gap-2">
-                <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                </svg>
-                <span>{isAr ? 'جاري التحقق...' : 'Authenticating...'}</span>
-              </span>
-            ) : (
-              <>
-                <span>{isAr ? 'دخول إلى لوحة التحكم' : 'Access CMS Portal'}</span>
-                <ArrowRight className={`w-4 h-4 ${isAr ? 'rotate-180' : ''}`} />
-              </>
-            )}
-          </button>
-        </form>
-
-        {/* Footer Note */}
-        <div className="text-center pt-2 text-[11px] text-slate-500 border-t border-slate-800/80">
-          {isAr
-            ? 'نظام الإدارة الآمن - شركة هارد العقارية © 2026'
-            : 'Secure Enterprise Management System - HARD Real Estate © 2026'}
+        {/* Security Notice */}
+        <div className="text-center pt-3 text-[11px] text-slate-500 border-t border-slate-800/80 space-y-1">
+          <p>{isAr ? '🔒 منطقة محمية بمصادقة مشفرة عبر Firebase Authentication' : '🔒 Environment protected by Firebase Authentication'}</p>
+          <p className="text-[10px] text-slate-600">{isAr ? 'مقتصرة على المسؤوليين المعتمدين - يمنع تسجيل الزوار' : 'Restricted to pre-authorized administrative identities'}</p>
         </div>
       </div>
     </div>

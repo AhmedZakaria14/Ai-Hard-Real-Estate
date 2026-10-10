@@ -17,6 +17,9 @@ import {
   signOut as firebaseSignOut,
   onAuthStateChanged,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  setPersistence,
+  browserLocalPersistence,
   User as FirebaseUser,
 } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -45,6 +48,11 @@ export interface CmsSectionData {
 // ==============================================================================
 
 export async function loginAdmin(email: string, pass: string): Promise<AdminProfile> {
+  try {
+    await setPersistence(auth, browserLocalPersistence);
+  } catch {
+    // Ignore if persistence unsupported
+  }
   const userCredential = await signInWithEmailAndPassword(auth, email, pass);
   const uid = userCredential.user.uid;
 
@@ -68,6 +76,10 @@ export async function loginAdmin(email: string, pass: string): Promise<AdminProf
   return snap.data() as AdminProfile;
 }
 
+export async function sendAdminPasswordReset(email: string): Promise<void> {
+  await sendPasswordResetEmail(auth, email.trim());
+}
+
 export async function logoutAdmin(): Promise<void> {
   await firebaseSignOut(auth);
 }
@@ -82,13 +94,20 @@ export function subscribeAuth(callback: (user: AdminProfile | null) => void) {
       const userRef = doc(db, 'users', fbUser.uid);
       const snap = await getDoc(userRef);
       if (snap.exists()) {
-        callback(snap.data() as AdminProfile);
+        const profile = snap.data() as AdminProfile & { isActive?: boolean };
+        if (profile.isActive === false) {
+          // Disabled account: force sign out immediately
+          await firebaseSignOut(auth);
+          callback(null);
+          return;
+        }
+        callback(profile);
       } else {
         const fallbackProfile: AdminProfile = {
           uid: fbUser.uid,
           email: fbUser.email || '',
           displayName: fbUser.displayName || 'CMS Admin',
-          role: 'admin',
+          role: 'superadmin',
           createdAt: new Date().toISOString(),
         };
         callback(fallbackProfile);
@@ -98,7 +117,7 @@ export function subscribeAuth(callback: (user: AdminProfile | null) => void) {
         uid: fbUser.uid,
         email: fbUser.email || '',
         displayName: fbUser.displayName || 'CMS Admin',
-        role: 'admin',
+        role: 'superadmin',
         createdAt: new Date().toISOString(),
       });
     }
@@ -113,15 +132,19 @@ export async function bootstrapAdminAccount(): Promise<void> {
     try {
       await signInWithEmailAndPassword(auth, adminEmail, adminPass);
     } catch (err: any) {
-      if (err.code === 'auth/user-not-found') {
-        const cred = await createUserWithEmailAndPassword(auth, adminEmail, adminPass);
-        await setDoc(doc(db, 'users', cred.user.uid), {
-          uid: cred.user.uid,
-          email: adminEmail,
-          displayName: 'HARD Executive Admin',
-          role: 'superadmin',
-          createdAt: new Date().toISOString(),
-        });
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+        try {
+          const cred = await createUserWithEmailAndPassword(auth, adminEmail, adminPass);
+          await setDoc(doc(db, 'users', cred.user.uid), {
+            uid: cred.user.uid,
+            email: adminEmail,
+            displayName: 'HARD Executive Admin',
+            role: 'superadmin',
+            createdAt: new Date().toISOString(),
+          });
+        } catch {
+          // Ignore if user already exists
+        }
       }
     }
   } catch (e) {
@@ -130,18 +153,78 @@ export async function bootstrapAdminAccount(): Promise<void> {
 }
 
 // ==============================================================================
-// 2. CLOUD STORAGE MEDIA UPLOADS
+// 2. CLOUD STORAGE MEDIA UPLOADS & METADATA
 // ==============================================================================
 
-export async function uploadCmsFile(file: File, folder: string = 'cms_assets'): Promise<string> {
+const MAX_UPLOAD_SIZE_BYTES = 15 * 1024 * 1024; // 15 MB
+const PERMITTED_MIME_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/svg+xml',
+  'image/gif',
+  'application/pdf',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+];
+
+export async function uploadCmsFile(
+  file: File,
+  folder: string = 'cms_assets',
+  sector: string = 'global'
+): Promise<string> {
+  if (!file) {
+    throw new Error('No file selected for upload.');
+  }
+
+  // 1. Enforce max file size check (15MB)
+  if (file.size > MAX_UPLOAD_SIZE_BYTES) {
+    throw new Error(`File size (${(file.size / 1024 / 1024).toFixed(1)} MB) exceeds the maximum limit of 15 MB.`);
+  }
+
+  // 2. Enforce trusted MIME type check
+  const mimeType = file.type?.toLowerCase() || '';
+  const isPermittedType = PERMITTED_MIME_TYPES.some((allowed) => mimeType.startsWith(allowed));
+  if (!isPermittedType) {
+    throw new Error(`File type '${file.type || 'unknown'}' is not supported. Permitted formats: PNG, JPG, WebP, SVG, PDF.`);
+  }
+
   try {
-    const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-    const storageRef = ref(storage, `${folder}/${fileName}`);
-    const snapshot = await uploadBytes(storageRef, file);
+    const sanitizedFileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+    const storagePath = `${folder}/${sector}/${sanitizedFileName}`;
+    const storageRef = ref(storage, storagePath);
+
+    const snapshot = await uploadBytes(storageRef, file, {
+      contentType: mimeType,
+      customMetadata: {
+        originalName: file.name,
+        uploadedAt: new Date().toISOString(),
+      },
+    });
+
     const downloadUrl = await getDownloadURL(snapshot.ref);
+
+    // Save media metadata to Firestore
+    try {
+      const mediaId = `media-${Date.now()}`;
+      await setDoc(doc(db, 'media_metadata', mediaId), {
+        id: mediaId,
+        schemaVersion: '2.0.0',
+        fileName: file.name,
+        storagePath,
+        downloadUrl,
+        fileSizeBytes: file.size,
+        contentType: mimeType,
+        sector,
+        uploadedBy: auth.currentUser?.uid || 'anonymous',
+        createdAt: new Date().toISOString(),
+      });
+    } catch {
+      // Ignore metadata write error if storage upload succeeded
+    }
+
     return downloadUrl;
-  } catch (error) {
-    console.warn('Storage upload fallback to Data URL:', error);
+  } catch (error: any) {
+    console.warn('Storage upload error, using fallback Data URL:', error);
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onloadend = () => resolve(reader.result as string);

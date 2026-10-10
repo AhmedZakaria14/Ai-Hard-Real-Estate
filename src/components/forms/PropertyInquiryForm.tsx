@@ -13,10 +13,12 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { Language, Property } from '../../types';
+import { FormAttachmentMeta } from '../../types/firestore-schema';
 import { translations } from '../../lib/translations';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { useData } from '../../context/DataContext';
+import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSubmissionService';
+import { FileUploadZone } from './FileUploadZone';
 
 interface PropertyInquiryFormProps {
   property: Property;
@@ -31,7 +33,6 @@ export function PropertyInquiryForm({
 }: PropertyInquiryFormProps) {
   const t = translations[language];
   const isAr = language === 'ar';
-  const { submitLead } = useData();
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -42,6 +43,7 @@ export function PropertyInquiryForm({
       ? `مرحباً، أود الاستفسار عن العقار "${property.title.ar}" (المعرف: ${property.id}). يرجى تزويدي بمزيد من المعلومات حول التوفر وخيارات الدفع.`
       : `Hello, I am interested in inquiring about "${property.title.en}" (ID: ${property.id}). Please send me full floorplans and available viewing windows.`
   );
+  const [attachments, setAttachments] = useState<FormAttachmentMeta[]>([]);
 
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -111,22 +113,21 @@ export function PropertyInquiryForm({
     setIsSubmitting(true);
     setSubmitError('');
     try {
-      const result = await submitLead({
+      const result = await submitCustomerForm({
+        formType: 'property_inquiry',
+        sector: 'realestate',
         name: fullName,
         email: email.trim(),
         phone: phone.trim(),
-        property_id: property.id,
-        property_title: property.title.en,
-        inquiry_type: 'property_inquiry',
-        recipient_email: 'info@hardgp.com',
+        entityId: property.id,
+        entityTitle: property.title[language] || property.title.en,
+        language,
         message: `Topic: ${inquiryTopic}\n\n${finalMessage}`,
-        source: 'Property Detail Page Inquiry Form',
-        metadata: {
+        attachments,
+        details: {
           inquiryTopic,
           propertyPriceSAR: property.price.sar,
-          language,
-          targetEmail: 'info@hardgp.com',
-          recipientEmail: 'info@hardgp.com',
+          propertyCity: property.location?.city?.[language] || 'Saudi Arabia',
         },
       });
 
@@ -134,17 +135,20 @@ export function PropertyInquiryForm({
         hour: '2-digit',
         minute: '2-digit',
       });
-      setReferenceNumber(result.lead.id);
-      setCrmRefNumber(result.crmResult.crmReferenceId);
+      setReferenceNumber(result.trackingCode);
+      setCrmRefNumber(`CRM-${result.leadId.slice(-6).toUpperCase()}`);
       setSubmittedTime(now);
       setIsSuccess(true);
       if (onSuccess) onSuccess();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Lead submission failed', err);
+      if (err instanceof FormValidationError) {
+        setErrors(err.fieldErrors);
+      }
       setSubmitError(
-        isAr
+        err?.message || (isAr
           ? 'تعذر إرسال الطلب حالياً. تم حفظ بياناتك المدخلة، يرجى الضغط على إعادة المحاولة.'
-          : 'Failed to submit inquiry. Your entered information is preserved. Please click retry.'
+          : 'Failed to submit inquiry. Your entered information is preserved. Please click retry.')
       );
     } finally {
       setIsSubmitting(false);
@@ -421,6 +425,14 @@ export function PropertyInquiryForm({
               </p>
             )}
           </div>
+
+          {/* File Upload Zone for Property Photos / Documents */}
+          <FileUploadZone
+            uploadSessionId={`prop-inq-${property.id}`}
+            attachments={attachments}
+            onChange={setAttachments}
+            language={language}
+          />
 
           {/* Trust Guarantee Note */}
           <div className="flex items-center gap-2 text-[11px] text-slate-500 pt-1">

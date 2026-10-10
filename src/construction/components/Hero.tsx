@@ -20,10 +20,16 @@ import { constructionTranslations } from '../utils/translations';
 import { COMPANY_CREDENTIALS } from '../data/seedData';
 
 export function Hero() {
-  const { language, openCostEstimator, openQuoteModal } = useConstruction();
+  const { language, openCostEstimator, openQuoteModal, heroContent } = useConstruction();
   const t = constructionTranslations[language];
   const isAr = language === 'ar';
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
+
+  const badgeText = isAr ? heroContent.badgeAr : heroContent.badgeEn;
+  const headlineText = isAr ? heroContent.headlineAr : heroContent.headlineEn;
+  const subtitleText = isAr ? heroContent.subtitleAr : heroContent.subtitleEn;
+  const ctaPrimaryText = isAr ? heroContent.ctaPrimaryAr : heroContent.ctaPrimaryEn;
+  const ctaSecondaryText = isAr ? heroContent.ctaSecondaryAr : heroContent.ctaSecondaryEn;
 
   const handleScrollTo = (id: string) => {
     const el = document.querySelector(id);
@@ -48,36 +54,17 @@ export function Hero() {
             {/* Pill Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#e8f4fc] border border-[#cbe4f7] text-[#009ee2] text-xs font-bold shadow-2xs">
               <Sparkles className="w-3.5 h-3.5 text-[#009ee2]" />
-              <span>
-                {isAr
-                  ? 'شركة هارد للمقاولات العامة والتطوير الإنشائي'
-                  : 'HARD General Contracting & Construction Development'}
-              </span>
+              <span>{badgeText}</span>
             </div>
 
             {/* Main Display Headline */}
             <h1 className="text-3xl sm:text-5xl lg:text-[52px] font-black font-display-serif text-[#0f243e] tracking-tight leading-[1.2]">
-              {isAr ? (
-                <>
-                  نبني صروح المستقبل <span className="text-[#009ee2]">بأعلى</span>
-                  <br />
-                  <span className="text-[#009ee2]">معايير الهندسة والإتقان</span>
-                </>
-              ) : (
-                <>
-                  Building the Future with{' '}
-                  <span className="text-[#009ee2]">Supreme</span>
-                  <br />
-                  <span className="text-[#009ee2]">Engineering Standards & Mastery</span>
-                </>
-              )}
+              {headlineText}
             </h1>
 
             {/* Subtitle */}
             <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl font-medium">
-              {isAr
-                ? 'المقاولات العامة والإنشاءات الكبرى والتشطيبات الفاخرة وإدارة المشاريع المتكاملة للمشاريع السكنية والتجارية في المملكة العربية السعودية.'
-                : 'General contracting, landmark construction, ultra-luxury fit-out, and turnkey project governance across the Kingdom of Saudi Arabia.'}
+              {subtitleText}
             </p>
 
             {/* Interactive CTAs */}
@@ -88,7 +75,7 @@ export function Hero() {
                 onClick={() => handleScrollTo('#projects')}
                 className="px-6 py-3.5 rounded-xl bg-[#009ee2] hover:bg-[#008bc7] text-white text-xs sm:text-sm font-bold flex items-center gap-2 transition-all shadow-md shadow-[#009ee2]/25 hover:scale-[1.02] cursor-pointer"
               >
-                <span>{isAr ? 'استعراض المشاريع الإنشائية' : 'Explore Construction Projects'}</span>
+                <span>{ctaPrimaryText}</span>
                 <ArrowIcon className="w-4 h-4" />
               </button>
 
@@ -99,7 +86,7 @@ export function Hero() {
                 className="px-5 py-3.5 rounded-xl bg-white hover:bg-sky-50/80 border border-sky-200 text-[#009ee2] text-xs sm:text-sm font-bold flex items-center gap-2 transition-all shadow-2xs hover:scale-[1.02] cursor-pointer"
               >
                 <Calculator className="w-4 h-4" />
-                <span>{isAr ? 'حاسبة التكلفة التقديرية' : 'Cost Estimator Calculator'}</span>
+                <span>{ctaSecondaryText}</span>
               </button>
 
               {/* Services Link */}

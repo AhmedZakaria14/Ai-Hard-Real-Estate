@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { Upload, Link2, X, Image as ImageIcon, Check, Trash2, Plus, Sparkles } from 'lucide-react';
+import { Upload, Link2, X, Image as ImageIcon, Check, Trash2, Plus, Sparkles, FolderOpen } from 'lucide-react';
 import { Language } from '../../types';
 import { uploadCmsFile } from '../../lib/firebaseService';
+import { CMSMediaLibrary } from './CMSMediaLibrary';
 
 interface SingleImageUploadProps {
   value: string;
@@ -32,6 +33,7 @@ export const CMSImageUpload: React.FC<SingleImageUploadProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isMediaLibraryOpen, setIsMediaLibraryOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,8 +137,8 @@ export const CMSImageUpload: React.FC<SingleImageUploadProps> = ({
         </div>
       )}
 
-      {/* Tabs for Upload vs URL */}
-      <div className="flex items-center gap-1.5 p-1 bg-slate-100/80 rounded-xl w-fit border border-slate-200/80">
+      {/* Tabs for Upload vs URL vs Media Library */}
+      <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-100/80 rounded-xl w-fit border border-slate-200/80">
         <button
           type="button"
           onClick={() => setActiveTab('upload')}
@@ -161,7 +163,32 @@ export const CMSImageUpload: React.FC<SingleImageUploadProps> = ({
           <Link2 className="w-3.5 h-3.5" />
           <span>{isAr ? 'رابط ويب (URL)' : 'Web URL'}</span>
         </button>
+        <button
+          type="button"
+          onClick={() => setIsMediaLibraryOpen(true)}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer bg-sky-50 text-sky-800 hover:bg-sky-100 border border-sky-200"
+        >
+          <FolderOpen className="w-3.5 h-3.5 text-sky-600" />
+          <span>{isAr ? 'مكتبة الوسائط' : 'Media Library'}</span>
+        </button>
       </div>
+
+      {/* Media Library Picker Modal */}
+      {isMediaLibraryOpen && (
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
+          <div className="bg-white rounded-3xl max-w-5xl w-full p-6 space-y-4 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
+            <CMSMediaLibrary
+              language={language}
+              isPickerMode
+              onClosePicker={() => setIsMediaLibraryOpen(false)}
+              onSelectAsset={(url) => {
+                onChange(url);
+                setIsMediaLibraryOpen(false);
+              }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Tab 1: Upload from Computer */}
       {activeTab === 'upload' && (

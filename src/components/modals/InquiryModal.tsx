@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Language } from '../../types';
+import { FormAttachmentMeta } from '../../types/firestore-schema';
 import { translations } from '../../lib/translations';
 import { CheckCircle2, MessageSquare, Sparkles } from 'lucide-react';
-import { useData } from '../../context/DataContext';
+import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSubmissionService';
+import { FileUploadZone } from '../forms/FileUploadZone';
 
 interface InquiryModalProps {
   isOpen: boolean;
@@ -20,7 +22,6 @@ export function InquiryModal({
   initialSubject = '',
 }: InquiryModalProps) {
   const t = translations[language];
-  const { submitLead } = useData();
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -28,6 +29,7 @@ export function InquiryModal({
   const [category, setCategory] = useState('buying');
   const [subject, setSubject] = useState(initialSubject);
   const [message, setMessage] = useState('');
+  const [attachments, setAttachments] = useState<FormAttachmentMeta[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [leadRef, setLeadRef] = useState('');
   const [crmRef, setCrmRef] = useState('');
@@ -68,27 +70,30 @@ export function InquiryModal({
 
     setIsLoading(true);
     try {
-      const result = await submitLead({
+      const result = await submitCustomerForm({
+        formType: 'general_contact',
+        sector: 'realestate',
         name: fullName.trim(),
         email: email.trim(),
         phone: phone.trim(),
-        inquiry_type: 'general_contact',
-        recipient_email: 'info@hardgp.com',
+        language,
         message: `Category: ${category}\nSubject: ${derivedSubject}\n\n${finalMessage}`,
-        source: 'General Advisory Inquiry Modal',
-        metadata: {
+        attachments,
+        details: {
           category,
           subject: derivedSubject,
-          language,
-          targetEmail: 'info@hardgp.com',
-          recipientEmail: 'info@hardgp.com',
         },
       });
-      setLeadRef(result.lead.id);
-      setCrmRef(result.crmResult.crmReferenceId);
+      setLeadRef(result.trackingCode);
+      setCrmRef(`CRM-${result.leadId.slice(-6).toUpperCase()}`);
       setSubmitted(true);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to submit advisory inquiry', err);
+      if (err instanceof FormValidationError) {
+        setContactError(Object.values(err.fieldErrors).join(' '));
+      } else {
+        setContactError(err?.message || (language === 'en' ? 'Failed to submit inquiry. Your input is preserved.' : 'فشل إرسال الطلب. تم الاحتفاظ ببياناتك.'));
+      }
     } finally {
       setIsLoading(false);
     }
@@ -223,6 +228,13 @@ export function InquiryModal({
               className="w-full px-3 py-2 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all resize-none"
             />
           </div>
+
+          <FileUploadZone
+            uploadSessionId="inquiry-modal"
+            attachments={attachments}
+            onChange={setAttachments}
+            isAr={language === 'ar'}
+          />
 
           <div className="pt-2">
             <Button type="submit" isLoading={isLoading} className="w-full">

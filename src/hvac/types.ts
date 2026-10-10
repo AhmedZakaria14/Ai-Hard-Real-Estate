@@ -19,6 +19,9 @@ export interface HVACLead {
   isUrgent?: boolean;
   areaSqM?: number;
   estimatedSavingsSAR?: number;
+  calculatorVersion?: number;
+  inputSnapshot?: Record<string, any>;
+  calculationSnapshot?: Record<string, any>;
 }
 
 export interface HVACService {

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useHVAC } from '../context/HVACContext';
 import { T, pick } from '../translations';
+import { submitCustomerForm } from '../../lib/forms/formSubmissionService';
 
 export function HVACQuoteDialog() {
   const {
@@ -132,30 +133,57 @@ export function HVACQuoteDialog() {
 
   const serviceName = quoteInitialData?.service || 'AC Inspection & Maintenance';
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [quoteError, setQuoteError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setQuoteError('');
     if (!fullName.trim() || !phone.trim()) return;
 
     setIsSubmitting(true);
-
-    const lead = addLead({
-      clientName: fullName.trim(),
-      phoneNumber: phone.trim(),
-      email: email.trim() || undefined,
-      city: cityName,
-      customCity: quoteInitialData?.customCity,
-      service: serviceName,
-      notes: notes.trim() || undefined,
-      isUrgent,
-    });
-
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setSubmittedLead({
-        referenceNumber: lead.referenceNumber,
-        clientName: lead.clientName,
+    try {
+      const result = await submitCustomerForm({
+        formType: 'hvac_service',
+        sector: 'hvac',
+        name: fullName.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        language,
+        message: `Service: ${serviceName}\nCity: ${cityName}\nUrgent: ${isUrgent ? 'Yes' : 'No'}\nNotes: ${notes}`,
+        details: {
+          service: serviceName,
+          city: cityName,
+          customCity: quoteInitialData?.customCity,
+          isUrgent,
+          notes: notes.trim() || undefined,
+        },
       });
-    }, 400);
+
+      const lead = addLead({
+        clientName: fullName.trim(),
+        phoneNumber: phone.trim(),
+        email: email.trim() || undefined,
+        city: cityName,
+        customCity: quoteInitialData?.customCity,
+        service: serviceName,
+        notes: notes.trim() || undefined,
+        isUrgent,
+      });
+
+      setSubmittedLead({
+        referenceNumber: result.trackingCode || lead.referenceNumber,
+        clientName: fullName.trim(),
+      });
+    } catch (err: any) {
+      console.error('HVAC quote submission failed', err);
+      setQuoteError(
+        err?.message || (isAr
+          ? 'تعذر إرسال طلب عرض السعر. تم الحفاظ على بياناتك المدخلة.'
+          : 'Failed to submit quote request. Input is preserved.')
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleWhatsAppHandoff = () => {
@@ -265,6 +293,11 @@ ${isUrgent ? '⚠️ Urgency: Emergency Request' : ''}`;
           ) : (
             /* Submission Form */
             <form onSubmit={handleSubmit} className="space-y-4 text-start">
+              {quoteError && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold">
+                  {quoteError}
+                </div>
+              )}
               <p className="text-xs text-slate-600 pb-1">
                 {pick(T.quoteForm.dialogSubtitle, language)}
               </p>

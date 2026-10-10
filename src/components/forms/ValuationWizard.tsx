@@ -24,10 +24,12 @@ import {
   Award,
 } from 'lucide-react';
 import { Language, PropertyType } from '../../types';
+import { FormAttachmentMeta } from '../../types/firestore-schema';
 import { translations } from '../../lib/translations';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { useData } from '../../context/DataContext';
+import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSubmissionService';
+import { FileUploadZone } from './FileUploadZone';
 import { SAUDI_CITIES } from '../../data/cities';
 import { CitySearchDropdown } from '../ui/CitySearchDropdown';
 
@@ -42,7 +44,6 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
   const isAr = language === 'ar';
   const ArrowNext = isAr ? ArrowLeft : ArrowRight;
   const ArrowPrev = isAr ? ArrowRight : ArrowLeft;
-  const { submitLead } = useData();
 
   const [currentStep, setCurrentStep] = useState<number>(1);
   const totalSteps = 4;
@@ -76,6 +77,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
   const [phone, setPhone] = useState('');
   const [preferredContact, setPreferredContact] = useState<'whatsapp' | 'call' | 'email'>('whatsapp');
   const [notes, setNotes] = useState('');
+  const [attachments, setAttachments] = useState<FormAttachmentMeta[]>([]);
 
   // State & Validation
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -166,15 +168,17 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
 
     setIsSubmitting(true);
     try {
-      const result = await submitLead({
+      const result = await submitCustomerForm({
+        formType: 'valuation_request',
+        sector: 'realestate',
         name: fullName,
         email,
         phone,
-        inquiry_type: 'valuation_request',
-        recipient_email: 'info@hardgp.com',
+        preferredContactMethod: preferredContact === 'call' ? 'phone' : preferredContact,
+        language,
         message: `Property Type: ${propertyType}\nLocation: ${cityArea} ${customAddress}\nArea: ${areaSqFt} sq ft (${bedrooms} beds, ${bathrooms} baths)\nCondition: ${condition}\nTimeline: ${timeline}\nOwner Role: ${ownerRole}\nContact Method: ${preferredContact}\nNotes: ${notes}`,
-        source: 'Valuation & CMA Multi-Step Wizard',
-        metadata: {
+        attachments,
+        details: {
           propertyType,
           cityArea,
           customAddress,
@@ -187,17 +191,17 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
           timeline,
           preferredContact,
           estimatedValueSAR: calculatedEstimate.minSar,
-          language,
-          targetEmail: 'info@hardgp.com',
-          recipientEmail: 'info@hardgp.com',
         },
       });
 
-      setReferenceId(result.lead.id);
+      setReferenceId(result.trackingCode);
       setIsSuccess(true);
       if (onSuccess) onSuccess();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to submit valuation lead', err);
+      if (err instanceof FormValidationError) {
+        setErrors(err.fieldErrors);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -864,6 +868,18 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                     </div>
                   </div>
                 </div>
+
+                {/* Private Attachment Upload (Photos, Deeds, Floor Plans) */}
+                <FileUploadZone
+                  uploadSessionId="valuation-wizard"
+                  attachments={attachments}
+                  onChange={setAttachments}
+                  language={language}
+                  labelEn="Attach Property Photos, Deeds or Floor Plans"
+                  labelAr="إرفاق صور العقار، الصكوك أو المخططات المعمارية"
+                  helpTextEn="Optional. Upload property images, floor plans, or deed copies for a more accurate CMA appraisal."
+                  helpTextAr="اختياري. يمكنك رفع صور العقار، المخططات أو صورة الصك للحصول على تقييم أكثر دقة."
+                />
 
                 {/* Additional Notes */}
                 <div>

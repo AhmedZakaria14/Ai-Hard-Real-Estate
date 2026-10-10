@@ -94,6 +94,9 @@ export interface ConstructionQuoteLead {
   source: 'quote_form' | 'cost_estimator' | 'project_inquiry' | 'direct_call';
   inquiredProjectId?: string;
   estimatedValueSAR?: number;
+  calculatorVersion?: number;
+  inputSnapshot?: Record<string, any>;
+  calculationSnapshot?: Record<string, any>;
   status: LeadStatus;
   adminNotes?: string;
 }

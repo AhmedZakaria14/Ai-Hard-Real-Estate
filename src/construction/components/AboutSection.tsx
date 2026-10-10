@@ -18,10 +18,15 @@ import { useConstruction } from '../context/ConstructionContext';
 import { constructionTranslations } from '../utils/translations';
 
 export function AboutSection() {
-  const { language } = useConstruction();
+  const { language, companyContent } = useConstruction();
   const t = constructionTranslations[language];
   const isAr = language === 'ar';
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
+
+  const aboutTitle = isAr ? companyContent.aboutTitleAr : companyContent.aboutTitleEn;
+  const aboutText = isAr ? companyContent.aboutTextAr : companyContent.aboutTextEn;
+  const visionText = isAr ? companyContent.visionAr : companyContent.visionEn;
+  const missionText = isAr ? companyContent.missionAr : companyContent.missionEn;
 
   const [activeTab, setActiveTab] = useState<'quality' | 'safety' | 'management'>('quality');
 
@@ -36,23 +41,11 @@ export function AboutSection() {
           </div>
 
           <h2 className="text-2xl sm:text-4xl font-black font-display-serif text-[#0f243e] tracking-tight leading-snug">
-            {isAr ? (
-              <>
-                شريكك الهندسي الموثوق في{' '}
-                <span className="text-[#009ee2]">البناء والتشييد المتكامل</span>
-              </>
-            ) : (
-              <>
-                Your Trusted Engineering Partner in{' '}
-                <span className="text-[#009ee2]">Integrated Construction</span>
-              </>
-            )}
+            {aboutTitle}
           </h2>
 
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl mx-auto font-medium">
-            {isAr
-              ? 'تأسست شركة هارد للمقاولات لتكون ركيزة أساسية في قطاع المقاولات والإنشاءات بالمملكة، حيث نجمع بين الخبرة الهندسية المتعمقة وأحدث المعدات والتقنيات الإنشائية لتقديم مشاريع متكاملة من التخطيط والتصميم وحتى تسليم المفتاح بأعلى معايير كود البناء السعودي.'
-              : 'HARD Contracting was founded as a cornerstone in the Kingdom’s contracting and construction sector, combining deep engineering expertise with state-of-the-art machinery to deliver turnkey projects adhering strictly to the Saudi Building Code (SBC).'}
+            {aboutText}
           </p>
         </div>
 
@@ -74,9 +67,7 @@ export function AboutSection() {
               </div>
             </div>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              {isAr
-                ? 'أن نكون الخيار الأول في قطاع المقاولات العامة والإنشاءات الكبرى عبر تقديم حلول هندسية مبتكرة ومستدامة تلبي تطلعات رؤية السعودية 2030 وتواكب النهضة العمرانية الشاملة.'
-                : 'To be the premier choice in general contracting and major engineering construction by providing innovative and sustainable engineering solutions aligned with Saudi Vision 2030.'}
+              {visionText}
             </p>
           </div>
 
@@ -96,9 +87,7 @@ export function AboutSection() {
               </div>
             </div>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              {isAr
-                ? 'تنفيذ كافة المشاريع الإنشائية بأعلى معايير الجودة والسلامة والالتزام الصارم بالجداول الزمنية والمواصفات المعتمدة، وبناء شراكات موثوقة ومستدامة مع عملائنا وشركائنا.'
-                : 'Delivering all construction projects with uncompromising quality, safety, strict timeline compliance, and approved specifications while fostering enduring partnerships.'}
+              {missionText}
             </p>
           </div>
         </div>

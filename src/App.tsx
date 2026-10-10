@@ -22,8 +22,11 @@ import { ProjectInquiryModal } from './components/modals/ProjectInquiryModal';
 import { FloatingTextEditor } from './components/ui/FloatingTextEditor';
 import { DataProvider, useData } from './context/DataContext';
 import { TextOverrideProvider } from './context/TextOverrideContext';
+import { SiteSettingsProvider } from './context/SiteSettingsContext';
 import { parsePropertyQueryParams, serializePropertyQueryParams } from './lib/propertyUrlParams';
 import { getPageTitle, getPageDescription, updateDocumentTitle } from './lib/pageTitles';
+import { getStoredSeoConfigs, applyPageSeoToHead } from './lib/seo/seoManager';
+import { PrivacyTermsModal } from './components/modals/PrivacyTermsModal';
 
 /**
  * Detects if a URL hash fragment is a copy of a route path or an old SPA route fragment
@@ -143,6 +146,10 @@ function AppContent() {
         detectedPage = 'contact';
       } else if (rawPath === '/marketing' || rawPath === '/services') {
         detectedPage = 'marketing';
+      } else if (rawPath === '/privacy' || rawPath === '/privacy/') {
+        detectedPage = 'privacy';
+      } else if (rawPath === '/terms' || rawPath === '/terms/') {
+        detectedPage = 'terms';
       } else if (rawPath === '/realestate' || rawPath.startsWith('/realestate/')) {
         let sub = rawPath.substring('/realestate'.length).replace(/^\/+/, '');
         sub = sub.split('?')[0].replace(/\/+$/, '');
@@ -297,21 +304,25 @@ function AppContent() {
 
   // Synchronize document title and OpenGraph metadata across all sectors and pages
   useEffect(() => {
-    // Construction and HVAC pages refine their titles with inner project/modal/CMS state,
-    // but synchronizing here ensures immediate updates upon client navigation or language changes.
-    const titleOptions = {
-      page: currentPage,
-      language,
-      propertyTitle: selectedProperty
-        ? {
-            ar: selectedProperty.title.ar,
-            en: selectedProperty.title.en,
-          }
-        : null,
-    };
-    const title = getPageTitle(titleOptions);
-    const description = getPageDescription(titleOptions);
-    updateDocumentTitle(title, description);
+    const seoConfigs = getStoredSeoConfigs();
+    const pageConfig = seoConfigs[currentPage];
+    if (pageConfig) {
+      applyPageSeoToHead(pageConfig, language);
+    } else {
+      const titleOptions = {
+        page: currentPage,
+        language,
+        propertyTitle: selectedProperty
+          ? {
+              ar: selectedProperty.title.ar,
+              en: selectedProperty.title.en,
+            }
+          : null,
+      };
+      const title = getPageTitle(titleOptions);
+      const description = getPageDescription(titleOptions);
+      updateDocumentTitle(title, description);
+    }
 
     // Set 404 HTTP status metadata hints for prerenderers and crawlers when on not-found page
     if (currentPage === 'not-found') {
@@ -330,15 +341,6 @@ function AppContent() {
         document.head.appendChild(prerenderStatusMeta);
       }
       prerenderStatusMeta.setAttribute('content', '404');
-    } else {
-      const robotsMeta = document.querySelector('meta[name="robots"]');
-      if (robotsMeta) {
-        robotsMeta.setAttribute('content', 'index, follow');
-      }
-      const prerenderStatusMeta = document.querySelector('meta[name="prerender-status-code"]');
-      if (prerenderStatusMeta) {
-        prerenderStatusMeta.remove();
-      }
     }
   }, [currentPage, language, selectedProperty]);
 
@@ -591,6 +593,13 @@ function AppContent() {
         language={language}
         project={selectedProjectForInquiry}
       />
+
+      <PrivacyTermsModal
+        isOpen={currentPage === 'privacy' || currentPage === 'terms'}
+        onClose={() => handleNavigate('home')}
+        language={language}
+        initialTab={currentPage === 'terms' ? 'terms' : 'privacy'}
+      />
     </div>
   );
 }
@@ -598,9 +607,11 @@ function AppContent() {
 export default function App() {
   return (
     <DataProvider>
-      <TextOverrideProvider>
-        <AppContent />
-      </TextOverrideProvider>
+      <SiteSettingsProvider>
+        <TextOverrideProvider>
+          <AppContent />
+        </TextOverrideProvider>
+      </SiteSettingsProvider>
     </DataProvider>
   );
 }

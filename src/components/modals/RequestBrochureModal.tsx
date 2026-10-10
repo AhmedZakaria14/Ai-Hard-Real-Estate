@@ -4,7 +4,7 @@ import { Button } from '../ui/Button';
 import { Language, Project } from '../../types';
 import { translations } from '../../lib/translations';
 import { CheckCircle2, FileText, Send, Sparkles } from 'lucide-react';
-import { useData } from '../../context/DataContext';
+import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSubmissionService';
 
 interface RequestBrochureModalProps {
   isOpen: boolean;
@@ -20,8 +20,6 @@ export function RequestBrochureModal({
   project,
 }: RequestBrochureModalProps) {
   const t = translations[language];
-  const { submitLead } = useData();
-
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -30,38 +28,49 @@ export function RequestBrochureModal({
   const [leadRef, setLeadRef] = useState('');
   const [crmRef, setCrmRef] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [formError, setFormError] = useState('');
 
   if (!project) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError('');
     if (!email || !email.includes('@')) return;
 
     setIsLoading(true);
     try {
-      const result = await submitLead({
-        name: fullName,
-        email,
-        phone,
-        inquiry_type: 'project_inquiry',
-        recipient_email: email,
+      const result = await submitCustomerForm({
+        formType: 'project_inquiry',
+        sector: 'realestate',
+        name: fullName.trim() || email.split('@')[0],
+        email: email.trim(),
+        phone: phone.trim(),
+        entityId: project.id,
+        entityTitle: project.title[language] || project.title.en,
+        language,
         message: `Project Brochure Request for: ${project.title[language]} (${project.id})`,
-        source: 'Project Brochure Request Modal',
-        metadata: {
+        details: {
+          requestType: 'brochure',
           projectId: project.id,
-          projectTitle: project.title[language],
-          targetEmail: email,
-          recipientEmail: email,
-          language,
+          recipientEmail: email.trim(),
         },
       });
 
-      setConfirmedEmail(email);
-      setLeadRef(result.lead.id);
-      setCrmRef(result.crmResult.crmReferenceId);
+      setConfirmedEmail(email.trim());
+      setLeadRef(result.trackingCode);
+      setCrmRef(`CRM-${result.leadId.slice(-6).toUpperCase()}`);
       setSubmitted(true);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to submit brochure request', err);
+      if (err instanceof FormValidationError) {
+        setFormError(Object.values(err.fieldErrors).join(' '));
+      } else {
+        setFormError(
+          err?.message || (language === 'en'
+            ? 'Failed to request brochure. Input is preserved. Please retry.'
+            : 'تعذر تقديم طلب الكتيب. تم الحفاظ على بياناتك، يرجى إعادة المحاولة.')
+        );
+      }
     } finally {
       setIsLoading(false);
     }

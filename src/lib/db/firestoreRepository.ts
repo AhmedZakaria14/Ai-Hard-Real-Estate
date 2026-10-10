@@ -11,6 +11,7 @@ import {
   onSnapshot,
 } from 'firebase/firestore';
 import { db } from '../firebase';
+import { PublicDataWriter } from '../firebase/dataAccess';
 import { Property, Project, BlogPost, Testimonial, JoinListSubscriber } from '../../types';
 import { LeadRecord } from '../integrations/crmSync';
 import { mockProperties, mockProjects, mockBlogPosts, mockTestimonials, mockSubscribers } from '../../data/mockData';
@@ -246,44 +247,55 @@ export const FirestoreLeadsRepository = {
     source?: string;
     metadata?: Record<string, any>;
   }): Promise<{ lead: LeadRecord; crmResult: { success: boolean; crmReferenceId: string; crmSystem: string } }> {
-    const trackingCode = `LEAD-${Math.floor(100000 + Math.random() * 900000)}`;
-    const id = `lead-${Date.now()}`;
-
-    const newLead: LeadRecord = {
-      id,
-      name: leadInput.name,
-      email: leadInput.email,
-      phone: leadInput.phone,
-      property_id: leadInput.property_id,
-      property_title: leadInput.property_title,
-      inquiry_type: leadInput.inquiry_type,
-      recipient_email: leadInput.recipient_email || 'info@hardgp.com',
-      message: leadInput.message || '',
-      status: 'new',
-      crm_sync_status: 'synced',
-      source: leadInput.source || 'HARD Group Portal',
-      metadata: {
-        ...leadInput.metadata,
-        trackingCode,
-      },
-      created_at: new Date().toISOString(),
-    };
-
     try {
-      const docRef = doc(db, 'leads', id);
-      await setDoc(docRef, sanitizePayload(newLead));
-    } catch (e) {
-      console.error('Error persisting lead to Firestore:', e);
-    }
+      const { lead: createdLead, trackingCode } = await PublicDataWriter.submitLead({
+        fullName: leadInput.name,
+        email: leadInput.email,
+        phone: leadInput.phone,
+        sector: 'realestate',
+        leadType: leadInput.inquiry_type,
+        message: leadInput.message,
+        metadata: {
+          property_id: leadInput.property_id,
+          property_title: leadInput.property_title,
+          recipient_email: leadInput.recipient_email || 'info@hardgp.com',
+          source: leadInput.source || 'HARD Group Portal',
+          ...leadInput.metadata,
+        },
+      });
 
-    return {
-      lead: newLead,
-      crmResult: {
-        success: true,
-        crmReferenceId: trackingCode,
-        crmSystem: 'Firestore CRM',
-      },
-    };
+      const leadRecord: LeadRecord = {
+        id: createdLead.id,
+        name: createdLead.fullName,
+        email: createdLead.email,
+        phone: createdLead.phone,
+        property_id: leadInput.property_id,
+        property_title: leadInput.property_title,
+        inquiry_type: leadInput.inquiry_type,
+        recipient_email: leadInput.recipient_email || 'info@hardgp.com',
+        message: createdLead.message || '',
+        status: createdLead.status as any,
+        crm_sync_status: 'synced',
+        source: leadInput.source || 'HARD Group Portal',
+        metadata: {
+          trackingCode,
+          ...leadInput.metadata,
+        },
+        created_at: createdLead.createdAt,
+      };
+
+      return {
+        lead: leadRecord,
+        crmResult: {
+          success: true,
+          crmReferenceId: trackingCode,
+          crmSystem: 'Firestore CRM',
+        },
+      };
+    } catch (e: any) {
+      console.error('Error persisting lead to Firestore:', e);
+      throw e;
+    }
   },
 };
 

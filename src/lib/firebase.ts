@@ -4,15 +4,17 @@ import { getFirestore, Firestore, doc, getDocFromServer, connectFirestoreEmulato
 import { getStorage, FirebaseStorage, connectStorageEmulator } from 'firebase/storage';
 import fallbackConfig from '../../firebase-applet-config.json';
 
+const metaEnv = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env : (process.env as any) || {};
+
 // Environment-specific configuration with applet config fallback
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || fallbackConfig.apiKey,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || fallbackConfig.authDomain,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || fallbackConfig.projectId,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || fallbackConfig.storageBucket,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || fallbackConfig.messagingSenderId,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || fallbackConfig.appId,
-  firestoreDatabaseId: import.meta.env.VITE_FIREBASE_FIRESTORE_DATABASE_ID || fallbackConfig.firestoreDatabaseId,
+  apiKey: metaEnv.VITE_FIREBASE_API_KEY || fallbackConfig.apiKey,
+  authDomain: metaEnv.VITE_FIREBASE_AUTH_DOMAIN || fallbackConfig.authDomain,
+  projectId: metaEnv.VITE_FIREBASE_PROJECT_ID || fallbackConfig.projectId,
+  storageBucket: metaEnv.VITE_FIREBASE_STORAGE_BUCKET || fallbackConfig.storageBucket,
+  messagingSenderId: metaEnv.VITE_FIREBASE_MESSAGING_SENDER_ID || fallbackConfig.messagingSenderId,
+  appId: metaEnv.VITE_FIREBASE_APP_ID || fallbackConfig.appId,
+  firestoreDatabaseId: metaEnv.VITE_FIREBASE_FIRESTORE_DATABASE_ID || fallbackConfig.firestoreDatabaseId,
 };
 
 let app: FirebaseApp;
@@ -27,14 +29,14 @@ export const db: Firestore = getFirestore(app, firebaseConfig.firestoreDatabaseI
 export const storage: FirebaseStorage = getStorage(app);
 
 // Connect Local Firebase Emulator Suite if configured
-const useEmulator = import.meta.env.VITE_USE_FIREBASE_EMULATOR === 'true';
+const useEmulator = metaEnv.VITE_USE_FIREBASE_EMULATOR === 'true';
 let emulatorsConnected = false;
 
 if (useEmulator && !emulatorsConnected) {
   try {
-    const authHost = import.meta.env.VITE_FIREBASE_AUTH_EMULATOR_HOST || 'localhost:9099';
-    const firestoreHost = import.meta.env.VITE_FIREBASE_FIRESTORE_EMULATOR_HOST || 'localhost';
-    const storageHost = import.meta.env.VITE_FIREBASE_STORAGE_EMULATOR_HOST || 'localhost';
+    const authHost = metaEnv.VITE_FIREBASE_AUTH_EMULATOR_HOST || 'localhost:9099';
+    const firestoreHost = metaEnv.VITE_FIREBASE_FIRESTORE_EMULATOR_HOST || 'localhost';
+    const storageHost = metaEnv.VITE_FIREBASE_STORAGE_EMULATOR_HOST || 'localhost';
 
     connectAuthEmulator(auth, `http://${authHost}`, { disableWarnings: true });
     
@@ -51,14 +53,23 @@ if (useEmulator && !emulatorsConnected) {
   }
 }
 
-// Connection test per SKILL.md specification
+// Connection test with timeout guard to handle offline or delayed initial connection
 export async function validateFirestoreConnection(): Promise<boolean> {
   try {
-    await getDocFromServer(doc(db, '_connection_check', 'ping'));
+    const connectionPromise = getDocFromServer(doc(db, '_connection_check', 'ping'));
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Connection check timeout')), 2500)
+    );
+    await Promise.race([connectionPromise, timeoutPromise]);
     return true;
   } catch (error: any) {
-    if (error?.message?.includes('the client is offline')) {
-      console.warn('Firebase client is offline. Checking network parameters.');
+    if (
+      error?.message?.includes('offline') ||
+      error?.message?.includes('timeout') ||
+      error?.code === 'unavailable' ||
+      error?.code === 'permission-denied'
+    ) {
+      console.warn('[Firebase Client] Offline mode or connection check skipped.');
       return false;
     }
     return true;

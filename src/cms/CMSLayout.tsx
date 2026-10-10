@@ -1,4 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import {
+  canEditContent,
+  canManageLeads,
+  canManageSettings,
+  AdminRole,
+} from "../types/firestore-schema";
 import {
   LayoutDashboard,
   Building,
@@ -17,19 +23,36 @@ import {
   Sparkles,
   Award,
   MailCheck,
-} from 'lucide-react';
-import { Language } from '../types';
+  UserCheck,
+  HelpCircle,
+  MapPin,
+  TrendingUp,
+  Building2,
+  FileText,
+  Calendar,
+  Sliders,
+} from "lucide-react";
+import { Language } from "../types";
 
 export type CMSTab =
-  | 'dashboard'
-  | 'properties'
-  | 'projects'
-  | 'content'
-  | 'blog'
-  | 'testimonials'
-  | 'subscribers'
-  | 'leads'
-  | 'settings';
+  | "dashboard"
+  | "properties"
+  | "projects"
+  | "content"
+  | "forms"
+  | "calculators"
+  | "team"
+  | "testimonials"
+  | "faqs"
+  | "offices"
+  | "certifications"
+  | "statistics"
+  | "partners"
+  | "blog"
+  | "subscribers"
+  | "leads"
+  | "appointments"
+  | "settings";
 
 interface CMSLayoutProps {
   activeTab: CMSTab;
@@ -52,25 +75,153 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
   onLanguageChange,
   children,
 }) => {
-  const isAr = language === 'ar';
+  const isAr = language === "ar";
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  const navItems: { id: CMSTab; labelEn: string; labelAr: string; icon: React.FC<{ className?: string }> }[] = [
-    { id: 'dashboard', labelEn: 'Executive Dashboard', labelAr: 'لوحة التحكم والمؤشرات', icon: LayoutDashboard },
-    { id: 'properties', labelEn: 'Properties & Listings', labelAr: 'إدارة العقارات والأصول', icon: Building },
-    { id: 'projects', labelEn: 'Major Projects & Off-Plan', labelAr: 'المشاريع التطويرية والواجهات', icon: Layers },
-    { id: 'content', labelEn: 'Site Content & Drafts', labelAr: 'إدارة المحتوى والمسودات', icon: Sparkles },
-    { id: 'blog', labelEn: 'Blog & Market Insights', labelAr: 'المدونة والتقارير العقارية', icon: BookOpen },
-    { id: 'testimonials', labelEn: 'Client Success Stories', labelAr: 'قصص نجاح العملاء', icon: Award },
-    { id: 'subscribers', labelEn: 'Join List', labelAr: 'قائمة الانضمام', icon: MailCheck },
-    { id: 'leads', labelEn: 'Inquiries & Leads', labelAr: 'الطلبات والاستفسارات', icon: Users },
-    { id: 'settings', labelEn: 'System Settings', labelAr: 'إعدادات النظام', icon: Settings },
+  const userRole = (adminUser.role || "superadmin") as AdminRole;
+
+  const allNavItems: {
+    id: CMSTab;
+    labelEn: string;
+    labelAr: string;
+    icon: React.FC<{ className?: string }>;
+    roleGuard?: (role: AdminRole) => boolean;
+  }[] = [
+    {
+      id: "dashboard",
+      labelEn: "Executive Dashboard",
+      labelAr: "لوحة التحكم والمؤشرات",
+      icon: LayoutDashboard,
+    },
+    {
+      id: "properties",
+      labelEn: "Properties & Listings",
+      labelAr: "إدارة العقارات والأصول",
+      icon: Building,
+      roleGuard: canEditContent,
+    },
+    {
+      id: "projects",
+      labelEn: "Major Projects & Off-Plan",
+      labelAr: "المشاريع التطويرية والواجهات",
+      icon: Layers,
+      roleGuard: canEditContent,
+    },
+    {
+      id: "content",
+      labelEn: "Site Content & Drafts",
+      labelAr: "إدارة المحتوى والمسودات",
+      icon: Sparkles,
+      roleGuard: canEditContent,
+    },
+    {
+      id: "forms",
+      labelEn: "Customer Form Builder",
+      labelAr: "بناء ونماذج الخدمة",
+      icon: FileText,
+      roleGuard: canEditContent,
+    },
+    {
+      id: "calculators",
+      labelEn: "Calculators & Estimators",
+      labelAr: "حاسبات التكلفة والتقديرات",
+      icon: Sliders,
+      roleGuard: canEditContent,
+    },
+    {
+      id: "team",
+      labelEn: "Team Members",
+      labelAr: "فريق العمل والقيادات",
+      icon: UserCheck,
+      roleGuard: canEditContent,
+    },
+    {
+      id: "testimonials",
+      labelEn: "Client Success Stories",
+      labelAr: "قصص نجاح العملاء",
+      icon: Award,
+      roleGuard: canEditContent,
+    },
+    {
+      id: "faqs",
+      labelEn: "Frequently Asked Questions",
+      labelAr: "الأسئلة الشائعة (FAQs)",
+      icon: HelpCircle,
+      roleGuard: canEditContent,
+    },
+    {
+      id: "offices",
+      labelEn: "Offices & Locations",
+      labelAr: "الفروع والمقرات الرسمية",
+      icon: MapPin,
+      roleGuard: canEditContent,
+    },
+    {
+      id: "certifications",
+      labelEn: "Certifications & Licenses",
+      labelAr: "الاعتمادات والتراخيص",
+      icon: Award,
+      roleGuard: canEditContent,
+    },
+    {
+      id: "statistics",
+      labelEn: "Key Statistics & Claims",
+      labelAr: "المؤشرات والأرقام الإحصائية",
+      icon: TrendingUp,
+      roleGuard: canEditContent,
+    },
+    {
+      id: "partners",
+      labelEn: "Partners & Brands",
+      labelAr: "الشركاء والعلامات التجارية",
+      icon: Building2,
+      roleGuard: canEditContent,
+    },
+    {
+      id: "blog",
+      labelEn: "Blog & Market Insights",
+      labelAr: "المدونة والتقارير العقارية",
+      icon: BookOpen,
+      roleGuard: canEditContent,
+    },
+    {
+      id: "subscribers",
+      labelEn: "Join List",
+      labelAr: "قائمة الانضمام",
+      icon: MailCheck,
+      roleGuard: canManageLeads,
+    },
+    {
+      id: "leads",
+      labelEn: "Inquiries & Leads",
+      labelAr: "الطلبات واستفسارات العملاء",
+      icon: Users,
+      roleGuard: canManageLeads,
+    },
+    {
+      id: "appointments",
+      labelEn: "Viewings & Appointments",
+      labelAr: "المعاينة والمواعيد الميدانية",
+      icon: Calendar,
+      roleGuard: canManageLeads,
+    },
+    {
+      id: "settings",
+      labelEn: "System Settings",
+      labelAr: "إعدادات النظام والصلحيات",
+      icon: Settings,
+      roleGuard: canManageSettings,
+    },
   ];
+
+  const navItems = allNavItems.filter(
+    (item) => !item.roleGuard || item.roleGuard(userRole),
+  );
 
   return (
     <div
-      dir={isAr ? 'rtl' : 'ltr'}
+      dir={isAr ? "rtl" : "ltr"}
       className="min-h-screen bg-slate-900/10 flex flex-col lg:flex-row font-ui-sans selection:bg-blue-600 selection:text-white"
     >
       {/* Mobile Top Bar */}
@@ -91,16 +242,20 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => onLanguageChange(isAr ? 'en' : 'ar')}
+            onClick={() => onLanguageChange(isAr ? "en" : "ar")}
             className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white/10 text-slate-200"
           >
-            {isAr ? 'EN' : 'عربي'}
+            {isAr ? "EN" : "عربي"}
           </button>
           <button
             onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
             className="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-white/10"
           >
-            {mobileSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileSidebarOpen ? (
+              <X className="w-5 h-5" />
+            ) : (
+              <Menu className="w-5 h-5" />
+            )}
           </button>
         </div>
       </div>
@@ -108,8 +263,8 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
       {/* SIDEBAR NAVIGATION (Desktop & Mobile Drawer) */}
       <aside
         className={`fixed lg:static top-0 bottom-0 start-0 z-40 bg-slate-950 text-slate-300 border-e border-slate-800/80 flex flex-col justify-between transition-all duration-300 ${
-          sidebarCollapsed ? 'lg:w-20' : 'lg:w-72'
-        } ${mobileSidebarOpen ? 'w-72 shadow-2xl block' : 'hidden lg:flex'}`}
+          sidebarCollapsed ? "lg:w-20" : "lg:w-72"
+        } ${mobileSidebarOpen ? "w-72 shadow-2xl block" : "hidden lg:flex"}`}
       >
         {/* Sidebar Top: Branding + Collapse button */}
         <div>
@@ -124,7 +279,7 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
                     <span>HARD Real Estate</span>
                   </div>
                   <span className="text-[10px] text-blue-400 font-bold uppercase tracking-wider block">
-                    {isAr ? 'بوابة الإدارة السحابية' : 'Enterprise CMS'}
+                    {isAr ? "بوابة الإدارة السحابية" : "Enterprise CMS"}
                   </span>
                 </div>
               </div>
@@ -139,10 +294,14 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
               className="hidden lg:flex p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
-              title={sidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+              title={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
             >
               {sidebarCollapsed ? (
-                isAr ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />
+                isAr ? (
+                  <ChevronLeft className="w-4 h-4" />
+                ) : (
+                  <ChevronRight className="w-4 h-4" />
+                )
               ) : isAr ? (
                 <ChevronRight className="w-4 h-4" />
               ) : (
@@ -165,14 +324,18 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
                   }}
                   className={`w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-lg shadow-blue-900/30'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-900/80'
-                  } ${sidebarCollapsed ? 'justify-center px-2' : ''}`}
+                      ? "bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-lg shadow-blue-900/30"
+                      : "text-slate-400 hover:text-white hover:bg-slate-900/80"
+                  } ${sidebarCollapsed ? "justify-center px-2" : ""}`}
                   title={isAr ? item.labelAr : item.labelEn}
                 >
-                  <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                  <Icon
+                    className={`w-5 h-5 shrink-0 ${isActive ? "text-white" : "text-slate-400"}`}
+                  />
                   {!sidebarCollapsed && (
-                    <span className="truncate">{isAr ? item.labelAr : item.labelEn}</span>
+                    <span className="truncate">
+                      {isAr ? item.labelAr : item.labelEn}
+                    </span>
                   )}
                 </button>
               );
@@ -186,11 +349,13 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
           <button
             onClick={onViewLiveSite}
             className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold transition-colors cursor-pointer border border-slate-800 ${
-              sidebarCollapsed ? 'justify-center px-2' : ''
+              sidebarCollapsed ? "justify-center px-2" : ""
             }`}
           >
             <ExternalLink className="w-4 h-4 text-blue-400 shrink-0" />
-            {!sidebarCollapsed && <span>{isAr ? 'معاينة الموقع الحي' : 'View Live Website'}</span>}
+            {!sidebarCollapsed && (
+              <span>{isAr ? "معاينة الموقع الحي" : "View Live Website"}</span>
+            )}
           </button>
 
           {/* Admin Info */}
@@ -214,11 +379,13 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
           <button
             onClick={onLogout}
             className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-bold text-red-400 hover:text-red-300 hover:bg-red-950/30 rounded-xl transition-colors cursor-pointer ${
-              sidebarCollapsed ? 'justify-center px-2' : ''
+              sidebarCollapsed ? "justify-center px-2" : ""
             }`}
           >
             <LogOut className="w-4 h-4 shrink-0" />
-            {!sidebarCollapsed && <span>{isAr ? 'تسجيل الخروج' : 'Log Out'}</span>}
+            {!sidebarCollapsed && (
+              <span>{isAr ? "تسجيل الخروج" : "Log Out"}</span>
+            )}
           </button>
         </div>
       </aside>
@@ -229,13 +396,21 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
         <header className="hidden lg:flex items-center justify-between px-8 py-4 bg-white border-b border-slate-200/80 sticky top-0 z-20 shadow-xs">
           <div className="space-y-0.5">
             <h2 className="text-base font-extrabold text-slate-900 font-display-serif capitalize">
-              {navItems.find((n) => n.id === activeTab)?.[isAr ? 'labelAr' : 'labelEn']}
+              {
+                navItems.find((n) => n.id === activeTab)?.[
+                  isAr ? "labelAr" : "labelEn"
+                ]
+              }
             </h2>
             <div className="text-[11px] text-slate-500 flex items-center gap-1.5">
               <span>CMS</span>
               <span>/</span>
               <span className="text-blue-600 font-semibold">
-                {navItems.find((n) => n.id === activeTab)?.[isAr ? 'labelAr' : 'labelEn']}
+                {
+                  navItems.find((n) => n.id === activeTab)?.[
+                    isAr ? "labelAr" : "labelEn"
+                  ]
+                }
               </span>
             </div>
           </div>
@@ -243,11 +418,11 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
           <div className="flex items-center gap-3">
             {/* Language Switcher */}
             <button
-              onClick={() => onLanguageChange(isAr ? 'en' : 'ar')}
+              onClick={() => onLanguageChange(isAr ? "en" : "ar")}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl text-slate-700 hover:text-blue-700 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer"
             >
               <Globe className="w-3.5 h-3.5 text-blue-600" />
-              <span>{isAr ? 'English' : 'العربية'}</span>
+              <span>{isAr ? "English" : "العربية"}</span>
             </button>
 
             {/* View Live Site Button */}
@@ -256,7 +431,7 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 transition-colors cursor-pointer"
             >
               <ExternalLink className="w-3.5 h-3.5 text-slate-600" />
-              <span>{isAr ? 'زيارة الموقع الحي' : 'Live Website'}</span>
+              <span>{isAr ? "زيارة الموقع الحي" : "Live Website"}</span>
             </button>
           </div>
         </header>

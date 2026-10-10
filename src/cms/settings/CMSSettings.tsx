@@ -25,9 +25,13 @@ import { syncAllToSupabase } from '../../lib/db/repository';
 import firebaseConfig from '../../../firebase-applet-config.json';
 import { validateFirestoreConnection } from '../../lib/firebase';
 
+import { CMSAdminManagement } from './CMSAdminManagement';
+import { CMSBrandingSettings } from './CMSBrandingSettings';
+
 interface CMSSettingsProps {
   language: Language;
   onResetToDefaults: () => void;
+  currentAdminUser?: { uid?: string; name: string; email: string; role: string };
 }
 
 const PERMANENT_FIX_SQL = `-- ==============================================================================
@@ -175,7 +179,11 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authen
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON ROUTINES TO anon, authenticated, service_role;
 `;
 
-export const CMSSettings: React.FC<CMSSettingsProps> = ({ language, onResetToDefaults }) => {
+export const CMSSettings: React.FC<CMSSettingsProps> = ({
+  language,
+  onResetToDefaults,
+  currentAdminUser,
+}) => {
   const isAr = language === 'ar';
   const [resetMessage, setResetMessage] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -270,7 +278,19 @@ export const CMSSettings: React.FC<CMSSettingsProps> = ({ language, onResetToDef
   };
 
   return (
-    <div className="space-y-6 max-w-4xl animate-in fade-in">
+    <div className="space-y-6 max-w-5xl animate-in fade-in">
+      {/* Branding, Identity & Public Settings */}
+      <CMSBrandingSettings
+        language={language}
+        currentAdminRole={currentAdminUser?.role}
+      />
+
+      {/* Super Administrator Governance Section */}
+      <CMSAdminManagement
+        language={language}
+        currentAdminUser={currentAdminUser || { name: 'Executive Admin', email: 'admin@hard.sa', role: 'superadmin' }}
+      />
+
       <div className="bg-white rounded-3xl border border-slate-200 shadow-xs p-6 space-y-6">
         <div className="space-y-1 pb-4 border-b border-slate-100">
           <h3 className="text-lg font-bold text-slate-900 font-display-serif">

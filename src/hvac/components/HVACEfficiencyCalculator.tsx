@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Calculator,
   TrendingDown,
@@ -17,9 +17,21 @@ import {
 import { useHVAC } from '../context/HVACContext';
 import { T, pick } from '../translations';
 import { EfficiencyTier } from '../types';
+import { subscribeToPublishedCalculatorConfig } from '../../lib/calculators/calculatorConfigService';
+import { calculateHVACEfficiencyWithConfig } from '../../lib/calculators/calculatorEngine';
+import { HVACCalculatorConfigDoc } from '../../lib/calculators/calculatorTypes';
 
 export function HVACEfficiencyCalculator() {
   const { language, isAr, openBookingModal } = useHVAC();
+
+  const [publishedConfig, setPublishedConfig] = useState<HVACCalculatorConfigDoc | null>(null);
+
+  useEffect(() => {
+    const unsub = subscribeToPublishedCalculatorConfig('hvac', (docData) => {
+      setPublishedConfig(docData as HVACCalculatorConfigDoc);
+    });
+    return () => unsub();
+  }, []);
 
   // Explicit User Inputs
   const [areaSqM, setAreaSqM] = useState<number>(150);
@@ -58,36 +70,30 @@ export function HVACEfficiencyCalculator() {
     },
   };
 
-  const selectedTarget = targetTierConfig[targetTier];
+  const calcResult = calculateHVACEfficiencyWithConfig(
+    {
+      areaSqM,
+      baselineSeer,
+      targetTier,
+      dailyHours,
+      tariffRate,
+      horizonYears,
+    },
+    publishedConfig?.coefficients
+  );
 
-  // First-Principles Physics & Engineering Calculations
-  // Standard Saudi cooling load estimation: 1 Ton of Refrigeration (TR) per 20 m²
-  const estimatedTR = areaSqM / 20;
-  const coolingLoadBTUh = estimatedTR * 12000;
-  const annualOperatingHours = dailyHours * 365;
-
-  // Annual kWh Consumption Formula: (BTU/h / SEER / 1000) * Annual Operating Hours
-  const baselineAnnualKWh = (coolingLoadBTUh / baselineSeer / 1000) * annualOperatingHours;
-  const upgradedAnnualKWh = (coolingLoadBTUh / selectedTarget.seer / 1000) * annualOperatingHours;
-
-  const annualKWhSaved = Math.max(0, baselineAnnualKWh - upgradedAnnualKWh);
-  const totalKWhSaved = annualKWhSaved * horizonYears;
-
-  // Financial Savings = kWh Saved * Tariff Rate
-  const totalFinancialSavingsSAR = totalKWhSaved * tariffRate;
-
-  // Grid Carbon Offset: Saudi SEC grid emission intensity ~ 0.52 kg CO₂/kWh (0.00052 Tons CO₂/kWh)
-  const totalCo2OffsetTons = (totalKWhSaved * 0.00052);
+  const estimatedTR = calcResult.estimatedTR;
+  const coolingLoadBTUh = calcResult.coolingLoadBTUh;
+  const annualOperatingHours = calcResult.annualOperatingHours;
+  const totalFinancialSavingsSAR = calcResult.totalFinancialSavingsSAR;
+  const totalCo2OffsetTons = calcResult.totalCo2OffsetTons;
+  const totalKWhSaved = calcResult.totalKWhSaved;
+  const efficiencyGainPercent = calcResult.efficiencyGainPercent;
 
   // Realistic Precision Formatting
   const formattedFinancialSavings = (Math.round(totalFinancialSavingsSAR / 10) * 10).toLocaleString();
   const formattedKWhSaved = (Math.round(totalKWhSaved / 100) * 100).toLocaleString();
   const formattedCo2Tons = totalCo2OffsetTons.toFixed(1);
-
-  // Efficiency Gain Percentage
-  const efficiencyGainPercent = Math.round(
-    ((selectedTarget.seer - baselineSeer) / baselineSeer) * 100
-  );
 
   return (
     <section id="calculator" className="py-16 sm:py-24 bg-white border-y border-slate-200/80">
@@ -351,7 +357,7 @@ export function HVACEfficiencyCalculator() {
                   </div>
                   <div>
                     <span className="text-slate-400 block">{isAr ? 'كفاءة النظام الجديد:' : 'Target Efficiency:'}</span>
-                    <span className="font-semibold text-[#0EA5E9]">{selectedTarget.seerDisplay}</span>
+                    <span className="font-semibold text-[#0EA5E9]">{calcResult.targetSeer} SEER ({calcResult.targetLabel})</span>
                   </div>
                   <div>
                     <span className="text-slate-400 block">{isAr ? 'ساعات التشغيل:' : 'Operating Hours:'}</span>

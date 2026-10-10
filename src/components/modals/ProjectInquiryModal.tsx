@@ -18,7 +18,7 @@ import {
   FileCheck2,
   AlertTriangle,
 } from 'lucide-react';
-import { useData } from '../../context/DataContext';
+import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSubmissionService';
 
 interface ProjectInquiryModalProps {
   isOpen: boolean;
@@ -34,7 +34,6 @@ export function ProjectInquiryModal({
   project,
 }: ProjectInquiryModalProps) {
   const t = translations[language];
-  const { submitLead } = useData();
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -78,39 +77,39 @@ export function ProjectInquiryModal({
 
     setIsLoading(true);
     try {
-      const result = await submitLead({
+      const result = await submitCustomerForm({
+        formType: 'project_inquiry',
+        sector: 'realestate',
         name: fullName.trim(),
         email: email.trim(),
         phone: phone.trim(),
-        inquiry_type: 'project_inquiry',
-        recipient_email: 'projects@hardgp.com',
+        entityId: project.id,
+        entityTitle: project.title[language] || project.title.en,
+        language,
         message: `[Project Unit Request]\nProject: ${project.title[language]} (ID: ${project.id})\nDeveloper: ${project.developer[language]}\nInquiry Type: ${inquiryType}\nStarting Price: ${project.startingPriceSAR}\nHandover: ${project.handoverDate[language]}\nAvailable Units: ${project.unitsAvailable}/${project.unitsTotal}\n\nClient Note:\n${message || 'No additional note provided.'}`,
-        source: `Master Project - ${project.title.en}`,
-        metadata: {
+        details: {
           projectId: project.id,
           projectTitleEn: project.title.en,
           projectTitleAr: project.title.ar,
           developerEn: project.developer.en,
           developerAr: project.developer.ar,
           startingPriceSAR: project.startingPriceSAR,
-          handoverDateEn: project.handoverDate.en,
-          handoverDateAr: project.handoverDate.ar,
           unitsAvailable: project.unitsAvailable,
           unitsTotal: project.unitsTotal,
-          roiProjected: project.roiProjected,
           inquiryType,
-          language,
-          targetEmail: 'projects@hardgp.com',
-          recipientEmail: 'projects@hardgp.com',
-          isConfirmedReservation: false,
         },
       });
 
-      setLeadRef(result.lead.id);
-      setCrmRef(result.crmResult.crmReferenceId);
+      setLeadRef(result.trackingCode);
+      setCrmRef(`CRM-${result.leadId.slice(-6).toUpperCase()}`);
       setSubmitted(true);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to submit project inquiry', err);
+      if (err instanceof FormValidationError) {
+        setContactError(Object.values(err.fieldErrors).join(' '));
+      } else {
+        setContactError(err?.message || (language === 'en' ? 'Failed to submit inquiry. Input is preserved.' : 'فشل إرسال الطلب. تم الحفاظ على البيانات.'));
+      }
     } finally {
       setIsLoading(false);
     }

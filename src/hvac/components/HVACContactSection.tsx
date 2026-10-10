@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useHVAC } from '../context/HVACContext';
 import { T, pick } from '../translations';
+import { submitCustomerForm } from '../../lib/forms/formSubmissionService';
 
 export function HVACContactSection() {
   const { language, isAr, addLead, services } = useHVAC();
@@ -26,29 +27,53 @@ export function HVACContactSection() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successStatus, setSuccessStatus] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [formError, setFormError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError('');
     if (!name.trim() || !phone.trim()) return;
 
     setIsSubmitting(true);
+    try {
+      const result = await submitCustomerForm({
+        formType: 'general_contact',
+        sector: 'hvac',
+        name: name.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        language,
+        message: `Service: ${service || 'General'}\n\n${message}`,
+        details: {
+          service: service || 'General Contact Inquiry',
+          recipientEmail: 'info@hardgp.com',
+        },
+      });
 
-    const newLead = addLead({
-      clientName: name.trim(),
-      phoneNumber: phone.trim(),
-      email: email.trim() || undefined,
-      city: 'Eastern Province Hub',
-      service: service || 'General Contact Inquiry',
-      notes: message.trim() || undefined,
-    });
+      const newLead = addLead({
+        clientName: name.trim(),
+        phoneNumber: phone.trim(),
+        email: email.trim() || undefined,
+        city: 'Eastern Province Hub',
+        service: service || 'General Contact Inquiry',
+        notes: message.trim() || undefined,
+      });
 
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setSuccessStatus(newLead.referenceNumber);
+      setSuccessStatus(result.trackingCode || newLead.referenceNumber);
       setName('');
       setPhone('');
       setEmail('');
       setMessage('');
-    }, 450);
+    } catch (err: any) {
+      console.error('HVAC contact section submission failed', err);
+      setFormError(
+        err?.message || (isAr
+          ? 'تعذر إرسال النموذج. تم الحفاظ على بياناتك، يرجى إعادة المحاولة.'
+          : 'Failed to submit form. Your entered information is preserved.')
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -79,6 +104,13 @@ export function HVACContactSection() {
                 ? 'يتم إرسال كافة الاستفسارات فوراً إلى info@hardgp.com لمتابعتها من قبل الإدارة الفنية.'
                 : 'All submissions are immediately dispatched to info@hardgp.com and logged in our system.'}
             </p>
+
+            {formError && (
+              <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+                <p className="font-semibold">{formError}</p>
+              </div>
+            )}
 
             {successStatus && (
               <div className="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm flex items-start gap-3 animate-in fade-in duration-200">

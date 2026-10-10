@@ -18,6 +18,7 @@ import { Language, PageId } from '../../types';
 import { translations as defaultTranslations } from '../../lib/translations';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import { useData } from '../../context/DataContext';
+import { submitCustomerForm } from '../../lib/forms/formSubmissionService';
 import { Button } from '../ui/Button';
 import { BrandLogo } from '../ui/BrandLogo';
 import { getPageHref, handleSemanticClick } from '../../lib/navigation';
@@ -72,15 +73,26 @@ export function Footer({ onNavigate, language }: FooterProps) {
     setLoading(true);
     setSubError('');
     try {
+      await submitCustomerForm({
+        formType: 'newsletter_signup',
+        sector: 'group',
+        name: newsletterEmail.split('@')[0],
+        email: newsletterEmail.trim(),
+        language,
+        message: `Newsletter subscription via main website footer (${language.toUpperCase()})`,
+        details: {
+          source: 'Website Footer',
+        },
+      });
       await addSubscriber(newsletterEmail.trim(), 'Website Footer', `Subscribed via ${language.toUpperCase()} site`);
       setSubscribed(true);
       setNewsletterEmail('');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Subscription error:', err);
       setSubError(
-        isAr
+        err?.message || (isAr
           ? 'تعذر تسليم الاشتراك حالياً. تم حفظ البريد المدخل، يرجى إعادة المحاولة.'
-          : 'Subscription delivery failed. Your email is preserved. Please click retry.'
+          : 'Subscription delivery failed. Your email is preserved. Please click retry.')
       );
     } finally {
       setLoading(false);

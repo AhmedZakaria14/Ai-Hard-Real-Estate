@@ -22,6 +22,7 @@ import { useConstruction } from '../context/ConstructionContext';
 import { constructionTranslations } from '../utils/translations';
 import { ConstructionProjectType, ConstructionQuoteLead } from '../types';
 import { COMPANY_CREDENTIALS } from '../data/seedData';
+import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSubmissionService';
 
 export function QuoteModal() {
   const {
@@ -82,26 +83,34 @@ export function QuoteModal() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setValidationError('');
 
-    if (!clientName.trim()) {
-      setValidationError(isAr ? 'يرجى إدخال الاسم الكريم أو اسم المنشأة' : 'Please enter your full name');
-      return;
-    }
-    if (!phoneNumber.trim() || phoneNumber.length < 9) {
-      setValidationError(isAr ? 'يرجى إدخال رقم جوال صحيح (+966)' : 'Please enter a valid phone number');
-      return;
-    }
-    if (!email.trim() || !email.includes('@')) {
-      setValidationError(isAr ? 'يرجى إدخال بريد إلكتروني صحيح' : 'Please enter a valid email address');
-      return;
-    }
-
     setIsSubmitting(true);
+    try {
+      const result = await submitCustomerForm({
+        formType: 'construction_quote',
+        sector: 'construction',
+        name: clientName.trim(),
+        email: email.trim(),
+        phone: phoneNumber.trim(),
+        language,
+        message: `Project Type: ${projectType}\nLocation: ${city} ${district}\nBuilt-Up Area: ${builtUpArea} sqm\nBudget: ${budgetRangeSAR}\nTimeline: ${timeline}\nFile: ${uploadedFileName || 'None'}\nNotes: ${notes}`,
+        details: {
+          city,
+          district,
+          projectType,
+          builtUpArea: Number(builtUpArea) || 1200,
+          budgetRangeSAR,
+          timeline,
+          uploadedFileName,
+          calculatorVersion: quoteModalInitialData?.calculatorVersion,
+          inputSnapshot: quoteModalInitialData?.inputSnapshot,
+          calculationSnapshot: quoteModalInitialData?.calculationSnapshot,
+        },
+      });
 
-    setTimeout(() => {
       const newLead = addLead({
         clientName,
         phoneNumber,
@@ -118,11 +127,23 @@ export function QuoteModal() {
         source: quoteModalInitialData?.source || 'quote_form',
         inquiredProjectId: quoteModalInitialData?.inquiredProjectId,
         estimatedValueSAR: quoteModalInitialData?.estimatedValueSAR,
+        calculatorVersion: quoteModalInitialData?.calculatorVersion,
+        inputSnapshot: quoteModalInitialData?.inputSnapshot,
+        calculationSnapshot: quoteModalInitialData?.calculationSnapshot,
       });
 
+      newLead.referenceNumber = result.trackingCode;
       setSubmittedLead(newLead);
+    } catch (err: any) {
+      console.error('Failed to submit quote request', err);
+      if (err instanceof FormValidationError) {
+        setValidationError(Object.values(err.fieldErrors).join(' '));
+      } else {
+        setValidationError(err?.message || (isAr ? 'فشل إرسال طلب التقييم. تم الحفاظ على بياناتك.' : 'Failed to submit quote request. Input is preserved.'));
+      }
+    } finally {
       setIsSubmitting(false);
-    }, 600);
+    }
   };
 
   const handleCopyRef = () => {

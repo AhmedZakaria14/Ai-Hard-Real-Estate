@@ -6,13 +6,42 @@ import {
   HVACService,
   HVACGalleryItem,
   HVACTestimonial,
+  HVACFaqItem,
+  HVACChecklistItem,
 } from '../types';
 import {
   initialServices,
   initialGallery,
   initialTestimonials,
+  initialFaqs,
+  summerChecklist as initialChecklist,
   initialSampleLeads,
 } from '../data/initialData';
+import {
+  subscribeHVACServices,
+  saveHVACServiceDoc,
+  deleteHVACServiceDoc,
+  subscribeHVACSectionContent,
+  saveHVACSectionContent,
+  subscribeHVACGallery,
+  saveHVACGalleryDoc,
+  deleteHVACGalleryDoc,
+  subscribeHVACTestimonials,
+  saveHVACTestimonialDoc,
+  deleteHVACTestimonialDoc,
+  subscribeHVACLeads,
+  saveHVACLeadDoc,
+  updateHVACLeadStatusDoc,
+  deleteHVACLeadDoc,
+  HVACCityArea,
+  HVACHeroContent,
+  HVACOperatingHoursContact,
+  HVACBookingCopy,
+  DEFAULT_HVAC_CITIES,
+  DEFAULT_HVAC_HERO,
+  DEFAULT_HVAC_HOURS_CONTACT,
+  DEFAULT_HVAC_BOOKING_COPY,
+} from '../services/hvacFirestore';
 
 interface QuoteInitData {
   city: string;
@@ -30,13 +59,39 @@ interface HVACContextType {
   addLead: (leadData: Omit<HVACLead, 'id' | 'referenceNumber' | 'createdAt' | 'status' | 'source'>) => HVACLead;
   updateLeadStatus: (id: string, status: HVACLeadStatus) => void;
   deleteLead: (id: string) => void;
-  // CMS Entities
+  // Services
   services: HVACService[];
+  addService: (svc: Omit<HVACService, 'id'>) => Promise<void>;
+  updateService: (id: string, svc: Partial<HVACService>) => Promise<void>;
+  deleteService: (id: string) => Promise<void>;
   updateServices: (services: HVACService[]) => void;
+  // Cities & Service Areas
+  serviceAreas: HVACCityArea[];
+  updateServiceAreas: (areas: HVACCityArea[]) => Promise<void>;
+  // Hero & Booking Copy & Contact
+  heroContent: HVACHeroContent;
+  updateHeroContent: (data: Partial<HVACHeroContent>) => Promise<void>;
+  operatingHours: HVACOperatingHoursContact;
+  updateOperatingHours: (data: Partial<HVACOperatingHoursContact>) => Promise<void>;
+  bookingCopy: HVACBookingCopy;
+  updateBookingCopy: (data: Partial<HVACBookingCopy>) => Promise<void>;
+  // Portfolio Gallery
   galleryItems: HVACGalleryItem[];
+  addGalleryItem: (item: Omit<HVACGalleryItem, 'id'>) => Promise<void>;
+  updateGalleryItem: (id: string, item: Partial<HVACGalleryItem>) => Promise<void>;
+  deleteGalleryItem: (id: string) => Promise<void>;
   updateGalleryItems: (items: HVACGalleryItem[]) => void;
+  // Testimonials
   testimonials: HVACTestimonial[];
+  addTestimonial: (item: Omit<HVACTestimonial, 'id'>) => Promise<void>;
+  updateTestimonial: (id: string, item: Partial<HVACTestimonial>) => Promise<void>;
+  deleteTestimonial: (id: string) => Promise<void>;
   updateTestimonials: (items: HVACTestimonial[]) => void;
+  // FAQs & Guides
+  faqItems: HVACFaqItem[];
+  updateFaqItems: (items: HVACFaqItem[]) => void;
+  maintenanceGuides: HVACChecklistItem[];
+  updateMaintenanceGuides: (items: HVACChecklistItem[]) => void;
   resetAllToDefaults: () => void;
   // Booking Modal
   isBookingModalOpen: boolean;
@@ -91,81 +146,166 @@ export function HVACProvider({
     setLanguage(next);
   };
 
-  // Leads state
-  const [leads, setLeads] = useState<HVACLead[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY_LEADS);
-      if (saved) return JSON.parse(saved);
-    } catch {
-      // ignore
-    }
-    return initialSampleLeads;
-  });
+  // Leads state with Firestore sync
+  const [leads, setLeads] = useState<HVACLead[]>(initialSampleLeads);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY_LEADS, JSON.stringify(leads));
-    } catch {
-      // ignore
-    }
-  }, [leads]);
+    const unsub = subscribeHVACLeads((list) => {
+      if (list && list.length > 0) setLeads(list);
+    });
+    return () => unsub();
+  }, []);
 
-  // Services
-  const [services, setServices] = useState<HVACService[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY_SERVICES);
-      if (saved) return JSON.parse(saved);
-    } catch {
-      // ignore
-    }
-    return initialServices;
-  });
+  // Services with Firestore Sync
+  const [services, setServices] = useState<HVACService[]>(initialServices);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY_SERVICES, JSON.stringify(services));
-    } catch {
-      // ignore
-    }
-  }, [services]);
+    const unsub = subscribeHVACServices((list) => {
+      setServices(list);
+    });
+    return () => unsub();
+  }, []);
+
+  const addService = async (svc: Omit<HVACService, 'id'>) => {
+    const newSvc: HVACService = {
+      ...svc,
+      id: `hvac-svc-${Date.now()}`,
+    };
+    await saveHVACServiceDoc(newSvc);
+  };
+
+  const updateService = async (id: string, updated: Partial<HVACService>) => {
+    const existing = services.find((s) => s.id === id);
+    if (!existing) return;
+    const merged = { ...existing, ...updated };
+    await saveHVACServiceDoc(merged);
+  };
+
+  const deleteService = async (id: string) => {
+    await deleteHVACServiceDoc(id);
+  };
+
+  // Shared Service Areas / Cities
+  const [serviceAreas, setServiceAreas] = useState<HVACCityArea[]>(DEFAULT_HVAC_CITIES);
+
+  useEffect(() => {
+    const unsub = subscribeHVACSectionContent<HVACCityArea[]>(
+      'service_areas',
+      DEFAULT_HVAC_CITIES,
+      (data) => setServiceAreas(data)
+    );
+    return () => unsub();
+  }, []);
+
+  const updateServiceAreas = async (areas: HVACCityArea[]) => {
+    setServiceAreas(areas);
+    await saveHVACSectionContent('service_areas', areas);
+  };
+
+  // Hero, Operating Hours & Booking Copy
+  const [heroContent, setHeroContent] = useState<HVACHeroContent>(DEFAULT_HVAC_HERO);
+  const [operatingHours, setOperatingHours] = useState<HVACOperatingHoursContact>(DEFAULT_HVAC_HOURS_CONTACT);
+  const [bookingCopy, setBookingCopy] = useState<HVACBookingCopy>(DEFAULT_HVAC_BOOKING_COPY);
+
+  useEffect(() => {
+    const unsubHero = subscribeHVACSectionContent<HVACHeroContent>(
+      'hero',
+      DEFAULT_HVAC_HERO,
+      (data) => setHeroContent(data)
+    );
+    const unsubHours = subscribeHVACSectionContent<HVACOperatingHoursContact>(
+      'hours_contact',
+      DEFAULT_HVAC_HOURS_CONTACT,
+      (data) => setOperatingHours(data)
+    );
+    const unsubBooking = subscribeHVACSectionContent<HVACBookingCopy>(
+      'booking_copy',
+      DEFAULT_HVAC_BOOKING_COPY,
+      (data) => setBookingCopy(data)
+    );
+
+    return () => {
+      unsubHero();
+      unsubHours();
+      unsubBooking();
+    };
+  }, []);
+
+  const updateHeroContent = async (data: Partial<HVACHeroContent>) => {
+    const merged = { ...heroContent, ...data };
+    setHeroContent(merged);
+    await saveHVACSectionContent('hero', merged);
+  };
+
+  const updateOperatingHours = async (data: Partial<HVACOperatingHoursContact>) => {
+    const merged = { ...operatingHours, ...data };
+    setOperatingHours(merged);
+    await saveHVACSectionContent('hours_contact', merged);
+  };
+
+  const updateBookingCopy = async (data: Partial<HVACBookingCopy>) => {
+    const merged = { ...bookingCopy, ...data };
+    setBookingCopy(merged);
+    await saveHVACSectionContent('booking_copy', merged);
+  };
 
   // Gallery Items
-  const [galleryItems, setGalleryItems] = useState<HVACGalleryItem[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY_GALLERY);
-      if (saved) return JSON.parse(saved);
-    } catch {
-      // ignore
-    }
-    return initialGallery;
-  });
+  const [galleryItems, setGalleryItems] = useState<HVACGalleryItem[]>(initialGallery);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY_GALLERY, JSON.stringify(galleryItems));
-    } catch {
-      // ignore
-    }
-  }, [galleryItems]);
+    const unsub = subscribeHVACGallery((list) => setGalleryItems(list));
+    return () => unsub();
+  }, []);
+
+  const addGalleryItem = async (item: Omit<HVACGalleryItem, 'id'>) => {
+    const newItem: HVACGalleryItem = {
+      ...item,
+      id: `gal-${Date.now()}`,
+    };
+    await saveHVACGalleryDoc(newItem);
+  };
+
+  const updateGalleryItem = async (id: string, updated: Partial<HVACGalleryItem>) => {
+    const existing = galleryItems.find((g) => g.id === id);
+    if (!existing) return;
+    const merged = { ...existing, ...updated };
+    await saveHVACGalleryDoc(merged);
+  };
+
+  const deleteGalleryItem = async (id: string) => {
+    await deleteHVACGalleryDoc(id);
+  };
 
   // Testimonials
-  const [testimonials, setTestimonials] = useState<HVACTestimonial[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY_REVIEWS);
-      if (saved) return JSON.parse(saved);
-    } catch {
-      // ignore
-    }
-    return initialTestimonials;
-  });
+  const [testimonials, setTestimonials] = useState<HVACTestimonial[]>(initialTestimonials);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY_REVIEWS, JSON.stringify(testimonials));
-    } catch {
-      // ignore
-    }
-  }, [testimonials]);
+    const unsub = subscribeHVACTestimonials((list) => setTestimonials(list));
+    return () => unsub();
+  }, []);
+
+  const addTestimonial = async (item: Omit<HVACTestimonial, 'id'>) => {
+    const newItem: HVACTestimonial = {
+      ...item,
+      id: `rev-${Date.now()}`,
+    };
+    await saveHVACTestimonialDoc(newItem);
+  };
+
+  const updateTestimonial = async (id: string, updated: Partial<HVACTestimonial>) => {
+    const existing = testimonials.find((t) => t.id === id);
+    if (!existing) return;
+    const merged = { ...existing, ...updated };
+    await saveHVACTestimonialDoc(merged);
+  };
+
+  const deleteTestimonial = async (id: string) => {
+    await deleteHVACTestimonialDoc(id);
+  };
+
+  // FAQs & Maintenance Guides
+  const [faqItems, setFaqItems] = useState<HVACFaqItem[]>(initialFaqs);
+  const [maintenanceGuides, setMaintenanceGuides] = useState<HVACChecklistItem[]>(initialChecklist);
 
   // Booking Modal
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -220,6 +360,7 @@ export function HVACProvider({
     };
 
     setLeads((prev) => [newLead, ...prev]);
+    saveHVACLeadDoc(newLead).catch((e) => console.warn(e));
 
     // Optional API dispatch / email trigger (non-blocking)
     try {
@@ -242,12 +383,14 @@ export function HVACProvider({
   };
 
   const updateLeadStatus = (id: string, status: HVACLeadStatus) => {
+    updateHVACLeadStatusDoc(id, status).catch((e) => console.warn(e));
     setLeads((prev) =>
       prev.map((l) => (l.id === id ? { ...l, status } : l))
     );
   };
 
   const deleteLead = (id: string) => {
+    deleteHVACLeadDoc(id).catch((e) => console.warn(e));
     setLeads((prev) => prev.filter((l) => l.id !== id));
   };
 
@@ -256,11 +399,14 @@ export function HVACProvider({
     setGalleryItems(initialGallery);
     setTestimonials(initialTestimonials);
     setLeads(initialSampleLeads);
-    localStorage.removeItem(STORAGE_KEY_SERVICES);
-    localStorage.removeItem(STORAGE_KEY_GALLERY);
-    localStorage.removeItem(STORAGE_KEY_REVIEWS);
-    localStorage.removeItem(STORAGE_KEY_LEADS);
+    setServiceAreas(DEFAULT_HVAC_CITIES);
+    setHeroContent(DEFAULT_HVAC_HERO);
+    setOperatingHours(DEFAULT_HVAC_HOURS_CONTACT);
+    setBookingCopy(DEFAULT_HVAC_BOOKING_COPY);
   };
+
+  const updateFaqItems = (items: HVACFaqItem[]) => setFaqItems(items);
+  const updateMaintenanceGuides = (items: HVACChecklistItem[]) => setMaintenanceGuides(items);
 
   return (
     <HVACContext.Provider
@@ -274,11 +420,32 @@ export function HVACProvider({
         updateLeadStatus,
         deleteLead,
         services,
+        addService,
+        updateService,
+        deleteService,
         updateServices: setServices,
+        serviceAreas,
+        updateServiceAreas,
+        heroContent,
+        updateHeroContent,
+        operatingHours,
+        updateOperatingHours,
+        bookingCopy,
+        updateBookingCopy,
         galleryItems,
+        addGalleryItem,
+        updateGalleryItem,
+        deleteGalleryItem,
         updateGalleryItems: setGalleryItems,
         testimonials,
+        addTestimonial,
+        updateTestimonial,
+        deleteTestimonial,
         updateTestimonials: setTestimonials,
+        faqItems,
+        updateFaqItems,
+        maintenanceGuides,
+        updateMaintenanceGuides,
         resetAllToDefaults,
         isBookingModalOpen,
         bookingInitialService,

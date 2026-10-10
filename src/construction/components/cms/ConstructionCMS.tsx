@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Lock,
   Unlock,
@@ -44,6 +44,18 @@ export function ConstructionCMS({ onExit }: ConstructionCMSProps) {
     updateProject,
     deleteProject,
     resetProjectsToDefault,
+    services,
+    addService,
+    updateService,
+    deleteService,
+    heroContent,
+    updateHeroContent,
+    companyContent,
+    updateCompanyContent,
+    workStages,
+    updateWorkStages,
+    officeLocations,
+    updateOfficeLocations,
     leads,
     updateLeadStatus,
     deleteLead,
@@ -59,7 +71,32 @@ export function ConstructionCMS({ onExit }: ConstructionCMSProps) {
   const [pinError, setPinError] = useState('');
 
   // Active CMS Tab
-  const [activeTab, setActiveTab] = useState<'leads' | 'projects' | 'analytics'>('leads');
+  const [activeTab, setActiveTab] = useState<
+    'projects' | 'services' | 'hero_company' | 'stages_guarantees' | 'offices_contact' | 'leads' | 'analytics'
+  >('projects');
+
+  // Hero & Company Form State
+  const [heroForm, setHeroForm] = useState(heroContent);
+  const [companyForm, setCompanyForm] = useState(companyContent);
+  const [stagesForm, setStagesForm] = useState(workStages);
+  const [officesForm, setOfficesForm] = useState(officeLocations);
+  const [saveSuccessMsg, setSaveSuccessMsg] = useState('');
+
+  useEffect(() => {
+    setHeroForm(heroContent);
+  }, [heroContent]);
+
+  useEffect(() => {
+    setCompanyForm(companyContent);
+  }, [companyContent]);
+
+  useEffect(() => {
+    setStagesForm(workStages);
+  }, [workStages]);
+
+  useEffect(() => {
+    setOfficesForm(officeLocations);
+  }, [officeLocations]);
 
   // Leads Filter & Search
   const [leadStatusFilter, setLeadStatusFilter] = useState<string>('all');
@@ -365,31 +402,15 @@ export function ConstructionCMS({ onExit }: ConstructionCMSProps) {
         <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-4">
           <button
             type="button"
-            onClick={() => setActiveTab('leads')}
-            className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 ${
-              activeTab === 'leads'
-                ? 'bg-[#009ee2] text-white shadow-xs'
-                : 'bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-            }`}
-          >
-            <FileText className="w-4 h-4" />
-            <span>{t.cms.tabs.leads}</span>
-            <span className="px-2 py-0.5 rounded-full bg-white/20 text-white text-[10px]">
-              {leads.length}
-            </span>
-          </button>
-
-          <button
-            type="button"
             onClick={() => setActiveTab('projects')}
-            className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 ${
+            className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 ${
               activeTab === 'projects'
                 ? 'bg-[#009ee2] text-white shadow-xs'
                 : 'bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50'
             }`}
           >
             <Building2 className="w-4 h-4" />
-            <span>{t.cms.tabs.projects}</span>
+            <span>{isAr ? 'المشاريع والمحفظة' : 'Projects & Portfolio'}</span>
             <span className="px-2 py-0.5 rounded-full bg-white/20 text-white text-[10px]">
               {projects.length}
             </span>
@@ -397,8 +418,79 @@ export function ConstructionCMS({ onExit }: ConstructionCMSProps) {
 
           <button
             type="button"
+            onClick={() => setActiveTab('services')}
+            className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              activeTab === 'services'
+                ? 'bg-[#009ee2] text-white shadow-xs'
+                : 'bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+            }`}
+          >
+            <Coins className="w-4 h-4" />
+            <span>{isAr ? 'الخدمات والحلول' : 'Services & Solutions'}</span>
+            <span className="px-2 py-0.5 rounded-full bg-white/20 text-white text-[10px]">
+              {services.length}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('hero_company')}
+            className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              activeTab === 'hero_company'
+                ? 'bg-[#009ee2] text-white shadow-xs'
+                : 'bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+            }`}
+          >
+            <Globe className="w-4 h-4" />
+            <span>{isAr ? 'الهيرو ومعلومات الشركة' : 'Hero & Company Info'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('stages_guarantees')}
+            className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              activeTab === 'stages_guarantees'
+                ? 'bg-[#009ee2] text-white shadow-xs'
+                : 'bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+            }`}
+          >
+            <ShieldCheck className="w-4 h-4" />
+            <span>{isAr ? 'مراحل العمل والضمانات' : 'Work Stages & Warranties'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('offices_contact')}
+            className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              activeTab === 'offices_contact'
+                ? 'bg-[#009ee2] text-white shadow-xs'
+                : 'bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+            }`}
+          >
+            <Phone className="w-4 h-4" />
+            <span>{isAr ? 'الفروع والتواصل' : 'Offices & Contact'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('leads')}
+            className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              activeTab === 'leads'
+                ? 'bg-[#009ee2] text-white shadow-xs'
+                : 'bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+            }`}
+          >
+            <FileText className="w-4 h-4" />
+            <span>{isAr ? 'طلبات الأسعار' : 'Quotation Leads'}</span>
+            <span className="px-2 py-0.5 rounded-full bg-white/20 text-white text-[10px]">
+              {leads.length}
+            </span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setActiveTab('analytics')}
-            className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 ${
+            className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 ${
               activeTab === 'analytics'
                 ? 'bg-[#009ee2] text-white shadow-xs'
                 : 'bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50'
@@ -655,7 +747,291 @@ export function ConstructionCMS({ onExit }: ConstructionCMSProps) {
           </div>
         )}
 
-        {/* Tab 3: Analytics */}
+        {/* Tab 2: Services Management */}
+        {activeTab === 'services' && (
+          <div className="space-y-6 animate-in fade-in-50">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-bold font-display-serif text-[#0f243e]">
+                  {isAr ? 'إدارة خدمات المقاولات والإنشاءات' : 'Construction Services & Solutions'}
+                </h2>
+                <p className="text-xs text-slate-500">
+                  {isAr ? 'إضافة وتعديل الخدمات والمسؤوليات والضمانات المعتمدة' : 'Manage construction services, deliverables, and warranties'}
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {services.map((svc) => (
+                <div key={svc.id} className="p-5 rounded-2xl bg-white border border-slate-200 space-y-3 shadow-2xs hover:shadow-xs transition-shadow">
+                  <div className="flex items-center justify-between">
+                    <div className="px-3 py-1 rounded-full bg-sky-50 text-[#009ee2] text-xs font-bold border border-sky-100">
+                      {isAr ? svc.badgeAr : svc.badgeEn || 'خدمة معتمدة'}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => deleteService(svc.id)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                        title="Delete Service"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <h3 className="font-bold text-sm text-[#0f243e]">
+                    {isAr ? svc.titleAr : svc.titleEn}
+                  </h3>
+                  <p className="text-xs text-slate-600 line-clamp-2">
+                    {isAr ? svc.descriptionAr : svc.descriptionEn}
+                  </p>
+
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
+                    <span>{isAr ? `ضمان ${svc.warrantyYears} سنوات` : `${svc.warrantyYears}-Year Warranty`}</span>
+                    <span className="text-[#009ee2] font-bold">{svc.startingPriceSAR || 'تواصل للتسعير'}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Tab 3: Hero & Company Info */}
+        {activeTab === 'hero_company' && (
+          <div className="space-y-6 animate-in fade-in-50">
+            {saveSuccessMsg && (
+              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center justify-between shadow-2xs">
+                <span>{saveSuccessMsg}</span>
+                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+              </div>
+            )}
+
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm">
+              <div className="border-b border-slate-100 pb-4">
+                <h3 className="text-base font-bold font-display-serif text-[#0f243e]">
+                  {isAr ? 'محتوى الهيرو الرئيسي (Hero Section)' : 'Main Hero Section Content'}
+                </h3>
+                <p className="text-xs text-slate-500">
+                  {isAr ? 'تعديل العناوين والشارات والأوصاف والإحصائيات على الصفحة الرئيسية' : 'Edit hero headlines, badges, subtitles, and statistics'}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">{isAr ? 'الشارة بالعربية' : 'Badge (Arabic)'}</label>
+                  <input
+                    type="text"
+                    value={heroForm.badgeAr}
+                    onChange={(e) => setHeroForm({ ...heroForm, badgeAr: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:border-[#009ee2] focus:outline-none"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">{isAr ? 'الشارة بالإنجليزية' : 'Badge (English)'}</label>
+                  <input
+                    type="text"
+                    value={heroForm.badgeEn}
+                    onChange={(e) => setHeroForm({ ...heroForm, badgeEn: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:border-[#009ee2] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">{isAr ? 'العنوان الرئيسي (عربي)' : 'Headline (Arabic)'}</label>
+                  <textarea
+                    rows={2}
+                    value={heroForm.headlineAr}
+                    onChange={(e) => setHeroForm({ ...heroForm, headlineAr: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:border-[#009ee2] focus:outline-none"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">{isAr ? 'العنوان الرئيسي (إنجليزية)' : 'Headline (English)'}</label>
+                  <textarea
+                    rows={2}
+                    value={heroForm.headlineEn}
+                    onChange={(e) => setHeroForm({ ...heroForm, headlineEn: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:border-[#009ee2] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">{isAr ? 'الوصف الفرعي (عربي)' : 'Subtitle (Arabic)'}</label>
+                  <textarea
+                    rows={3}
+                    value={heroForm.subtitleAr}
+                    onChange={(e) => setHeroForm({ ...heroForm, subtitleAr: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:border-[#009ee2] focus:outline-none"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">{isAr ? 'الوصف الفرعي (إنجليزية)' : 'Subtitle (English)'}</label>
+                  <textarea
+                    rows={3}
+                    value={heroForm.subtitleEn}
+                    onChange={(e) => setHeroForm({ ...heroForm, subtitleEn: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:border-[#009ee2] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-4">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await updateHeroContent(heroForm);
+                    await updateCompanyContent(companyForm);
+                    setSaveSuccessMsg(isAr ? 'تم حفظ التغييرات بنجاح في قاعدة البيانات' : 'Hero & Company changes saved successfully');
+                    setTimeout(() => setSaveSuccessMsg(''), 4000);
+                  }}
+                  className="px-6 py-2.5 rounded-xl bg-[#009ee2] hover:bg-[#008bc7] text-white text-xs font-bold cursor-pointer shadow-md shadow-sky-500/20"
+                >
+                  {isAr ? 'حفظ إعدادات الهيرو والشركة' : 'Save Hero & Company Settings'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 4: Work Stages & Guarantees */}
+        {activeTab === 'stages_guarantees' && (
+          <div className="space-y-6 animate-in fade-in-50">
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm">
+              <div className="border-b border-slate-100 pb-4">
+                <h3 className="text-base font-bold font-display-serif text-[#0f243e]">
+                  {isAr ? 'مراحل التنفيذ والضمانات الإنشائية' : 'Construction Work Stages & Warranties'}
+                </h3>
+              </div>
+
+              <div className="space-y-4">
+                {stagesForm.map((stg, idx) => (
+                  <div key={stg.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-xs text-[#009ee2]">
+                        {isAr ? `المرحلة ${stg.order}` : `Stage ${stg.order}`}
+                      </span>
+                      <span className="text-[11px] font-bold text-slate-500">{stg.durationAr}</span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <input
+                        type="text"
+                        value={stg.titleAr}
+                        onChange={(e) => {
+                          const updated = [...stagesForm];
+                          updated[idx].titleAr = e.target.value;
+                          setStagesForm(updated);
+                        }}
+                        className="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-bold"
+                      />
+                      <input
+                        type="text"
+                        value={stg.titleEn}
+                        onChange={(e) => {
+                          const updated = [...stagesForm];
+                          updated[idx].titleEn = e.target.value;
+                          setStagesForm(updated);
+                        }}
+                        className="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-bold"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex justify-end pt-4">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await updateWorkStages(stagesForm);
+                    setSaveSuccessMsg(isAr ? 'تم حفظ مراحل العمل بنجاح' : 'Work stages saved successfully');
+                    setTimeout(() => setSaveSuccessMsg(''), 4000);
+                  }}
+                  className="px-6 py-2.5 rounded-xl bg-[#009ee2] hover:bg-[#008bc7] text-white text-xs font-bold cursor-pointer shadow-md shadow-sky-500/20"
+                >
+                  {isAr ? 'حفظ مراحل العمل' : 'Save Work Stages'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 5: Offices & Contact */}
+        {activeTab === 'offices_contact' && (
+          <div className="space-y-6 animate-in fade-in-50">
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm">
+              <div className="border-b border-slate-100 pb-4">
+                <h3 className="text-base font-bold font-display-serif text-[#0f243e]">
+                  {isAr ? 'مقار وفروع شركة هارد' : 'HARD Office Locations'}
+                </h3>
+              </div>
+
+              <div className="space-y-6">
+                {officesForm.map((off, idx) => (
+                  <div key={off.id} className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-sm text-[#0f243e]">
+                        {isAr ? off.nameAr : off.nameEn}
+                      </h4>
+                      {off.isHQ && (
+                        <span className="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold">
+                          {isAr ? 'المقر الرئيسي' : 'HQ'}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-bold text-slate-600">{isAr ? 'الهاتف' : 'Phone'}</label>
+                        <input
+                          type="text"
+                          value={off.phone}
+                          onChange={(e) => {
+                            const updated = [...officesForm];
+                            updated[idx].phone = e.target.value;
+                            setOfficesForm(updated);
+                          }}
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-bold text-slate-600">{isAr ? 'الواتساب' : 'WhatsApp'}</label>
+                        <input
+                          type="text"
+                          value={off.whatsapp}
+                          onChange={(e) => {
+                            const updated = [...officesForm];
+                            updated[idx].whatsapp = e.target.value;
+                            setOfficesForm(updated);
+                          }}
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex justify-end pt-4">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await updateOfficeLocations(officesForm);
+                    setSaveSuccessMsg(isAr ? 'تم حفظ بيانات الفروع بنجاح' : 'Office locations saved successfully');
+                    setTimeout(() => setSaveSuccessMsg(''), 4000);
+                  }}
+                  className="px-6 py-2.5 rounded-xl bg-[#009ee2] hover:bg-[#008bc7] text-white text-xs font-bold cursor-pointer shadow-md shadow-sky-500/20"
+                >
+                  {isAr ? 'حفظ بيانات التواصل والفروع' : 'Save Offices & Contact'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         {activeTab === 'analytics' && (
           <div className="space-y-8 animate-in fade-in-50">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -12,6 +12,8 @@ export type PageId =
   | 'contact'
   | 'construction'
   | 'hvac'
+  | 'privacy'
+  | 'terms'
   | 'admin'
   | 'not-found';
 

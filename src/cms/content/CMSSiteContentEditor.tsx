@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Send, Sparkles, RefreshCw, CheckCircle2, Globe, FileText, Layers, Layers3, AlertCircle } from 'lucide-react';
+import { Save, Send, Sparkles, RefreshCw, CheckCircle2, Globe, FileText, Layers, Layers3, AlertCircle, Search } from 'lucide-react';
 import { Language } from '../../types';
 import {
   saveCmsSectionDraft,
@@ -8,6 +8,9 @@ import {
   subscribeCmsSection,
   CmsSectionData,
 } from '../../lib/firebaseService';
+import { CMSNavigationManager } from './CMSNavigationManager';
+import { CMSPageSectionEditor } from './CMSPageSectionEditor';
+import { CMSSeoLegalEditor } from '../seo/CMSSeoLegalEditor';
 
 interface CMSSiteContentEditorProps {
   language: Language;
@@ -15,6 +18,7 @@ interface CMSSiteContentEditorProps {
 
 export const CMSSiteContentEditor: React.FC<CMSSiteContentEditorProps> = ({ language }) => {
   const isAr = language === 'ar';
+  const [editorView, setEditorView] = useState<'sections' | 'navigation' | 'seo_legal'>('sections');
   const [activeSector, setActiveSector] = useState<'portal' | 'realestate' | 'construction' | 'hvac'>('portal');
   const [sectionData, setSectionData] = useState<CmsSectionData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -121,231 +125,48 @@ export const CMSSiteContentEditor: React.FC<CMSSiteContentEditorProps> = ({ lang
 
   return (
     <div dir={isAr ? 'rtl' : 'ltr'} className="space-y-6">
-      {/* Top Banner */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 text-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
-        <div className="space-y-1">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>{isAr ? 'إدارة محتوى أقسام الموقع' : 'CMS Section Content Manager'}</span>
-          </div>
-          <h2 className="text-xl font-bold font-display-serif">
-            {isAr ? 'المسودات والنشر المباشر (Firebase Firestore CMS)' : 'Autosaved Drafts & Explicit Live Publishing'}
-          </h2>
-          <p className="text-xs text-slate-400 leading-relaxed max-w-xl">
-            {isAr
-              ? 'قم بتعديل محتوى الصفحة وتجربة المسودات دون التأثير على الموقع المباشر. عند النقر على "نشر المباشر"، يتحدث الموقع فوراً عبر Firestore.'
-              : 'Edit content, autosave drafts, and review changes safely. Click "Publish Live" to push changes instantly to visitors.'}
-          </p>
-        </div>
-
-        {/* Sector Tabs */}
-        <div className="flex flex-wrap gap-2 bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800">
-          {(['portal', 'realestate', 'construction', 'hvac'] as const).map((sector) => (
-            <button
-              key={sector}
-              onClick={() => setActiveSector(sector)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                activeSector === sector
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              {sector === 'portal' && (isAr ? 'بوابة المجموعة' : 'Group Portal')}
-              {sector === 'realestate' && (isAr ? 'العقارات' : 'Real Estate')}
-              {sector === 'construction' && (isAr ? 'المقاولات' : 'Construction')}
-              {sector === 'hvac' && (isAr ? 'التكييف' : 'HVAC')}
-            </button>
-          ))}
-        </div>
+      {/* Top Navigation Mode Switcher */}
+      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-3">
+        <button
+          onClick={() => setEditorView('sections')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            editorView === 'sections'
+              ? 'bg-slate-900 text-white shadow-xs'
+              : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+          }`}
+        >
+          {isAr ? 'محتوى الأقسام والمسودات' : 'Section Content & Drafts'}
+        </button>
+        <button
+          onClick={() => setEditorView('navigation')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            editorView === 'navigation'
+              ? 'bg-slate-900 text-white shadow-xs'
+              : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+          }`}
+        >
+          {isAr ? 'القوائم والتوجيه وروابط القطاعات' : 'Navigation Menus & URL Redirects'}
+        </button>
+        <button
+          onClick={() => setEditorView('seo_legal')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+            editorView === 'seo_legal'
+              ? 'bg-slate-900 text-white shadow-xs'
+              : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+          }`}
+        >
+          <Search className="w-3.5 h-3.5 text-blue-500" />
+          <span>{isAr ? 'تهيئة SEO، الخصوصية وSitemap' : 'SEO, Legal & Sitemap'}</span>
+        </button>
       </div>
 
-      {statusMessage && (
-        <div className="p-4 bg-emerald-950/80 border border-emerald-800 rounded-2xl text-emerald-200 text-xs flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>{statusMessage}</span>
-          </div>
-          {sectionData?.updatedAt && (
-            <span className="text-[10px] text-emerald-400 font-mono">
-              {new Date(sectionData.updatedAt).toLocaleTimeString()}
-            </span>
-          )}
-        </div>
+      {editorView === 'navigation' ? (
+        <CMSNavigationManager language={language} />
+      ) : editorView === 'seo_legal' ? (
+        <CMSSeoLegalEditor language={language} />
+      ) : (
+        <CMSPageSectionEditor language={language} />
       )}
-
-      {/* Editor Form */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-6 text-white">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-          <div className="flex items-center gap-2">
-            <Globe className="w-5 h-5 text-blue-400" />
-            <h3 className="font-bold text-base">
-              {isAr ? `محتوى قسم (${activeSector.toUpperCase()})` : `${activeSector.toUpperCase()} Section CMS Content`}
-            </h3>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${
-              sectionData?.isPublished ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-            }`}>
-              {sectionData?.isPublished ? (isAr ? 'منشور مباشرة' : 'Published Live') : (isAr ? 'مسودة معلقة' : 'Draft Pending')}
-            </span>
-          </div>
-        </div>
-
-        {/* Hero Section Form Fields */}
-        <div className="space-y-4">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-            {isAr ? 'عنوان البانر الرئيسي (Hero Section)' : 'Hero Banner Headline & Subtitle'}
-          </h4>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
-                {isAr ? 'العنوان بالعربية' : 'Arabic Headline'}
-              </label>
-              <textarea
-                rows={2}
-                value={heroTitleAr}
-                onChange={(e) => setHeroTitleAr(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
-                {isAr ? 'العنوان بالإنجليزية' : 'English Headline'}
-              </label>
-              <textarea
-                rows={2}
-                value={heroTitleEn}
-                onChange={(e) => setHeroTitleEn(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
-                {isAr ? 'الوصف الفرعي بالعربية' : 'Arabic Subtitle'}
-              </label>
-              <textarea
-                rows={2}
-                value={heroSubAr}
-                onChange={(e) => setHeroSubAr(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
-                {isAr ? 'الوصف الفرعي بالإنجليزية' : 'English Subtitle'}
-              </label>
-              <textarea
-                rows={2}
-                value={heroSubEn}
-                onChange={(e) => setHeroSubEn(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Contact Information Fields */}
-        <div className="pt-4 border-t border-slate-800 space-y-4">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-            {isAr ? 'معلومات التواصل المباشرة' : 'Direct Contact & Phone Line'}
-          </h4>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
-                {isAr ? 'رقم الهاتف المعتمد' : 'Official Hotline'}
-              </label>
-              <input
-                type="text"
-                value={phoneContact}
-                onChange={(e) => setPhoneContact(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
-                {isAr ? 'البريد الإلكتروني الرسمي' : 'Official Email Address'}
-              </label>
-              <input
-                type="email"
-                value={emailContact}
-                onChange={(e) => setEmailContact(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* About Overview */}
-        <div className="pt-4 border-t border-slate-800 space-y-4">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-            {isAr ? 'نبذة عن القسم (About Summary)' : 'Section Overview & Copy'}
-          </h4>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
-                {isAr ? 'النبذة بالعربية' : 'Arabic Overview'}
-              </label>
-              <textarea
-                rows={3}
-                value={aboutTextAr}
-                onChange={(e) => setAboutTextAr(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
-                {isAr ? 'النبذة بالإنجليزية' : 'English Overview'}
-              </label>
-              <textarea
-                rows={3}
-                value={aboutTextEn}
-                onChange={(e) => setAboutTextEn(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Action Controls */}
-        <div className="pt-6 border-t border-slate-800 flex flex-wrap items-center justify-between gap-4">
-          <div className="text-xs text-slate-400">
-            {sectionData?.updatedAt && (
-              <span>
-                {isAr ? 'آخر تحديث للمسودة: ' : 'Draft Last Updated: '}
-                <strong className="text-slate-200">{new Date(sectionData.updatedAt).toLocaleString()}</strong>
-              </span>
-            )}
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={handleSaveDraft}
-              disabled={isSavingDraft}
-              className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold inline-flex items-center gap-2 border border-slate-700 transition-colors cursor-pointer"
-            >
-              <Save className="w-4 h-4 text-blue-400" />
-              <span>{isSavingDraft ? (isAr ? 'جارٍ الحفظ...' : 'Saving Draft...') : (isAr ? 'حفظ مسودة' : 'Save Draft')}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handlePublish}
-              disabled={isPublishing}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white text-xs font-bold shadow-lg shadow-blue-900/40 inline-flex items-center gap-2 transition-all cursor-pointer"
-            >
-              <Send className="w-4 h-4 text-white" />
-              <span>{isPublishing ? (isAr ? 'جارٍ النشر المباشر...' : 'Publishing Live...') : (isAr ? 'نشر مباشر للموقع' : 'Publish Live to Website')}</span>
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

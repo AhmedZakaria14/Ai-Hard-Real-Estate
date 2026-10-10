@@ -14,7 +14,7 @@ import { Language, PageId } from '../types';
 import { translations } from '../lib/translations';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
-import { useData } from '../context/DataContext';
+import { submitCustomerForm } from '../lib/forms/formSubmissionService';
 
 interface ContactPageProps {
   onNavigate: (page: PageId) => void;
@@ -23,7 +23,6 @@ interface ContactPageProps {
 
 export function ContactPage({ onNavigate, language }: ContactPageProps) {
   const t = translations[language];
-  const { submitLead } = useData();
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -71,27 +70,30 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
 
     setLoading(true);
     try {
-      const result = await submitLead({
+      const result = await submitCustomerForm({
+        formType: 'general_contact',
+        sector: 'group',
         name: fullName.trim(),
         email: email.trim(),
         phone: phone.trim(),
-        inquiry_type: 'general_contact',
-        recipient_email: 'info@hardgp.com',
+        language,
         message: `Inquiry Type: ${inquiryType}\nSubject: ${derivedSubject}\n\n${finalMessage}`,
-        source: 'Contact Us Concierge Page',
-        metadata: {
+        details: {
           inquiryType,
           subject: derivedSubject,
-          language,
-          targetEmail: 'info@hardgp.com',
           recipientEmail: 'info@hardgp.com',
         },
       });
-      setLeadRef(result.lead.id);
-      setCrmRef(result.crmResult.crmReferenceId);
+      setLeadRef(result.trackingCode);
+      setCrmRef(`CRM-${result.leadId.slice(-6).toUpperCase()}`);
       setSubmitted(true);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Contact form submission failed', err);
+      setContactError(
+        err?.message || (language === 'en'
+          ? 'Failed to send message. Your entered details are preserved. Please retry.'
+          : 'تعذر إرسال الرسالة. تم حفظ بياناتك المدخلة، يرجى إعادة المحاولة.')
+      );
     } finally {
       setLoading(false);
     }

@@ -25,6 +25,7 @@ import { Button } from '../ui/Button';
 import { BrandLogo } from '../ui/BrandLogo';
 import { getPageHref, handleSemanticClick } from '../../lib/navigation';
 import { HARD_GROUP_SECTORS } from '../../lib/sectors';
+import { subscribeNavigationDoc, NavItem } from '../../lib/cmsNavigationManager';
 
 interface NavbarProps {
   currentPage: PageId;
@@ -64,15 +65,17 @@ export function Navbar({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close dropdown on outside click
+  const [cmsNavItems, setCmsNavItems] = useState<NavItem[] | null>(null);
+
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setSectorsDropdownOpen(false);
+    const unsub = subscribeNavigationDoc('header_realestate', (doc) => {
+      if (doc && doc.items && doc.items.length > 0) {
+        setCmsNavItems(doc.items.filter((i) => i.isVisible).sort((a, b) => a.order - b.order));
+      } else {
+        setCmsNavItems(null);
       }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    });
+    return () => unsub();
   }, []);
 
   const navItems: { id: PageId; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
@@ -119,25 +122,49 @@ export function Navbar({
 
           {/* Center Navigation Links (Desktop) */}
           <nav className="hidden lg:flex items-center space-x-1 rtl:space-x-reverse" aria-label="Main Navigation">
-            {navItems.map((item) => {
-              const isActive = currentPage === item.id;
-              const href = getPageHref(item.id);
-              return (
-                <a
-                  key={item.id}
-                  href={href}
-                  onClick={(e) => handleSemanticClick(e, () => handleNavClick(item.id))}
-                  aria-current={isActive ? 'page' : undefined}
-                  className={`px-3.5 py-2 rounded-xl text-sm font-medium transition-colors cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 ${
-                    isActive
-                      ? 'text-blue-700 bg-blue-50/80 font-semibold'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                  }`}
-                >
-                  {item.label}
-                </a>
-              );
-            })}
+            {cmsNavItems && cmsNavItems.length > 0
+              ? cmsNavItems.map((item) => {
+                  const label = item.label[language] || item.label.en || '';
+                  const href = item.targetPath;
+                  const isExternal = item.type === 'external';
+                  return (
+                    <a
+                      key={item.id}
+                      href={href}
+                      target={isExternal || item.openInNewTab ? '_blank' : undefined}
+                      rel={isExternal || item.openInNewTab ? 'noopener noreferrer' : undefined}
+                      onClick={(e) => {
+                        if (!isExternal) {
+                          const route = href.replace(/^\/realestate\/?/, '').replace(/^\//, '');
+                          const mappedPage: PageId = (route as PageId) || 'home';
+                          handleSemanticClick(e, () => handleNavClick(mappedPage));
+                        }
+                      }}
+                      className="px-3.5 py-2 rounded-xl text-sm font-medium transition-colors cursor-pointer select-none text-slate-600 hover:text-slate-900 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                    >
+                      {label}
+                    </a>
+                  );
+                })
+              : navItems.map((item) => {
+                  const isActive = currentPage === item.id;
+                  const href = getPageHref(item.id);
+                  return (
+                    <a
+                      key={item.id}
+                      href={href}
+                      onClick={(e) => handleSemanticClick(e, () => handleNavClick(item.id))}
+                      aria-current={isActive ? 'page' : undefined}
+                      className={`px-3.5 py-2 rounded-xl text-sm font-medium transition-colors cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 ${
+                        isActive
+                          ? 'text-blue-700 bg-blue-50/80 font-semibold'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                      }`}
+                    >
+                      {item.label}
+                    </a>
+                  );
+                })}
           </nav>
 
           {/* Right Actions: Sectors Dropdown, Language Switcher, CTA Button */}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Lock,
   Unlock,
@@ -41,18 +41,57 @@ export function HVACCMS({ onExit }: HVACCMSProps) {
     updateLeadStatus,
     deleteLead,
     services,
-    updateServices,
+    addService,
+    updateService,
+    deleteService,
+    serviceAreas,
+    updateServiceAreas,
+    heroContent,
+    updateHeroContent,
+    operatingHours,
+    updateOperatingHours,
+    bookingCopy,
+    updateBookingCopy,
     galleryItems,
-    updateGalleryItems,
+    addGalleryItem,
+    updateGalleryItem,
+    deleteGalleryItem,
     testimonials,
-    updateTestimonials,
+    addTestimonial,
+    updateTestimonial,
+    deleteTestimonial,
     resetAllToDefaults,
   } = useHVAC();
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pinInput, setPinInput] = useState('');
   const [pinError, setPinError] = useState(false);
-  const [activeTab, setActiveTab] = useState<'leads' | 'services' | 'gallery' | 'reviews'>('leads');
+  const [activeTab, setActiveTab] = useState<
+    'leads' | 'services' | 'service_areas' | 'hero_booking' | 'portfolio' | 'testimonials' | 'hours_contact'
+  >('leads');
+
+  // Form states
+  const [heroForm, setHeroForm] = useState(heroContent);
+  const [hoursForm, setHoursForm] = useState(operatingHours);
+  const [bookingForm, setBookingForm] = useState(bookingCopy);
+  const [areasForm, setAreasForm] = useState(serviceAreas);
+  const [saveSuccessMsg, setSaveSuccessMsg] = useState('');
+
+  useEffect(() => {
+    setHeroForm(heroContent);
+  }, [heroContent]);
+
+  useEffect(() => {
+    setHoursForm(operatingHours);
+  }, [operatingHours]);
+
+  useEffect(() => {
+    setBookingForm(bookingCopy);
+  }, [bookingCopy]);
+
+  useEffect(() => {
+    setAreasForm(serviceAreas);
+  }, [serviceAreas]);
 
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
 
@@ -113,9 +152,10 @@ export function HVACCMS({ onExit }: HVACCMSProps) {
 
   // Toggle Service Active
   const handleToggleService = (id: string) => {
-    updateServices(
-      services.map((s) => (s.id === id ? { ...s, active: !s.active } : s))
-    );
+    const target = services.find((s) => s.id === id);
+    if (target) {
+      updateService(id, { active: !target.active });
+    }
   };
 
   if (!isAuthenticated) {
@@ -233,7 +273,7 @@ export function HVACCMS({ onExit }: HVACCMSProps) {
           <button
             type="button"
             onClick={() => setActiveTab('leads')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
               activeTab === 'leads'
                 ? 'bg-[#0EA5E9] text-white shadow-xs'
                 : 'text-slate-600 hover:bg-slate-100'
@@ -249,7 +289,7 @@ export function HVACCMS({ onExit }: HVACCMSProps) {
           <button
             type="button"
             onClick={() => setActiveTab('services')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
               activeTab === 'services'
                 ? 'bg-[#0EA5E9] text-white shadow-xs'
                 : 'text-slate-600 hover:bg-slate-100'
@@ -257,13 +297,45 @@ export function HVACCMS({ onExit }: HVACCMSProps) {
           >
             <Wrench className="w-4 h-4" />
             <span>{pick(T.cms.tabServices, language)}</span>
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-white/20 text-white font-mono">
+              {services.length}
+            </span>
           </button>
 
           <button
             type="button"
-            onClick={() => setActiveTab('gallery')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer ${
-              activeTab === 'gallery'
+            onClick={() => setActiveTab('service_areas')}
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
+              activeTab === 'service_areas'
+                ? 'bg-[#0EA5E9] text-white shadow-xs'
+                : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <MapPin className="w-4 h-4" />
+            <span>{isAr ? 'مناطق الخدمة والمدن' : 'Service Areas'}</span>
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-white/20 text-white font-mono">
+              {serviceAreas.length}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('hero_booking')}
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
+              activeTab === 'hero_booking'
+                ? 'bg-[#0EA5E9] text-white shadow-xs'
+                : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <Calendar className="w-4 h-4" />
+            <span>{isAr ? 'محتوى الهيرو والحجز' : 'Hero & Booking Copy'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('portfolio')}
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
+              activeTab === 'portfolio'
                 ? 'bg-[#0EA5E9] text-white shadow-xs'
                 : 'text-slate-600 hover:bg-slate-100'
             }`}
@@ -274,15 +346,28 @@ export function HVACCMS({ onExit }: HVACCMSProps) {
 
           <button
             type="button"
-            onClick={() => setActiveTab('reviews')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer ${
-              activeTab === 'reviews'
+            onClick={() => setActiveTab('testimonials')}
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
+              activeTab === 'testimonials'
                 ? 'bg-[#0EA5E9] text-white shadow-xs'
                 : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
             <Star className="w-4 h-4" />
             <span>{pick(T.cms.tabReviews, language)}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('hours_contact')}
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
+              activeTab === 'hours_contact'
+                ? 'bg-[#0EA5E9] text-white shadow-xs'
+                : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <Phone className="w-4 h-4" />
+            <span>{isAr ? 'ساعات العمل والتواصل' : 'Hours & Emergency Contact'}</span>
           </button>
         </div>
       </div>
@@ -432,7 +517,240 @@ export function HVACCMS({ onExit }: HVACCMSProps) {
           </div>
         )}
 
-        {/* Tab 2: Services Management */}
+        {/* Tab 3: Service Areas */}
+        {activeTab === 'service_areas' && (
+          <div className="space-y-6">
+            {saveSuccessMsg && (
+              <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center justify-between">
+                <span>{saveSuccessMsg}</span>
+                <CheckCircle className="w-4 h-4 text-emerald-600" />
+              </div>
+            )}
+
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-6">
+              <div className="border-b border-slate-100 pb-4">
+                <h2 className="text-lg font-bold text-slate-900">
+                  {isAr ? 'مناطق التغطية والخدمة (الشرقية والرياض)' : 'Service Areas & City Coverage'}
+                </h2>
+                <p className="text-xs text-slate-500">
+                  {isAr ? 'إدارة المدن المشمولة وأزمنة استجابة الطوارئ بدقة' : 'Manage covered cities and emergency response dispatch SLAs'}
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                {areasForm.map((city, idx) => (
+                  <div key={city.id} className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="space-y-1">
+                      <div className="font-bold text-sm text-slate-900">
+                        {isAr ? city.cityNameAr : city.cityNameEn} ({isAr ? city.regionAr : city.regionEn})
+                      </div>
+                      <div className="text-xs text-slate-500">
+                        {city.isPrimaryArea ? (isAr ? 'منطقة تغطية رئيسية' : 'Primary SLA Zone') : (isAr ? 'فرع ثانوي' : 'Secondary Zone')}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1 text-xs">
+                        <label className="text-slate-600 font-medium">{isAr ? 'زمن الاستجابة (دقيقة):' : 'Response (min):'}</label>
+                        <input
+                          type="number"
+                          value={city.responseTimeMin}
+                          onChange={(e) => {
+                            const updated = [...areasForm];
+                            updated[idx].responseTimeMin = Number(e.target.value);
+                            setAreasForm(updated);
+                          }}
+                          className="w-20 px-2 py-1 bg-white border border-slate-300 rounded-lg text-xs text-center font-bold"
+                        />
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = [...areasForm];
+                          updated[idx].active = !updated[idx].active;
+                          setAreasForm(updated);
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                          city.active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
+                        }`}
+                      >
+                        {city.active ? (isAr ? 'نشط' : 'Active') : (isAr ? 'معطل' : 'Disabled')}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex justify-end pt-2">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await updateServiceAreas(areasForm);
+                    setSaveSuccessMsg(isAr ? 'تم حفظ مناطق الخدمة بنجاح' : 'Service areas saved successfully');
+                    setTimeout(() => setSaveSuccessMsg(''), 4000);
+                  }}
+                  className="px-6 py-2.5 rounded-xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-xs font-bold cursor-pointer shadow-xs"
+                >
+                  {isAr ? 'حفظ مناطق التغطية' : 'Save Service Areas'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 4: Hero & Booking Copy */}
+        {activeTab === 'hero_booking' && (
+          <div className="space-y-6">
+            {saveSuccessMsg && (
+              <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center justify-between">
+                <span>{saveSuccessMsg}</span>
+                <CheckCircle className="w-4 h-4 text-emerald-600" />
+              </div>
+            )}
+
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-6">
+              <div className="border-b border-slate-100 pb-4">
+                <h2 className="text-lg font-bold text-slate-900">
+                  {isAr ? 'تعديل محتوى الهيرو ونموذج الحجز' : 'Hero & Booking Copy Editor'}
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">{isAr ? 'العنوان الرئيسي (عربي)' : 'Headline (Arabic)'}</label>
+                  <textarea
+                    rows={2}
+                    value={heroForm.headlineAr}
+                    onChange={(e) => setHeroForm({ ...heroForm, headlineAr: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">{isAr ? 'العنوان الرئيسي (إنجليزية)' : 'Headline (English)'}</label>
+                  <textarea
+                    rows={2}
+                    value={heroForm.headlineEn}
+                    onChange={(e) => setHeroForm({ ...heroForm, headlineEn: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">{isAr ? 'الوصف الفرعي (عربي)' : 'Subtitle (Arabic)'}</label>
+                  <textarea
+                    rows={3}
+                    value={heroForm.subtitleAr}
+                    onChange={(e) => setHeroForm({ ...heroForm, subtitleAr: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">{isAr ? 'الوصف الفرعي (إنجليزية)' : 'Subtitle (English)'}</label>
+                  <textarea
+                    rows={3}
+                    value={heroForm.subtitleEn}
+                    onChange={(e) => setHeroForm({ ...heroForm, subtitleEn: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-2">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await updateHeroContent(heroForm);
+                    await updateBookingCopy(bookingForm);
+                    setSaveSuccessMsg(isAr ? 'تم حفظ نصوص الهيرو والحجز بنجاح' : 'Hero & booking copy saved successfully');
+                    setTimeout(() => setSaveSuccessMsg(''), 4000);
+                  }}
+                  className="px-6 py-2.5 rounded-xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-xs font-bold cursor-pointer shadow-xs"
+                >
+                  {isAr ? 'حفظ النصوص والمحتوى' : 'Save Content'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 5: Hours & Contact */}
+        {activeTab === 'hours_contact' && (
+          <div className="space-y-6">
+            {saveSuccessMsg && (
+              <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center justify-between">
+                <span>{saveSuccessMsg}</span>
+                <CheckCircle className="w-4 h-4 text-emerald-600" />
+              </div>
+            )}
+
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-6">
+              <div className="border-b border-slate-100 pb-4">
+                <h2 className="text-lg font-bold text-slate-900">
+                  {isAr ? 'ساعات العمل وهاتف طوارئ التكييف' : 'Operating Hours & Emergency Contact'}
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">{isAr ? 'هاتف الطوارئ (Emergency Phone)' : 'Emergency Phone'}</label>
+                  <input
+                    type="text"
+                    value={hoursForm.emergencyPhone}
+                    onChange={(e) => setHoursForm({ ...hoursForm, emergencyPhone: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">{isAr ? 'رقم الواتساب السريع' : 'WhatsApp Number'}</label>
+                  <input
+                    type="text"
+                    value={hoursForm.whatsappNumber}
+                    onChange={(e) => setHoursForm({ ...hoursForm, whatsappNumber: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">{isAr ? 'ساعات العمل الأسبوعية (عربي)' : 'Weekday Hours (Arabic)'}</label>
+                  <input
+                    type="text"
+                    value={hoursForm.hoursWeekdayAr}
+                    onChange={(e) => setHoursForm({ ...hoursForm, hoursWeekdayAr: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">{isAr ? 'ساعات العمل الأسبوعية (إنجليزية)' : 'Weekday Hours (English)'}</label>
+                  <input
+                    type="text"
+                    value={hoursForm.hoursWeekdayEn}
+                    onChange={(e) => setHoursForm({ ...hoursForm, hoursWeekdayEn: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-2">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await updateOperatingHours(hoursForm);
+                    setSaveSuccessMsg(isAr ? 'تم حفظ بيانات الاتصال وساعات العمل' : 'Hours and contact info saved successfully');
+                    setTimeout(() => setSaveSuccessMsg(''), 4000);
+                  }}
+                  className="px-6 py-2.5 rounded-xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-xs font-bold cursor-pointer shadow-xs"
+                >
+                  {isAr ? 'حفظ بيانات الاتصال' : 'Save Contact Info'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         {activeTab === 'services' && (
           <div className="space-y-6">
             <div>

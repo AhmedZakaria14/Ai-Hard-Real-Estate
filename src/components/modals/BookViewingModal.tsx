@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Property, Language } from '../../types';
+import { FormAttachmentMeta } from '../../types/firestore-schema';
 import { translations } from '../../lib/translations';
 import { Calendar, Clock, User, Mail, Phone, Video, CheckCircle2, MessageSquare, Sparkles } from 'lucide-react';
-import { useData } from '../../context/DataContext';
+import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSubmissionService';
+import { FileUploadZone } from '../forms/FileUploadZone';
 
 interface BookViewingModalProps {
   isOpen: boolean;
@@ -20,7 +22,6 @@ export function BookViewingModal({
   language,
 }: BookViewingModalProps) {
   const t = translations[language];
-  const { submitLead } = useData();
 
   const [tourType, setTourType] = useState<'in-person' | 'virtual'>('in-person');
   const [preferredDate, setPreferredDate] = useState('');
@@ -29,6 +30,7 @@ export function BookViewingModal({
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [notes, setNotes] = useState('');
+  const [attachments, setAttachments] = useState<FormAttachmentMeta[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [leadRef, setLeadRef] = useState('');
   const [crmRef, setCrmRef] = useState('');
@@ -52,31 +54,34 @@ export function BookViewingModal({
 
     setIsLoading(true);
     try {
-      const result = await submitLead({
+      const result = await submitCustomerForm({
+        formType: 'book_viewing',
+        sector: 'realestate',
         name: fullName.trim(),
         email: email.trim(),
         phone: phone.trim(),
-        property_id: property.id,
-        property_title: property.title.en,
-        inquiry_type: 'viewing_booking',
-        recipient_email: 'info@hardgp.com',
+        entityId: property.id,
+        entityTitle: property.title[language] || property.title.en,
+        language,
         message: `Format: ${tourType}\nPreferred Date: ${preferredDate}\nPreferred Time: ${preferredTime}\nNotes: ${notes}`,
-        source: 'Modal Viewing Booking',
-        metadata: {
+        attachments,
+        details: {
           tourType,
           preferredDate,
           preferredTime,
-          agentAssigned: property.agent.name.en,
-          language,
-          targetEmail: 'info@hardgp.com',
-          recipientEmail: 'info@hardgp.com',
+          agentAssigned: (property as any).agent?.name?.en || 'HARD Advisor',
         },
       });
-      setLeadRef(result.lead.id);
-      setCrmRef(result.crmResult.crmReferenceId);
+      setLeadRef(result.trackingCode);
+      setCrmRef(`CRM-${result.leadId.slice(-6).toUpperCase()}`);
       setSubmitted(true);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to book viewing', err);
+      if (err instanceof FormValidationError) {
+        setContactError(Object.values(err.fieldErrors).join(' '));
+      } else {
+        setContactError(err?.message || (language === 'en' ? 'Failed to book viewing. Input is preserved.' : 'فشل حجز الموعد. تم الحفاظ على البيانات.'));
+      }
     } finally {
       setIsLoading(false);
     }
@@ -307,6 +312,13 @@ export function BookViewingModal({
               className="w-full px-3 py-2 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
             />
           </div>
+
+          <FileUploadZone
+            uploadSessionId="book-viewing-modal"
+            attachments={attachments}
+            onChange={setAttachments}
+            isAr={language === 'ar'}
+          />
 
           <div className="pt-2">
             <Button type="submit" isLoading={isLoading} className="w-full">

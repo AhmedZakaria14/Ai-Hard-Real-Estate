@@ -15,6 +15,9 @@ import {
 } from 'lucide-react';
 import { useHVAC } from '../context/HVACContext';
 import { T, pick } from '../translations';
+import { FormAttachmentMeta } from '../../types/firestore-schema';
+import { submitCustomerForm } from '../../lib/forms/formSubmissionService';
+import { FileUploadZone } from '../../components/forms/FileUploadZone';
 
 export function HVACBookingModal() {
   const {
@@ -25,6 +28,8 @@ export function HVACBookingModal() {
     closeBookingModal,
     addLead,
     services,
+    serviceAreas,
+    bookingCopy,
   } = useHVAC();
 
   const [service, setService] = useState('');
@@ -35,6 +40,7 @@ export function HVACBookingModal() {
   const [city, setCity] = useState('khobar');
   const [customCity, setCustomCity] = useState('');
   const [notes, setNotes] = useState('');
+  const [attachments, setAttachments] = useState<FormAttachmentMeta[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmedLead, setConfirmedLead] = useState<{
     referenceNumber: string;
@@ -134,30 +140,60 @@ export function HVACBookingModal() {
       ? pick(T.citiesList.find((c) => c.id === city), language)
       : city;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [bookingError, setBookingError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setBookingError('');
     if (!name.trim() || !phone.trim() || !date || !service) return;
 
     setIsSubmitting(true);
-
-    const lead = addLead({
-      clientName: name.trim(),
-      phoneNumber: phone.trim(),
-      city: cityName,
-      customCity: city === 'other' ? customCity : undefined,
-      service: service,
-      preferredDate: `${date} (${slot})`,
-      notes: notes.trim() || undefined,
-      isUrgent: slot === 'emergency',
-    });
-
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setConfirmedLead({
-        referenceNumber: lead.referenceNumber,
-        clientName: lead.clientName,
+    try {
+      const result = await submitCustomerForm({
+        formType: 'hvac_service',
+        sector: 'hvac',
+        name: name.trim(),
+        email: '',
+        phone: phone.trim(),
+        language,
+        message: `Service: ${service}\nPreferred Date: ${date} (${slot})\nCity: ${cityName}\nNotes: ${notes}`,
+        attachments,
+        details: {
+          service,
+          date,
+          slot,
+          city: cityName,
+          customCity: city === 'other' ? customCity : undefined,
+          isUrgent: slot === 'emergency',
+          notes: notes.trim() || undefined,
+        },
       });
-    }, 450);
+
+      const lead = addLead({
+        clientName: name.trim(),
+        phoneNumber: phone.trim(),
+        city: cityName,
+        customCity: city === 'other' ? customCity : undefined,
+        service: service,
+        preferredDate: `${date} (${slot})`,
+        notes: notes.trim() || undefined,
+        isUrgent: slot === 'emergency',
+      });
+
+      setConfirmedLead({
+        referenceNumber: result.trackingCode || lead.referenceNumber,
+        clientName: name.trim(),
+      });
+    } catch (err: any) {
+      console.error('HVAC booking submission failed', err);
+      setBookingError(
+        err?.message || (isAr
+          ? 'تعذر إرسال الطلب. تم الحفاظ على بياناتك، يرجى إعادة المحاولة.'
+          : 'Failed to submit booking request. Input is preserved. Please retry.')
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleWhatsAppConfirmation = () => {
@@ -269,6 +305,11 @@ City: ${cityName}`;
           ) : (
             /* Booking Form */
             <form onSubmit={handleSubmit} className="space-y-4 text-start">
+              {bookingError && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold">
+                  {bookingError}
+                </div>
+              )}
               {/* Service Select */}
               <div>
                 <label className="block text-xs font-bold text-slate-800 mb-1.5">
@@ -346,9 +387,9 @@ City: ${cityName}`;
                     onChange={(e) => setCity(e.target.value)}
                     className="w-full ps-9 pe-8 py-2.5 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed cursor-pointer"
                   >
-                    {T.citiesList.map((c) => (
+                    {serviceAreas.filter((c) => c.active).map((c) => (
                       <option key={c.id} value={c.id}>
-                        {pick(c, language)}
+                        {isAr ? c.cityNameAr : c.cityNameEn} ({c.responseTimeMin} {isAr ? 'دقيقة' : 'min'})
                       </option>
                     ))}
                   </select>
@@ -426,6 +467,15 @@ City: ${cityName}`;
                   className="w-full p-3 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-500 focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed resize-none"
                 />
               </div>
+
+              {/* Attachments */}
+              <FileUploadZone
+                uploadSessionId="hvac-booking-modal"
+                attachments={attachments}
+                onChange={setAttachments}
+                isAr={isAr}
+                label={isAr ? 'صور الموقع أو الوحدة إن وجدت (اختياري)' : 'Site or Unit Photos (Optional)'}
+              />
 
               {/* Submit Button */}
               <div className="pt-2">
