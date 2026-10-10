@@ -27,6 +27,8 @@ import { CMSAddSubscriberModal } from './subscribers/CMSAddSubscriberModal';
 import { CMSLeadsList } from './leads/CMSLeadsList';
 import { CMSSettings } from './settings/CMSSettings';
 
+import { notifyAdminAuthChange } from '../lib/adminAuth';
+
 interface CMSAppProps {
   onReturnToSite: () => void;
   onViewPropertyOnSite?: (property: Property) => void;
@@ -109,6 +111,7 @@ export const CMSApp: React.FC<CMSAppProps> = ({
     setAdminUser(user);
     try {
       sessionStorage.setItem('hard_cms_admin_session', JSON.stringify(user));
+      notifyAdminAuthChange();
     } catch (e) {
       console.warn('Session storage write failed:', e);
     }
@@ -118,6 +121,7 @@ export const CMSApp: React.FC<CMSAppProps> = ({
     setAdminUser(null);
     try {
       sessionStorage.removeItem('hard_cms_admin_session');
+      notifyAdminAuthChange();
     } catch (e) {
       console.warn('Session storage remove failed:', e);
     }

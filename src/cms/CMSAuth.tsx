@@ -108,7 +108,7 @@ export const CMSAuth: React.FC<CMSAuthProps> = ({
 
         {/* Error Alert */}
         {error && (
-          <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-medium animate-in fade-in">
+          <div className="p-3.5 rounded-xl bg-red-500/20 border border-red-500/40 text-red-200 text-xs font-semibold animate-in fade-in">
             {error}
           </div>
         )}
@@ -116,41 +116,46 @@ export const CMSAuth: React.FC<CMSAuthProps> = ({
         {/* Credentials Form */}
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5 text-start">
-              {isAr ? 'البريد الإلكتروني للإدارة' : 'Admin Email Address'}
+            <label htmlFor="cms-admin-email" className="block text-xs font-bold text-slate-200 mb-1.5 text-start">
+              {isAr ? 'البريد الإلكتروني للإدارة' : 'Admin Email Address'} *
             </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5 pointer-events-none" />
               <input
+                id="cms-admin-email"
                 type="text"
                 required
+                aria-required="true"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={isAr ? 'admin@hard.sa' : 'admin@hard.sa'}
-                className="w-full ps-10 pe-4 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-start"
+                className="w-full ps-10 pe-4 py-2.5 bg-slate-800/90 border border-slate-700 hover:border-slate-600 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-start"
               />
             </div>
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs font-semibold text-slate-300 text-start">
-                {isAr ? 'كلمة المرور' : 'Password'}
+              <label htmlFor="cms-admin-password" className="block text-xs font-bold text-slate-200 text-start">
+                {isAr ? 'كلمة المرور' : 'Password'} *
               </label>
             </div>
             <div className="relative">
               <Lock className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5 pointer-events-none" />
               <input
+                id="cms-admin-password"
                 type={showPassword ? 'text' : 'password'}
                 required
+                aria-required="true"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full ps-10 pe-11 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-start"
+                className="w-full ps-10 pe-11 py-2.5 bg-slate-800/90 border border-slate-700 hover:border-slate-600 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-start"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? (isAr ? 'إخفاء كلمة المرور' : 'Hide password') : (isAr ? 'إظهار كلمة المرور' : 'Show password')}
                 className="absolute top-3 end-3 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -159,10 +164,10 @@ export const CMSAuth: React.FC<CMSAuthProps> = ({
           </div>
 
           {/* Quick Demo Credentials Autofill Helper */}
-          <div className="p-3 rounded-xl bg-blue-950/40 border border-blue-800/30 flex items-center justify-between text-xs">
+          <div className="p-3 rounded-xl bg-blue-950/60 border border-blue-800/50 flex items-center justify-between text-xs">
             <div className="space-y-0.5 text-start">
-              <span className="text-slate-400 block text-[11px]">{isAr ? 'بيانات التجربة السريعة:' : 'Demo Access:'}</span>
-              <span className="font-mono text-blue-300 text-[11px]">admin@hard.sa / admin</span>
+              <span className="text-slate-300 block text-xs font-medium">{isAr ? 'بيانات التجربة السريعة:' : 'Demo Access:'}</span>
+              <span className="font-mono text-blue-300 text-xs font-bold">admin@hard.sa / admin</span>
             </div>
             <button
               type="button"

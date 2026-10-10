@@ -32,22 +32,53 @@ export function InquiryModal({
   const [leadRef, setLeadRef] = useState('');
   const [crmRef, setCrmRef] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [contactError, setContactError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setContactError('');
+
+    if (!fullName.trim()) return;
+    if (!email.trim() && !phone.trim()) {
+      setContactError(
+        language === 'en'
+          ? 'Please provide at least one contact method (email or phone).'
+          : 'يرجى تقديم وسيلة تواصل واحدة على الأقل (البريد الإلكتروني أو رقم الهاتف).'
+      );
+      return;
+    }
+
+    const categoryMap: Record<string, { en: string; ar: string }> = {
+      buying: { en: 'Property Acquisition / Buying', ar: 'شراء وتملك عقار' },
+      renting: { en: 'Property Leasing / Renting', ar: 'استئجار عقار' },
+      listing: { en: 'Selling / Listing My Property', ar: 'بيع أو إدراج عقاري' },
+      investment: { en: 'High-Yield Investment & Projects', ar: 'استثمار بعوائد مرتفعة ومشاريع' },
+      commercial: { en: 'Commercial Real Estate', ar: 'عقارات تجارية واستثمارية' },
+    };
+
+    const derivedSubject = subject.trim()
+      ? subject.trim()
+      : categoryMap[category]?.[language] || (language === 'en' ? 'General Advisory Inquiry' : 'استفسار استشاري عام');
+
+    const finalMessage = message.trim()
+      ? message.trim()
+      : language === 'en'
+      ? `General advisory request for category: ${derivedSubject}`
+      : `طلب استشارة عامة لقسم: ${derivedSubject}`;
+
     setIsLoading(true);
     try {
       const result = await submitLead({
-        name: fullName,
-        email,
-        phone,
+        name: fullName.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
         inquiry_type: 'general_contact',
         recipient_email: 'info@hardgp.com',
-        message: `Category: ${category}\nSubject: ${subject || 'Advisory Inquiry'}\n\n${message}`,
+        message: `Category: ${category}\nSubject: ${derivedSubject}\n\n${finalMessage}`,
         source: 'General Advisory Inquiry Modal',
         metadata: {
           category,
-          subject,
+          subject: derivedSubject,
           language,
           targetEmail: 'info@hardgp.com',
           recipientEmail: 'info@hardgp.com',
@@ -107,12 +138,14 @@ export function InquiryModal({
       ) : (
         <form onSubmit={handleSubmit} className="space-y-3.5">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label htmlFor="advisory-inquiry-fullname" className="block text-xs font-semibold text-slate-700 mb-1">
               {t.contact.fullName} *
             </label>
             <input
+              id="advisory-inquiry-fullname"
               type="text"
               required
+              aria-required="true"
               placeholder={language === 'en' ? 'Your Name' : 'اسمك الكريم'}
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
@@ -122,38 +155,49 @@ export function InquiryModal({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                {t.contact.email} *
+              <label htmlFor="advisory-inquiry-email" className="block text-xs font-semibold text-slate-700 mb-1">
+                {t.contact.email} <span className="text-slate-400 font-normal">({language === 'en' ? 'or Phone' : 'أو الهاتف'})</span>
               </label>
               <input
+                id="advisory-inquiry-email"
                 type="email"
-                required
                 placeholder="name@email.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (contactError) setContactError('');
+                }}
                 className="w-full px-3 py-2 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                {t.contact.phone} *
+              <label htmlFor="advisory-inquiry-phone" className="block text-xs font-semibold text-slate-700 mb-1">
+                {t.contact.phone} <span className="text-slate-400 font-normal">({language === 'en' ? 'or Email' : 'أو البريد'})</span>
               </label>
               <input
+                id="advisory-inquiry-phone"
                 type="tel"
-                required
                 placeholder="+966 50 000 0000"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => {
+                  setPhone(e.target.value);
+                  if (contactError) setContactError('');
+                }}
                 className="w-full px-3 py-2 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all"
               />
             </div>
           </div>
 
+          {contactError && (
+            <p className="text-xs text-rose-500 font-medium">{contactError}</p>
+          )}
+
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label htmlFor="advisory-inquiry-category" className="block text-xs font-semibold text-slate-700 mb-1">
               {t.contact.inquiryType}
             </label>
             <select
+              id="advisory-inquiry-category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               className="w-full px-3 py-2 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all cursor-pointer"
@@ -167,12 +211,12 @@ export function InquiryModal({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              {t.contact.message}
+            <label htmlFor="advisory-inquiry-message" className="block text-xs font-semibold text-slate-700 mb-1">
+              {t.contact.message} <span className="text-slate-400 font-normal">({language === 'en' ? 'Optional' : 'اختياري'})</span>
             </label>
             <textarea
+              id="advisory-inquiry-message"
               rows={3}
-              required
               placeholder={language === 'en' ? 'Tell us about your budget, target areas, or timeline...' : 'اكتب تفاصيل ميزانيتك، المناطق المفضلة، أو الإطار الزمني...'}
               value={message}
               onChange={(e) => setMessage(e.target.value)}

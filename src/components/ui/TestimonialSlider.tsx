@@ -13,6 +13,7 @@ import {
 import { Language, Testimonial } from '../../types';
 import { translations } from '../../lib/translations';
 import { Badge } from './Badge';
+import { ComplianceVerificationModal } from '../modals/ComplianceVerificationModal';
 
 interface TestimonialSliderProps {
   testimonials: Testimonial[];
@@ -23,6 +24,7 @@ export function TestimonialSlider({ testimonials, language }: TestimonialSliderP
   const t = translations[language];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [isComplianceModalOpen, setIsComplianceModalOpen] = useState(false);
 
   // Auto slide every 6 seconds if not paused
   useEffect(() => {
@@ -80,10 +82,15 @@ export function TestimonialSlider({ testimonials, language }: TestimonialSliderP
               <Sparkles className="w-3 h-3 me-1 inline" />
               {categoryBadgeLabel[current.category]}
             </Badge>
-            <span className="inline-flex items-center gap-1 text-xs text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2.5 py-0.5 rounded-full font-medium">
+            <button
+              type="button"
+              onClick={() => setIsComplianceModalOpen(true)}
+              className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300 bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-800/60 px-2.5 py-0.5 rounded-full font-medium transition-colors cursor-pointer"
+              title={language === 'en' ? 'Click to view client verification policy' : 'انقر لعرض سياسة توثيق التقييمات'}
+            >
               <ShieldCheck className="w-3.5 h-3.5" />
-              {language === 'en' ? 'Verified Client' : 'عميل موثق'}
-            </span>
+              <span>{language === 'en' ? 'Verified Client Record' : 'صفقة عميل موثقة'}</span>
+            </button>
           </div>
         </div>
 
@@ -166,6 +173,13 @@ export function TestimonialSlider({ testimonials, language }: TestimonialSliderP
           </div>
         </div>
       </div>
+
+      <ComplianceVerificationModal
+        isOpen={isComplianceModalOpen}
+        onClose={() => setIsComplianceModalOpen(false)}
+        language={language}
+        initialTab="reviews"
+      />
     </div>
   );
 }

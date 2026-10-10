@@ -13,6 +13,8 @@ import { useHVAC } from '../context/HVACContext';
 import { HVACBrandLockup } from './HVACBrandLockup';
 import { T, pick } from '../translations';
 import { PageId } from '../../types';
+import { handleSemanticClick } from '../../lib/navigation';
+import { isAuthorizedAdmin } from '../../lib/adminAuth';
 
 interface HVACFooterProps {
   onNavigatePage?: (page: PageId) => void;
@@ -21,6 +23,18 @@ interface HVACFooterProps {
 
 export function HVACFooter({ onNavigatePage, onOpenCMS }: HVACFooterProps) {
   const { language, isAr } = useHVAC();
+  const [isAdmin, setIsAdmin] = React.useState<boolean>(() => isAuthorizedAdmin());
+
+  React.useEffect(() => {
+    const checkAuth = () => setIsAdmin(isAuthorizedAdmin());
+    checkAuth();
+    window.addEventListener('cms-auth-change', checkAuth);
+    window.addEventListener('storage', checkAuth);
+    return () => {
+      window.removeEventListener('cms-auth-change', checkAuth);
+      window.removeEventListener('storage', checkAuth);
+    };
+  }, []);
 
   return (
     <footer className="bg-white border-t border-slate-200/80 pt-16 pb-8 text-start">
@@ -122,45 +136,51 @@ export function HVACFooter({ onNavigatePage, onOpenCMS }: HVACFooterProps) {
           {/* Col 3 (3 cols): HARD Group Divisions */}
           <div className="lg:col-span-2 space-y-3">
             <h4 className="font-semibold text-slate-900 text-sm">
-              {pick(T.footer.groupLinks, language)}
+              {isAr ? 'قطاعات مجموعة هارد' : 'HARD Group Sectors'}
             </h4>
             <ul className="space-y-2 text-xs text-slate-600">
               {onNavigatePage && (
                 <>
                   <li>
-                    <button
-                      type="button"
-                      onClick={() => onNavigatePage('portal')}
-                      className="hover:text-[#0EA5E9] transition-colors text-start cursor-pointer flex items-center gap-1.5"
+                    <a
+                      href="/"
+                      onClick={(e) => handleSemanticClick(e, () => onNavigatePage('portal'))}
+                      className="hover:text-[#0EA5E9] transition-colors text-start cursor-pointer flex items-center gap-1.5 focus-visible:outline-none focus-visible:underline"
                     >
                       <Layers className="w-3.5 h-3.5 text-[#0EA5E9]" />
-                      <span>{pick(T.footer.corporatePortal, language)}</span>
-                    </button>
+                      <span>{isAr ? 'بوابة مجموعة هارد' : 'HARD Group Portal'}</span>
+                    </a>
                   </li>
                   <li>
-                    <button
-                      type="button"
-                      onClick={() => onNavigatePage('construction')}
-                      className="hover:text-[#0EA5E9] transition-colors text-start cursor-pointer flex items-center gap-1.5"
+                    <a
+                      href="/realestate"
+                      onClick={(e) => handleSemanticClick(e, () => onNavigatePage('home'))}
+                      className="hover:text-[#0EA5E9] transition-colors text-start cursor-pointer flex items-center gap-1.5 focus-visible:outline-none focus-visible:underline"
                     >
                       <Building className="w-3.5 h-3.5 text-[#0EA5E9]" />
-                      <span>{pick(T.footer.constructionDiv, language)}</span>
-                    </button>
+                      <span>{isAr ? 'هارد للعقارات' : 'HARD Real Estate'}</span>
+                    </a>
                   </li>
                   <li>
-                    <button
-                      type="button"
-                      onClick={() => onNavigatePage('home')}
-                      className="hover:text-[#0EA5E9] transition-colors text-start cursor-pointer flex items-center gap-1.5"
+                    <a
+                      href="/construction"
+                      onClick={(e) => handleSemanticClick(e, () => onNavigatePage('construction'))}
+                      className="hover:text-[#0EA5E9] transition-colors text-start cursor-pointer flex items-center gap-1.5 focus-visible:outline-none focus-visible:underline"
                     >
                       <Building className="w-3.5 h-3.5 text-[#0EA5E9]" />
-                      <span>{pick(T.footer.realEstateDiv, language)}</span>
-                    </button>
+                      <span>{isAr ? 'هارد للإنشاءات' : 'HARD Construction'}</span>
+                    </a>
+                  </li>
+                  <li>
+                    <span className="text-[#0EA5E9] font-bold flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#0EA5E9]" />
+                      <span>{isAr ? 'هارد لصيانة التكييف (القطاع الحالي)' : 'HARD HVAC Maintenance (Current)'}</span>
+                    </span>
                   </li>
                 </>
               )}
 
-              {onOpenCMS && (
+              {isAdmin && onOpenCMS && (
                 <li className="pt-2">
                   <button
                     type="button"
@@ -210,11 +230,45 @@ export function HVACFooter({ onNavigatePage, onOpenCMS }: HVACFooterProps) {
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-8 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <div className="pt-8 border-t border-slate-200/80 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>{pick(T.footer.rights, language)}</p>
-          <p className="font-medium text-slate-600">
-            {pick(T.footer.slogan, language)}
-          </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 font-medium text-slate-600">
+            <span className="text-slate-400 font-semibold uppercase text-[10px] tracking-wider">
+              {isAr ? 'قطاعات هارد:' : 'Sectors:'}
+            </span>
+            {onNavigatePage && (
+              <>
+                <a
+                  href="/"
+                  onClick={(e) => handleSemanticClick(e, () => onNavigatePage('portal'))}
+                  className="hover:text-[#0EA5E9] transition-colors"
+                >
+                  {isAr ? 'بوابة مجموعة هارد' : 'HARD Group Portal'}
+                </a>
+                <span className="text-slate-300">•</span>
+                <a
+                  href="/realestate"
+                  onClick={(e) => handleSemanticClick(e, () => onNavigatePage('home'))}
+                  className="hover:text-[#0EA5E9] transition-colors"
+                >
+                  {isAr ? 'هارد للعقارات' : 'HARD Real Estate'}
+                </a>
+                <span className="text-slate-300">•</span>
+                <a
+                  href="/construction"
+                  onClick={(e) => handleSemanticClick(e, () => onNavigatePage('construction'))}
+                  className="hover:text-[#0EA5E9] transition-colors"
+                >
+                  {isAr ? 'هارد للإنشاءات' : 'HARD Construction'}
+                </a>
+                <span className="text-slate-300">•</span>
+                <span className="text-[#0EA5E9] font-bold">
+                  {isAr ? 'هارد لصيانة التكييف (القطاع الحالي)' : 'HARD HVAC Maintenance (Current)'}
+                </span>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </footer>

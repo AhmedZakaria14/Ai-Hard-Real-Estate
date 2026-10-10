@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useId } from 'react';
 import {
   X,
   CheckCircle2,
@@ -36,6 +36,79 @@ export function HVACQuoteDialog() {
     referenceNumber: string;
     clientName: string;
   } | null>(null);
+
+  const modalRef = useRef<HTMLDivElement>(null);
+  const triggerElementRef = useRef<HTMLElement | null>(null);
+  const titleId = useId();
+
+  // Focus management, focus restoration, and body scroll lock
+  useEffect(() => {
+    if (isQuoteDialogOpen) {
+      triggerElementRef.current = document.activeElement as HTMLElement;
+      document.body.style.overflow = 'hidden';
+
+      const timer = setTimeout(() => {
+        if (modalRef.current) {
+          const focusables = modalRef.current.querySelectorAll<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          );
+          if (focusables.length > 0) {
+            focusables[0].focus();
+          } else {
+            modalRef.current.focus();
+          }
+        }
+      }, 50);
+
+      return () => {
+        clearTimeout(timer);
+        document.body.style.overflow = '';
+        if (triggerElementRef.current && typeof triggerElementRef.current.focus === 'function') {
+          triggerElementRef.current.focus();
+        }
+      };
+    }
+  }, [isQuoteDialogOpen]);
+
+  // Handle Escape key dismissal and Tab focus containment
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Escape') {
+      e.stopPropagation();
+      closeQuoteDialog();
+      return;
+    }
+
+    if (e.key === 'Tab' && modalRef.current) {
+      const elements = Array.from(
+        modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
+      );
+      const focusables: HTMLElement[] = elements.filter(
+        (el): el is HTMLElement =>
+          el instanceof HTMLElement &&
+          !el.hasAttribute('disabled') &&
+          el.getAttribute('aria-hidden') !== 'true'
+      );
+
+      if (focusables.length === 0) return;
+
+      const firstElement = focusables[0];
+      const lastElement = focusables[focusables.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement || document.activeElement === modalRef.current) {
+          e.preventDefault();
+          lastElement.focus();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
+        }
+      }
+    }
+  };
 
   // Reset form when dialog opens
   useEffect(() => {
@@ -109,9 +182,16 @@ ${isUrgent ? '⚠️ Urgency: Emergency Request' : ''}`;
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200"
       onClick={closeQuoteDialog}
+      dir={isAr ? 'rtl' : 'ltr'}
     >
       <div
-        className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl relative"
+        ref={modalRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        onKeyDown={handleKeyDown}
+        className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl relative focus:outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
@@ -121,7 +201,7 @@ ${isUrgent ? '⚠️ Urgency: Emergency Request' : ''}`;
               <FileText className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-semibold text-base sm:text-lg">
+              <h3 id={titleId} className="font-semibold text-base sm:text-lg">
                 {pick(T.quoteForm.dialogTitle, language)}
               </h3>
               <p className="text-xs text-slate-300">
@@ -133,9 +213,11 @@ ${isUrgent ? '⚠️ Urgency: Emergency Request' : ''}`;
           <button
             type="button"
             onClick={closeQuoteDialog}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            aria-label={isAr ? 'إغلاق نافذة طلب عرض السعر' : 'Close quote request dialog'}
+            title={isAr ? 'إغلاق نافذة طلب عرض السعر' : 'Close quote request dialog'}
+            className="p-2.5 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0EA5E9] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1E293B] transition-colors cursor-pointer shrink-0"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 
@@ -189,29 +271,29 @@ ${isUrgent ? '⚠️ Urgency: Emergency Request' : ''}`;
 
               {/* Full Name */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-800 mb-1.5">
                   {pick(T.quoteForm.fullNameLabel, language)} *
                 </label>
                 <div className="relative">
-                  <User className="w-4 h-4 text-slate-400 absolute start-3 top-1/2 -translate-y-1/2" />
+                  <User className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="text"
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder={isAr ? 'مثال: م. سعود القحطاني' : 'e.g. Eng. Saud Al-Qahtani'}
-                    className="w-full ps-9 pe-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-[#0EA5E9] focus:ring-1 focus:ring-[#0EA5E9]"
+                    className="w-full ps-9 pe-4 py-2.5 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-500 focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
 
               {/* Phone */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-800 mb-1.5">
                   {pick(T.quoteForm.phoneLabel, language)} *
                 </label>
                 <div className="relative">
-                  <Phone className="w-4 h-4 text-slate-400 absolute start-3 top-1/2 -translate-y-1/2" />
+                  <Phone className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="tel"
                     required
@@ -219,31 +301,31 @@ ${isUrgent ? '⚠️ Urgency: Emergency Request' : ''}`;
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="05XXXXXXXX / +966 5X XXX XXXX"
-                    className="w-full ps-9 pe-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-[#0EA5E9] focus:ring-1 focus:ring-[#0EA5E9] font-mono text-start"
+                    className="w-full ps-9 pe-4 py-2.5 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-500 focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed font-mono text-start"
                   />
                 </div>
               </div>
 
               {/* Email Optional */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-800 mb-1.5">
                   {pick(T.quoteForm.emailLabel, language)}
                 </label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-slate-400 absolute start-3 top-1/2 -translate-y-1/2" />
+                  <Mail className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="user@example.com"
-                    className="w-full ps-9 pe-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-[#0EA5E9] focus:ring-1 focus:ring-[#0EA5E9]"
+                    className="w-full ps-9 pe-4 py-2.5 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-500 focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
 
               {/* Notes */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-800 mb-1.5">
                   {pick(T.quoteForm.notesLabel, language)}
                 </label>
                 <textarea
@@ -255,7 +337,7 @@ ${isUrgent ? '⚠️ Urgency: Emergency Request' : ''}`;
                       ? 'عدد المكيفات، نوعها (سبليت/مركزي)، أو تفاصيل العطل...'
                       : 'Number of ACs, type (split/central), symptoms...'
                   }
-                  className="w-full p-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-[#0EA5E9] focus:ring-1 focus:ring-[#0EA5E9] resize-none"
+                  className="w-full p-3 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-500 focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed resize-none"
                 />
               </div>
 

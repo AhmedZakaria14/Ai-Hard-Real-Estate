@@ -5,10 +5,13 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'whatsapp' | 'white' | 'destructive';
   size?: 'sm' | 'md' | 'lg' | 'icon';
   isLoading?: boolean;
+  href?: string;
+  target?: string;
+  rel?: string;
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'primary', size = 'md', isLoading, children, disabled, ...props }, ref) => {
+  ({ className, variant = 'primary', size = 'md', isLoading, children, disabled, href, target, rel, ...props }, ref) => {
     const baseStyles =
       'inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer select-none rounded-xl active:scale-[0.99]';
 
@@ -35,6 +38,20 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       lg: 'h-13 px-7 text-base font-semibold gap-2.5',
       icon: 'h-10 w-10 p-0',
     };
+
+    if (href) {
+      return (
+        <a
+          href={href}
+          target={target}
+          rel={rel}
+          className={cn(baseStyles, variants[variant], sizes[size], className)}
+          {...(props as unknown as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
+        >
+          {children}
+        </a>
+      );
+    }
 
     return (
       <button

@@ -16,6 +16,9 @@ import {
 import { useConstruction } from '../context/ConstructionContext';
 import { constructionTranslations } from '../utils/translations';
 import { COMPANY_CREDENTIALS } from '../data/seedData';
+import { handleSemanticClick } from '../../lib/navigation';
+import { HARD_GROUP_SECTORS } from '../../lib/sectors';
+import { isAuthorizedAdmin } from '../../lib/adminAuth';
 
 interface NavbarProps {
   onNavigate?: (page: any) => void;
@@ -30,13 +33,33 @@ export function Navbar({
   onNavigateToRealEstate,
   onOpenCMS,
 }: NavbarProps) {
-  const { language, toggleLanguage, openCostEstimator, openQuoteModal } = useConstruction();
+  const {
+    language,
+    toggleLanguage,
+    openCostEstimator,
+    openQuoteModal,
+    closeProjectModal,
+    selectedProjectForModal,
+    unknownProjectId,
+  } = useConstruction();
   const t = constructionTranslations[language];
   const isAr = language === 'ar';
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(() => isAuthorizedAdmin());
+
+  useEffect(() => {
+    const checkAuth = () => setIsAdmin(isAuthorizedAdmin());
+    checkAuth();
+    window.addEventListener('cms-auth-change', checkAuth);
+    window.addEventListener('storage', checkAuth);
+    return () => {
+      window.removeEventListener('cms-auth-change', checkAuth);
+      window.removeEventListener('storage', checkAuth);
+    };
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,6 +81,9 @@ export function Navbar({
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string, isCalc?: boolean) => {
     e.preventDefault();
     setMobileMenuOpen(false);
+    if (selectedProjectForModal || unknownProjectId) {
+      closeProjectModal();
+    }
     if (isCalc) {
       openCostEstimator();
       return;
@@ -110,8 +136,9 @@ export function Navbar({
               href="/construction"
               className="flex items-center gap-3 group focus:outline-none"
               onClick={(e) => {
-                e.preventDefault();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                handleSemanticClick(e, () => {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
               }}
             >
               <img
@@ -178,16 +205,18 @@ export function Navbar({
               <span>{language === 'en' ? 'العربية' : 'English'}</span>
             </button>
 
-            {/* CMS Portal Trigger */}
-            <button
-              type="button"
-              onClick={onOpenCMS}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-xs font-medium text-slate-600 border border-slate-200 transition-colors cursor-pointer"
-              title={t.nav.cms}
-            >
-              <Lock className="w-3.5 h-3.5 text-amber-500" />
-              <span className="hidden md:inline">{t.nav.cms}</span>
-            </button>
+            {/* CMS Portal Trigger (Admins Only) */}
+            {isAdmin && onOpenCMS && (
+              <button
+                type="button"
+                onClick={onOpenCMS}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-xs font-medium text-slate-600 border border-slate-200 transition-colors cursor-pointer"
+                title={t.nav.cms}
+              >
+                <Lock className="w-3.5 h-3.5 text-amber-500" />
+                <span className="hidden md:inline">{t.nav.cms}</span>
+              </button>
+            )}
 
             {/* Instant Quote CTA */}
             <button
@@ -224,8 +253,50 @@ export function Navbar({
 
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-3 animate-in slide-in-from-top-4 shadow-lg">
+          <div className="lg:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-4 animate-in slide-in-from-top-4 shadow-lg max-h-[85vh] overflow-y-auto">
+            {/* Dedicated HARD Group Sectors Switcher */}
+            <div className="bg-slate-900 rounded-2xl p-3 text-white space-y-2">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-1">
+                {isAr ? 'قطاعات مجموعة هارد' : 'HARD Group Sectors'}
+              </div>
+              <div className="space-y-1">
+                {HARD_GROUP_SECTORS.map((sector) => {
+                  const isCurrent = sector.id === 'construction';
+                  return (
+                    <a
+                      key={sector.id}
+                      href={sector.href}
+                      onClick={(e) =>
+                        handleSemanticClick(e, () => {
+                          if (!isCurrent && onNavigate) {
+                            onNavigate(sector.pageId);
+                          }
+                          setMobileMenuOpen(false);
+                        })
+                      }
+                      aria-current={isCurrent ? 'page' : undefined}
+                      className={`flex items-center justify-between p-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
+                        isCurrent
+                          ? 'bg-[#009ee2] text-white font-bold'
+                          : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                      }`}
+                    >
+                      <span>{sector.name[language]}</span>
+                      {isCurrent && (
+                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-black/30 text-sky-200 uppercase font-extrabold">
+                          {isAr ? 'القطاع الحالي' : 'Active'}
+                        </span>
+                      )}
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+
             <div className="flex flex-col space-y-1">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-1">
+                {isAr ? 'أقسام الموقع' : 'Construction Navigation'}
+              </div>
               {navLinks.map((link) => (
                 <a
                   key={link.href}
@@ -266,17 +337,19 @@ export function Navbar({
               </button>
 
               <div className="flex items-center justify-between pt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    if (onOpenCMS) onOpenCMS();
-                  }}
-                  className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-amber-600"
-                >
-                  <Lock className="w-3.5 h-3.5 text-amber-500" />
-                  <span>{t.nav.cms}</span>
-                </button>
+                {isAdmin && onOpenCMS && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      if (onOpenCMS) onOpenCMS();
+                    }}
+                    className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-amber-600"
+                  >
+                    <Lock className="w-3.5 h-3.5 text-amber-500" />
+                    <span>{t.nav.cms}</span>
+                  </button>
+                )}
 
                 <a
                   href={`tel:${COMPANY_CREDENTIALS.phone.replace(/\s+/g, '')}`}

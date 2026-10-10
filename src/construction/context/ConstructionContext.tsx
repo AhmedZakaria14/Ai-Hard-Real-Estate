@@ -2,12 +2,17 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   ConstructionLanguage,
   ConstructionProject,
+  ConstructionProjectCategory,
   ConstructionQuoteLead,
   CostEstimateParams,
   CostEstimateResult,
 } from '../types';
 import { INITIAL_PROJECTS, INITIAL_LEADS } from '../data/seedData';
 import { calculateConstructionCost } from '../utils/costCalculator';
+import {
+  parseConstructionUrl,
+  syncConstructionUrl,
+} from '../utils/constructionUrlParams';
 
 interface ConstructionContextType {
   language: ConstructionLanguage;
@@ -22,7 +27,7 @@ interface ConstructionContextType {
   addLead: (lead: Omit<ConstructionQuoteLead, 'id' | 'referenceNumber' | 'createdAt' | 'status'>) => ConstructionQuoteLead;
   updateLeadStatus: (id: string, status: ConstructionQuoteLead['status'], adminNotes?: string) => void;
   deleteLead: (id: string) => void;
-  // Modals
+  // Modals & Project routing
   isCostEstimatorOpen: boolean;
   openCostEstimator: () => void;
   closeCostEstimator: () => void;
@@ -31,8 +36,16 @@ interface ConstructionContextType {
   closeQuoteModal: () => void;
   quoteModalInitialData: Partial<ConstructionQuoteLead> | null;
   selectedProjectForModal: ConstructionProject | null;
-  openProjectModal: (project: ConstructionProject) => void;
+  unknownProjectId: string | null;
+  openProjectModal: (project: ConstructionProject, options?: { replace?: boolean }) => void;
+  openProjectById: (id: string, options?: { replace?: boolean }) => void;
   closeProjectModal: () => void;
+  // Project list filters & URL synchronization
+  activeCategory: ConstructionProjectCategory;
+  setActiveCategory: (cat: ConstructionProjectCategory) => void;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  resetProjectFilters: () => void;
   // Cost calculation live
   costParams: CostEstimateParams;
   setCostParams: React.Dispatch<React.SetStateAction<CostEstimateParams>>;
@@ -171,11 +184,110 @@ export const ConstructionProvider: React.FC<{
     setLeads((prev) => prev.filter((l) => l.id !== id));
   };
 
+  // Project list filters state (initialized from URL)
+  const [activeCategory, setActiveCategoryState] = useState<ConstructionProjectCategory>(() => {
+    if (typeof window !== 'undefined') {
+      const parsed = parseConstructionUrl();
+      return parsed.category;
+    }
+    return 'all';
+  });
+
+  const [searchQuery, setSearchQueryState] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      const parsed = parseConstructionUrl();
+      return parsed.search;
+    }
+    return '';
+  });
+
   // Modals state
   const [isCostEstimatorOpen, setIsCostEstimatorOpen] = useState(false);
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
   const [quoteModalInitialData, setQuoteModalInitialData] = useState<Partial<ConstructionQuoteLead> | null>(null);
-  const [selectedProjectForModal, setSelectedProjectForModal] = useState<ConstructionProject | null>(null);
+
+  // Selected project for modal (initialized synchronously from URL)
+  const [selectedProjectForModal, setSelectedProjectForModal] = useState<ConstructionProject | null>(() => {
+    if (typeof window !== 'undefined') {
+      const parsed = parseConstructionUrl();
+      if (parsed.projectId) {
+        const stored = (() => {
+          try {
+            const raw = localStorage.getItem(PROJECTS_STORAGE_KEY);
+            return raw ? JSON.parse(raw) : INITIAL_PROJECTS;
+          } catch {
+            return INITIAL_PROJECTS;
+          }
+        })();
+        const match = stored.find((p: ConstructionProject) => p.id === parsed.projectId);
+        return match || null;
+      }
+    }
+    return null;
+  });
+
+  // Unknown project ID state (when user accesses an unknown project URL)
+  const [unknownProjectId, setUnknownProjectId] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      const parsed = parseConstructionUrl();
+      if (parsed.projectId) {
+        const stored = (() => {
+          try {
+            const raw = localStorage.getItem(PROJECTS_STORAGE_KEY);
+            return raw ? JSON.parse(raw) : INITIAL_PROJECTS;
+          } catch {
+            return INITIAL_PROJECTS;
+          }
+        })();
+        const match = stored.find((p: ConstructionProject) => p.id === parsed.projectId);
+        return match ? null : parsed.projectId;
+      }
+    }
+    return null;
+  });
+
+  // Synchronize URL and state on popstate (browser back/forward)
+  useEffect(() => {
+    const handlePopState = () => {
+      const parsed = parseConstructionUrl();
+
+      if (parsed.projectId) {
+        const found = projects.find((p) => p.id === parsed.projectId);
+        if (found) {
+          setSelectedProjectForModal(found);
+          setUnknownProjectId(null);
+        } else {
+          setSelectedProjectForModal(null);
+          setUnknownProjectId(parsed.projectId);
+        }
+      } else {
+        setSelectedProjectForModal(null);
+        setUnknownProjectId(null);
+      }
+
+      // Restore list filters from URL
+      setActiveCategoryState(parsed.category);
+      setSearchQueryState(parsed.search);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [projects]);
+
+  // Keep project selection in sync if project list loads or changes
+  useEffect(() => {
+    const parsed = parseConstructionUrl();
+    if (parsed.projectId) {
+      const found = projects.find((p) => p.id === parsed.projectId);
+      if (found) {
+        setSelectedProjectForModal(found);
+        setUnknownProjectId(null);
+      } else {
+        setSelectedProjectForModal(null);
+        setUnknownProjectId(parsed.projectId);
+      }
+    }
+  }, [projects]);
 
   const openCostEstimator = () => setIsCostEstimatorOpen(true);
   const closeCostEstimator = () => setIsCostEstimatorOpen(false);
@@ -189,11 +301,114 @@ export const ConstructionProvider: React.FC<{
     setQuoteModalInitialData(null);
   };
 
-  const openProjectModal = (project: ConstructionProject) => {
+  const openProjectModal = (project: ConstructionProject, options?: { replace?: boolean }) => {
     setSelectedProjectForModal(project);
+    setUnknownProjectId(null);
+    syncConstructionUrl(
+      {
+        projectId: project.id,
+        category: activeCategory,
+        search: searchQuery,
+      },
+      options
+    );
   };
+
+  const openProjectById = (id: string, options?: { replace?: boolean }) => {
+    const found = projects.find((p) => p.id === id);
+    if (found) {
+      setSelectedProjectForModal(found);
+      setUnknownProjectId(null);
+      syncConstructionUrl(
+        {
+          projectId: found.id,
+          category: activeCategory,
+          search: searchQuery,
+        },
+        options
+      );
+    } else {
+      setSelectedProjectForModal(null);
+      setUnknownProjectId(id);
+      syncConstructionUrl(
+        {
+          projectId: id,
+          category: activeCategory,
+          search: searchQuery,
+        },
+        options
+      );
+    }
+  };
+
   const closeProjectModal = () => {
     setSelectedProjectForModal(null);
+    setUnknownProjectId(null);
+
+    // If history has a previous entry for construction list within session, use history.back()
+    if (typeof window !== 'undefined' && window.history.state?.projectId) {
+      window.history.back();
+    } else {
+      // Direct entry or refresh fallback: navigate cleanly to list preserving filters
+      syncConstructionUrl(
+        {
+          projectId: null,
+          category: activeCategory,
+          search: searchQuery,
+          includeAnchor: true,
+        },
+        { replace: false }
+      );
+      if (typeof document !== 'undefined') {
+        const el = document.getElementById('projects');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    }
+  };
+
+  const setActiveCategory = (cat: ConstructionProjectCategory) => {
+    setActiveCategoryState(cat);
+    if (!selectedProjectForModal && !unknownProjectId) {
+      syncConstructionUrl(
+        {
+          projectId: null,
+          category: cat,
+          search: searchQuery,
+        },
+        { replace: true }
+      );
+    }
+  };
+
+  const setSearchQuery = (query: string) => {
+    setSearchQueryState(query);
+    if (!selectedProjectForModal && !unknownProjectId) {
+      syncConstructionUrl(
+        {
+          projectId: null,
+          category: activeCategory,
+          search: query,
+        },
+        { replace: true }
+      );
+    }
+  };
+
+  const resetProjectFilters = () => {
+    setActiveCategoryState('all');
+    setSearchQueryState('');
+    if (!selectedProjectForModal && !unknownProjectId) {
+      syncConstructionUrl(
+        {
+          projectId: null,
+          category: 'all',
+          search: '',
+        },
+        { replace: true }
+      );
+    }
   };
 
   // Live Cost Estimator state
@@ -252,8 +467,15 @@ export const ConstructionProvider: React.FC<{
         closeQuoteModal,
         quoteModalInitialData,
         selectedProjectForModal,
+        unknownProjectId,
         openProjectModal,
+        openProjectById,
         closeProjectModal,
+        activeCategory,
+        setActiveCategory,
+        searchQuery,
+        setSearchQuery,
+        resetProjectFilters,
         costParams,
         setCostParams,
         currentEstimate,

@@ -18,7 +18,7 @@ export function HVACHero() {
 
   const [selectedCity, setSelectedCity] = useState('khobar');
   const [customCity, setCustomCity] = useState('');
-  const [selectedService, setSelectedService] = useState('Deep Coil Cleaning & Chemical Washing');
+  const [selectedService, setSelectedService] = useState('');
 
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
 
@@ -38,6 +38,9 @@ export function HVACHero() {
         <img
           src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=2000&q=85"
           alt="HARD HVAC Maintenance Engineer at Work"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
           className="w-full h-full object-cover object-center"
         />
         {/* Darkened overlay strictly compliant with prompt */}
@@ -87,14 +90,14 @@ export function HVACHero() {
           <div className="lg:col-span-5">
             <div className="bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-xl space-y-5 text-start">
               <div className="space-y-1">
-                <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0EA5E9]">
-                  <Sparkles className="w-3.5 h-3.5" />
+                <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0284C7]">
+                  <Sparkles className="w-3.5 h-3.5 text-[#0284C7]" />
                   <span>{isAr ? 'عرض سعر فوري' : 'Instant Estimation'}</span>
                 </div>
                 <h2 className="text-xl font-semibold text-slate-900 leading-tight">
                   {pick(T.quoteForm.title, language)}
                 </h2>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-600 font-medium">
                   {pick(T.quoteForm.subtitle, language)}
                 </p>
               </div>
@@ -102,15 +105,15 @@ export function HVACHero() {
               <form onSubmit={handleGetQuote} className="space-y-4">
                 {/* 1. City Dropdown */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-bold text-slate-800 mb-1.5">
                     {pick(T.quoteForm.cityLabel, language)}
                   </label>
                   <div className="relative">
-                    <MapPin className="w-4 h-4 text-slate-400 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <MapPin className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <select
                       value={selectedCity}
                       onChange={(e) => setSelectedCity(e.target.value)}
-                      className="w-full ps-9 pe-8 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-800 bg-white focus:outline-none focus:border-[#0EA5E9] focus:ring-1 focus:ring-[#0EA5E9] cursor-pointer"
+                      className="w-full ps-9 pe-8 py-2.5 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 cursor-pointer"
                     >
                       {T.citiesList.map((city) => (
                         <option key={city.id} value={city.id}>
@@ -124,7 +127,7 @@ export function HVACHero() {
                 {/* If Other City is selected, reveal free-text city field */}
                 {selectedCity === 'other' && (
                   <div className="animate-in fade-in slide-in-from-top-2 duration-200">
-                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    <label className="block text-xs font-bold text-slate-800 mb-1.5">
                       {pick(T.quoteForm.otherCityLabel, language)} *
                     </label>
                     <input
@@ -133,23 +136,27 @@ export function HVACHero() {
                       value={customCity}
                       onChange={(e) => setCustomCity(e.target.value)}
                       placeholder={pick(T.quoteForm.otherCityPlaceholder, language)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-800 focus:outline-none focus:border-[#0EA5E9] focus:ring-1 focus:ring-[#0EA5E9]"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 placeholder:text-slate-500 focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20"
                     />
                   </div>
                 )}
 
                 {/* 2. Service Select */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-bold text-slate-800 mb-1.5">
                     {pick(T.quoteForm.serviceLabel, language)}
                   </label>
                   <div className="relative">
-                    <Wrench className="w-4 h-4 text-slate-400 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <Wrench className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <select
+                      required
                       value={selectedService}
                       onChange={(e) => setSelectedService(e.target.value)}
-                      className="w-full ps-9 pe-8 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-800 bg-white focus:outline-none focus:border-[#0EA5E9] focus:ring-1 focus:ring-[#0EA5E9] cursor-pointer"
+                      className="w-full ps-9 pe-8 py-2.5 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 cursor-pointer"
                     >
+                      <option value="" disabled>
+                        {isAr ? '-- اختر الخدمة المطلوبة --' : '-- Select Requested Service --'}
+                      </option>
                       {services
                         .filter((s) => s.active)
                         .map((s) => (
@@ -175,16 +182,16 @@ export function HVACHero() {
               </form>
 
               {/* Direct Emergency Call / Booking Note */}
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <span className="flex items-center gap-1 text-slate-600">
-                  <Clock className="w-3.5 h-3.5 text-[#0EA5E9]" />
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600 font-medium">
+                <span className="flex items-center gap-1 text-slate-700">
+                  <Clock className="w-3.5 h-3.5 text-[#0284C7]" />
                   <span>{isAr ? 'استجابة سريعة ١٥ دقيقة' : '15-min callback guarantee'}</span>
                 </span>
 
                 <button
                   type="button"
-                  onClick={() => openBookingModal()}
-                  className="text-[#0EA5E9] hover:underline font-semibold cursor-pointer"
+                  onClick={() => openBookingModal(selectedService)}
+                  className="text-[#0284C7] hover:underline font-bold cursor-pointer"
                 >
                   {isAr ? 'أو احجز موعد تقويم' : 'Or Schedule Date'}
                 </button>

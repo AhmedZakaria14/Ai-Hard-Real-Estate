@@ -10,6 +10,8 @@ import {
 import { Language, PageId } from '../types';
 import { ConstructionShowcaseModal } from '../components/portal/ConstructionShowcaseModal';
 import { HVACShowcaseModal } from '../components/portal/HVACShowcaseModal';
+import { handleSemanticClick } from '../lib/navigation';
+import { SectorNav } from '../components/layout/SectorNav';
 
 interface GroupPortalDashboardProps {
   language: Language;
@@ -71,7 +73,7 @@ export function GroupPortalDashboard({
     {
       id: 'construction',
       nameEn: 'HARD Construction',
-      nameAr: 'هارد للإنشاءات والمقاولات',
+      nameAr: 'هارد للإنشاءات',
       descriptionEn:
         'Class-A general contracting division building high-specification commercial structures, modern residential complexes, luxury fit-outs, and turnkey infrastructure projects with rigorous SBC compliance.',
       descriptionAr:
@@ -86,7 +88,7 @@ export function GroupPortalDashboard({
     {
       id: 'hvac',
       nameEn: 'HARD HVAC Maintenance',
-      nameAr: 'هارد لصيانة وتكييف الهواء',
+      nameAr: 'هارد لصيانة التكييف',
       descriptionEn:
         'Specialized electro-mechanical engineering services providing comprehensive chiller overhaul, central VRF installations, smart climate automation, and 24/7 rapid emergency dispatch across Eastern Province & Riyadh.',
       descriptionAr:
@@ -102,6 +104,18 @@ export function GroupPortalDashboard({
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-ui-sans selection:bg-blue-600 selection:text-white">
+      {/* 0. Global Sector Utility Navigation Bar */}
+      <SectorNav
+        currentPage="portal"
+        language={language}
+        onNavigate={(pageId) => {
+          if (pageId === 'portal') return;
+          if (pageId === 'construction') handleConstructionClick();
+          else if (pageId === 'hvac') handleHVACClick();
+          else onNavigateToRealEstate(pageId);
+        }}
+      />
+
       {/* Top Corporate Nav Bar matching Real Estate palette */}
       <header className="sticky top-0 z-40 bg-white border-b border-slate-100 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
@@ -165,11 +179,9 @@ export function GroupPortalDashboard({
                 {/* 1. Main Image (clickable) */}
                 <a
                   href={div.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    div.onClick();
-                  }}
-                  className="aspect-16/10 overflow-hidden bg-slate-100 relative block cursor-pointer"
+                  onClick={(e) => handleSemanticClick(e, div.onClick)}
+                  className="aspect-16/10 overflow-hidden bg-slate-100 relative block cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                  aria-label={isAr ? div.nameAr : div.nameEn}
                 >
                   <img
                     src={div.image}
@@ -184,11 +196,8 @@ export function GroupPortalDashboard({
                   <h2>
                     <a
                       href={div.href}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        div.onClick();
-                      }}
-                      className="text-lg sm:text-xl font-bold text-slate-900 group-hover:text-sky-600 hover:text-sky-600 font-display-serif transition-colors inline-flex items-center gap-2 cursor-pointer"
+                      onClick={(e) => handleSemanticClick(e, div.onClick)}
+                      className="text-lg sm:text-xl font-bold text-slate-900 group-hover:text-sky-600 hover:text-sky-600 font-display-serif transition-colors inline-flex items-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:underline"
                     >
                       <span>{isAr ? div.nameAr : div.nameEn}</span>
                       <ArrowIcon className="w-4 h-4 text-sky-600 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -214,36 +223,36 @@ export function GroupPortalDashboard({
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-5 font-medium">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-5 font-medium">
+            <span className="text-slate-400 font-semibold uppercase text-[10px] tracking-wider">
+              {isAr ? 'قطاعات هارد:' : 'Sectors:'}
+            </span>
+            <span className="text-sky-600 font-bold">
+              {isAr ? 'بوابة مجموعة هارد (القطاع الحالي)' : 'HARD Group Portal (Current)'}
+            </span>
+            <span className="text-slate-300">•</span>
             <a
               href="/realestate"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigateToRealEstate('home');
-              }}
+              onClick={(e) => handleSemanticClick(e, () => onNavigateToRealEstate('home'))}
               className="text-slate-600 hover:text-sky-600 transition-colors"
             >
-              {isAr ? 'هارد العقارية' : 'HARD Real Estate'}
+              {isAr ? 'هارد للعقارات' : 'HARD Real Estate'}
             </a>
+            <span className="text-slate-300">•</span>
             <a
               href="/construction"
-              onClick={(e) => {
-                e.preventDefault();
-                handleConstructionClick();
-              }}
+              onClick={(e) => handleSemanticClick(e, handleConstructionClick)}
               className="text-slate-600 hover:text-sky-600 transition-colors"
             >
               {isAr ? 'هارد للإنشاءات' : 'HARD Construction'}
             </a>
+            <span className="text-slate-300">•</span>
             <a
               href="/hvac"
-              onClick={(e) => {
-                e.preventDefault();
-                setHvacModalOpen(true);
-              }}
+              onClick={(e) => handleSemanticClick(e, handleHVACClick)}
               className="text-slate-600 hover:text-sky-600 transition-colors"
             >
-              {isAr ? 'هارد للتكييف' : 'HARD HVAC'}
+              {isAr ? 'هارد لصيانة التكييف' : 'HARD HVAC Maintenance'}
             </a>
           </div>
         </div>

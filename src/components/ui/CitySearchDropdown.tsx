@@ -148,7 +148,7 @@ export const CitySearchDropdown: React.FC<CitySearchDropdownProps> = ({
       {/* Embedded Dropdown Menu - highly visible outside white box with high z-index and prominent shadow */}
       {isOpen && (
         <div
-          className="absolute z-[999] top-full mt-2 start-0 w-full min-w-[280px] sm:min-w-[320px] max-w-[420px] bg-slate-50 border border-slate-300 rounded-2xl shadow-2xl ring-1 ring-black/10 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150"
+          className="absolute z-[999] top-full mt-2 start-0 w-full min-w-[240px] sm:min-w-[320px] max-w-[calc(100vw-2rem)] sm:max-w-[420px] bg-slate-50 border border-slate-300 rounded-2xl shadow-2xl ring-1 ring-black/10 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150"
           role="listbox"
         >
           {/* First Row: Search Field matching "Search by city name" */}

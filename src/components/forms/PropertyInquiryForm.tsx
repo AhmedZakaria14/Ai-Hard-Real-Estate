@@ -46,6 +46,7 @@ export function PropertyInquiryForm({
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
   const [referenceNumber, setReferenceNumber] = useState('');
   const [crmRefNumber, setCrmRefNumber] = useState('');
@@ -58,31 +59,30 @@ export function PropertyInquiryForm({
     // Full name
     if (!fullName.trim()) {
       newErrors.fullName = t.propertyDetails.validation.nameRequired;
-    } else if (fullName.trim().length < 3) {
+    } else if (fullName.trim().length < 2) {
       newErrors.fullName = t.propertyDetails.validation.nameMinLength;
     }
 
-    // Email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.trim()) {
-      newErrors.email = t.propertyDetails.validation.emailRequired;
-    } else if (!emailRegex.test(email.trim())) {
-      newErrors.email = t.propertyDetails.validation.emailInvalid;
-    }
+    const hasEmail = Boolean(email.trim());
+    const hasPhone = Boolean(phone.trim());
 
-    // Phone
-    const phoneDigits = phone.replace(/\D/g, '');
-    if (!phone.trim()) {
-      newErrors.phone = t.propertyDetails.validation.phoneRequired;
-    } else if (phoneDigits.length < 8) {
-      newErrors.phone = t.propertyDetails.validation.phoneInvalid;
-    }
-
-    // Message
-    if (!message.trim()) {
-      newErrors.message = t.propertyDetails.validation.messageRequired;
-    } else if (message.trim().length < 10) {
-      newErrors.message = t.propertyDetails.validation.messageMinLength;
+    if (!hasEmail && !hasPhone) {
+      const msg = isAr
+        ? 'يرجى تقديم وسيلة تواصل واحدة على الأقل (البريد أو الهاتف)'
+        : 'Please provide at least one contact method (email or phone).';
+      newErrors.email = msg;
+      newErrors.phone = msg;
+    } else {
+      if (hasEmail && !emailRegex.test(email.trim())) {
+        newErrors.email = t.propertyDetails.validation.emailInvalid;
+      }
+      if (hasPhone) {
+        const phoneDigits = phone.replace(/\D/g, '');
+        if (phoneDigits.length < 7) {
+          newErrors.phone = t.propertyDetails.validation.phoneInvalid;
+        }
+      }
     }
 
     setErrors(newErrors);
@@ -102,17 +102,24 @@ export function PropertyInquiryForm({
       return;
     }
 
+    const finalMessage = message.trim()
+      ? message.trim()
+      : isAr
+      ? `مرحباً، أود الاستفسار عن العقار "${property.title.ar}" (المعرف: ${property.id}).`
+      : `Hello, I am interested in inquiring about "${property.title.en}" (ID: ${property.id}).`;
+
     setIsSubmitting(true);
+    setSubmitError('');
     try {
       const result = await submitLead({
         name: fullName,
-        email,
-        phone,
+        email: email.trim(),
+        phone: phone.trim(),
         property_id: property.id,
         property_title: property.title.en,
         inquiry_type: 'property_inquiry',
         recipient_email: 'info@hardgp.com',
-        message: `Topic: ${inquiryTopic}\n\n${message}`,
+        message: `Topic: ${inquiryTopic}\n\n${finalMessage}`,
         source: 'Property Detail Page Inquiry Form',
         metadata: {
           inquiryTopic,
@@ -134,6 +141,11 @@ export function PropertyInquiryForm({
       if (onSuccess) onSuccess();
     } catch (err) {
       console.error('Lead submission failed', err);
+      setSubmitError(
+        isAr
+          ? 'تعذر إرسال الطلب حالياً. تم حفظ بياناتك المدخلة، يرجى الضغط على إعادة المحاولة.'
+          : 'Failed to submit inquiry. Your entered information is preserved. Please click retry.'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -216,7 +228,7 @@ export function PropertyInquiryForm({
 
           {/* Post-submit Actions */}
           <div className="flex flex-col sm:flex-row gap-3 pt-1">
-            <a
+            <Button
               href={`https://wa.me/966556125711?text=${encodeURIComponent(
                 isAr
                   ? `مرحباً هارد للعقارات، لقد أرسلت استفساراً بخصوص "${property.title.ar}" (رقم المرجع: ${referenceNumber}).`
@@ -224,13 +236,13 @@ export function PropertyInquiryForm({
               )}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto flex-1"
+              variant="whatsapp"
+              size="md"
+              className="w-full sm:w-auto flex-1 justify-center"
             >
-              <Button variant="whatsapp" size="md" className="w-full justify-center">
-                <MessageSquare className="w-4 h-4" />
-                <span>{t.cta.chatOnWhatsApp}</span>
-              </Button>
-            </a>
+              <MessageSquare className="w-4 h-4" />
+              <span>{t.cta.chatOnWhatsApp}</span>
+            </Button>
 
             <Button
               variant="outline"
@@ -245,12 +257,33 @@ export function PropertyInquiryForm({
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
+          {submitError && (
+            <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-xs space-y-2 text-rose-900 animate-in fade-in">
+              <div className="flex items-center gap-2 font-bold text-rose-700">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{isAr ? 'فشل إرسال الاستفسار' : 'Inquiry Submission Failed'}</span>
+              </div>
+              <p className="leading-relaxed">{submitError}</p>
+              <Button
+                type="submit"
+                variant="primary"
+                size="sm"
+                isLoading={isSubmitting}
+                className="mt-1 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs py-1.5 px-3"
+              >
+                <RotateCcw className="w-3.5 h-3.5 me-1" />
+                <span>{isAr ? 'إعادة المحاولة الان' : 'Retry Submission Now'}</span>
+              </Button>
+            </div>
+          )}
+
           {/* Inquiry Topic Dropdown */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+            <label htmlFor="prop-inquiry-topic" className="block text-xs font-bold text-slate-700 mb-1.5">
               {t.propertyDetails.inquiryTopic}
             </label>
             <select
+              id="prop-inquiry-topic"
               value={inquiryTopic}
               onChange={(e) => setInquiryTopic(e.target.value)}
               className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
@@ -265,13 +298,18 @@ export function PropertyInquiryForm({
 
           {/* Full Name Field */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
+            <label htmlFor="prop-inquiry-fullname" className="block text-xs font-bold text-slate-700 mb-1">
               {t.propertyDetails.fullName} <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
               <User className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5" />
               <input
+                id="prop-inquiry-fullname"
                 type="text"
+                required
+                aria-required="true"
+                aria-invalid={Boolean(touched.fullName && errors.fullName)}
+                aria-describedby={touched.fullName && errors.fullName ? "prop-inquiry-fullname-error" : undefined}
                 placeholder={t.propertyDetails.fullNamePlaceholder}
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
@@ -284,7 +322,7 @@ export function PropertyInquiryForm({
               />
             </div>
             {touched.fullName && errors.fullName && (
-              <p className="text-[11px] text-rose-500 mt-1 flex items-center gap-1">
+              <p id="prop-inquiry-fullname-error" className="text-[11px] text-rose-500 mt-1 flex items-center gap-1">
                 <AlertCircle className="w-3 h-3 shrink-0" />
                 <span>{errors.fullName}</span>
               </p>
@@ -295,13 +333,16 @@ export function PropertyInquiryForm({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Email Field */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                {t.propertyDetails.email} <span className="text-rose-500">*</span>
+              <label htmlFor="prop-inquiry-email" className="block text-xs font-bold text-slate-700 mb-1">
+                {t.propertyDetails.email} <span className="text-slate-400 font-normal">({isAr ? 'أو الهاتف' : 'or Phone'})</span>
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5" />
                 <input
+                  id="prop-inquiry-email"
                   type="email"
+                  aria-invalid={Boolean(touched.email && errors.email)}
+                  aria-describedby={touched.email && errors.email ? "prop-inquiry-email-error" : undefined}
                   placeholder={t.propertyDetails.emailPlaceholder}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -314,7 +355,7 @@ export function PropertyInquiryForm({
                 />
               </div>
               {touched.email && errors.email && (
-                <p className="text-[11px] text-rose-500 mt-1 flex items-center gap-1">
+                <p id="prop-inquiry-email-error" className="text-[11px] text-rose-500 mt-1 flex items-center gap-1">
                   <AlertCircle className="w-3 h-3 shrink-0" />
                   <span>{errors.email}</span>
                 </p>
@@ -323,13 +364,16 @@ export function PropertyInquiryForm({
 
             {/* Phone Field */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                {t.propertyDetails.phone} <span className="text-rose-500">*</span>
+              <label htmlFor="prop-inquiry-phone" className="block text-xs font-bold text-slate-700 mb-1">
+                {t.propertyDetails.phone} <span className="text-slate-400 font-normal">({isAr ? 'أو البريد' : 'or Email'})</span>
               </label>
               <div className="relative">
                 <Phone className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5" />
                 <input
+                  id="prop-inquiry-phone"
                   type="tel"
+                  aria-invalid={Boolean(touched.phone && errors.phone)}
+                  aria-describedby={touched.phone && errors.phone ? "prop-inquiry-phone-error" : undefined}
                   placeholder={t.propertyDetails.phonePlaceholder}
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
@@ -342,7 +386,7 @@ export function PropertyInquiryForm({
                 />
               </div>
               {touched.phone && errors.phone && (
-                <p className="text-[11px] text-rose-500 mt-1 flex items-center gap-1">
+                <p id="prop-inquiry-phone-error" className="text-[11px] text-rose-500 mt-1 flex items-center gap-1">
                   <AlertCircle className="w-3 h-3 shrink-0" />
                   <span>{errors.phone}</span>
                 </p>
@@ -352,11 +396,14 @@ export function PropertyInquiryForm({
 
           {/* Message Textarea */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
-              {t.propertyDetails.message} <span className="text-rose-500">*</span>
+            <label htmlFor="prop-inquiry-message" className="block text-xs font-bold text-slate-700 mb-1">
+              {t.propertyDetails.message} <span className="text-slate-400 font-normal">({isAr ? 'اختياري' : 'Optional'})</span>
             </label>
             <textarea
-              rows={4}
+              id="prop-inquiry-message"
+              rows={3}
+              aria-invalid={Boolean(touched.message && errors.message)}
+              aria-describedby={touched.message && errors.message ? "prop-inquiry-message-error" : undefined}
               placeholder={t.propertyDetails.messagePlaceholder}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
@@ -368,7 +415,7 @@ export function PropertyInquiryForm({
               }`}
             ></textarea>
             {touched.message && errors.message && (
-              <p className="text-[11px] text-rose-500 mt-1 flex items-center gap-1">
+              <p id="prop-inquiry-message-error" className="text-[11px] text-rose-500 mt-1 flex items-center gap-1">
                 <AlertCircle className="w-3 h-3 shrink-0" />
                 <span>{errors.message}</span>
               </p>

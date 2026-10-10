@@ -15,15 +15,24 @@ import {
 import { useConstruction } from '../context/ConstructionContext';
 import { ConstructionProjectCategory, ConstructionProject } from '../types';
 import { constructionTranslations } from '../utils/translations';
+import { buildConstructionProjectUrl } from '../utils/constructionUrlParams';
+import { getLocalizedCategoryLabel, formatAreaBUA } from '../utils/constructionFormatters';
 
 export function ProjectsSection() {
-  const { language, projects, openProjectModal, openQuoteModal } = useConstruction();
+  const {
+    language,
+    projects,
+    openProjectModal,
+    openQuoteModal,
+    activeCategory,
+    setActiveCategory,
+    searchQuery,
+    setSearchQuery,
+    resetProjectFilters,
+  } = useConstruction();
   const t = constructionTranslations[language];
   const isAr = language === 'ar';
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
-
-  const [activeCategory, setActiveCategory] = useState<ConstructionProjectCategory>('all');
-  const [searchQuery, setSearchQuery] = useState('');
 
   const filterTabs = [
     { id: 'all' as const, label: t.projects.filterAll },
@@ -61,7 +70,7 @@ export function ProjectsSection() {
       case 'delivered':
         return {
           label: t.projects.statusDelivered,
-          classes: 'bg-sky-50 text-[#009ee2] border-sky-200',
+          classes: 'bg-sky-50 text-[#0072b8] border-sky-200',
           icon: CheckCircle2,
         };
     }
@@ -73,8 +82,8 @@ export function ProjectsSection() {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-3 max-w-3xl text-start">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#e8f4fc] border border-[#d0e9fa] text-[#009ee2] text-xs font-bold shadow-2xs">
-              <Building2 className="w-3.5 h-3.5 text-[#009ee2]" />
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#e8f4fc] border border-[#d0e9fa] text-[#0072b8] text-xs font-bold shadow-2xs">
+              <Building2 className="w-3.5 h-3.5 text-[#0072b8]" />
               <span>{t.projects.badge}</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-black font-display-serif text-[#0f243e] tracking-tight">
@@ -87,13 +96,13 @@ export function ProjectsSection() {
 
           {/* Search Input */}
           <div className="relative w-full sm:w-72">
-            <Search className="w-4 h-4 text-slate-400 absolute top-1/2 -translate-y-1/2 start-3.5 pointer-events-none" />
+            <Search className="w-4 h-4 text-slate-500 absolute top-1/2 -translate-y-1/2 start-3.5 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={isAr ? 'بحث في المشاريع أو المواقع...' : 'Search projects or locations...'}
-              className="w-full ps-10 pe-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:border-[#009ee2] focus:bg-white focus:outline-none transition-colors"
+              className="w-full ps-10 pe-4 py-2.5 bg-slate-50 hover:bg-white border border-slate-300 hover:border-slate-400 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-500 focus:border-[#0072b8] focus:bg-white focus:ring-2 focus:ring-[#0072b8]/20 focus:outline-none transition-colors"
             />
           </div>
         </div>
@@ -107,8 +116,8 @@ export function ProjectsSection() {
               onClick={() => setActiveCategory(tab.id)}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                 activeCategory === tab.id
-                  ? 'bg-[#009ee2] text-white shadow-md shadow-[#009ee2]/20'
-                  : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200 border border-slate-200'
+                  ? 'bg-[#0f243e] text-white shadow-md shadow-[#0f243e]/20'
+                  : 'bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200 border border-slate-200'
               }`}
             >
               {tab.label}
@@ -125,10 +134,7 @@ export function ProjectsSection() {
             </div>
             <button
               type="button"
-              onClick={() => {
-                setActiveCategory('all');
-                setSearchQuery('');
-              }}
+              onClick={resetProjectFilters}
               className="px-4 py-2 text-xs font-bold text-[#009ee2] hover:underline cursor-pointer"
             >
               {isAr ? 'إعادة ضبط التصفية' : 'Reset Filters'}
@@ -139,13 +145,26 @@ export function ProjectsSection() {
             {filteredProjects.map((proj) => {
               const statusInfo = getStatusBadge(proj.status);
               const StatusIcon = statusInfo.icon;
+              const projectUrl = buildConstructionProjectUrl(proj.id, {
+                category: activeCategory,
+                search: searchQuery,
+              });
+
               return (
                 <div
                   key={proj.id}
                   className="bg-[#f8fafc] border border-sky-100 rounded-2xl overflow-hidden hover:border-[#009ee2] hover:shadow-lg transition-all duration-300 flex flex-col justify-between group shadow-sm"
                 >
-                  {/* Project Image & Status Badge */}
-                  <div className="relative aspect-16/10 overflow-hidden bg-slate-900">
+                  {/* Project Image & Status Badge (Clickable) */}
+                  <a
+                    href={projectUrl}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      openProjectModal(proj);
+                    }}
+                    className="relative aspect-16/10 overflow-hidden bg-slate-900 block cursor-pointer"
+                    aria-label={isAr ? proj.titleAr : proj.titleEn}
+                  >
                     <img
                       src={proj.image}
                       alt={isAr ? proj.titleAr : proj.titleEn}
@@ -162,11 +181,16 @@ export function ProjectsSection() {
                       <span>{statusInfo.label}</span>
                     </div>
 
-                    {/* Category Label */}
-                    <div className="absolute bottom-3 start-3 text-xs font-bold text-sky-200">
-                      {isAr ? proj.cityAr : proj.cityEn}
+                    {/* Category & City Label */}
+                    <div className="absolute bottom-3 start-3 flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#0f243e]/85 text-sky-200 border border-sky-400/30 backdrop-blur-xs">
+                        {getLocalizedCategoryLabel(proj.category, language)}
+                      </span>
+                      <span className="text-xs font-semibold text-slate-200">
+                        {isAr ? proj.cityAr : proj.cityEn}
+                      </span>
                     </div>
-                  </div>
+                  </a>
 
                   {/* Body Content */}
                   <div className="p-6 space-y-4 flex-1 flex flex-col justify-between text-start">
@@ -176,9 +200,18 @@ export function ProjectsSection() {
                         <span>{isAr ? proj.locationAr : proj.locationEn}</span>
                       </div>
 
-                      <h3 className="text-lg font-bold text-[#0f243e] font-display-serif group-hover:text-[#009ee2] transition-colors">
-                        {isAr ? proj.titleAr : proj.titleEn}
-                      </h3>
+                      <a
+                        href={projectUrl}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          openProjectModal(proj);
+                        }}
+                        className="block focus:outline-none"
+                      >
+                        <h3 className="text-lg font-bold text-[#0f243e] font-display-serif group-hover:text-[#009ee2] transition-colors cursor-pointer">
+                          {isAr ? proj.titleAr : proj.titleEn}
+                        </h3>
+                      </a>
 
                       <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
                         {isAr ? proj.descriptionAr : proj.descriptionEn}
@@ -187,26 +220,29 @@ export function ProjectsSection() {
 
                     {/* Specs Pills */}
                     <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200 text-[11px] text-slate-600 font-medium">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 min-w-0">
                         <Layers className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                        <span>{proj.buaM2.toLocaleString()} {isAr ? 'م² بناء' : 'm² BUA'}</span>
+                        <span className="truncate">{formatAreaBUA(proj.buaM2, language)}</span>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-[#009ee2] shrink-0" />
-                        <span>{proj.year}</span>
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <Calendar className="w-3.5 h-3.5 text-[#0072b8] shrink-0" />
+                        <span className="truncate">{proj.year}</span>
                       </div>
                     </div>
 
                     {/* Action Buttons */}
                     <div className="pt-2 flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => openProjectModal(proj)}
+                      <a
+                        href={projectUrl}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          openProjectModal(proj);
+                        }}
                         className="flex-1 py-2.5 px-3 rounded-xl bg-white hover:bg-sky-50 text-xs font-bold text-slate-800 hover:text-[#009ee2] border border-slate-200 flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
                       >
                         <Eye className="w-3.5 h-3.5 text-[#009ee2]" />
                         <span>{t.projects.viewSpecs}</span>
-                      </button>
+                      </a>
 
                       <button
                         type="button"

@@ -13,11 +13,26 @@ import {
   Clock,
   Coins,
   ShieldCheck,
+  AlertCircle,
+  HelpCircle,
 } from 'lucide-react';
 import { useConstruction } from '../context/ConstructionContext';
 import { constructionTranslations } from '../utils/translations';
-import { ConstructionProjectType, FinishingLevel } from '../types';
+import { formatAreaBUA, formatAreaSimple } from '../utils/constructionFormatters';
+import { ConstructionProjectType, FinishingLevel, CostEstimateParams } from '../types';
 import { formatSAR } from '../utils/costCalculator';
+
+const DEFAULT_COST_PARAMS: CostEstimateParams = {
+  projectType: 'villa',
+  finishingLevel: 'deluxe',
+  builtUpArea: 1200,
+  floors: 2,
+  hasBasement: false,
+  hasPool: true,
+  hasElevator: true,
+  hasSmartHome: true,
+  location: 'Riyadh',
+};
 
 export function CostEstimatorModal() {
   const {
@@ -77,6 +92,37 @@ export function CostEstimatorModal() {
     },
   ];
 
+  const getActiveExtrasList = () => {
+    const list: string[] = [];
+    if (costParams.hasBasement) list.push(isAr ? 'قبو مجهز' : 'Basement');
+    if (costParams.hasPool) list.push(isAr ? 'مسبح خرساني' : 'Swimming Pool');
+    if (costParams.hasElevator) list.push(isAr ? 'مصعد إيطالي' : 'Elevator');
+    if (costParams.hasSmartHome) list.push(isAr ? 'منزل ذكي KNX' : 'KNX Automation');
+    if (list.length === 0) return isAr ? 'لا توجد إضافات' : 'None Selected';
+    return list.join(' • ');
+  };
+
+  const handleAreaInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseInt(e.target.value, 10);
+    if (isNaN(val)) {
+      setCostParams((prev) => ({ ...prev, builtUpArea: 150 }));
+      return;
+    }
+    const safeArea = Math.min(Math.max(val, 50), 20000);
+    setCostParams((prev) => ({ ...prev, builtUpArea: safeArea }));
+  };
+
+  const isProjectTypeDefault = costParams.projectType === DEFAULT_COST_PARAMS.projectType;
+  const isFinishingDefault = costParams.finishingLevel === DEFAULT_COST_PARAMS.finishingLevel;
+  const isAreaDefault =
+    costParams.builtUpArea === DEFAULT_COST_PARAMS.builtUpArea &&
+    costParams.floors === DEFAULT_COST_PARAMS.floors;
+  const isExtrasDefault =
+    costParams.hasBasement === DEFAULT_COST_PARAMS.hasBasement &&
+    costParams.hasPool === DEFAULT_COST_PARAMS.hasPool &&
+    costParams.hasElevator === DEFAULT_COST_PARAMS.hasElevator &&
+    costParams.hasSmartHome === DEFAULT_COST_PARAMS.hasSmartHome;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm overflow-y-auto">
       <div className="relative w-full max-w-4xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden my-8 text-slate-900">
@@ -98,7 +144,7 @@ export function CostEstimatorModal() {
             type="button"
             onClick={closeCostEstimator}
             className="p-2 rounded-xl bg-white hover:bg-slate-100 text-slate-500 hover:text-slate-900 border border-slate-200 transition-colors cursor-pointer"
-            aria-label="Close"
+            aria-label={isAr ? 'إغلاق الحاسبة' : 'Close cost estimator'}
           >
             <X className="w-5 h-5" />
           </button>
@@ -111,8 +157,8 @@ export function CostEstimatorModal() {
             onClick={() => setActiveStep(1)}
             className={`py-3 px-2 border-b-2 transition-all cursor-pointer ${
               activeStep === 1
-                ? 'border-[#009ee2] text-[#009ee2] bg-sky-50/50'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'border-[#0072b8] text-[#0072b8] bg-sky-50/70'
+                : 'border-transparent text-slate-600 hover:text-slate-900'
             }`}
           >
             {t.calculator.step1}
@@ -122,8 +168,8 @@ export function CostEstimatorModal() {
             onClick={() => setActiveStep(2)}
             className={`py-3 px-2 border-b-2 transition-all cursor-pointer ${
               activeStep === 2
-                ? 'border-[#009ee2] text-[#009ee2] bg-sky-50/50'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'border-[#0072b8] text-[#0072b8] bg-sky-50/70'
+                : 'border-transparent text-slate-600 hover:text-slate-900'
             }`}
           >
             {t.calculator.step2}
@@ -133,8 +179,8 @@ export function CostEstimatorModal() {
             onClick={() => setActiveStep(3)}
             className={`py-3 px-2 border-b-2 transition-all cursor-pointer ${
               activeStep === 3
-                ? 'border-[#009ee2] text-[#009ee2] bg-sky-50/50'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'border-[#0072b8] text-[#0072b8] bg-sky-50/70'
+                : 'border-transparent text-slate-600 hover:text-slate-900'
             }`}
           >
             {t.calculator.step3}
@@ -142,7 +188,100 @@ export function CostEstimatorModal() {
         </div>
 
         {/* Body Content */}
-        <div className="p-6 sm:p-8 space-y-8 text-start max-h-[70vh] overflow-y-auto">
+        <div className="p-6 sm:p-8 space-y-6 text-start max-h-[72vh] overflow-y-auto">
+          {/* Live Calculation Assumptions Summary Banner */}
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#0072b8]" />
+                <span className="text-xs font-bold text-[#0f243e]">
+                  {isAr ? 'فرضيات ومعايير التقدير الحالية:' : 'Current Active Calculation Assumptions:'}
+                </span>
+              </div>
+              <span className="text-[10px] font-semibold text-slate-600 bg-white px-2.5 py-0.5 rounded-full border border-slate-200">
+                {isAr ? 'محدث تلقائياً' : 'Live Auto-Updated'}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              {/* Project Type */}
+              <div className="p-2.5 rounded-xl bg-white border border-slate-200 space-y-1">
+                <div className="flex items-center justify-between text-[10px] text-slate-600 font-medium">
+                  <span>{isAr ? 'نوع المنشأة' : 'Project Type'}</span>
+                  <span
+                    className={`px-1.5 py-0.2 rounded text-[9px] font-bold ${
+                      isProjectTypeDefault
+                        ? 'bg-slate-100 text-slate-700'
+                        : 'bg-sky-50 text-[#0072b8] border border-sky-200'
+                    }`}
+                  >
+                    {isProjectTypeDefault ? (isAr ? 'افتراضي' : 'Default') : (isAr ? 'مخصص' : 'Custom')}
+                  </span>
+                </div>
+                <div className="text-xs font-bold text-slate-900 truncate">
+                  {projectTypes.find((p) => p.id === costParams.projectType)?.label}
+                </div>
+              </div>
+
+              {/* Finish Level */}
+              <div className="p-2.5 rounded-xl bg-white border border-slate-200 space-y-1">
+                <div className="flex items-center justify-between text-[10px] text-slate-500">
+                  <span>{isAr ? 'مستوى التشطيب' : 'Finish Level'}</span>
+                  <span
+                    className={`px-1.5 py-0.2 rounded text-[9px] font-bold ${
+                      isFinishingDefault
+                        ? 'bg-slate-100 text-slate-600'
+                        : 'bg-sky-50 text-[#009ee2] border border-sky-200'
+                    }`}
+                  >
+                    {isFinishingDefault ? (isAr ? 'افتراضي' : 'Default') : (isAr ? 'مخصص' : 'Custom')}
+                  </span>
+                </div>
+                <div className="text-xs font-bold text-slate-900 truncate">
+                  {finishingLevels.find((f) => f.id === costParams.finishingLevel)?.label}
+                </div>
+              </div>
+
+              {/* Area & Floors */}
+              <div className="p-2.5 rounded-xl bg-white border border-slate-200 space-y-1">
+                <div className="flex items-center justify-between text-[10px] text-slate-500">
+                  <span>{isAr ? 'المساحة والأدوار' : 'BUA & Floors'}</span>
+                  <span
+                    className={`px-1.5 py-0.2 rounded text-[9px] font-bold ${
+                      isAreaDefault
+                        ? 'bg-slate-100 text-slate-600'
+                        : 'bg-sky-50 text-[#009ee2] border border-sky-200'
+                    }`}
+                  >
+                    {isAreaDefault ? (isAr ? 'افتراضي' : 'Default') : (isAr ? 'مخصص' : 'Custom')}
+                  </span>
+                </div>
+                <div className="text-xs font-bold text-slate-900 truncate">
+                  {formatAreaBUA(costParams.builtUpArea, language)} • {costParams.floors} {isAr ? 'أدوار' : 'Fl.'}
+                </div>
+              </div>
+
+              {/* Extras */}
+              <div className="p-2.5 rounded-xl bg-white border border-slate-200 space-y-1">
+                <div className="flex items-center justify-between text-[10px] text-slate-500">
+                  <span>{isAr ? 'الإضافات الخاصة' : 'Selected Extras'}</span>
+                  <span
+                    className={`px-1.5 py-0.2 rounded text-[9px] font-bold ${
+                      isExtrasDefault
+                        ? 'bg-slate-100 text-slate-600'
+                        : 'bg-sky-50 text-[#009ee2] border border-sky-200'
+                    }`}
+                  >
+                    {isExtrasDefault ? (isAr ? 'افتراضي' : 'Default') : (isAr ? 'مخصص' : 'Custom')}
+                  </span>
+                </div>
+                <div className="text-xs font-bold text-slate-900 truncate" title={getActiveExtrasList()}>
+                  {getActiveExtrasList()}
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Step 1: Project Type */}
           {activeStep === 1 && (
             <div className="space-y-4 animate-in fade-in-50">
@@ -173,7 +312,7 @@ export function CostEstimatorModal() {
                 })}
               </div>
 
-              <div className="flex justify-end pt-4">
+              <div className="flex justify-end pt-2">
                 <button
                   type="button"
                   onClick={() => setActiveStep(2)}
@@ -216,7 +355,7 @@ export function CostEstimatorModal() {
                 })}
               </div>
 
-              <div className="flex items-center justify-between pt-4">
+              <div className="flex items-center justify-between pt-2">
                 <button
                   type="button"
                   onClick={() => setActiveStep(1)}
@@ -239,17 +378,30 @@ export function CostEstimatorModal() {
           {/* Step 3: Area, Floors & Addons */}
           {activeStep === 3 && (
             <div className="space-y-6 animate-in fade-in-50">
-              {/* Built-up Area Slider */}
+              {/* Built-up Area Slider & Direct Numerical Input */}
               <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <label className="text-xs sm:text-sm font-bold text-[#0f243e] flex items-center gap-2">
                     <Sliders className="w-4 h-4 text-[#009ee2]" />
                     <span>{t.calculator.buaLabel}</span>
                   </label>
-                  <span className="px-3 py-1 rounded-lg bg-[#e8f4fc] text-[#009ee2] font-extrabold text-sm border border-[#d0e9fa]">
-                    {costParams.builtUpArea.toLocaleString()} {isAr ? 'م²' : 'm²'}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min={50}
+                      max={20000}
+                      step={10}
+                      value={costParams.builtUpArea}
+                      onChange={handleAreaInputChange}
+                      className="w-28 px-3 py-1 text-xs font-bold text-end text-[#009ee2] bg-white border border-[#d0e9fa] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#009ee2]"
+                      aria-label={isAr ? 'إدخال المساحة بالمتر المربع' : 'Enter area in square meters'}
+                    />
+                    <span className="px-3 py-1 rounded-lg bg-[#e8f4fc] text-[#009ee2] font-extrabold text-xs border border-[#d0e9fa]">
+                      {formatAreaBUA(costParams.builtUpArea, language)}
+                    </span>
+                  </div>
                 </div>
+
                 <input
                   type="range"
                   min={150}
@@ -261,11 +413,12 @@ export function CostEstimatorModal() {
                   }
                   className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#009ee2]"
                 />
-                <div className="flex justify-between text-[10px] text-slate-500">
-                  <span>150 m²</span>
-                  <span>1,500 m²</span>
-                  <span>3,000 m²</span>
-                  <span>5,000 m²</span>
+
+                <div className="flex justify-between text-[10px] text-slate-500 font-medium">
+                  <span>{formatAreaSimple(150, language)}</span>
+                  <span>{formatAreaSimple(1500, language)}</span>
+                  <span>{formatAreaSimple(3000, language)}</span>
+                  <span>{formatAreaSimple(5000, language)}</span>
                 </div>
               </div>
 
@@ -362,9 +515,19 @@ export function CostEstimatorModal() {
             </div>
           )}
 
-          {/* Live Estimate Result Display Box */}
+          {/* Live Estimate Result Display Box (Visible across all steps) */}
           <div className="p-6 rounded-2xl bg-gradient-to-br from-slate-50 via-[#eef7ff]/50 to-slate-50 border border-sky-200 space-y-6 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+            {/* Preliminary Disclaimer Badge */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold">
+              <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0" />
+              <span>
+                {isAr
+                  ? 'تقدير أولي استرشادي (نسبة التفاوت المقدرة ±٧٪) — يتطلب الاعتماد النهائي دراسة المخططات وجداول الكميات (BOQ)'
+                  : 'Preliminary Baseline Estimate (±7% Variance) — Final contract pricing requires BOQ & architectural review'}
+              </span>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#009ee2]">
                   {t.calculator.resultsTitle}
@@ -373,7 +536,7 @@ export function CostEstimatorModal() {
                   {formatSAR(currentEstimate.minTotalSAR, isAr)} -{' '}
                   {formatSAR(currentEstimate.maxTotalSAR, isAr)}
                 </div>
-                <div className="text-xs text-slate-500 font-medium">
+                <div className="text-xs text-slate-500 font-medium pt-0.5">
                   {t.calculator.breakdown.averageM2}{' '}
                   <span className="font-bold text-[#009ee2]">
                     {formatSAR(currentEstimate.pricePerM2SAR, isAr)}

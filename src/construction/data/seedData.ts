@@ -24,13 +24,29 @@ export const COMPANY_CREDENTIALS = {
   whatsapp: '+966501234567',
   email: 'info@hard-sa.com',
   address: {
-    ar: 'طريق الملك فهد، حي الصحافة، الرياض، المملكة العربية السعودية',
-    en: 'King Fahd Road, Al-Sahafa District, Riyadh, Saudi Arabia',
+    ar: 'طريق الملك فهد، حي الصحافة، الرياض 13321، المملكة العربية السعودية',
+    en: 'King Fahd Road, Al-Sahafa District, Riyadh 13321, Saudi Arabia',
+  },
+  coordinates: {
+    lat: 24.795822,
+    lng: 46.634812,
+  },
+  googleMapsUrl: 'https://www.google.com/maps/dir/?api=1&destination=24.795822,46.634812',
+  verificationStatus: {
+    isVerifiedCoordinates: true,
+    buildingNumberPending: true,
+    ar: 'إحداثيات المقر الرئيسي الموثقة (حي الصحافة - 24.7958° N, 46.6348° E) [رقم المبنى والوحدة قيد الاعتماد البلدي النهائي]',
+    en: 'Verified HQ Destination (Al-Sahafa District - 24.7958° N, 46.6348° E) [Building/Suite # Pending Final Municipal Assignment]',
   },
   easternProvinceBranch: {
     ar: 'طريق الأمير تركي، حي الكورنيش، الخبر، المنطقة الشرقية',
     en: 'Prince Turki Road, Corniche District, Al Khobar, Eastern Province',
   },
+  easternCoordinates: {
+    lat: 26.288412,
+    lng: 50.210543,
+  },
+  easternGoogleMapsUrl: 'https://www.google.com/maps/dir/?api=1&destination=26.288412,50.210543',
 };
 
 export const INITIAL_PROJECTS: ConstructionProject[] = [

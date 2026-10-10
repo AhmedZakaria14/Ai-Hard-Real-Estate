@@ -35,22 +35,53 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
   const [leadRef, setLeadRef] = useState('');
   const [crmRef, setCrmRef] = useState('');
   const [loading, setLoading] = useState(false);
+  const [contactError, setContactError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setContactError('');
+
+    if (!fullName.trim()) return;
+    if (!email.trim() && !phone.trim()) {
+      setContactError(
+        language === 'en'
+          ? 'Please provide at least one contact method (email or phone).'
+          : 'يرجى تقديم وسيلة تواصل واحدة على الأقل (البريد الإلكتروني أو رقم الهاتف).'
+      );
+      return;
+    }
+
+    const typeLabels: Record<string, { en: string; ar: string }> = {
+      buying: { en: 'Property Acquisition Inquiry', ar: 'استفسار عن شراء عقار' },
+      renting: { en: 'Property Rental Inquiry', ar: 'استفسار عن استئجار عقار' },
+      listing: { en: 'Listing / Selling Inquiry', ar: 'استفسار عن بيع وإدراج عقار' },
+      investment: { en: 'Investment Advisory Inquiry', ar: 'استشارة استثمارية' },
+      consultation: { en: 'General Consultation Inquiry', ar: 'استشارة عقارية عامة' },
+    };
+
+    const derivedSubject = subject.trim()
+      ? subject.trim()
+      : typeLabels[inquiryType]?.[language] || (language === 'en' ? 'General Inquiry' : 'استفسار عام');
+
+    const finalMessage = message.trim()
+      ? message.trim()
+      : language === 'en'
+      ? `Contact request for: ${derivedSubject}`
+      : `طلب تواصل بخصوص: ${derivedSubject}`;
+
     setLoading(true);
     try {
       const result = await submitLead({
-        name: fullName,
-        email,
-        phone,
+        name: fullName.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
         inquiry_type: 'general_contact',
         recipient_email: 'info@hardgp.com',
-        message: `Inquiry Type: ${inquiryType}\nSubject: ${subject || 'Contact Inquiry'}\n\n${message}`,
+        message: `Inquiry Type: ${inquiryType}\nSubject: ${derivedSubject}\n\n${finalMessage}`,
         source: 'Contact Us Concierge Page',
         metadata: {
           inquiryType,
-          subject,
+          subject: derivedSubject,
           language,
           targetEmail: 'info@hardgp.com',
           recipientEmail: 'info@hardgp.com',
@@ -122,12 +153,14 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label htmlFor="contact-page-fullname" className="block text-xs font-semibold text-slate-700 mb-1">
                   {t.contact.fullName} *
                 </label>
                 <input
+                  id="contact-page-fullname"
                   type="text"
                   required
+                  aria-required="true"
                   placeholder={language === 'en' ? 'e.g. John Doe' : 'مثال: عبد الله السعيد'}
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
@@ -137,39 +170,50 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    {t.contact.email} *
+                  <label htmlFor="contact-page-email" className="block text-xs font-semibold text-slate-700 mb-1">
+                    {t.contact.email} <span className="text-slate-400 font-normal">({language === 'en' ? 'or Phone' : 'أو الهاتف'})</span>
                   </label>
                   <input
+                    id="contact-page-email"
                     type="email"
-                    required
                     placeholder="name@domain.com"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (contactError) setContactError('');
+                    }}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    {t.contact.phone} *
+                  <label htmlFor="contact-page-phone" className="block text-xs font-semibold text-slate-700 mb-1">
+                    {t.contact.phone} <span className="text-slate-400 font-normal">({language === 'en' ? 'or Email' : 'أو البريد'})</span>
                   </label>
                   <input
+                    id="contact-page-phone"
                     type="tel"
-                    required
                     placeholder="+966 50 000 0000"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => {
+                      setPhone(e.target.value);
+                      if (contactError) setContactError('');
+                    }}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                   />
                 </div>
               </div>
 
+              {contactError && (
+                <p className="text-xs text-rose-500 font-medium">{contactError}</p>
+              )}
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label htmlFor="contact-page-inquiry-type" className="block text-xs font-semibold text-slate-700 mb-1">
                     {t.contact.inquiryType}
                   </label>
                   <select
+                    id="contact-page-inquiry-type"
                     value={inquiryType}
                     onChange={(e) => setInquiryType(e.target.value)}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all cursor-pointer"
@@ -182,13 +226,13 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    {t.contact.subject} *
+                  <label htmlFor="contact-page-subject" className="block text-xs font-semibold text-slate-700 mb-1">
+                    {t.contact.subject} <span className="text-slate-400 font-normal">({language === 'en' ? 'Auto / Optional' : 'تلقائي / اختياري'})</span>
                   </label>
                   <input
+                    id="contact-page-subject"
                     type="text"
-                    required
-                    placeholder={language === 'en' ? 'Brief subject...' : 'موضوع الرسالة...'}
+                    placeholder={language === 'en' ? 'Derived from topic if empty...' : 'يُحدد تلقائياً إن ترك فارغاً...'}
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
@@ -197,12 +241,12 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  {t.contact.message} *
+                <label htmlFor="contact-page-message" className="block text-xs font-semibold text-slate-700 mb-1">
+                  {t.contact.message} <span className="text-slate-400 font-normal">({language === 'en' ? 'Optional' : 'اختياري'})</span>
                 </label>
                 <textarea
+                  id="contact-page-message"
                   rows={4}
-                  required
                   placeholder={language === 'en' ? 'Please provide detailed specifications, questions, or target budgets...' : 'يرجى كتابة تفاصيل استفسارك أو ميزانيتك المقترحة...'}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
@@ -278,17 +322,17 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
 
             {/* Direct WhatsApp Callout Button */}
             <div className="pt-2 border-t border-slate-800">
-              <a
+              <Button
                 href="https://wa.me/966556125711?text=Hello%20HARD%20Real%20Estate,%20I%20would%20like%20to%20connect%20with%20a%20broker."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex w-full"
+                variant="whatsapp"
+                size="lg"
+                className="w-full justify-center"
               >
-                <Button variant="whatsapp" size="lg" className="w-full justify-center">
-                  <MessageSquare className="w-4 h-4" />
-                  <span>{t.cta.chatOnWhatsApp}</span>
-                </Button>
-              </a>
+                <MessageSquare className="w-4 h-4" />
+                <span>{t.cta.chatOnWhatsApp}</span>
+              </Button>
             </div>
           </div>
         </div>

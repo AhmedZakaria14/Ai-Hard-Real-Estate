@@ -9,6 +9,10 @@ import {
   ArrowLeft,
   ShieldCheck,
   Instagram,
+  Building2,
+  Home,
+  HardHat,
+  ThermometerSnowflake,
 } from 'lucide-react';
 import { Language, PageId } from '../../types';
 import { translations as defaultTranslations } from '../../lib/translations';
@@ -16,30 +20,68 @@ import { useTextOverride } from '../../context/TextOverrideContext';
 import { useData } from '../../context/DataContext';
 import { Button } from '../ui/Button';
 import { BrandLogo } from '../ui/BrandLogo';
+import { getPageHref, handleSemanticClick } from '../../lib/navigation';
+import { HARD_GROUP_SECTORS } from '../../lib/sectors';
+import { isAuthorizedAdmin } from '../../lib/adminAuth';
+import { ComplianceVerificationModal } from '../modals/ComplianceVerificationModal';
+import { PrivacyTermsModal } from '../modals/PrivacyTermsModal';
+import { SitemapModal } from '../modals/SitemapModal';
 
 interface FooterProps {
   onNavigate: (page: PageId) => void;
   language: Language;
 }
 
+const SECTOR_ICONS = {
+  Building2,
+  Home,
+  HardHat,
+  ThermometerSnowflake,
+};
+
 export function Footer({ onNavigate, language }: FooterProps) {
   const { translations } = useTextOverride();
   const { addSubscriber } = useData();
   const t = translations[language] || defaultTranslations[language];
+  const isAr = language === 'ar';
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [subError, setSubError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isComplianceModalOpen, setIsComplianceModalOpen] = useState(false);
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  const [privacyInitialTab, setPrivacyInitialTab] = useState<'privacy' | 'terms'>('privacy');
+  const [isSitemapModalOpen, setIsSitemapModalOpen] = useState(false);
+
+  const [isAdmin, setIsAdmin] = useState<boolean>(() => isAuthorizedAdmin());
+
+  React.useEffect(() => {
+    const checkAuth = () => setIsAdmin(isAuthorizedAdmin());
+    checkAuth();
+    window.addEventListener('cms-auth-change', checkAuth);
+    window.addEventListener('storage', checkAuth);
+    return () => {
+      window.removeEventListener('cms-auth-change', checkAuth);
+      window.removeEventListener('storage', checkAuth);
+    };
+  }, []);
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newsletterEmail.trim()) return;
     setLoading(true);
+    setSubError('');
     try {
       await addSubscriber(newsletterEmail.trim(), 'Website Footer', `Subscribed via ${language.toUpperCase()} site`);
       setSubscribed(true);
       setNewsletterEmail('');
     } catch (err) {
       console.error('Subscription error:', err);
+      setSubError(
+        isAr
+          ? 'تعذر تسليم الاشتراك حالياً. تم حفظ البريد المدخل، يرجى إعادة المحاولة.'
+          : 'Subscription delivery failed. Your email is preserved. Please click retry.'
+      );
     } finally {
       setLoading(false);
     }
@@ -50,7 +92,7 @@ export function Footer({ onNavigate, language }: FooterProps) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const ArrowIcon = language === 'ar' ? ArrowLeft : ArrowRight;
+  const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
 
   return (
     <footer className="bg-slate-950 text-slate-300 border-t border-slate-900 mt-20">
@@ -59,111 +101,31 @@ export function Footer({ onNavigate, language }: FooterProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
           {/* Column 1: Brand / Bio */}
           <div className="space-y-4">
-            <div
-              onClick={() => handleLinkClick('home')}
-              className="cursor-pointer group inline-block"
-              role="button"
-              tabIndex={0}
-              aria-label="HARD Real Estate Home"
+            <a
+              href="/realestate"
+              onClick={(e) => handleSemanticClick(e, () => handleLinkClick('home'))}
+              className="cursor-pointer group inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 rounded-xl"
+              aria-label={isAr ? 'الرئيسية - هارد للعقارات' : 'HARD Real Estate Home'}
             >
               <BrandLogo size="md" language={language} variant="light" />
-            </div>
+            </a>
 
             <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
               {t.brandBio}
             </p>
 
-            <div className="pt-2 flex items-center gap-2 text-xs text-blue-400 font-medium">
-              <ShieldCheck className="w-4 h-4" />
+            <button
+              type="button"
+              onClick={() => setIsComplianceModalOpen(true)}
+              className="pt-2 flex items-center gap-2 text-xs text-blue-400 hover:text-blue-300 font-medium transition-colors cursor-pointer group text-start focus-visible:outline-none focus-visible:underline"
+            >
+              <ShieldCheck className="w-4 h-4 shrink-0 text-blue-400 group-hover:scale-110 transition-transform" />
               <span>
                 {language === 'en'
-                  ? 'Officially Licensed Brokerage Firm'
-                  : 'مؤسسة وساطة عقارية معتمدة ومرخصة'}
+                  ? 'Officially Licensed REGA Brokerage • View Audit'
+                  : 'مؤسسة وساطة عقارية مرخصة رسمياً (عرض السجل)'}
               </span>
-            </div>
-          </div>
-
-          {/* Column 2: Quick Links (Sitemap) */}
-          <div>
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4 font-ui-sans">
-              {t.footer.quickLinks}
-            </h4>
-            <ul className="space-y-2.5 text-xs sm:text-sm">
-              {[
-                { id: 'portal', label: language === 'ar' ? 'بوابة مجموعة هارد' : 'HARD Group Portal' },
-                { id: 'construction', label: language === 'ar' ? 'هارد للإنشاءات' : 'HARD Construction' },
-                { id: 'home', label: t.nav.home },
-                { id: 'about', label: t.nav.about },
-                { id: 'properties', label: t.nav.properties },
-                { id: 'projects', label: t.nav.projects },
-                { id: 'marketing', label: t.nav.marketing },
-                { id: 'blog', label: t.nav.blog },
-                { id: 'contact', label: t.nav.contact },
-              ].map((link) => (
-                <li key={link.id}>
-                  <button
-                    onClick={() => handleLinkClick(link.id as PageId)}
-                    className="hover:text-blue-400 transition-colors flex items-center gap-1.5 cursor-pointer text-slate-300"
-                  >
-                    <span className="text-blue-500 opacity-60">›</span>
-                    <span>{link.label}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Column 3: Contact Info & Socials */}
-          <div className="space-y-4">
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4 font-ui-sans">
-              {t.footer.contactInfo}
-            </h4>
-
-            <div className="space-y-3 text-xs sm:text-sm text-slate-300">
-              <div className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-                <span className="text-xs sm:text-sm leading-snug">
-                  {language === 'en'
-                    ? 'Prince Mutaib Road, Hajr Dist., Dammam, Eastern Province, Saudi Arabia'
-                    : 'طريق الأمير متعب، حي هجر، الدمام، المنطقة الشرقية، المملكة العربية السعودية'}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2.5">
-                <Phone className="w-4 h-4 text-blue-400 shrink-0" />
-                <a
-                  href="tel:+966556125711"
-                  dir="ltr"
-                  className="text-xs sm:text-sm hover:text-blue-400 transition-colors font-medium inline-block text-left"
-                >
-                  <bdi dir="ltr">+966 55 612 5711</bdi>
-                </a>
-              </div>
-
-              <div className="flex items-center gap-2.5">
-                <Mail className="w-4 h-4 text-blue-400 shrink-0" />
-                <a
-                  href="mailto:info@hardgp.com"
-                  dir="ltr"
-                  className="hover:text-blue-400 transition-colors text-xs sm:text-sm"
-                >
-                  info@hardgp.com
-                </a>
-              </div>
-
-              <div className="flex items-center gap-2.5">
-                <MessageSquare className="w-4 h-4 text-emerald-400 shrink-0" />
-                <a
-                  href="https://wa.me/966556125711"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  dir="ltr"
-                  className="text-emerald-400 hover:text-emerald-300 transition-colors font-medium text-xs sm:text-sm inline-block text-left"
-                >
-                  <bdi dir="ltr">+966 55 612 5711</bdi>
-                </a>
-              </div>
-            </div>
+            </button>
 
             {/* Social handles */}
             <div className="pt-2 flex items-center gap-2.5">
@@ -196,92 +158,342 @@ export function Footer({ onNavigate, language }: FooterProps) {
             </div>
           </div>
 
-          {/* Column 4: Newsletter Subscription */}
+          {/* Column 2: HARD Group Sectors (Standardized Sector Navigation) */}
+          <div className="space-y-4">
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider font-ui-sans flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-blue-500" />
+              <span>{isAr ? 'قطاعات مجموعة هارد' : 'HARD Group Sectors'}</span>
+            </h4>
+            <ul className="space-y-2 text-xs sm:text-sm">
+              {HARD_GROUP_SECTORS.map((sector) => {
+                const Icon = SECTOR_ICONS[sector.iconName];
+                const isCurrent = sector.id === 'realestate';
+                return (
+                  <li key={sector.id}>
+                    <a
+                      href={sector.href}
+                      onClick={(e) =>
+                        handleSemanticClick(e, () => {
+                          if (!isCurrent) handleLinkClick(sector.pageId);
+                        })
+                      }
+                      aria-current={isCurrent ? 'page' : undefined}
+                      className={`flex items-center justify-between p-2 rounded-xl border transition-all cursor-pointer ${
+                        isCurrent
+                          ? 'bg-blue-950/70 border-blue-800 text-blue-200 font-semibold'
+                          : 'bg-slate-900/60 border-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-900 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Icon
+                          className={`w-4 h-4 shrink-0 ${
+                            isCurrent ? 'text-blue-400' : 'text-slate-400'
+                          }`}
+                        />
+                        <span>{sector.name[language]}</span>
+                      </div>
+                      {isCurrent ? (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-300 border border-blue-500/40">
+                          {isAr ? 'القطاع الحالي' : 'Current'}
+                        </span>
+                      ) : (
+                        <span className="text-slate-500 text-xs">›</span>
+                      )}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          {/* Column 3: Real Estate Sitemap */}
+          <div>
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4 font-ui-sans">
+              {isAr ? 'صفحات العقارات' : 'Real Estate Navigation'}
+            </h4>
+            <ul className="space-y-2 text-xs sm:text-sm">
+              {[
+                { id: 'home', label: t.nav.home },
+                { id: 'properties', label: t.nav.properties },
+                { id: 'projects', label: t.nav.projects },
+                { id: 'marketing', label: t.nav.marketing },
+                { id: 'about', label: t.nav.about },
+                { id: 'blog', label: t.nav.blog },
+                { id: 'contact', label: t.nav.contact },
+              ].map((link) => {
+                const href = getPageHref(link.id as PageId);
+                return (
+                  <li key={link.id}>
+                    <a
+                      href={href}
+                      onClick={(e) => handleSemanticClick(e, () => handleLinkClick(link.id as PageId))}
+                      className="hover:text-blue-400 transition-colors flex items-center gap-1.5 cursor-pointer text-slate-300 focus-visible:outline-none focus-visible:underline py-0.5"
+                    >
+                      <span className="text-blue-500 opacity-60">›</span>
+                      <span>{link.label}</span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+
+            {/* Legal & Sitemap Controls */}
+            <div className="pt-3 border-t border-slate-900/80 space-y-1.5 text-xs">
+              <a
+                href="/realestate/privacy"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setPrivacyInitialTab('privacy');
+                  setIsPrivacyModalOpen(true);
+                }}
+                className="hover:text-blue-400 text-slate-400 transition-colors flex items-center gap-1.5 cursor-pointer py-0.5"
+              >
+                <span className="text-slate-600">•</span>
+                <span>{t.footer.privacy}</span>
+              </a>
+
+              <a
+                href="/realestate/terms"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setPrivacyInitialTab('terms');
+                  setIsPrivacyModalOpen(true);
+                }}
+                className="hover:text-blue-400 text-slate-400 transition-colors flex items-center gap-1.5 cursor-pointer py-0.5"
+              >
+                <span className="text-slate-600">•</span>
+                <span>{t.footer.terms}</span>
+              </a>
+
+              <a
+                href="/realestate/sitemap"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsSitemapModalOpen(true);
+                }}
+                className="hover:text-blue-400 text-slate-300 font-semibold transition-colors flex items-center gap-1.5 cursor-pointer py-0.5"
+              >
+                <span className="text-blue-400">•</span>
+                <span>{t.footer.sitemap} (HTML)</span>
+              </a>
+            </div>
+          </div>
+
+          {/* Column 4: Contact & Newsletter Subscription */}
           <div className="space-y-4">
             <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-2 font-ui-sans">
-              {t.footer.newsletterTitle}
+              {t.footer.contactInfo}
             </h4>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              {t.footer.newsletterSubtitle}
-            </p>
 
-            {subscribed ? (
-              <div className="p-4 bg-blue-950/60 border border-blue-800/80 rounded-2xl text-blue-200 text-xs space-y-1 animate-in fade-in">
-                <div className="flex items-center gap-2 font-semibold text-white">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>{language === 'en' ? 'Subscription Activated' : 'تم تفعيل الاشتراك'}</span>
-                </div>
-                <p>{t.footer.newsletterSuccess}</p>
+            <div className="space-y-2.5 text-xs text-slate-300 pb-2">
+              <div className="flex items-start gap-2">
+                <MapPin className="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5" />
+                <span className="leading-snug">
+                  {language === 'en'
+                    ? 'Prince Mutaib Road, Hajr Dist., Dammam, KSA'
+                    : 'طريق الأمير متعب، حي هجر، الدمام، السعودية'}
+                </span>
               </div>
-            ) : (
-              <form onSubmit={handleSubscribe} className="space-y-2.5">
-                <div className="relative">
-                  <input
-                    type="email"
-                    required
-                    placeholder={t.footer.newsletterPlaceholder}
-                    value={newsletterEmail}
-                    onChange={(e) => setNewsletterEmail(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 hover:border-slate-600 focus:border-blue-500 rounded-xl text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="sm"
-                  isLoading={loading}
-                  className="w-full justify-center"
-                >
-                  <span>{t.footer.newsletterButton}</span>
-                  <ArrowIcon className="w-3.5 h-3.5" />
-                </Button>
-              </form>
-            )}
 
-            <p className="text-[11px] text-slate-500 leading-tight">
-              {language === 'en'
-                ? 'We respect your privacy. Unsubscribe at any time with 1 click.'
-                : 'نحن نحترم خصوصيتك بالكامل، يمكنك إلغاء الاشتراك في أي وقت.'}
-            </p>
+              <div className="flex items-center gap-2">
+                <Phone className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                <a
+                  href="tel:+966556125711"
+                  dir="ltr"
+                  className="hover:text-blue-400 transition-colors font-medium text-left"
+                >
+                  <bdi dir="ltr">+966 55 612 5711</bdi>
+                </a>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Mail className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                <a
+                  href="mailto:info@hardgp.com"
+                  dir="ltr"
+                  className="hover:text-blue-400 transition-colors"
+                >
+                  info@hardgp.com
+                </a>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <a
+                  href="https://wa.me/966556125711"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  dir="ltr"
+                  className="text-emerald-400 hover:text-emerald-300 transition-colors font-medium text-left"
+                >
+                  <bdi dir="ltr">+966 55 612 5711</bdi>
+                </a>
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-slate-900">
+              <h5 className="text-xs font-bold text-white uppercase tracking-wider mb-1 font-ui-sans">
+                {t.footer.newsletterTitle}
+              </h5>
+              <p className="text-[11px] text-slate-400 leading-relaxed mb-2">
+                {t.footer.newsletterSubtitle}
+              </p>
+
+              {subscribed ? (
+                <div className="p-3 bg-blue-950/60 border border-blue-800/80 rounded-xl text-blue-200 text-xs space-y-1 animate-in fade-in">
+                  <div className="flex items-center gap-1.5 font-semibold text-white">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>{language === 'en' ? 'Subscribed' : 'تم الاشتراك'}</span>
+                  </div>
+                  <p className="text-[11px]">{t.footer.newsletterSuccess}</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubscribe} className="space-y-2">
+                  {subError && (
+                    <div className="p-2.5 bg-rose-950/80 border border-rose-800 text-rose-200 rounded-xl text-[11px] leading-relaxed animate-in fade-in">
+                      <p>{subError}</p>
+                    </div>
+                  )}
+                  <div className="relative">
+                    <input
+                      type="email"
+                      required
+                      placeholder={t.footer.newsletterPlaceholder}
+                      value={newsletterEmail}
+                      onChange={(e) => setNewsletterEmail(e.target.value)}
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 hover:border-slate-600 focus:border-blue-500 rounded-xl text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    size="sm"
+                    isLoading={loading}
+                    className="w-full justify-center text-xs py-2"
+                  >
+                    <span>{t.footer.newsletterButton}</span>
+                    <ArrowIcon className="w-3.5 h-3.5" />
+                  </Button>
+                </form>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="mt-12 pt-8 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>{t.footer.copyright}</p>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => handleLinkClick('contact')}
-              className="hover:text-slate-300"
+        {/* Bottom bar with Direct Legal & Cross-Sector Links */}
+        <div className="mt-12 pt-8 border-t border-slate-900 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+          <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-start">
+            <p>{t.footer.copyright}</p>
+            <span className="hidden sm:inline text-slate-800">•</span>
+            {/* Legal Links */}
+            <div className="flex items-center gap-3 text-slate-400 font-medium">
+              <a
+                href="/realestate/privacy"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setPrivacyInitialTab('privacy');
+                  setIsPrivacyModalOpen(true);
+                }}
+                className="hover:text-blue-400 transition-colors cursor-pointer"
+              >
+                {t.footer.privacy}
+              </a>
+              <span className="text-slate-700">•</span>
+              <a
+                href="/realestate/terms"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setPrivacyInitialTab('terms');
+                  setIsPrivacyModalOpen(true);
+                }}
+                className="hover:text-blue-400 transition-colors cursor-pointer"
+              >
+                {t.footer.terms}
+              </a>
+              <span className="text-slate-700">•</span>
+              <a
+                href="/realestate/sitemap"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsSitemapModalOpen(true);
+                }}
+                className="hover:text-blue-400 font-semibold text-slate-300 transition-colors cursor-pointer"
+              >
+                {t.footer.sitemap}
+              </a>
+            </div>
+          </div>
+
+          {/* Standardized Direct Sector Destination Links */}
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 font-medium text-slate-400">
+            <span className="text-slate-600 font-semibold uppercase text-[10px] tracking-wider">
+              {isAr ? 'قطاعات هارد:' : 'Sectors:'}
+            </span>
+            <a
+              href="/"
+              onClick={(e) => handleSemanticClick(e, () => handleLinkClick('portal'))}
+              className="hover:text-blue-400 transition-colors"
             >
-              {t.footer.privacy}
-            </button>
-            <span>•</span>
-            <button
-              onClick={() => handleLinkClick('contact')}
-              className="hover:text-slate-300"
+              {isAr ? 'بوابة مجموعة هارد' : 'HARD Group Portal'}
+            </a>
+            <span className="text-slate-700">•</span>
+            <span className="text-blue-400 font-bold">
+              {isAr ? 'هارد للعقارات (القطاع الحالي)' : 'HARD Real Estate (Current)'}
+            </span>
+            <span className="text-slate-700">•</span>
+            <a
+              href="/construction"
+              onClick={(e) => handleSemanticClick(e, () => handleLinkClick('construction'))}
+              className="hover:text-blue-400 transition-colors"
             >
-              {t.footer.terms}
-            </button>
-            <span>•</span>
-            <button
-              onClick={() => handleLinkClick('properties')}
-              className="hover:text-slate-300"
+              {isAr ? 'هارد للإنشاءات' : 'HARD Construction'}
+            </a>
+            <span className="text-slate-700">•</span>
+            <a
+              href="/hvac"
+              onClick={(e) => handleSemanticClick(e, () => handleLinkClick('hvac'))}
+              className="hover:text-blue-400 transition-colors font-medium text-slate-300"
             >
-              {t.footer.sitemap}
-            </button>
-            <span>•</span>
-            <button
-              onClick={() => handleLinkClick('admin')}
-              className="hover:text-blue-400 font-semibold inline-flex items-center gap-1 text-slate-400 transition-colors"
-              title="Admin CMS Portal"
-            >
-              <ShieldCheck className="w-3 h-3 text-blue-400" />
-              <span>{language === 'en' ? 'Admin CMS' : 'بوابة الإدارة (CMS)'}</span>
-            </button>
+              {isAr ? 'هارد لصيانة التكييف' : 'HARD HVAC Maintenance'}
+            </a>
+            {isAdmin && (
+              <>
+                <span className="text-slate-700">•</span>
+                <a
+                  href="/realestate/admin"
+                  onClick={(e) => handleSemanticClick(e, () => handleLinkClick('admin'))}
+                  className="hover:text-blue-400 font-semibold inline-flex items-center gap-1 text-slate-400 transition-colors"
+                  title="Admin CMS Portal"
+                >
+                  <ShieldCheck className="w-3 h-3 text-blue-400" />
+                  <span>{language === 'en' ? 'Admin CMS' : 'بوابة الإدارة (CMS)'}</span>
+                </a>
+              </>
+            )}
           </div>
         </div>
       </div>
+
+      <ComplianceVerificationModal
+        isOpen={isComplianceModalOpen}
+        onClose={() => setIsComplianceModalOpen(false)}
+        language={language}
+        initialTab="licensing"
+      />
+
+      <PrivacyTermsModal
+        isOpen={isPrivacyModalOpen}
+        onClose={() => setIsPrivacyModalOpen(false)}
+        language={language}
+        initialTab={privacyInitialTab}
+      />
+
+      <SitemapModal
+        isOpen={isSitemapModalOpen}
+        onClose={() => setIsSitemapModalOpen(false)}
+        language={language}
+        onNavigate={onNavigate}
+      />
     </footer>
   );
 }

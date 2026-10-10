@@ -8,6 +8,9 @@ import {
   CheckCircle2,
   AlertCircle,
   Building2,
+  ExternalLink,
+  Compass,
+  ShieldCheck,
 } from 'lucide-react';
 import { useHVAC } from '../context/HVACContext';
 import { T, pick } from '../translations';
@@ -18,7 +21,7 @@ export function HVACContactSection() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const [service, setService] = useState('HVAC Maintenance Contract');
+  const [service, setService] = useState('');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successStatus, setSuccessStatus] = useState<string | null>(null);
@@ -141,10 +144,14 @@ export function HVACContactSection() {
                   {pick(T.contact.formService, language)}
                 </label>
                 <select
+                  required
                   value={service}
                   onChange={(e) => setService(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:border-[#0EA5E9] focus:ring-1 focus:ring-[#0EA5E9] cursor-pointer"
                 >
+                  <option value="" disabled>
+                    {isAr ? '-- اختر الخدمة المطلوب الاستفسار عنها --' : '-- Select Requested Service --'}
+                  </option>
                   <option value="AC Maintenance Contract">
                     {isAr ? 'عقد صيانة سنوي (AMC)' : 'Annual Maintenance Contract (AMC)'}
                   </option>
@@ -197,38 +204,59 @@ export function HVACContactSection() {
             </form>
           </div>
 
-          {/* Right Column (6 cols): Embedded Google Map at 26.373784, 50.103001 + Info Block */}
+          {/* Right Column (6 cols): Verified Physical Map Location & Office Information */}
           <div className="lg:col-span-6 space-y-6 text-start">
             {/* Map Container */}
-            <div className="bg-[#F8FAFC] border border-slate-200/80 rounded-2xl overflow-hidden shadow-xs">
-              <div className="p-4 border-b border-slate-200/80 bg-white flex items-center justify-between">
+            <div className="bg-[#F8FAFC] border border-slate-200/80 rounded-2xl overflow-hidden shadow-xs space-y-0">
+              <div className="p-4 border-b border-slate-200/80 bg-white flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-[#0EA5E9]" />
                   <span className="font-semibold text-xs sm:text-sm text-slate-800">
                     {pick(T.contact.mapTitle, language)}
                   </span>
                 </div>
-                <span className="text-[11px] font-mono text-slate-400">26.3737° N, 50.1030° E</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
+                    26.373784° N, 50.103001° E
+                  </span>
+                  <a
+                    href="https://www.google.com/maps/dir/?api=1&destination=26.373784,50.103001"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-white bg-[#0EA5E9] hover:bg-[#0284C7] rounded-lg transition-colors"
+                  >
+                    <span>{pick(T.contact.getDirections, language)}</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
               </div>
 
               {/* Google Maps Iframe */}
-              <div className="h-64 sm:h-72 w-full bg-slate-100 relative">
+              <div className="h-60 sm:h-64 w-full bg-slate-100 relative">
                 <iframe
-                  title="HARD HVAC Maintenance Service Hub"
+                  title="HARD HVAC Maintenance Service Hub - Al Khobar"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
                   loading="lazy"
                   allowFullScreen
                   referrerPolicy="no-referrer-when-downgrade"
-                  src="https://maps.google.com/maps?q=26.373784,50.103001&hl=en&z=14&output=embed"
+                  src="https://maps.google.com/maps?q=26.373784,50.103001&hl=en&z=15&output=embed"
                 />
               </div>
             </div>
 
-            {/* Address, Email, and Working Hours */}
+            {/* Verification Notice Banner */}
+            <div className="p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200/80 text-amber-900 text-xs flex items-start gap-2.5">
+              <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <p className="leading-relaxed">
+                {pick(T.contact.verificationNotice, language)}
+              </p>
+            </div>
+
+            {/* Address, Coverage, Email, and Working Hours Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Address */}
+              {/* Physical Office Address (Al Khobar) */}
               <div className="bg-[#F8FAFC] border border-slate-200/80 rounded-2xl p-4.5 space-y-2">
                 <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-[#0EA5E9]">
                   <Building2 className="w-4 h-4" />
@@ -236,8 +264,21 @@ export function HVACContactSection() {
                 <h4 className="font-semibold text-xs text-slate-900">
                   {pick(T.contact.addressTitle, language)}
                 </h4>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className="text-xs text-slate-700 leading-relaxed font-medium">
                   {pick(T.contact.addressDesc, language)}
+                </p>
+              </div>
+
+              {/* Field Service Coverage Area */}
+              <div className="bg-[#F8FAFC] border border-slate-200/80 rounded-2xl p-4.5 space-y-2">
+                <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-[#0EA5E9]">
+                  <Compass className="w-4 h-4" />
+                </div>
+                <h4 className="font-semibold text-xs text-slate-900">
+                  {pick(T.contact.coverageTitle, language)}
+                </h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  {pick(T.contact.coverageDesc, language)}
                 </p>
               </div>
 
@@ -260,24 +301,22 @@ export function HVACContactSection() {
                 </p>
               </div>
 
-              {/* Working Hours (full span) */}
-              <div className="sm:col-span-2 bg-[#F8FAFC] border border-slate-200/80 rounded-2xl p-4.5 space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-[#F97316]">
-                    <Clock className="w-4 h-4" />
-                  </div>
-                  <h4 className="font-semibold text-xs text-slate-900">
-                    {pick(T.contact.hoursTitle, language)}
-                  </h4>
+              {/* Working Hours */}
+              <div className="bg-[#F8FAFC] border border-slate-200/80 rounded-2xl p-4.5 space-y-2">
+                <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-[#F97316]">
+                  <Clock className="w-4 h-4" />
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700 pt-1">
-                  <div className="p-2 rounded-lg bg-white border border-slate-200 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <h4 className="font-semibold text-xs text-slate-900">
+                  {pick(T.contact.hoursTitle, language)}
+                </h4>
+                <div className="space-y-1 text-xs text-slate-700">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                     <span>{pick(T.contact.hoursRegular, language)}</span>
                   </div>
-                  <div className="p-2 rounded-lg bg-white border border-amber-200 text-amber-900 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#F97316]" />
-                    <span className="font-semibold">{pick(T.contact.hoursFriday, language)}</span>
+                  <div className="flex items-center gap-1.5 text-amber-900 font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#F97316]" />
+                    <span>{pick(T.contact.hoursFriday, language)}</span>
                   </div>
                 </div>
               </div>

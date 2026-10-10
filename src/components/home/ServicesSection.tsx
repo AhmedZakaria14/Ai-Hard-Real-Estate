@@ -16,6 +16,7 @@ import { useTextOverride } from '../../context/TextOverrideContext';
 import { mockServices } from '../../data/mockData';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
+import { getPageHref, handleSemanticClick } from '../../lib/navigation';
 
 interface ServicesSectionProps {
   language: Language;
@@ -165,17 +166,28 @@ export function ServicesSection({
                   ))}
                 </div>
 
-                {/* Call-to-action Button */}
+                {/* Call-to-action */}
                 <div className="pt-2">
-                  <Button
-                    variant="primary"
-                    size="md"
-                    onClick={() => handleAction(service.actionType)}
-                    className="font-bold shadow-md"
-                  >
-                    <span>{service.actionText[language]}</span>
-                    <ArrowIcon className="w-4 h-4" />
-                  </Button>
+                  {service.actionType === 'list-property' ? (
+                    <Button
+                      variant="primary"
+                      size="md"
+                      onClick={() => handleAction(service.actionType)}
+                      className="font-bold shadow-md"
+                    >
+                      <span>{service.actionText[language]}</span>
+                      <ArrowIcon className="w-4 h-4" />
+                    </Button>
+                  ) : (
+                    <a
+                      href={getPageHref(service.actionType as PageId)}
+                      onClick={(e) => handleSemanticClick(e, () => handleAction(service.actionType))}
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                    >
+                      <span>{service.actionText[language]}</span>
+                      <ArrowIcon className="w-4 h-4" />
+                    </a>
+                  )}
                 </div>
               </div>
             </div>

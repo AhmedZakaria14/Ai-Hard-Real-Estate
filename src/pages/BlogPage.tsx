@@ -14,6 +14,7 @@ import { useData } from '../context/DataContext';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Modal } from '../components/ui/Modal';
+import { getPageTitle, updateDocumentTitle } from '../lib/pageTitles';
 
 interface BlogPageProps {
   onNavigate: (page: PageId) => void;
@@ -26,6 +27,21 @@ export function BlogPage({ onNavigate, language }: BlogPageProps) {
   const ArrowIcon = language === 'ar' ? ArrowLeft : ArrowRight;
   const [activeCategory, setActiveCategory] = useState('All');
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
+
+  // Synchronize document title for articles page and active article modal
+  React.useEffect(() => {
+    const title = getPageTitle({
+      page: 'blog',
+      language,
+      articleTitle: selectedPost
+        ? {
+            ar: selectedPost.title.ar,
+            en: selectedPost.title.en,
+          }
+        : null,
+    });
+    updateDocumentTitle(title);
+  }, [language, selectedPost]);
 
   // Show published posts only on public site
   const livePosts = blogPosts.filter((p) => (p.status || 'published') === 'published');

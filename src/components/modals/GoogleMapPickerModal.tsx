@@ -117,7 +117,14 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
 
   // Initialize Map when modal opens
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+        markerRef.current = null;
+      }
+      return;
+    }
 
     const timer = setTimeout(() => {
       if (!mapContainerRef.current) return;
@@ -125,61 +132,70 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
       const initial = parseInitial();
       setCoords(initial);
 
-      // Create Leaflet Map Instance
-      if (!mapInstanceRef.current) {
-        const map = L.map(mapContainerRef.current, {
-          center: [initial.lat, initial.lng],
-          zoom: 15,
-          zoomControl: false,
-        });
-
-        // Add Zoom Control at Bottom Right
-        L.control.zoom({ position: isAr ? 'bottomleft' : 'bottomright' }).addTo(map);
-
-        // Tile layer
-        const tile = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          attribution: '&copy; OpenStreetMap contributors',
-        }).addTo(map);
-        tileLayerRef.current = tile;
-
-        // Custom Marker
-        const marker = L.marker([initial.lat, initial.lng], {
-          icon: createCustomPinIcon(),
-          draggable: true,
-        }).addTo(map);
-
-        // Drag handler
-        marker.on('dragend', (e) => {
-          const latlng = e.target.getLatLng();
-          setCoords({ lat: latlng.lat, lng: latlng.lng });
-          reverseGeocode(latlng.lat, latlng.lng);
-        });
-
-        // Click on map to place/move marker
-        map.on('click', (e: L.LeafletMouseEvent) => {
-          const { lat, lng } = e.latlng;
-          setCoords({ lat, lng });
-          marker.setLatLng([lat, lng]);
-          reverseGeocode(lat, lng);
-        });
-
-        markerRef.current = marker;
-        mapInstanceRef.current = map;
-
-        reverseGeocode(initial.lat, initial.lng);
-      } else {
-        mapInstanceRef.current.invalidateSize();
-        mapInstanceRef.current.setView([initial.lat, initial.lng], 15);
-        if (markerRef.current) {
-          markerRef.current.setLatLng([initial.lat, initial.lng]);
-        }
-        reverseGeocode(initial.lat, initial.lng);
+      // Clean up previous map instance if any
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+        markerRef.current = null;
       }
+
+      // Create Leaflet Map Instance
+      const map = L.map(mapContainerRef.current, {
+        center: [initial.lat, initial.lng],
+        zoom: 15,
+        zoomControl: false,
+      });
+
+      // Add Zoom Control at Bottom Right
+      L.control.zoom({ position: isAr ? 'bottomleft' : 'bottomright' }).addTo(map);
+
+      // Tile layer
+      const tile = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors',
+      }).addTo(map);
+      tileLayerRef.current = tile;
+
+      // Custom Marker
+      const marker = L.marker([initial.lat, initial.lng], {
+        icon: createCustomPinIcon(),
+        draggable: true,
+      }).addTo(map);
+
+      // Drag handler
+      marker.on('dragend', (e) => {
+        const latlng = e.target.getLatLng();
+        setCoords({ lat: latlng.lat, lng: latlng.lng });
+        reverseGeocode(latlng.lat, latlng.lng);
+      });
+
+      // Click on map to place/move marker
+      map.on('click', (e: L.LeafletMouseEvent) => {
+        const { lat, lng } = e.latlng;
+        setCoords({ lat, lng });
+        marker.setLatLng([lat, lng]);
+        reverseGeocode(lat, lng);
+      });
+
+      markerRef.current = marker;
+      mapInstanceRef.current = map;
+
+      setTimeout(() => {
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.invalidateSize();
+        }
+      }, 150);
+
+      reverseGeocode(initial.lat, initial.lng);
     }, 100);
 
     return () => {
       clearTimeout(timer);
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+        markerRef.current = null;
+      }
     };
   }, [isOpen]);
 

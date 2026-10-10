@@ -13,6 +13,8 @@ import {
 import { useConstruction } from '../context/ConstructionContext';
 import { constructionTranslations } from '../utils/translations';
 import { COMPANY_CREDENTIALS } from '../data/seedData';
+import { handleSemanticClick } from '../../lib/navigation';
+import { isAuthorizedAdmin } from '../../lib/adminAuth';
 
 interface FooterProps {
   onNavigate?: (page: any) => void;
@@ -23,6 +25,19 @@ export function Footer({ onNavigate, onOpenCMS }: FooterProps) {
   const { language, toggleLanguage, openCostEstimator, openQuoteModal } = useConstruction();
   const t = constructionTranslations[language];
   const isAr = language === 'ar';
+
+  const [isAdmin, setIsAdmin] = React.useState<boolean>(() => isAuthorizedAdmin());
+
+  React.useEffect(() => {
+    const checkAuth = () => setIsAdmin(isAuthorizedAdmin());
+    checkAuth();
+    window.addEventListener('cms-auth-change', checkAuth);
+    window.addEventListener('storage', checkAuth);
+    return () => {
+      window.removeEventListener('cms-auth-change', checkAuth);
+      window.removeEventListener('storage', checkAuth);
+    };
+  }, []);
 
   return (
     <footer className="bg-[#0b1b2d] text-slate-400 border-t border-slate-800 text-xs">
@@ -56,51 +71,109 @@ export function Footer({ onNavigate, onOpenCMS }: FooterProps) {
           </div>
         </div>
 
-        {/* Col 2: Quick Links */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-bold text-white font-display-serif">
-            {isAr ? 'روابط سريعة' : 'Quick Navigation'}
-          </h4>
-          <ul className="space-y-2 text-xs">
-            <li>
-              <a href="#home" className="hover:text-[#009ee2] transition-colors">
-                {t.nav.home}
-              </a>
-            </li>
-            <li>
-              <a href="#about" className="hover:text-[#009ee2] transition-colors">
-                {t.nav.about}
-              </a>
-            </li>
-            <li>
-              <a href="#projects" className="hover:text-[#009ee2] transition-colors">
-                {t.nav.projects}
-              </a>
-            </li>
-            <li>
-              <a href="#services" className="hover:text-[#009ee2] transition-colors">
-                {t.nav.services}
-              </a>
-            </li>
-            <li>
-              <button
-                type="button"
-                onClick={openCostEstimator}
-                className="text-amber-400 hover:text-amber-300 font-bold cursor-pointer"
-              >
-                {t.nav.calculator}
-              </button>
-            </li>
-            <li>
-              <button
-                type="button"
-                onClick={() => openQuoteModal()}
-                className="text-[#009ee2] hover:text-sky-300 font-bold cursor-pointer"
-              >
-                {t.nav.requestQuote}
-              </button>
-            </li>
-          </ul>
+        {/* Col 2: Quick Links & Group Sectors */}
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <h4 className="text-sm font-bold text-white font-display-serif">
+              {isAr ? 'قطاعات مجموعة هارد' : 'HARD Group Sectors'}
+            </h4>
+            <ul className="space-y-1.5 text-xs">
+              <li>
+                <a
+                  href="/"
+                  onClick={(e) => {
+                    handleSemanticClick(e, () => {
+                      if (onNavigate) onNavigate('portal');
+                    });
+                  }}
+                  className="hover:text-[#009ee2] transition-colors flex items-center gap-1.5"
+                >
+                  <span className="text-slate-500">›</span>
+                  <span>{isAr ? 'بوابة مجموعة هارد' : 'HARD Group Portal'}</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/realestate"
+                  onClick={(e) => {
+                    handleSemanticClick(e, () => {
+                      if (onNavigate) onNavigate('home');
+                    });
+                  }}
+                  className="hover:text-[#009ee2] transition-colors flex items-center gap-1.5"
+                >
+                  <span className="text-slate-500">›</span>
+                  <span>{isAr ? 'هارد للعقارات' : 'HARD Real Estate'}</span>
+                </a>
+              </li>
+              <li>
+                <span className="text-[#009ee2] font-bold flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#009ee2]" />
+                  <span>{isAr ? 'هارد للإنشاءات (القطاع الحالي)' : 'HARD Construction (Current)'}</span>
+                </span>
+              </li>
+              <li>
+                <a
+                  href="/hvac"
+                  onClick={(e) => {
+                    handleSemanticClick(e, () => {
+                      if (onNavigate) onNavigate('hvac');
+                    });
+                  }}
+                  className="hover:text-[#009ee2] transition-colors flex items-center gap-1.5 font-medium text-slate-300"
+                >
+                  <span className="text-slate-500">›</span>
+                  <span>{isAr ? 'هارد لصيانة التكييف' : 'HARD HVAC Maintenance'}</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div className="pt-2 border-t border-slate-800/80 space-y-2">
+            <h4 className="text-sm font-bold text-white font-display-serif">
+              {isAr ? 'روابط سريعة' : 'Quick Navigation'}
+            </h4>
+            <ul className="space-y-1.5 text-xs">
+              <li>
+                <a href="#home" className="hover:text-[#009ee2] transition-colors">
+                  {t.nav.home}
+                </a>
+              </li>
+              <li>
+                <a href="#about" className="hover:text-[#009ee2] transition-colors">
+                  {t.nav.about}
+                </a>
+              </li>
+              <li>
+                <a href="#projects" className="hover:text-[#009ee2] transition-colors">
+                  {t.nav.projects}
+                </a>
+              </li>
+              <li>
+                <a href="#services" className="hover:text-[#009ee2] transition-colors">
+                  {t.nav.services}
+                </a>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={openCostEstimator}
+                  className="text-amber-400 hover:text-amber-300 font-bold cursor-pointer"
+                >
+                  {t.nav.calculator}
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => openQuoteModal()}
+                  className="text-[#009ee2] hover:text-sky-300 font-bold cursor-pointer"
+                >
+                  {t.nav.requestQuote}
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
 
         {/* Col 3: Accreditations */}
@@ -165,14 +238,16 @@ export function Footer({ onNavigate, onOpenCMS }: FooterProps) {
               <span>{language === 'en' ? 'العربية (RTL)' : 'English (LTR)'}</span>
             </button>
 
-            <button
-              type="button"
-              onClick={onOpenCMS}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-bold text-amber-300 border border-slate-700 cursor-pointer"
-            >
-              <Lock className="w-3.5 h-3.5 text-amber-400" />
-              <span>{t.nav.cms}</span>
-            </button>
+            {isAdmin && onOpenCMS && (
+              <button
+                type="button"
+                onClick={onOpenCMS}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-bold text-amber-300 border border-slate-700 cursor-pointer"
+              >
+                <Lock className="w-3.5 h-3.5 text-amber-400" />
+                <span>{t.nav.cms}</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -183,30 +258,51 @@ export function Footer({ onNavigate, onOpenCMS }: FooterProps) {
           <div>
             © {new Date().getFullYear()} {isAr ? 'شركة هارد للمقاولات العامة والإنشاءات. جميع الحقوق محفوظة.' : 'HARD Contracting Co. All rights reserved.'}
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 font-medium">
+            <span className="text-slate-500 uppercase tracking-wider text-[10px]">
+              {isAr ? 'قطاعات هارد:' : 'Sectors:'}
+            </span>
             <a
               href="/"
               onClick={(e) => {
-                e.preventDefault();
-                if (onNavigate) onNavigate('portal');
+                handleSemanticClick(e, () => {
+                  if (onNavigate) onNavigate('portal');
+                });
               }}
               className="hover:text-[#009ee2] transition-colors"
             >
               {isAr ? 'بوابة مجموعة هارد' : 'HARD Group Portal'}
             </a>
-            <span>•</span>
+            <span className="text-slate-700">•</span>
             <a
               href="/realestate"
               onClick={(e) => {
-                e.preventDefault();
-                if (onNavigate) onNavigate('home');
+                handleSemanticClick(e, () => {
+                  if (onNavigate) onNavigate('home');
+                });
               }}
               className="hover:text-[#009ee2] transition-colors"
             >
-              {isAr ? 'هارد العقارية' : 'HARD Real Estate'}
+              {isAr ? 'هارد للعقارات' : 'HARD Real Estate'}
             </a>
-            <span>•</span>
-            <span className="text-emerald-400 font-semibold">{isAr ? 'معتمد رسمياً في المملكة العربية السعودية' : 'Officially Certified in KSA'}</span>
+            <span className="text-slate-700">•</span>
+            <span className="text-[#009ee2] font-bold">
+              {isAr ? 'هارد للإنشاءات (القطاع الحالي)' : 'HARD Construction (Current)'}
+            </span>
+            <span className="text-slate-700">•</span>
+            <a
+              href="/hvac"
+              onClick={(e) => {
+                handleSemanticClick(e, () => {
+                  if (onNavigate) onNavigate('hvac');
+                });
+              }}
+              className="hover:text-[#009ee2] transition-colors"
+            >
+              {isAr ? 'هارد لصيانة التكييف' : 'HARD HVAC Maintenance'}
+            </a>
+            <span className="text-slate-700">•</span>
+            <span className="text-emerald-400 font-semibold">{isAr ? 'معتمد رسمياً في المملكة' : 'Certified in KSA'}</span>
           </div>
         </div>
       </div>

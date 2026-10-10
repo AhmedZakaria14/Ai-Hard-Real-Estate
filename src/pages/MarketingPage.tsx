@@ -98,20 +98,16 @@ export function MarketingPage({
               <span>{t.cta.listProperty}</span>
               <ArrowIcon className="w-4 h-4" />
             </Button>
-            <a
+            <Button
               href="https://wa.me/966556125711?text=Hello%20HARD%20Real%20Estate,%20I%20would%20like%20a%20property%20valuation."
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex"
+              variant="outline"
+              size="lg"
+              className="bg-transparent border-white text-white hover:bg-white/10 w-full"
             >
-              <Button
-                variant="outline"
-                size="lg"
-                className="bg-transparent border-white text-white hover:bg-white/10 w-full"
-              >
-                <span>{t.cta.chatOnWhatsApp}</span>
-              </Button>
-            </a>
+              <span>{t.cta.chatOnWhatsApp}</span>
+            </Button>
           </div>
         </div>
 

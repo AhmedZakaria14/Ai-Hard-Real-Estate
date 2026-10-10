@@ -275,9 +275,9 @@ export const initialFaqs: HVACFaqItem[] = [
     questionEn: 'What is the response time for 24/7 emergency AC breakdowns?',
     questionAr: 'ما هي المدة الزمنية لوصول فريق طوارئ التكييف في الحالات العاجلة؟',
     answerEn:
-      'Our mobile service units are positioned across Dammam, Khobar, and Dhahran, with average on-site arrival within 30 to 45 minutes for urgent calls. Immediate phone triage and technician assignment occur instantly.',
+      'Our mobile service units are positioned across Dammam, Khobar, and Dhahran, with average on-site arrival within 30 to 45 minutes for urgent calls. Immediate phone triage and dispatch request review occur upon submission.',
     answerAr:
-      'تتوزع سيارات الخدمة الميدانية السريعة في نقاط حيوية بالخبر والدمام والظهران، ويصل الفني لموقعك خلال ٣٠ إلى ٤٥ دقيقة في المتوسط للبلاغات الطارئة، مع توجيه هاتفي فوري من مهندس التشغيل.',
+      'تتوزع سيارات الخدمة الميدانية السريعة في نقاط حيوية بالخبر والدمام والظهران، ويصل الفني لموقعك خلال ٣٠ إلى ٤٥ دقيقة في المتوسط للبلاغات الطارئة، مع توجيه هاتفي فوري ومراجعة طلب الإسناد عند الإرسال.',
   },
   {
     id: 'faq-3',

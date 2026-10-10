@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { Property, PropertyType, ListingStatus, Language } from '../../types';
 import { SAUDI_CITIES } from '../../data/cities';
+import { getPropertyAreaSqM } from '../../lib/utils';
 
 interface CMSPropertiesListProps {
   properties: Property[];
@@ -470,8 +471,8 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
                         <span className="flex items-center gap-1" title={`${prop.bathrooms} Bathrooms`}>
                           <Bath className="w-3.5 h-3.5 text-slate-400" /> {prop.bathrooms}
                         </span>
-                        <span className="flex items-center gap-1 font-semibold text-slate-700" title={`${prop.areaSqM} m²`}>
-                          <Maximize2 className="w-3.5 h-3.5 text-slate-400" /> {prop.areaSqM} m²
+                        <span className="flex items-center gap-1 font-semibold text-slate-700" title={`${getPropertyAreaSqM(prop)} ${isAr ? 'م²' : 'm²'}`}>
+                          <Maximize2 className="w-3.5 h-3.5 text-slate-400" /> {getPropertyAreaSqM(prop)} {isAr ? 'م²' : 'm²'}
                         </span>
                       </div>
                     </td>

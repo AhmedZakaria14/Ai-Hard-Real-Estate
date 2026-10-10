@@ -18,7 +18,7 @@ export function useGoogleMaps(): GoogleMapsLoaderState {
 
   useEffect(() => {
     if (!apiKey) {
-      // Graceful fallback to embedded interactive SVG geo-spatial engine
+      // Graceful fallback to default interactive tile map engine
       setIsLoaded(true);
       return;
     }

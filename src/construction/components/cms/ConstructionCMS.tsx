@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { useConstruction } from '../../context/ConstructionContext';
 import { constructionTranslations } from '../../utils/translations';
+import { formatAreaBUA } from '../../utils/constructionFormatters';
 import { ConstructionProject, ConstructionQuoteLead, LeadStatus } from '../../types';
 import { formatSAR } from '../../utils/costCalculator';
 
@@ -501,7 +502,7 @@ export function ConstructionCMS({ onExit }: ConstructionCMSProps) {
                               {lead.projectType.replace('-', ' ')}
                             </td>
                             <td className="py-3.5 px-4 text-slate-700">
-                              {lead.builtUpArea ? `${lead.builtUpArea} m²` : '-'}
+                              {lead.builtUpArea ? formatAreaBUA(lead.builtUpArea, isAr ? 'ar' : 'en') : '-'}
                             </td>
                             <td className="py-3.5 px-4 text-slate-700">
                               {lead.city} {lead.district ? `(${lead.district})` : ''}

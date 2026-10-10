@@ -45,11 +45,16 @@ export function HVACFloatingWidgets() {
         </button>
       )}
 
-      {/* 2. Modern WhatsApp Button (966550641000) */}
-      <button
-        type="button"
-        onClick={openWhatsApp}
-        className="w-14 h-14 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white shadow-xl flex items-center justify-center transition-all transform hover:scale-105 cursor-pointer relative group"
+      {/* 2. Modern WhatsApp Navigation Link (966550641000) */}
+      <a
+        href={`https://wa.me/966550641000?text=${encodeURIComponent(
+          isAr
+            ? 'السلام عليكم، أرغب بحجز موعد صيانة أو الاستفسار عن خدمات هارد للتكييف والتبريد.'
+            : 'Hello HARD HVAC Maintenance, I would like to book a service or inquire about maintenance plans.'
+        )}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="w-14 h-14 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white shadow-xl flex items-center justify-center transition-all transform hover:scale-105 cursor-pointer relative group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0EA5E9]"
         title={isAr ? 'محادثة مباشرة عبر واتساب' : 'Chat on WhatsApp'}
         aria-label="WhatsApp Support"
       >
@@ -64,7 +69,7 @@ export function HVACFloatingWidgets() {
         >
           {isAr ? 'واتساب الدعم الفني: 0550641000' : 'WhatsApp Dispatch: +966 55 064 1000'}
         </span>
-      </button>
+      </a>
     </div>
   );
 }

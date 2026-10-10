@@ -314,52 +314,132 @@ export const T = {
       ar: 'كفاءة الطاقة والتوفير',
     },
     title: {
-      en: 'Calculate Local Efficiency Incentives & Savings',
-      ar: 'احسب حوافز وتوفير كفاءة الطاقة السنوي',
+      en: 'Calculate Energy Efficiency & Electricity Bill Savings',
+      ar: 'احسب الوفر السنوي في فاتورة الكهرباء وكفاءة التبريد',
     },
     subtitle: {
-      en: 'Estimate electricity bill reductions and local Saudi energy efficiency rebates when upgrading and servicing your cooling system with HARD.',
-      ar: 'اكتشف حجم الوفر المالي في فاتورة الكهرباء ومقدار الحوافز التقديرية عند صيانة وتحديث أجهزتك بأنظمة عالية الكفاءة.',
+      en: 'Estimate your annual electricity bill reductions and environmental impact when upgrading to high-SEER and VRF inverter cooling systems with regular maintenance.',
+      ar: 'احسب حجم الوفر المالي التقديري في فاتورة الكهرباء السنوية والأثر البيئي عند تحديث أجهزة التكييف إلى أنظمة الانفرتر وVRF عالية الكفاءة.',
     },
     areaSliderLabel: {
       en: 'Air-Conditioned Area (Square Metres):',
       ar: 'المساحة المكيفة الإجمالية (متر مربع):',
     },
     tierLabel: {
-      en: 'Cooling System Tier:',
-      ar: 'نوع وكفاءة نظام التكييف:',
+      en: 'Upgraded Target Cooling System:',
+      ar: 'نظام التكييف المستهدف للتحديث:',
+    },
+    baselineLabel: {
+      en: 'Existing Baseline System Efficiency:',
+      ar: 'كفاءة النظام الحالي (قبل التحديث):',
+    },
+    baselineLegacy: {
+      en: 'Legacy Non-Inverter Split / Window (10.5 SEER)',
+      ar: 'سبليت/شباك قديم بدون إنفرتر (SEER 10.5)',
+    },
+    baselineStandardCentral: {
+      en: 'Standard Central Packaged Unit (11.5 SEER)',
+      ar: 'سنترال/باكج تقليدي (SEER 11.5)',
+    },
+    baselineChiller: {
+      en: 'Standard Reciprocating Chiller (10.0 SEER)',
+      ar: 'شيلر تبادلي عادي (SEER 10.0)',
+    },
+    hoursLabel: {
+      en: 'Average Daily Cooling Operating Hours:',
+      ar: 'متوسط ساعات تشغيل التكييف اليومية:',
+    },
+    tariffLabel: {
+      en: 'SEC Electricity Tariff Rate:',
+      ar: 'تعرفة الكهرباء المطبقة (شركة الكهرباء):',
+    },
+    tariffResidential: {
+      en: 'Residential ≤6,000 kWh (0.18 SAR/kWh)',
+      ar: 'سكني - الشريحة الأولى (0.18 ريال / ك.و.س)',
+    },
+    tariffResidentialTier2: {
+      en: 'Residential >6,000 kWh (0.30 SAR/kWh)',
+      ar: 'سكني - الشريحة الثانية (0.30 ريال / ك.و.س)',
+    },
+    tariffCommercial: {
+      en: 'Commercial Rate (0.20 SAR/kWh)',
+      ar: 'تجاري (0.20 ريال / ك.و.س)',
+    },
+    tariffGovernment: {
+      en: 'Government / Institutional Rate (0.26 SAR/kWh)',
+      ar: 'حكومي / مؤسسي (0.26 ريال / ك.و.س)',
+    },
+    periodLabel: {
+      en: 'Calculation Horizon:',
+      ar: 'المدة الزمنية لحساب الوفر:',
+    },
+    period1Yr: {
+      en: '1 Year (Annual)',
+      ar: 'سنة واحدة (سنوي)',
+    },
+    period3Yr: {
+      en: '3 Years (Cumulative)',
+      ar: '3 سنوات (تراكمي)',
+    },
+    period5Yr: {
+      en: '5 Years (Cumulative)',
+      ar: '5 سنوات (تراكمي)',
     },
     tierSplitStandard: {
-      en: 'Standard Split (Lower SEER)',
-      ar: 'سبليت تقليدي (كفاءة عادية)',
+      en: 'Standard Split Upgrade (13.5 SEER)',
+      ar: 'ترقية إلى سبليت معتمد (SEER 13.5)',
     },
     tierInverterHigh: {
-      en: 'Inverter Split (High SEER Energy Saver)',
-      ar: 'سبليت إنفرتر موفر للطاقة (كفاءة عالية)',
+      en: 'Inverter High-SEER Split (18.0 SEER)',
+      ar: 'ترقية إلى سبليت إنفرتر ذكي (SEER 18.0)',
     },
     tierPackage: {
-      en: 'Rooftop Package Unit',
-      ar: 'وحدات مدمجة سطحية (باكج سنترال)',
+      en: 'High-Efficiency Rooftop Package (15.5 SEER)',
+      ar: 'ترقية إلى باكج سطح عالي الكفاءة (SEER 15.5)',
     },
     tierVRF: {
-      en: 'VRF / Central Chiller Solution',
-      ar: 'أنظمة تدفق التبريد المتغير VRF / الشيلرات',
+      en: 'Smart VRF / Inverter Chiller (21.0+ SEER)',
+      ar: 'ترقية إلى نظام VRF أو شيلر إنفرتر (SEER 21.0+)',
     },
     annualSavingsTitle: {
-      en: 'Estimated Annual Electricity Savings',
-      ar: 'الوفر السنوي التقديري في فاتورة الكهرباء',
+      en: 'Estimated Financial Savings',
+      ar: 'الوفر المالي التقديري',
     },
-    incentiveEstimateTitle: {
-      en: 'Estimated Saudi Energy Rebates & Efficiency Value',
-      ar: 'قيمة الحوافز والدعم التقديرية لكفاءة التبريد',
+    kwhSavedTitle: {
+      en: 'Estimated Electrical Energy Saved',
+      ar: 'طاقة الكهرباء الموفرة التقديرية',
+    },
+    efficiencyGainTitle: {
+      en: 'Seasonal Efficiency Rating (SEER)',
+      ar: 'معامل كفاءة الطاقة الموسمي (SEER)',
     },
     carbonOffsetTitle: {
-      en: 'Annual CO₂ Footprint Reduction',
-      ar: 'خفض الانبعاثات الكربونية السنوي',
+      en: 'Estimated Grid CO₂ Reduction',
+      ar: 'الخفض التقديري للانبعاثات الكربونية',
+    },
+    illustrativeTag: {
+      en: 'Illustrative Technical Simulation (Unmeasured Model)',
+      ar: 'محاكاة هندسية نموذجية (تقدير غير مقاس ميدانياً)',
+    },
+    assumptionsCardTitle: {
+      en: 'Model Calculation Parameters & Visible Assumptions',
+      ar: 'معايير وافتراضات النموذج الهندسي المكشوفة',
+    },
+    methodologyTitle: {
+      en: 'Engineering Physics Formula & SEC Tariff Assumptions',
+      ar: 'معادلة الفيزياء الهندسية وافتراضات التعرفة',
+    },
+    methodologyDesc: {
+      en: 'Cooling Load = Area / 20 m² per Ton of Refrigeration (TR). Annual kWh = (Load × 12,000 BTU/h / SEER) × Operating Hours. Savings = (Baseline kWh − Upgraded kWh) × Selected Tariff.',
+      ar: 'حمل التبريد = المساحة / 20 م² لكل طن تبريد. الاستهلاك السنوي = (الحمل × 12,000 / معامل SEER) × ساعات التشغيل. الوفر = (الاستهلاك الحالي − الاستهلاك الجديد) × التعرفة.',
+    },
+    measuredSavingsNotice: {
+      en: 'Important: These figures represent illustrative unmeasured engineering model estimates. Actual measured field savings require baseline power metering (IPMVP Protocol) and weather-normalized data.',
+      ar: 'تنبيه: هذه الأرقام تمثل محاكاة هندسية تقديرية غير مقاسة ميدانياً. يتطلب قياس الوفر الفعلي تركيب عدادات طاقة ومعايرة مناخية وفق بروتوكول القياس والتحقق IPMVP.',
     },
     disclaimer: {
-      en: '*Estimates calculated based on SEC tariff rates, Gulf peak summer temperature curves (48°C), and optimal system SEER ratings with regular HARD maintenance.',
-      ar: '*الحسابات تقديرية وتعتمد على تعرفة الشركة السعودية للكهرباء ومعدلات تشغيل ذروة الصيف (٤٨ مئوية) مع الصيانة الدورية من هارد.',
+      en: '*Estimates use standard SEC tariffs and nominal cooling hours. Actual savings vary by thermostat setpoints, building thermal envelope insulation, and ambient dry-bulb temperatures.',
+      ar: '*الحسابات هندسية نموذجية تعتمد على التعرفة المختارة وساعات التشغيل. يختلف الوفر المالي الفعلي بحسب العزل الحراري وضبط التيرموستات ودرجات الحرارة المحيطة.',
     },
     bookUpgradeBtn: {
       en: 'Book Energy Efficiency Audit',
@@ -462,12 +542,24 @@ export const T = {
       ar: 'تم إرسال رسالتك بنجاح إلى info@hardgp.com. سنتواصل معك خلال دقائق!',
     },
     addressTitle: {
-      en: 'Regional Office & Dispatch Hub',
-      ar: 'المكتب الإقليمي ومركز الصيانة',
+      en: 'Physical Office Location',
+      ar: 'موقع المقر الميداني والتشغيلي',
     },
     addressDesc: {
-      en: 'King Fahd Road, Al Khobar / Dammam Metropolitan, Eastern Province, Kingdom of Saudi Arabia',
-      ar: 'طريق الملك فهد، الخبر / الدمام، المنطقة الشرقية، المملكة العربية السعودية',
+      en: 'King Fahd Road, Al Rakah Al Shamaliya District, Al Khobar 34224, Eastern Province, Kingdom of Saudi Arabia',
+      ar: 'طريق الملك فهد، حي الراكة الشمالية، الخبر 34224، المنطقة الشرقية، المملكة العربية السعودية',
+    },
+    coverageTitle: {
+      en: 'Field Service Coverage Area',
+      ar: 'نطاق التغطية الميدانية',
+    },
+    coverageDesc: {
+      en: 'On-site emergency maintenance & contract dispatch across Al Khobar, Dammam, Dhahran, Jubail, Qatif, and Riyadh.',
+      ar: 'فرق الصيانة الميدانية والطوارئ تغطي: الخبر، الدمام، الظهران، الجبيل، القطيف، والرياض.',
+    },
+    verificationNotice: {
+      en: 'GPS Destination Verified: 26.373784° N, 50.103001° E (Al Khobar). Exact Building/Unit # & National Address Code pending final municipal assignment.',
+      ar: 'إحداثيات المقر موثقة: 26.373784° N, 50.103001° E (الخبر). رقم المبنى والرمز البريدي الوطني قيد الاعتماد البلدي النهائي.',
     },
     emailTitle: {
       en: 'Direct Email',
@@ -487,8 +579,12 @@ export const T = {
       ar: 'الجمعة: خدمة الطوارئ الميدانية فقط (٢٤ ساعة)',
     },
     mapTitle: {
-      en: 'HARD HVAC Service Hub (Coordinates: 26.373784, 50.103001)',
-      ar: 'موقع مركز خدمات هارد للتكييف (الإحداثيات: 26.373784, 50.103001)',
+      en: 'HARD HVAC Regional Hub (Al Khobar - 26.373784, 50.103001)',
+      ar: 'مقر هارد للتكييف (الخبر - الإحداثيات: 26.373784, 50.103001)',
+    },
+    getDirections: {
+      en: 'Get Driving Directions',
+      ar: 'اتجاهات القيادة المباشرة',
     },
   },
   emergencyBanner: {
@@ -569,12 +665,12 @@ export const T = {
   },
   bookingModal: {
     title: {
-      en: 'Book HVAC Maintenance & Inspection',
-      ar: 'حجز موعد صيانة وفحص التكييف',
+      en: 'Request HVAC Maintenance & Inspection',
+      ar: 'طلب موعد صيانة وفحص التكييف',
     },
     subtitle: {
-      en: 'Choose your desired service, date, and time slot. We will confirm with a certified technician assignment.',
-      ar: 'اختر الخدمة المطلوبة والموعد المناسب وسيتم إسناد فني متخصص وتأكيد الحجز فوراً.',
+      en: 'Select your requested service, preferred date, and time slot. Your request will be reviewed by dispatch to confirm technician slot availability.',
+      ar: 'اختر الخدمة والموعد والوقت المفضل. سيقوم فريق العمليات بمراجعة الطلب وتأكيد توافر الفني المعتمد معك.',
     },
     serviceSelect: {
       en: 'Select Service Required',
@@ -601,8 +697,8 @@ export const T = {
       ar: 'مسائية (٦:٠٠ م – ٩:٠٠ م)',
     },
     slotEmergency: {
-      en: 'Urgent Same-Day Emergency',
-      ar: 'طوارئ عاجلة في نفس اليوم',
+      en: 'Urgent Same-Day Emergency Request',
+      ar: 'طلب طوارئ عاجلة في نفس اليوم',
     },
     clientName: {
       en: 'Client Name',
@@ -621,8 +717,20 @@ export const T = {
       ar: 'ملاحظات الأعطال وعدد الأجهزة',
     },
     submitBtn: {
-      en: 'Confirm Booking Request',
-      ar: 'تأكيد طلب الحجز',
+      en: 'Submit Booking Request',
+      ar: 'إرسال طلب الحجز',
+    },
+    resultTitle: {
+      en: 'Booking Request Received',
+      ar: 'تم استلام طلب الحجز بنجاح',
+    },
+    resultStatusBadge: {
+      en: 'Status: Pending Operations Confirmation',
+      ar: 'حالة الطلب: بانتظار تأكيد فريق العمليات',
+    },
+    resultDesc: {
+      en: 'Your booking request has been registered in our queue. Our operations supervisor will verify technician slot availability and contact you on your phone number to formally confirm your appointment.',
+      ar: 'تم تسجيل طلب الحجز الخاص بك بنجاح. سيقوم مشرف العمليات بالتواصل معك هاتفياً لمراجعة جدول الفنيين وتأكيد الموعد رسمياً.',
     },
   },
   cms: {

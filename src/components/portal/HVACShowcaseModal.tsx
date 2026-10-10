@@ -31,7 +31,7 @@ export function HVACShowcaseModal({
     phone: '',
     serviceType: 'amc',
     systemType: 'chiller',
-    location: 'Khobar / Dammam',
+    location: 'Al Khobar',
     notes: '',
   });
   const [submitted, setSubmitted] = useState(false);

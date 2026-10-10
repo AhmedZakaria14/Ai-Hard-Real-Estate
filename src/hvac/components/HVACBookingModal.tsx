@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useId } from 'react';
 import {
   X,
   Calendar as CalendarIcon,
@@ -41,16 +41,89 @@ export function HVACBookingModal() {
     clientName: string;
   } | null>(null);
 
+  const modalRef = useRef<HTMLDivElement>(null);
+  const triggerElementRef = useRef<HTMLElement | null>(null);
+  const titleId = useId();
+
+  // Focus management, focus restoration, and body scroll lock
+  useEffect(() => {
+    if (isBookingModalOpen) {
+      triggerElementRef.current = document.activeElement as HTMLElement;
+      document.body.style.overflow = 'hidden';
+
+      const timer = setTimeout(() => {
+        if (modalRef.current) {
+          const focusables = modalRef.current.querySelectorAll<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          );
+          if (focusables.length > 0) {
+            focusables[0].focus();
+          } else {
+            modalRef.current.focus();
+          }
+        }
+      }, 50);
+
+      return () => {
+        clearTimeout(timer);
+        document.body.style.overflow = '';
+        if (triggerElementRef.current && typeof triggerElementRef.current.focus === 'function') {
+          triggerElementRef.current.focus();
+        }
+      };
+    }
+  }, [isBookingModalOpen]);
+
+  // Handle Escape key dismissal and Tab focus containment
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Escape') {
+      e.stopPropagation();
+      closeBookingModal();
+      return;
+    }
+
+    if (e.key === 'Tab' && modalRef.current) {
+      const elements = Array.from(
+        modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
+      );
+      const focusables: HTMLElement[] = elements.filter(
+        (el): el is HTMLElement =>
+          el instanceof HTMLElement &&
+          !el.hasAttribute('disabled') &&
+          el.getAttribute('aria-hidden') !== 'true'
+      );
+
+      if (focusables.length === 0) return;
+
+      const firstElement = focusables[0];
+      const lastElement = focusables[focusables.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement || document.activeElement === modalRef.current) {
+          e.preventDefault();
+          lastElement.focus();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
+        }
+      }
+    }
+  };
+
   // Set initial service and tomorrow's date by default
   useEffect(() => {
     if (isBookingModalOpen) {
       setConfirmedLead(null);
-      setService(bookingInitialService || (isAr ? 'الغسيل الكيميائي العميق وتنظيف الكويلات' : 'Deep Coil Cleaning & Chemical Washing'));
+      setService(bookingInitialService || '');
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       setDate(tomorrow.toISOString().split('T')[0]);
     }
-  }, [isBookingModalOpen, bookingInitialService, isAr]);
+  }, [isBookingModalOpen, bookingInitialService]);
 
   if (!isBookingModalOpen) return null;
 
@@ -63,7 +136,7 @@ export function HVACBookingModal() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !phone.trim() || !date) return;
+    if (!name.trim() || !phone.trim() || !date || !service) return;
 
     setIsSubmitting(true);
 
@@ -111,9 +184,16 @@ City: ${cityName}`;
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200"
       onClick={closeBookingModal}
+      dir={isAr ? 'rtl' : 'ltr'}
     >
       <div
-        className="bg-white border border-slate-200 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl relative"
+        ref={modalRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        onKeyDown={handleKeyDown}
+        className="bg-white border border-slate-200 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl relative focus:outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
@@ -123,7 +203,7 @@ City: ${cityName}`;
               <CalendarIcon className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-semibold text-base sm:text-lg">
+              <h3 id={titleId} className="font-semibold text-base sm:text-lg">
                 {pick(T.bookingModal.title, language)}
               </h3>
               <p className="text-xs text-slate-300">
@@ -135,9 +215,11 @@ City: ${cityName}`;
           <button
             type="button"
             onClick={closeBookingModal}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            aria-label={isAr ? 'إغلاق نافذة حجز خدمة التكييف' : 'Close booking dialog'}
+            title={isAr ? 'إغلاق نافذة الحجز' : 'Close booking dialog'}
+            className="p-2.5 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0EA5E9] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1E293B] transition-colors cursor-pointer shrink-0"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 
@@ -146,21 +228,22 @@ City: ${cityName}`;
           {confirmedLead ? (
             /* Confirmation Screen */
             <div className="text-center space-y-5 py-6">
-              <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto animate-in zoom-in-90 duration-300">
+              <div className="w-16 h-16 rounded-full bg-sky-100 text-[#0EA5E9] flex items-center justify-center mx-auto animate-in zoom-in-90 duration-300">
                 <CheckCircle2 className="w-9 h-9" />
               </div>
 
               <div className="space-y-2">
+                <div className="inline-block px-3 py-1 rounded-md bg-amber-50 border border-amber-200 text-amber-900 text-xs font-medium">
+                  {pick(T.bookingModal.resultStatusBadge, language)}
+                </div>
                 <h4 className="text-xl font-semibold text-slate-900">
-                  {isAr ? 'تم تأكيد طلب موعد الصيانة بنجاح!' : 'Booking Request Confirmed!'}
+                  {pick(T.bookingModal.resultTitle, language)}
                 </h4>
                 <div className="inline-block px-4 py-2 rounded-xl bg-slate-100 border border-slate-200 text-[#0EA5E9] font-mono font-bold text-lg">
                   <bdi dir="ltr">{confirmedLead.referenceNumber}</bdi>
                 </div>
-                <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto">
-                  {isAr
-                    ? `سيقوم مشرف العمليات بالتواصل على رقمك لتأكيد اسم الفني والوصول في الموعد المحدد (${date}).`
-                    : `Our dispatch supervisor will contact you shortly to confirm technician arrival for (${date}).`}
+                <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
+                  {pick(T.bookingModal.resultDesc, language)}
                 </p>
               </div>
 
@@ -171,7 +254,7 @@ City: ${cityName}`;
                   className="px-5 py-3 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
                 >
                   <MessageSquare className="w-4 h-4" />
-                  <span>{pick(T.quoteForm.whatsappHandoff, language)}</span>
+                  <span>{isAr ? 'متابعة وتأكيد الطلب عبر الواتساب' : 'Follow up via WhatsApp'}</span>
                 </button>
 
                 <button
@@ -188,16 +271,20 @@ City: ${cityName}`;
             <form onSubmit={handleSubmit} className="space-y-4 text-start">
               {/* Service Select */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-800 mb-1.5">
                   {pick(T.bookingModal.serviceSelect, language)} *
                 </label>
                 <div className="relative">
-                  <Wrench className="w-4 h-4 text-slate-400 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Wrench className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <select
+                    required
                     value={service}
                     onChange={(e) => setService(e.target.value)}
-                    className="w-full ps-9 pe-8 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-800 bg-white focus:outline-none focus:border-[#0EA5E9] focus:ring-1 focus:ring-[#0EA5E9] cursor-pointer"
+                    className="w-full ps-9 pe-8 py-2.5 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed cursor-pointer"
                   >
+                    <option value="" disabled>
+                      {isAr ? '-- اختر الخدمة المطلوب تنفيذها --' : '-- Select Requested Service --'}
+                    </option>
                     {services.map((s) => (
                       <option key={s.id} value={isAr ? s.titleAr : s.titleEn}>
                         {isAr ? s.titleAr : s.titleEn}
@@ -211,32 +298,32 @@ City: ${cityName}`;
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Preferred Date */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-bold text-slate-800 mb-1.5">
                     {pick(T.bookingModal.dateLabel, language)} *
                   </label>
                   <div className="relative">
-                    <CalendarIcon className="w-4 h-4 text-slate-400 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <CalendarIcon className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
                       type="date"
                       required
                       value={date}
                       onChange={(e) => setDate(e.target.value)}
-                      className="w-full ps-9 pe-4 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-800 bg-white focus:outline-none focus:border-[#0EA5E9] focus:ring-1 focus:ring-[#0EA5E9]"
+                      className="w-full ps-9 pe-4 py-2.5 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed"
                     />
                   </div>
                 </div>
 
                 {/* Time Slot */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-bold text-slate-800 mb-1.5">
                     {pick(T.bookingModal.timeSlotLabel, language)} *
                   </label>
                   <div className="relative">
-                    <Clock className="w-4 h-4 text-slate-400 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <Clock className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <select
                       value={slot}
                       onChange={(e) => setSlot(e.target.value as any)}
-                      className="w-full ps-9 pe-8 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-800 bg-white focus:outline-none focus:border-[#0EA5E9] focus:ring-1 focus:ring-[#0EA5E9] cursor-pointer"
+                      className="w-full ps-9 pe-8 py-2.5 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed cursor-pointer"
                     >
                       <option value="morning">{pick(T.bookingModal.slotMorning, language)}</option>
                       <option value="afternoon">{pick(T.bookingModal.slotAfternoon, language)}</option>
@@ -249,15 +336,15 @@ City: ${cityName}`;
 
               {/* City Selection */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-800 mb-1.5">
                   {pick(T.bookingModal.city, language)} *
                 </label>
                 <div className="relative">
-                  <MapPin className="w-4 h-4 text-slate-400 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <MapPin className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <select
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    className="w-full ps-9 pe-8 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-800 bg-white focus:outline-none focus:border-[#0EA5E9] focus:ring-1 focus:ring-[#0EA5E9] cursor-pointer"
+                    className="w-full ps-9 pe-8 py-2.5 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed cursor-pointer"
                   >
                     {T.citiesList.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -270,7 +357,7 @@ City: ${cityName}`;
 
               {city === 'other' && (
                 <div className="animate-in fade-in duration-200">
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-bold text-slate-800 mb-1.5">
                     {pick(T.quoteForm.otherCityLabel, language)} *
                   </label>
                   <input
@@ -279,7 +366,7 @@ City: ${cityName}`;
                     value={customCity}
                     onChange={(e) => setCustomCity(e.target.value)}
                     placeholder={pick(T.quoteForm.otherCityPlaceholder, language)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-500 focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed"
                   />
                 </div>
               )}
@@ -287,28 +374,28 @@ City: ${cityName}`;
               {/* Client Name & Phone */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-bold text-slate-800 mb-1.5">
                     {pick(T.bookingModal.clientName, language)} *
                   </label>
                   <div className="relative">
-                    <User className="w-4 h-4 text-slate-400 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <User className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
                       type="text"
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder={isAr ? 'الاسم الكريم' : 'Your Name'}
-                      className="w-full ps-9 pe-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-[#0EA5E9] focus:ring-1 focus:ring-[#0EA5E9]"
+                      className="w-full ps-9 pe-4 py-2.5 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-500 focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-bold text-slate-800 mb-1.5">
                     {pick(T.bookingModal.phone, language)} *
                   </label>
                   <div className="relative">
-                    <Phone className="w-4 h-4 text-slate-400 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <Phone className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
                       type="tel"
                       required
@@ -316,7 +403,7 @@ City: ${cityName}`;
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="05XXXXXXXX"
-                      className="w-full ps-9 pe-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-[#0EA5E9] focus:ring-1 focus:ring-[#0EA5E9] font-mono text-start"
+                      className="w-full ps-9 pe-4 py-2.5 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-500 focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed font-mono text-start"
                     />
                   </div>
                 </div>
@@ -324,7 +411,7 @@ City: ${cityName}`;
 
               {/* Notes */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-800 mb-1.5">
                   {pick(T.bookingModal.notes, language)}
                 </label>
                 <textarea
@@ -336,7 +423,7 @@ City: ${cityName}`;
                       ? 'عدد المكيفات، نوعها، أو العنوان التفصيلي...'
                       : 'Number of units, type, or specific address details...'
                   }
-                  className="w-full p-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-[#0EA5E9] focus:ring-1 focus:ring-[#0EA5E9] resize-none"
+                  className="w-full p-3 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-500 focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed resize-none"
                 />
               </div>
 

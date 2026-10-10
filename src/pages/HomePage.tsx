@@ -12,8 +12,10 @@ import {
   TrendingUp,
   SlidersHorizontal,
   Compass,
+  ShieldAlert,
+  ShieldCheck,
 } from 'lucide-react';
-import { Language, PageId, Property, PropertyFilterParams } from '../types';
+import { Language, PageId, Property, PropertyFilterParams, Project } from '../types';
 import { translations as defaultTranslations } from '../lib/translations';
 import { mockProjects, mockTestimonials } from '../data/mockData';
 import { SAUDI_CITIES } from '../data/cities';
@@ -23,9 +25,11 @@ import { Badge } from '../components/ui/Badge';
 import { PropertyCard } from '../components/ui/PropertyCard';
 import { TestimonialSlider } from '../components/ui/TestimonialSlider';
 import { ServicesSection } from '../components/home/ServicesSection';
+import { ComplianceVerificationModal } from '../components/modals/ComplianceVerificationModal';
 import { useData } from '../context/DataContext';
 import { useTextOverride } from '../context/TextOverrideContext';
 import { BrandLogo } from '../components/ui/BrandLogo';
+import { getPageHref, handleSemanticClick } from '../lib/navigation';
 
 interface HomePageProps {
   onNavigate: (page: PageId, filters?: PropertyFilterParams) => void;
@@ -34,6 +38,7 @@ interface HomePageProps {
   onOpenBookViewingModal: (property: Property) => void;
   onOpenListPropertyModal: () => void;
   onOpenInquiryModal: () => void;
+  onOpenProjectInquiryModal?: (project: Project) => void;
 }
 
 export function HomePage({
@@ -43,6 +48,7 @@ export function HomePage({
   onOpenBookViewingModal,
   onOpenListPropertyModal,
   onOpenInquiryModal,
+  onOpenProjectInquiryModal,
 }: HomePageProps) {
   const { translations } = useTextOverride();
   const t = translations[language] || defaultTranslations[language];
@@ -55,6 +61,10 @@ export function HomePage({
   const [searchType, setSearchType] = useState('all');
   const [searchBudget, setSearchBudget] = useState('all');
 
+  // Compliance & Evidence Verification Modal State
+  const [isComplianceModalOpen, setIsComplianceModalOpen] = useState(false);
+  const [complianceTab, setComplianceTab] = useState<'licensing' | 'reviews' | 'financials' | 'stats'>('stats');
+
   // Featured properties: 3-column top listings fetched directly from the database layer
   const featuredProperties = properties.filter((p) => p.featured).slice(0, 3).length > 0
     ? properties.filter((p) => p.featured).slice(0, 3)
@@ -65,22 +75,39 @@ export function HomePage({
     e.preventDefault();
 
     let min = 0;
-    let max = 50000000;
-    if (searchBudget === '500k-1m') {
-      min = 500000;
-      max = 1000000;
-    } else if (searchBudget === '1m-3m') {
-      min = 1000000;
-      max = 3000000;
-    } else if (searchBudget === '3m-6m') {
-      min = 3000000;
-      max = 6000000;
-    } else if (searchBudget === '6m-12m') {
-      min = 6000000;
-      max = 12000000;
-    } else if (searchBudget === '12m+') {
-      min = 12000000;
-      max = 50000000;
+    let max = activeTab === 'rent' ? 500000 : 50000000;
+
+    if (activeTab === 'rent') {
+      if (searchBudget === 'rent-under-100k') {
+        min = 0;
+        max = 100000;
+      } else if (searchBudget === 'rent-100k-200k') {
+        min = 100000;
+        max = 200000;
+      } else if (searchBudget === 'rent-200k-350k') {
+        min = 200000;
+        max = 350000;
+      } else if (searchBudget === 'rent-350k+') {
+        min = 350000;
+        max = 500000;
+      }
+    } else {
+      if (searchBudget === '500k-1m') {
+        min = 500000;
+        max = 1000000;
+      } else if (searchBudget === '1m-3m') {
+        min = 1000000;
+        max = 3000000;
+      } else if (searchBudget === '3m-6m') {
+        min = 3000000;
+        max = 6000000;
+      } else if (searchBudget === '6m-12m') {
+        min = 6000000;
+        max = 12000000;
+      } else if (searchBudget === '12m+') {
+        min = 12000000;
+        max = 50000000;
+      }
     }
 
     const statusMap: Record<string, string> = {
@@ -93,6 +120,7 @@ export function HomePage({
       city: searchLocation || 'all',
       type: searchType,
       status: statusMap[activeTab] || 'all',
+      rentalPeriod: 'year',
       minPrice: min,
       maxPrice: max,
       priceRange: searchBudget,
@@ -118,6 +146,9 @@ export function HomePage({
           <img
             src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=2200&q=90"
             alt="Luxury Modern Architecture"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
             referrerPolicy="no-referrer"
             className="w-full h-full object-cover object-center opacity-65 brightness-110 contrast-105 scale-105 transform duration-1000 ease-out"
           />
@@ -214,6 +245,7 @@ export function HomePage({
                   <option value="villa">{t.properties.filters.villa}</option>
                   <option value="apartment">{t.properties.filters.apartment}</option>
                   <option value="penthouse">{t.properties.filters.penthouse}</option>
+                  <option value="mansion">{t.properties.filters.mansion}</option>
                   <option value="townhouse">{t.properties.filters.townhouse}</option>
                   <option value="commercial">{t.properties.filters.commercial}</option>
                 </select>
@@ -229,12 +261,24 @@ export function HomePage({
                   onChange={(e) => setSearchBudget(e.target.value)}
                   className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
                 >
-                  <option value="all">{language === 'en' ? 'Any Price Range' : 'جميع الميزانيات'}</option>
-                  <option value="500k-1m">{language === 'en' ? '500,000 - 1,000,000 SAR' : '500,000 - 1,000,000 ريال'}</option>
-                  <option value="1m-3m">{language === 'en' ? '1,000,000 - 3,000,000 SAR' : '1,000,000 - 3,000,000 ريال'}</option>
-                  <option value="3m-6m">{language === 'en' ? '3,000,000 - 6,000,000 SAR' : '3,000,000 - 6,000,000 ريال'}</option>
-                  <option value="6m-12m">{language === 'en' ? '6,000,000 - 12,000,000 SAR' : '6,000,000 - 12,000,000 ريال'}</option>
-                  <option value="12m+">{language === 'en' ? '12,000,000+ SAR' : '12,000,000+ ريال'}</option>
+                  {activeTab === 'rent' ? (
+                    <>
+                      <option value="all">{language === 'en' ? 'Any Rental Budget' : 'جميع ميزانيات الإيجار'}</option>
+                      <option value="rent-under-100k">{language === 'en' ? 'Under 100,000 SAR / yr' : 'أقل من 100,000 ر.س / سنوياً'}</option>
+                      <option value="rent-100k-200k">{language === 'en' ? '100,000 - 200,000 SAR / yr' : '100,000 - 200,000 ر.س / سنوياً'}</option>
+                      <option value="rent-200k-350k">{language === 'en' ? '200,000 - 350,000 SAR / yr' : '200,000 - 350,000 ر.س / سنوياً'}</option>
+                      <option value="rent-350k+">{language === 'en' ? '350,000+ SAR / yr' : 'أكثر من 350,000 ر.س / سنوياً'}</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="all">{language === 'en' ? 'Any Purchase Budget' : 'جميع ميزانيات الشراء'}</option>
+                      <option value="500k-1m">{language === 'en' ? '500,000 - 1,000,000 SAR' : '500,000 - 1,000,000 ريال'}</option>
+                      <option value="1m-3m">{language === 'en' ? '1,000,000 - 3,000,000 SAR' : '1,000,000 - 3,000,000 ريال'}</option>
+                      <option value="3m-6m">{language === 'en' ? '3,000,000 - 6,000,000 SAR' : '3,000,000 - 6,000,000 ريال'}</option>
+                      <option value="6m-12m">{language === 'en' ? '6,000,000 - 12,000,000 SAR' : '6,000,000 - 12,000,000 ريال'}</option>
+                      <option value="12m+">{language === 'en' ? '12,000,000+ SAR' : '12,000,000+ ريال'}</option>
+                    </>
+                  )}
                 </select>
               </div>
 
@@ -255,7 +299,7 @@ export function HomePage({
       </section>
 
       {/* TRUST STATS BANNER */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-3">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 p-6 sm:p-8 bg-white rounded-3xl border border-slate-200/90 shadow-xs divide-y sm:divide-y-0 sm:divide-x sm:divide-x-reverse sm:divide-slate-100">
           {statList.map((stat, idx) => (
             <div
@@ -270,6 +314,24 @@ export function HomePage({
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={() => {
+              setComplianceTab('stats');
+              setIsComplianceModalOpen(true);
+            }}
+            className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-blue-700 font-semibold transition-colors cursor-pointer"
+          >
+            <ShieldCheck className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+            <span>
+              {language === 'en'
+                ? 'Audited Corporate Metrics & Evidence Basis (Q3 2026 Audit)'
+                : 'إحصائيات موثقة وأدلة الاعتماد والتراخيص (تحديث أكتوبر 2026)'}
+            </span>
+          </button>
         </div>
       </section>
 
@@ -289,15 +351,14 @@ export function HomePage({
             </p>
           </div>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onNavigate('properties')}
-            className="self-start sm:self-auto font-bold"
+          <a
+            href={getPageHref('properties')}
+            onClick={(e) => handleSemanticClick(e, () => onNavigate('properties'))}
+            className="self-start sm:self-auto inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 text-slate-800 text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
           >
             <span>{t.cta.viewAvailableProperties}</span>
             <ArrowIcon className="w-3.5 h-3.5" />
-          </Button>
+          </a>
         </div>
 
         {/* 3-Column Card Grid displaying top properties */}
@@ -344,38 +405,6 @@ export function HomePage({
         <TestimonialSlider testimonials={testimonials.length > 0 ? testimonials : mockTestimonials} language={language} />
       </section>
 
-      {/* TARGET AUDIENCE TAILORED CARDS */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="space-y-2 max-w-2xl">
-          <Badge variant="primary">{language === 'en' ? 'Client Specialization' : 'تخصصات العملاء'}</Badge>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 font-display-serif tracking-tight">
-            {t.home.targetAudiencesTitle}
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-            {t.home.targetAudiencesSubtitle}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {t.home.audiences.map((item, idx) => (
-            <div
-              key={idx}
-              className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-start space-y-4 group"
-            >
-              <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm font-display-serif">
-                0{idx + 1}
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 font-display-serif group-hover:text-blue-600 transition-colors">
-                {item.title}
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                {item.desc}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* MASTER PROJECT SPOTLIGHT */}
       {spotlightProject && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -387,10 +416,20 @@ export function HomePage({
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute top-4 start-4 bg-emerald-600 text-white text-xs px-3 py-1 rounded-full font-bold shadow-md flex items-center gap-1.5">
-                <TrendingUp className="w-3.5 h-3.5" />
-                <span>ROI: {spotlightProject.roiProjected}</span>
-              </div>
+              {spotlightProject.financialMetric?.isVerified ? (
+                <div className="absolute top-4 start-4 bg-emerald-600 text-white text-xs px-3 py-1 rounded-full font-bold shadow-md flex items-center gap-1.5">
+                  <TrendingUp className="w-3.5 h-3.5" />
+                  <span>{spotlightProject.financialMetric.value} {spotlightProject.financialMetric.metricLabel?.[language]}</span>
+                </div>
+              ) : (
+                <div
+                  className="absolute top-4 start-4 bg-slate-900/90 backdrop-blur-md text-amber-300 border border-amber-500/40 text-xs px-3 py-1.5 rounded-full font-semibold shadow-lg flex items-center gap-1.5"
+                  title={spotlightProject.financialMetric?.statusNote?.[language]}
+                >
+                  <ShieldAlert className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>{spotlightProject.financialMetric?.verificationStatus?.[language] || spotlightProject.roiProjected}</span>
+                </div>
+              )}
             </div>
 
             <div className="lg:col-span-6 p-6 sm:p-10 flex flex-col justify-between space-y-6">
@@ -408,6 +447,13 @@ export function HomePage({
                   {spotlightProject.description[language]}
                 </p>
 
+                {spotlightProject.financialMetric && !spotlightProject.financialMetric.isVerified && spotlightProject.financialMetric.statusNote && (
+                  <div className="p-3 bg-amber-950/40 border border-amber-500/30 rounded-2xl text-[11px] text-amber-200 leading-relaxed">
+                    <strong className="text-amber-400 block mb-0.5">{language === 'en' ? 'Financial Audit Notice:' : 'إشعار التدقيق المالي:'}</strong>
+                    <span>{spotlightProject.financialMetric.statusNote[language]}</span>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 gap-3 pt-2">
                   <div className="p-3.5 bg-slate-800/80 rounded-2xl border border-slate-700">
                     <span className="text-[11px] text-slate-400 block font-medium">{t.projects.startingFrom}:</span>
@@ -416,26 +462,41 @@ export function HomePage({
                     </strong>
                   </div>
                   <div className="p-3.5 bg-slate-800/80 rounded-2xl border border-slate-700">
-                    <span className="text-[11px] text-slate-400 block font-medium">{t.projects.handover}:</span>
-                    <strong className="text-base sm:text-lg text-slate-200 font-medium">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] text-slate-400 block font-medium">{t.projects.handover}:</span>
+                      <span className="text-[10px] text-slate-400 font-mono">
+                        {spotlightProject.lastUpdated || '2026-10-09'}
+                      </span>
+                    </div>
+                    <strong className="text-base sm:text-lg text-slate-200 font-medium block">
                       {spotlightProject.handoverDate[language]}
                     </strong>
+                    <div className="mt-1 flex items-center justify-between text-[10px] text-slate-400">
+                      <span>{t.projects.progress}: {spotlightProject.progressPercentage || 68}%</span>
+                      <span className="text-blue-400 font-semibold">{t.projects.underConstruction}</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                <Button
-                  variant="primary"
-                  onClick={() => onNavigate('projects')}
-                  className="font-bold justify-center shadow-lg"
+                <a
+                  href={getPageHref('projects')}
+                  onClick={(e) => handleSemanticClick(e, () => onNavigate('projects'))}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold justify-center shadow-lg transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
                 >
                   <span>{t.cta.exploreProjects}</span>
                   <ArrowIcon className="w-4 h-4" />
-                </Button>
+                </a>
                 <Button
                   variant="secondary"
-                  onClick={onOpenInquiryModal}
+                  onClick={() => {
+                    if (onOpenProjectInquiryModal && spotlightProject) {
+                      onOpenProjectInquiryModal(spotlightProject);
+                    } else {
+                      onOpenInquiryModal();
+                    }
+                  }}
                   className="justify-center"
                 >
                   <span>{t.projects.inquireProject}</span>
@@ -479,6 +540,14 @@ export function HomePage({
           </div>
         </div>
       </section>
+
+      {/* Compliance & Verification Audit Modal */}
+      <ComplianceVerificationModal
+        isOpen={isComplianceModalOpen}
+        onClose={() => setIsComplianceModalOpen(false)}
+        language={language}
+        initialTab={complianceTab}
+      />
     </div>
   );
 }

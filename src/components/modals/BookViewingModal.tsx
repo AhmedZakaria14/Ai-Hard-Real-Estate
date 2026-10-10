@@ -33,16 +33,29 @@ export function BookViewingModal({
   const [leadRef, setLeadRef] = useState('');
   const [crmRef, setCrmRef] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [contactError, setContactError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!property) return;
+    setContactError('');
+
+    if (!fullName.trim()) return;
+    if (!email.trim() && !phone.trim()) {
+      setContactError(
+        language === 'en'
+          ? 'Please provide at least one contact method (email or phone).'
+          : 'يرجى تقديم وسيلة تواصل واحدة على الأقل (البريد الإلكتروني أو رقم الهاتف).'
+      );
+      return;
+    }
+
     setIsLoading(true);
     try {
       const result = await submitLead({
-        name: fullName,
-        email,
-        phone,
+        name: fullName.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
         property_id: property.id,
         property_title: property.title.en,
         inquiry_type: 'viewing_booking',
@@ -109,7 +122,7 @@ export function BookViewingModal({
             </p>
           </div>
           <div className="pt-2 flex flex-col sm:flex-row gap-2 justify-center">
-            <a
+            <Button
               href={`https://wa.me/966556125711?text=${encodeURIComponent(
                 language === 'en'
                   ? `Hello HARD Real Estate, I have booked a viewing for "${property.title.en}" (Ref: ${leadRef}). Please confirm.`
@@ -117,13 +130,12 @@ export function BookViewingModal({
               )}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex"
+              variant="whatsapp"
+              className="w-full sm:w-auto"
             >
-              <Button variant="whatsapp" className="w-full sm:w-auto">
-                <MessageSquare className="w-4 h-4" />
-                {t.cta.chatOnWhatsApp}
-              </Button>
-            </a>
+              <MessageSquare className="w-4 h-4" />
+              {t.cta.chatOnWhatsApp}
+            </Button>
             <Button variant="secondary" onClick={handleReset}>
               {language === 'en' ? 'Close Window' : 'إغلاق النافذة'}
             </Button>
@@ -167,7 +179,7 @@ export function BookViewingModal({
           {/* Date & Time */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label htmlFor="book-viewing-date" className="block text-xs font-semibold text-slate-700 mb-1">
                 {t.modals.preferredDate} *
               </label>
               <div className="relative group">
@@ -195,8 +207,10 @@ export function BookViewingModal({
 
                 {/* Overlaid native HTML5 date input */}
                 <input
+                  id="book-viewing-date"
                   type="date"
                   required
+                  aria-required="true"
                   min={new Date().toISOString().split('T')[0]}
                   value={preferredDate}
                   onChange={(e) => setPreferredDate(e.target.value)}
@@ -206,10 +220,13 @@ export function BookViewingModal({
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label htmlFor="book-viewing-time" className="block text-xs font-semibold text-slate-700 mb-1">
                 {t.modals.preferredTime} *
               </label>
               <select
+                id="book-viewing-time"
+                required
+                aria-required="true"
                 value={preferredTime}
                 onChange={(e) => setPreferredTime(e.target.value)}
                 className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all cursor-pointer"
@@ -223,12 +240,14 @@ export function BookViewingModal({
 
           {/* Contact Fields */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label htmlFor="book-viewing-fullname" className="block text-xs font-semibold text-slate-700 mb-1">
               {t.contact.fullName} *
             </label>
             <input
+              id="book-viewing-fullname"
               type="text"
               required
+              aria-required="true"
               placeholder={language === 'en' ? 'e.g. Faisal Al-Otaibi' : 'مثال: فيصل العتيبي'}
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
@@ -238,38 +257,49 @@ export function BookViewingModal({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                {t.contact.email} *
+              <label htmlFor="book-viewing-email" className="block text-xs font-semibold text-slate-700 mb-1">
+                {t.contact.email} <span className="text-slate-400 font-normal">({language === 'en' ? 'or Phone' : 'أو الهاتف'})</span>
               </label>
               <input
+                id="book-viewing-email"
                 type="email"
-                required
                 placeholder="name@domain.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (contactError) setContactError('');
+                }}
                 className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                {t.contact.phone} *
+              <label htmlFor="book-viewing-phone" className="block text-xs font-semibold text-slate-700 mb-1">
+                {t.contact.phone} <span className="text-slate-400 font-normal">({language === 'en' ? 'or Email' : 'أو البريد'})</span>
               </label>
               <input
+                id="book-viewing-phone"
                 type="tel"
-                required
                 placeholder="+966 50 000 0000"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => {
+                  setPhone(e.target.value);
+                  if (contactError) setContactError('');
+                }}
                 className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
               />
             </div>
           </div>
 
+          {contactError && (
+            <p className="text-xs text-rose-500 font-medium">{contactError}</p>
+          )}
+
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              {t.modals.notes}
+            <label htmlFor="book-viewing-notes" className="block text-xs font-semibold text-slate-700 mb-1">
+              {t.modals.notes} <span className="text-slate-400 font-normal">({language === 'en' ? 'Optional' : 'اختياري'})</span>
             </label>
             <textarea
+              id="book-viewing-notes"
               rows={2}
               placeholder={language === 'en' ? 'Any specific questions or gate access requirements...' : 'أي استفسارات أو متطلبات خاصة بالدخول...'}
               value={notes}

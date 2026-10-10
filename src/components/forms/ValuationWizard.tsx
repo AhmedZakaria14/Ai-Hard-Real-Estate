@@ -3,6 +3,7 @@ import {
   Building2,
   Home,
   Sparkles,
+  Crown,
   KeyRound,
   MapPin,
   Bed,
@@ -328,7 +329,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
 
             {/* Quick Action CTA Suite */}
             <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <a
+              <Button
                 href={`https://wa.me/966556125711?text=${encodeURIComponent(
                   isAr
                     ? `مرحباً، أود متابعة تقرير تقييم عقاري في ${cityArea} (رقم المرجع: ${referenceId}).`
@@ -336,13 +337,13 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto"
+                variant="whatsapp"
+                size="lg"
+                className="w-full sm:w-auto justify-center"
               >
-                <Button variant="whatsapp" size="lg" className="w-full justify-center">
-                  <MessageSquare className="w-4 h-4" />
-                  <span>{isAr ? 'محادثة المدير عبر واتساب' : 'Connect on WhatsApp'}</span>
-                </Button>
-              </a>
+                <MessageSquare className="w-4 h-4" />
+                <span>{isAr ? 'محادثة المدير عبر واتساب' : 'Connect on WhatsApp'}</span>
+              </Button>
 
               <Button variant="outline" size="lg" onClick={handleReset} className="w-full sm:w-auto">
                 <span>{isAr ? 'تقييم عقار آخر' : 'Evaluate Another Property'}</span>
@@ -366,11 +367,12 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                 </div>
 
                 {/* Property Type Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
                   {[
                     { id: 'villa', label: isAr ? 'فيلا' : 'Villa', icon: Home },
                     { id: 'apartment', label: isAr ? 'شقة' : 'Apartment', icon: Building2 },
                     { id: 'penthouse', label: isAr ? 'بنتهاوس' : 'Penthouse', icon: Sparkles },
+                    { id: 'mansion', label: isAr ? 'قصر' : 'Mansion', icon: Crown },
                     { id: 'townhouse', label: isAr ? 'تاون هاوس' : 'Townhouse', icon: Building2 },
                     { id: 'commercial', label: isAr ? 'تجاري' : 'Commercial', icon: Building2 },
                   ].map((item) => {
@@ -397,7 +399,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                 {/* Location Selection & Address */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                    <label htmlFor="valuation-city-search" className="block text-xs font-bold text-slate-700 mb-1">
                       {isAr ? 'المدينة' : 'City'} *
                     </label>
                     <CitySearchDropdown
@@ -411,10 +413,11 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                    <label htmlFor="val-custom-address" className="block text-xs font-bold text-slate-700 mb-1">
                       {isAr ? 'اسم المبنى أو المجمع (اختياري)' : 'Building / Project / Sub-community'}
                     </label>
                     <input
+                      id="val-custom-address"
                       type="text"
                       placeholder={isAr ? 'مثال: برج أرماني، فيلا رقم 14' : 'e.g. Armani Residences, Villa 24'}
                       value={customAddress}
@@ -427,10 +430,11 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                 {/* Specs: Bedrooms, Bathrooms, Area */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                    <label htmlFor="val-bedrooms" className="block text-xs font-bold text-slate-700 mb-1">
                       {isAr ? 'عدد غرف النوم' : 'Bedrooms'}
                     </label>
                     <select
+                      id="val-bedrooms"
                       value={bedrooms}
                       onChange={(e) => setBedrooms(e.target.value)}
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-2xl text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all cursor-pointer"
@@ -445,10 +449,11 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                    <label htmlFor="val-bathrooms" className="block text-xs font-bold text-slate-700 mb-1">
                       {isAr ? 'دورات المياه' : 'Bathrooms'}
                     </label>
                     <select
+                      id="val-bathrooms"
                       value={bathrooms}
                       onChange={(e) => setBathrooms(e.target.value)}
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-2xl text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all cursor-pointer"
@@ -463,11 +468,16 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                    <label htmlFor="val-area-sqft" className="block text-xs font-bold text-slate-700 mb-1">
                       {isAr ? 'المساحة المبنية (قدم²)' : 'Built Area (Sq Ft)'} *
                     </label>
                     <input
+                      id="val-area-sqft"
                       type="number"
+                      required
+                      aria-required="true"
+                      aria-invalid={Boolean(errors.area)}
+                      aria-describedby={errors.area ? "val-area-sqft-error" : undefined}
                       placeholder="e.g. 5500"
                       value={areaSqFt}
                       onChange={(e) => setAreaSqFt(e.target.value)}
@@ -475,7 +485,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                         errors.area ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 hover:border-slate-400 focus:border-blue-500 focus:ring-blue-500'
                       }`}
                     />
-                    {errors.area && <p className="text-[11px] text-rose-500 mt-1">{errors.area}</p>}
+                    {errors.area && <p id="val-area-sqft-error" className="text-[11px] text-rose-500 mt-1">{errors.area}</p>}
                   </div>
                 </div>
               </div>
@@ -752,13 +762,18 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Full Name */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                    <label htmlFor="val-fullname" className="block text-xs font-bold text-slate-700 mb-1">
                       {isAr ? 'الاسم الكامل' : 'Full Name'} *
                     </label>
                     <div className="relative">
                       <User className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5" />
                       <input
+                        id="val-fullname"
                         type="text"
+                        required
+                        aria-required="true"
+                        aria-invalid={Boolean(errors.fullName)}
+                        aria-describedby={errors.fullName ? "val-fullname-error" : undefined}
                         placeholder={isAr ? 'مثال: محمد السعيد' : 'e.g. Jonathan Sterling'}
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
@@ -767,18 +782,23 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                         }`}
                       />
                     </div>
-                    {errors.fullName && <p className="text-[11px] text-rose-500 mt-1">{errors.fullName}</p>}
+                    {errors.fullName && <p id="val-fullname-error" className="text-[11px] text-rose-500 mt-1">{errors.fullName}</p>}
                   </div>
 
                   {/* Email */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                    <label htmlFor="val-email" className="block text-xs font-bold text-slate-700 mb-1">
                       {isAr ? 'البريد الإلكتروني' : 'Email Address'} *
                     </label>
                     <div className="relative">
                       <Mail className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5" />
                       <input
+                        id="val-email"
                         type="email"
+                        required
+                        aria-required="true"
+                        aria-invalid={Boolean(errors.email)}
+                        aria-describedby={errors.email ? "val-email-error" : undefined}
                         placeholder="name@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -787,20 +807,25 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                         }`}
                       />
                     </div>
-                    {errors.email && <p className="text-[11px] text-rose-500 mt-1">{errors.email}</p>}
+                    {errors.email && <p id="val-email-error" className="text-[11px] text-rose-500 mt-1">{errors.email}</p>}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Phone */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                    <label htmlFor="val-phone" className="block text-xs font-bold text-slate-700 mb-1">
                       {isAr ? 'رقم الهاتف / واتساب' : 'Phone / WhatsApp Number'} *
                     </label>
                     <div className="relative">
                       <Phone className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5" />
                       <input
+                        id="val-phone"
                         type="tel"
+                        required
+                        aria-required="true"
+                        aria-invalid={Boolean(errors.phone)}
+                        aria-describedby={errors.phone ? "val-phone-error" : undefined}
                         placeholder="+966 50 123 4567"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
@@ -809,7 +834,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                         }`}
                       />
                     </div>
-                    {errors.phone && <p className="text-[11px] text-rose-500 mt-1">{errors.phone}</p>}
+                    {errors.phone && <p id="val-phone-error" className="text-[11px] text-rose-500 mt-1">{errors.phone}</p>}
                   </div>
 
                   {/* Preferred Delivery Channel */}
@@ -842,10 +867,11 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
 
                 {/* Additional Notes */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label htmlFor="val-notes" className="block text-xs font-bold text-slate-700 mb-1">
                     {isAr ? 'ملاحظات إضافية (أوقات المعاينة، تفاصيل المستأجر، إلخ)' : 'Additional Notes / Special Instructions'}
                   </label>
                   <textarea
+                    id="val-notes"
                     rows={3}
                     placeholder={
                       isAr

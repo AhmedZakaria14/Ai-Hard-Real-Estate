@@ -13,6 +13,8 @@ import { QuoteModal } from '../construction/components/QuoteModal';
 import { ProjectDetailModal } from '../construction/components/ProjectDetailModal';
 import { FloatingWidgets } from '../construction/components/FloatingWidgets';
 import { ConstructionCMS } from '../construction/components/cms/ConstructionCMS';
+import { getPageTitle, updateDocumentTitle } from '../lib/pageTitles';
+import { SectorNav } from '../components/layout/SectorNav';
 
 interface ConstructionPageProps {
   language: Language;
@@ -26,24 +28,79 @@ function ConstructionPageInner({
   onNavigate: (page: PageId) => void;
 }) {
   const [isCMSActive, setIsCMSActive] = useState(false);
+  const { language, selectedProjectForModal, unknownProjectId } = useConstruction();
 
-  // Listen for #cms in hash
+  // Synchronize document title based on construction state
   useEffect(() => {
-    const checkHash = () => {
-      const hash = window.location.hash.toLowerCase();
-      if (hash.includes('cms') || hash.includes('admin')) {
+    const pathname = window.location.pathname.toLowerCase();
+    const isProjectList =
+      pathname === '/construction/projects' || pathname === '/construction/project';
+
+    const title = getPageTitle({
+      page: 'construction',
+      language,
+      isConstructionCMS: isCMSActive,
+      constructionProjectTitle: selectedProjectForModal
+        ? {
+            ar: selectedProjectForModal.titleAr,
+            en: selectedProjectForModal.titleEn,
+          }
+        : null,
+      isConstructionUnknownProject: !!unknownProjectId,
+      isConstructionProjectList:
+        !selectedProjectForModal && !unknownProjectId && isProjectList,
+    });
+
+    updateDocumentTitle(title);
+  }, [language, isCMSActive, selectedProjectForModal, unknownProjectId]);
+
+  // Listen for route/hash changes (CMS or genuine section anchors like #services, #projects)
+  useEffect(() => {
+    const handleUrlState = () => {
+      const pathname = window.location.pathname.toLowerCase();
+      const rawHash = window.location.hash.toLowerCase();
+      const hash = rawHash.replace(/^#\/?/, '');
+
+      if (pathname.endsWith('/cms') || hash === 'cms' || hash === 'construction/cms') {
         setIsCMSActive(true);
+        if (hash) {
+          window.history.replaceState(null, '', '/construction/cms' + window.location.search);
+        }
+      } else {
+        setIsCMSActive(false);
+        // Clean duplicate route hash #construction if present
+        if (hash === 'construction') {
+          window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        } else if (hash) {
+          // Genuine section anchor (e.g. #services, #about, #projects, #contact)
+          const el = document.getElementById(hash);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        } else if (pathname === '/construction/projects' || pathname === '/construction/project') {
+          // Direct entry to project list route: scroll to projects section
+          const el = document.getElementById('projects');
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
       }
     };
-    checkHash();
-    window.addEventListener('hashchange', checkHash);
-    return () => window.removeEventListener('hashchange', checkHash);
+
+    const timer = setTimeout(handleUrlState, 100);
+    window.addEventListener('popstate', handleUrlState);
+    window.addEventListener('hashchange', handleUrlState);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('popstate', handleUrlState);
+      window.removeEventListener('hashchange', handleUrlState);
+    };
   }, []);
 
   const handleOpenCMS = () => {
     setIsCMSActive(true);
     try {
-      window.location.hash = 'construction/cms';
+      window.history.pushState({ page: 'construction', cms: true }, '', '/construction/cms');
     } catch {
       // fallback
     }
@@ -52,7 +109,7 @@ function ConstructionPageInner({
   const handleExitCMS = () => {
     setIsCMSActive(false);
     try {
-      window.location.hash = 'construction';
+      window.history.pushState({ page: 'construction' }, '', '/construction');
     } catch {
       // fallback
     }
@@ -64,6 +121,13 @@ function ConstructionPageInner({
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-ui-sans selection:bg-[#009ee2] selection:text-white">
+      {/* 0. Global Sector Utility Navigation Bar */}
+      <SectorNav
+        currentPage="construction"
+        language={language}
+        onNavigate={onNavigate}
+      />
+
       {/* Sticky Top Header */}
       <Navbar
         onNavigate={onNavigate}

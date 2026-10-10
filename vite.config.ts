@@ -26,6 +26,11 @@ export default defineConfig(() => {
       outDir: 'dist',
       rollupOptions: {
         input: path.resolve(__dirname, 'index.html'),
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom', 'lucide-react'],
+          },
+        },
       },
     },
     server: {

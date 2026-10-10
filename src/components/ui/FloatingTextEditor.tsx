@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Edit2, Check, RotateCcw, X } from 'lucide-react';
 import { Language } from '../../types';
+import { isAuthorizedAdmin } from '../../lib/adminAuth';
 
 interface FloatingTextEditorProps {
   currentLanguage: Language;
@@ -10,10 +11,30 @@ interface FloatingTextEditorProps {
 const STORAGE_KEY_PREFIX = 'hard_real_estate_page_edits_';
 
 export function FloatingTextEditor({ currentLanguage }: FloatingTextEditorProps) {
+  const [isAdmin, setIsAdmin] = useState<boolean>(() => isAuthorizedAdmin());
   const [isEditing, setIsEditing] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [showSavedToast, setShowSavedToast] = useState(false);
   const originalSnapshotRef = useRef<Map<string, string>>(new Map());
+
+  // Listen for login/logout auth state changes
+  useEffect(() => {
+    const checkAuth = () => {
+      const authorized = isAuthorizedAdmin();
+      setIsAdmin(authorized);
+      if (!authorized && isEditing) {
+        setIsEditing(false);
+      }
+    };
+
+    checkAuth();
+    window.addEventListener('cms-auth-change', checkAuth);
+    window.addEventListener('storage', checkAuth);
+    return () => {
+      window.removeEventListener('cms-auth-change', checkAuth);
+      window.removeEventListener('storage', checkAuth);
+    };
+  }, [isEditing]);
 
   // Storage key for the active language
   const storageKey = `${STORAGE_KEY_PREFIX}${currentLanguage}`;
@@ -26,8 +47,9 @@ export function FloatingTextEditor({ currentLanguage }: FloatingTextEditorProps)
     return `${parentId}${tagName}[data-edit-idx="${index}"]`;
   };
 
-  // Restore saved edits from localStorage on mount and language switch
+  // Restore saved edits from localStorage on mount and language switch (only for authorized admin)
   const restoreSavedEdits = () => {
+    if (!isAuthorizedAdmin()) return;
     try {
       const saved = localStorage.getItem(storageKey);
       if (!saved) return;
@@ -56,6 +78,10 @@ export function FloatingTextEditor({ currentLanguage }: FloatingTextEditorProps)
 
   // Save all modified texts to localStorage
   const handleSave = () => {
+    if (!isAuthorizedAdmin()) {
+      console.warn('[Authorization Guard] Refused save action for unauthorized user.');
+      return;
+    }
     try {
       const edits: Record<string, string> = {};
       const editableElements = document.querySelectorAll<HTMLElement>(
@@ -83,6 +109,10 @@ export function FloatingTextEditor({ currentLanguage }: FloatingTextEditorProps)
 
   // Reset all edits back to defaults
   const handleReset = () => {
+    if (!isAuthorizedAdmin()) {
+      console.warn('[Authorization Guard] Refused reset action for unauthorized user.');
+      return;
+    }
     try {
       localStorage.removeItem(storageKey);
       window.location.reload();
@@ -93,6 +123,11 @@ export function FloatingTextEditor({ currentLanguage }: FloatingTextEditorProps)
 
   // Toggle Edit Mode
   const toggleEditMode = () => {
+    if (!isAuthorizedAdmin()) {
+      console.warn('[Authorization Guard] Refused toggle edit mode for unauthorized user.');
+      setIsEditing(false);
+      return;
+    }
     const nextState = !isEditing;
     setIsEditing(nextState);
 
@@ -146,14 +181,15 @@ export function FloatingTextEditor({ currentLanguage }: FloatingTextEditorProps)
 
   // Restore edits on initial mount or when language changes
   useEffect(() => {
+    if (!isAdmin) return;
     // Delay slightly to let React render pages
     const timer = setTimeout(() => {
       restoreSavedEdits();
     }, 150);
     return () => clearTimeout(timer);
-  }, [currentLanguage]);
+  }, [currentLanguage, isAdmin]);
 
-  // Clean up contenteditable if component unmounts
+  // Clean up contenteditable if component unmounts or admin status drops
   useEffect(() => {
     return () => {
       document.querySelectorAll<HTMLElement>('.inline-editable-target').forEach((el) => {
@@ -162,6 +198,11 @@ export function FloatingTextEditor({ currentLanguage }: FloatingTextEditorProps)
       });
     };
   }, []);
+
+  // Strict Security Gate: Render NOTHING for anonymous / non-admin users
+  if (!isAdmin) {
+    return null;
+  }
 
   return (
     <>

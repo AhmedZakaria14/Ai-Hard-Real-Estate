@@ -141,10 +141,10 @@ export function dbRowToProperty(row: any): Property {
       ar: Array.isArray(row.features_ar) ? row.features_ar : [],
     },
     features: {
-      yearBuilt: 2025,
-      parkingSpaces: 3,
-      furnishing: { en: 'Luxury Finishes', ar: 'تشطيبات فاخرة' },
-      view: { en: 'Panoramic View', ar: 'إطلالة بانورامية' },
+      yearBuilt: Number(row.year_built || row.features?.yearBuilt) || 2025,
+      parkingSpaces: Number(row.parking_spaces ?? row.features?.parkingSpaces ?? 4),
+      furnishing: row.furnishing || row.features?.furnishing || { en: 'Luxury Finishes', ar: 'تشطيبات فاخرة' },
+      view: row.view || row.features?.view || { en: 'Panoramic View', ar: 'إطلالة بانورامية' },
     },
     agent: {
       name: { en: 'Faisal Al-Otaibi', ar: 'فيصل العتيبي' },
@@ -188,12 +188,39 @@ export function dbRowToProject(row: any): Project {
     location: { en: row.location_en, ar: row.location_ar },
     category: { en: row.type_en || 'Luxury Residences', ar: row.type_ar || 'شقق وأجنحة فاخرة' },
     status: 'under-construction',
-    progressPercentage: 65,
+    progressPercentage: row.progress || 65,
+    lastUpdated: row.last_updated || '2026-10-09',
+    isOverdue: Boolean(row.is_overdue),
+    flaggedForAdminReview: Boolean(row.flagged_for_review),
     handoverDate: { en: row.completion_date || '2026', ar: row.completion_date || '2026' },
     startingPriceSAR: `${Number(row.starting_price || 0).toLocaleString()} SAR`,
     unitsTotal: row.units_count || 100,
     unitsAvailable: Math.round((row.units_count || 100) * 0.35),
-    roiProjected: '8.5% Projected Yield',
+    roiProjected: 'Pending Audit Verification',
+    deliveryAudit: row.delivery_audit || {
+      status: 'under-construction',
+      progressPercentage: row.progress || 65,
+      lastUpdated: row.last_updated || '2026-10-09',
+      originalHandoverDate: { en: row.completion_date || '2026', ar: row.completion_date || '2026' },
+      currentHandoverDate: { en: row.completion_date || '2026', ar: row.completion_date || '2026' },
+      isOverdue: Boolean(row.is_overdue),
+      flaggedForAdminReview: Boolean(row.flagged_for_review),
+      auditNote: {
+        en: 'Audit status verified as of October 9, 2026.',
+        ar: 'حالة التدقيق موثقة بتاريخ 9 أكتوبر 2026.',
+      },
+    },
+    financialMetric: {
+      isVerified: false,
+      verificationStatus: {
+        en: 'Pending Independent Audit Verification',
+        ar: 'قيد التدقيق المالي المستقل',
+      },
+      statusNote: {
+        en: 'Yield and financial figures withheld pending third-party audit verification.',
+        ar: 'تم حجب نسب العائد المالي لحين اكتمال التدقيق المالي المستقل.',
+      },
+    },
     image: row.image,
     description: { en: row.description_en || '', ar: row.description_ar || '' },
     highlights: {
@@ -616,7 +643,18 @@ export const ProjectsRepository = {
       handoverDate: projectData.handoverDate || { en: 'Q4 2026', ar: 'الربع الرابع 2026' },
       unitsTotal: projectData.unitsTotal || 120,
       unitsAvailable: projectData.unitsAvailable || 45,
-      roiProjected: projectData.roiProjected || '8.5% Projected Yield',
+      roiProjected: projectData.roiProjected || 'Pending Audit Verification',
+      financialMetric: projectData.financialMetric || {
+        isVerified: false,
+        verificationStatus: {
+          en: 'Pending Independent Audit Verification',
+          ar: 'قيد التدقيق المالي المستقل',
+        },
+        statusNote: {
+          en: 'Yield and financial figures withheld pending third-party audit verification.',
+          ar: 'تم حجب نسب العائد المالي لحين اكتمال التدقيق المالي المستقل.',
+        },
+      },
       image: projectData.image || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',
       gallery: projectData.gallery || [
         'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',

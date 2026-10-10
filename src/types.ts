@@ -12,7 +12,8 @@ export type PageId =
   | 'contact'
   | 'construction'
   | 'hvac'
-  | 'admin';
+  | 'admin'
+  | 'not-found';
 
 export type PropertyType = 'villa' | 'apartment' | 'penthouse' | 'townhouse' | 'commercial' | 'mansion';
 export type ListingStatus = 'for-sale' | 'for-rent' | 'off-plan' | 'exclusive' | 'new-launch';
@@ -72,6 +73,29 @@ export interface Property {
 export type ProjectStatus = 'planning' | 'off-plan' | 'under-construction' | 'completed' | 'handover';
 export type BlogStatus = 'published' | 'draft' | 'archived';
 
+export interface ProjectFinancialMetric {
+  isVerified: boolean;
+  metricType?: 'net_roi' | 'projected_yield' | 'capital_appreciation' | 'rental_demand';
+  value?: string;
+  metricLabel?: { en: string; ar: string };
+  definition?: { en: string; ar: string };
+  calculationPeriod?: { en: string; ar: string };
+  asOfDate?: string;
+  verificationStatus: { en: string; ar: string };
+  statusNote?: { en: string; ar: string };
+}
+
+export interface ProjectDeliveryAudit {
+  status: ProjectStatus;
+  progressPercentage: number;
+  lastUpdated: string;
+  originalHandoverDate: { en: string; ar: string };
+  currentHandoverDate: { en: string; ar: string };
+  isOverdue: boolean;
+  flaggedForAdminReview: boolean;
+  auditNote: { en: string; ar: string };
+}
+
 export interface Project {
   id: string;
   slug?: string;
@@ -84,14 +108,20 @@ export interface Project {
   unitsTotal: number;
   unitsAvailable: number;
   roiProjected: string;
+  financialMetric?: ProjectFinancialMetric;
   image: string;
   gallery?: string[];
   category: { en: string; ar: string };
   status?: ProjectStatus;
   progressPercentage?: number;
+  lastUpdated?: string;
+  isOverdue?: boolean;
+  flaggedForAdminReview?: boolean;
+  deliveryAudit?: ProjectDeliveryAudit;
   description: { en: string; ar: string };
   highlights: { en: string[]; ar: string[] };
   featured?: boolean;
+  brochureUrl?: string;
 }
 
 export interface BlogPost {
@@ -206,9 +236,12 @@ export interface PropertyFilterParams {
   city?: string;
   type?: string;
   status?: string;
+  rentalPeriod?: 'year' | 'month';
   minPrice?: number;
   maxPrice?: number;
   priceRange?: string;
   searchQuery?: string;
   bedroom?: string;
+  sortBy?: string;
+  viewMode?: string;
 }

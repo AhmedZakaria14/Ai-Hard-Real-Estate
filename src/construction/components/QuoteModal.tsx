@@ -239,8 +239,8 @@ export function QuoteModal() {
               {/* Client Name & Phone */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                    <User className="w-3.5 h-3.5 text-[#009ee2]" />
+                  <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-[#0072b8]" />
                     <span>{t.quoteModal.fullName}</span>
                   </label>
                   <input
@@ -249,13 +249,13 @@ export function QuoteModal() {
                     value={clientName}
                     onChange={(e) => setClientName(e.target.value)}
                     placeholder={isAr ? 'مثال: م. فهد السبيعي / شركة الأفق' : 'e.g., Eng. Fahad Al-Subaie'}
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:border-[#009ee2] focus:ring-1 focus:ring-[#009ee2] focus:outline-none"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 hover:border-slate-400 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-500 focus:border-[#0072b8] focus:ring-2 focus:ring-[#0072b8]/20 focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                    <Phone className="w-3.5 h-3.5 text-[#009ee2]" />
+                  <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <Phone className="w-3.5 h-3.5 text-[#0072b8]" />
                     <span>{t.quoteModal.phone}</span>
                   </label>
                   <input
@@ -264,7 +264,7 @@ export function QuoteModal() {
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     placeholder="05XXXXXXXX / +9665XXXXXXXX"
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:border-[#009ee2] focus:ring-1 focus:ring-[#009ee2] focus:outline-none dir-ltr text-start"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 hover:border-slate-400 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-500 focus:border-[#0072b8] focus:ring-2 focus:ring-[#0072b8]/20 focus:outline-none dir-ltr text-start disabled:bg-slate-100 disabled:text-slate-500"
                   />
                 </div>
               </div>
@@ -272,8 +272,8 @@ export function QuoteModal() {
               {/* Email & City/District */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5 text-[#009ee2]" />
+                  <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <Mail className="w-3.5 h-3.5 text-[#0072b8]" />
                     <span>{t.quoteModal.email}</span>
                   </label>
                   <input
@@ -282,13 +282,13 @@ export function QuoteModal() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@company.com"
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:border-[#009ee2] focus:ring-1 focus:ring-[#009ee2] focus:outline-none"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 hover:border-slate-400 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-500 focus:border-[#0072b8] focus:ring-2 focus:ring-[#0072b8]/20 focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-[#009ee2]" />
+                  <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-[#0072b8]" />
                     <span>{t.quoteModal.cityDistrict}</span>
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -297,14 +297,14 @@ export function QuoteModal() {
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
                       placeholder={isAr ? 'المدينة (الرياض)' : 'City (Riyadh)'}
-                      className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:border-[#009ee2] focus:ring-1 focus:ring-[#009ee2] focus:outline-none"
+                      className="w-full px-3.5 py-2.5 bg-white border border-slate-300 hover:border-slate-400 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-500 focus:border-[#0072b8] focus:ring-2 focus:ring-[#0072b8]/20 focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
                     />
                     <input
                       type="text"
                       value={district}
                       onChange={(e) => setDistrict(e.target.value)}
                       placeholder={isAr ? 'الحي (حطين)' : 'District (Hittin)'}
-                      className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:border-[#009ee2] focus:ring-1 focus:ring-[#009ee2] focus:outline-none"
+                      className="w-full px-3.5 py-2.5 bg-white border border-slate-300 hover:border-slate-400 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-500 focus:border-[#0072b8] focus:ring-2 focus:ring-[#0072b8]/20 focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
                     />
                   </div>
                 </div>
@@ -313,14 +313,14 @@ export function QuoteModal() {
               {/* Project Type & Built-up Area */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                    <Building2 className="w-3.5 h-3.5 text-[#009ee2]" />
+                  <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <Building2 className="w-3.5 h-3.5 text-[#0072b8]" />
                     <span>{t.quoteModal.projectType}</span>
                   </label>
                   <select
                     value={projectType}
                     onChange={(e) => setProjectType(e.target.value as ConstructionProjectType)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:border-[#009ee2] focus:ring-1 focus:ring-[#009ee2] focus:outline-none"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 hover:border-slate-400 rounded-xl text-xs sm:text-sm font-medium text-slate-900 focus:border-[#0072b8] focus:ring-2 focus:ring-[#0072b8]/20 focus:outline-none disabled:bg-slate-100 disabled:text-slate-500 cursor-pointer"
                   >
                     <option value="villa">{t.calculator.types.villa}</option>
                     <option value="commercial-building">{t.calculator.types.commercial}</option>
@@ -331,8 +331,8 @@ export function QuoteModal() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                    <Layers className="w-3.5 h-3.5 text-[#009ee2]" />
+                  <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <Layers className="w-3.5 h-3.5 text-[#0072b8]" />
                     <span>{t.quoteModal.builtUpArea}</span>
                   </label>
                   <input
@@ -340,7 +340,7 @@ export function QuoteModal() {
                     value={builtUpArea}
                     onChange={(e) => setBuiltUpArea(e.target.value)}
                     placeholder="1200"
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:border-[#009ee2] focus:ring-1 focus:ring-[#009ee2] focus:outline-none"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 hover:border-slate-400 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-500 focus:border-[#0072b8] focus:ring-2 focus:ring-[#0072b8]/20 focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
                   />
                 </div>
               </div>
@@ -348,7 +348,7 @@ export function QuoteModal() {
               {/* Budget & Timeline */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">
+                  <label className="text-xs font-bold text-slate-800">
                     {t.quoteModal.budgetRange}
                   </label>
                   <input
@@ -356,12 +356,12 @@ export function QuoteModal() {
                     value={budgetRangeSAR}
                     onChange={(e) => setBudgetRangeSAR(e.target.value)}
                     placeholder={isAr ? 'مثال: ٥ - ٨ مليون ريال' : 'e.g. 5M - 8M SAR'}
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:border-[#009ee2] focus:ring-1 focus:ring-[#009ee2] focus:outline-none"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 hover:border-slate-400 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-500 focus:border-[#0072b8] focus:ring-2 focus:ring-[#0072b8]/20 focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">
+                  <label className="text-xs font-bold text-slate-800">
                     {t.quoteModal.timeline}
                   </label>
                   <input
@@ -369,7 +369,7 @@ export function QuoteModal() {
                     value={timeline}
                     onChange={(e) => setTimeline(e.target.value)}
                     placeholder={isAr ? 'خلال ٣ أشهر' : 'Within 3 months'}
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:border-[#009ee2] focus:ring-1 focus:ring-[#009ee2] focus:outline-none"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 hover:border-slate-400 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-500 focus:border-[#0072b8] focus:ring-2 focus:ring-[#0072b8]/20 focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
                   />
                 </div>
               </div>

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { translations as defaultTranslations } from '../lib/translations';
 import { Language } from '../types';
+import { isAuthorizedAdmin } from '../lib/adminAuth';
 
 export interface TextOverrideItem {
   id: string;
@@ -301,6 +302,10 @@ export function TextOverrideProvider({ children }: { children: React.ReactNode }
   }, [overrides]);
 
   const updateText = useCallback((path: string, lang: Language, value: string) => {
+    if (!isAuthorizedAdmin()) {
+      console.warn('[Authorization Guard] Refused text override write for unauthorized user.');
+      return;
+    }
     setOverrides((prev) => ({
       ...prev,
       [lang]: {
@@ -311,6 +316,10 @@ export function TextOverrideProvider({ children }: { children: React.ReactNode }
   }, []);
 
   const resetText = useCallback((path: string, lang: Language) => {
+    if (!isAuthorizedAdmin()) {
+      console.warn('[Authorization Guard] Refused text override reset for unauthorized user.');
+      return;
+    }
     setOverrides((prev) => {
       const newLangOverrides = { ...prev[lang] };
       delete newLangOverrides[path];
@@ -322,6 +331,10 @@ export function TextOverrideProvider({ children }: { children: React.ReactNode }
   }, []);
 
   const resetAll = useCallback(() => {
+    if (!isAuthorizedAdmin()) {
+      console.warn('[Authorization Guard] Refused text override resetAll for unauthorized user.');
+      return;
+    }
     setOverrides({ en: {}, ar: {} });
     try {
       localStorage.removeItem(STORAGE_KEY);

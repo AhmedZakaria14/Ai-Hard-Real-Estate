@@ -11,6 +11,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { Language } from '../../types';
+import { COMPANY_CREDENTIALS } from '../../construction/data/seedData';
 
 interface ConstructionShowcaseModalProps {
   isOpen: boolean;
@@ -166,11 +167,15 @@ export function ConstructionShowcaseModal({
                 <span className="font-bold text-sky-900 block">{isAr ? 'التواصل المباشر مع إدارة المشاريع:' : 'Direct Project Management Desk:'}</span>
                 <div className="flex items-center gap-2 text-slate-700 dir-ltr">
                   <Phone className="w-3.5 h-3.5 text-sky-600" />
-                  <span>+966 13 800 4272</span>
+                  <a href={`tel:${COMPANY_CREDENTIALS.phone.replace(/\s+/g, '')}`} className="hover:text-sky-600 font-semibold">
+                    {COMPANY_CREDENTIALS.phone}
+                  </a>
                 </div>
                 <div className="flex items-center gap-2 text-slate-700 dir-ltr">
                   <Mail className="w-3.5 h-3.5 text-sky-600" />
-                  <span>projects@hard.sa</span>
+                  <a href={`mailto:${COMPANY_CREDENTIALS.email}`} className="hover:text-sky-600 font-semibold">
+                    {COMPANY_CREDENTIALS.email}
+                  </a>
                 </div>
               </div>
             </div>

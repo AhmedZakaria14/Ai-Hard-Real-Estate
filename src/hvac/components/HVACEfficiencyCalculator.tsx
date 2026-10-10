@@ -4,10 +4,15 @@ import {
   TrendingDown,
   Zap,
   Leaf,
-  Coins,
   ArrowRight,
   ArrowLeft,
-  Sparkles,
+  Gauge,
+  Info,
+  Clock,
+  Building2,
+  Calendar,
+  Layers,
+  ShieldAlert,
 } from 'lucide-react';
 import { useHVAC } from '../context/HVACContext';
 import { T, pick } from '../translations';
@@ -15,58 +20,80 @@ import { EfficiencyTier } from '../types';
 
 export function HVACEfficiencyCalculator() {
   const { language, isAr, openBookingModal } = useHVAC();
-  const [areaSqM, setAreaSqM] = useState<number>(100);
-  const [tier, setTier] = useState<EfficiencyTier>('inverter_high');
+
+  // Explicit User Inputs
+  const [areaSqM, setAreaSqM] = useState<number>(150);
+  const [baselineSeer, setBaselineSeer] = useState<number>(10.5);
+  const [targetTier, setTargetTier] = useState<EfficiencyTier>('inverter_high');
+  const [dailyHours, setDailyHours] = useState<number>(12);
+  const [tariffRate, setTariffRate] = useState<number>(0.18);
+  const [horizonYears, setHorizonYears] = useState<number>(1);
 
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
 
-  // Calculation parameters calibrated to Saudi climate & SEC tariff
-  const tierConfig: Record<
+  // Upgraded target tier configurations (SEER ratings grounded in Saudi SASO / SEEC standards)
+  const targetTierConfig: Record<
     EfficiencyTier,
-    { label: string; savingsPercent: number; multiplier: number; rebatePerSqm: number; co2PerSqm: number }
+    { label: string; seer: number; seerDisplay: string }
   > = {
     split_standard: {
       label: pick(T.calculator.tierSplitStandard, language),
-      savingsPercent: 18,
-      multiplier: 12.5,
-      rebatePerSqm: 8,
-      co2PerSqm: 0.012,
+      seer: 13.5,
+      seerDisplay: '13.5 SEER',
     },
     inverter_high: {
       label: pick(T.calculator.tierInverterHigh, language),
-      savingsPercent: 35,
-      multiplier: 24.8,
-      rebatePerSqm: 18,
-      co2PerSqm: 0.024,
+      seer: 18.0,
+      seerDisplay: '18.0 SEER (Inverter)',
     },
     package_unit: {
       label: pick(T.calculator.tierPackage, language),
-      savingsPercent: 28,
-      multiplier: 21.0,
-      rebatePerSqm: 15,
-      co2PerSqm: 0.019,
+      seer: 15.5,
+      seerDisplay: '15.5 SEER',
     },
     vrf_central: {
       label: pick(T.calculator.tierVRF, language),
-      savingsPercent: 44,
-      multiplier: 32.4,
-      rebatePerSqm: 25,
-      co2PerSqm: 0.031,
+      seer: 21.0,
+      seerDisplay: '21.0+ SEER (Smart VRF)',
     },
   };
 
-  const selectedTierConfig = tierConfig[tier];
+  const selectedTarget = targetTierConfig[targetTier];
 
-  // Calculated values
-  const annualSavingsSAR = Math.round(areaSqM * selectedTierConfig.multiplier);
-  const estimatedRebateSAR = Math.round(areaSqM * selectedTierConfig.rebatePerSqm);
-  const co2ReductionTons = (areaSqM * selectedTierConfig.co2PerSqm).toFixed(1);
+  // First-Principles Physics & Engineering Calculations
+  // Standard Saudi cooling load estimation: 1 Ton of Refrigeration (TR) per 20 m²
+  const estimatedTR = areaSqM / 20;
+  const coolingLoadBTUh = estimatedTR * 12000;
+  const annualOperatingHours = dailyHours * 365;
+
+  // Annual kWh Consumption Formula: (BTU/h / SEER / 1000) * Annual Operating Hours
+  const baselineAnnualKWh = (coolingLoadBTUh / baselineSeer / 1000) * annualOperatingHours;
+  const upgradedAnnualKWh = (coolingLoadBTUh / selectedTarget.seer / 1000) * annualOperatingHours;
+
+  const annualKWhSaved = Math.max(0, baselineAnnualKWh - upgradedAnnualKWh);
+  const totalKWhSaved = annualKWhSaved * horizonYears;
+
+  // Financial Savings = kWh Saved * Tariff Rate
+  const totalFinancialSavingsSAR = totalKWhSaved * tariffRate;
+
+  // Grid Carbon Offset: Saudi SEC grid emission intensity ~ 0.52 kg CO₂/kWh (0.00052 Tons CO₂/kWh)
+  const totalCo2OffsetTons = (totalKWhSaved * 0.00052);
+
+  // Realistic Precision Formatting
+  const formattedFinancialSavings = (Math.round(totalFinancialSavingsSAR / 10) * 10).toLocaleString();
+  const formattedKWhSaved = (Math.round(totalKWhSaved / 100) * 100).toLocaleString();
+  const formattedCo2Tons = totalCo2OffsetTons.toFixed(1);
+
+  // Efficiency Gain Percentage
+  const efficiencyGainPercent = Math.round(
+    ((selectedTarget.seer - baselineSeer) / baselineSeer) * 100
+  );
 
   return (
     <section id="calculator" className="py-16 sm:py-24 bg-white border-y border-slate-200/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-3 mb-12 sm:mb-16">
+        {/* Section Header */}
+        <div className="text-center max-w-3xl mx-auto space-y-3 mb-10 sm:mb-14">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0EA5E9]/10 text-[#0EA5E9] text-xs font-semibold">
             <Calculator className="w-3.5 h-3.5" />
             <span>{pick(T.calculator.eyebrow, language)}</span>
@@ -77,25 +104,32 @@ export function HVACEfficiencyCalculator() {
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
             {pick(T.calculator.subtitle, language)}
           </p>
+
+          {/* Illustrative Simulation Tag */}
+          <div className="pt-1">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-50 border border-amber-200/80 text-amber-900 text-xs font-medium">
+              <Info className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+              <span>{pick(T.calculator.illustrativeTag, language)}</span>
+            </span>
+          </div>
         </div>
 
-        {/* Interactive Calculator Box */}
-        <div className="bg-[#F8FAFC] border border-slate-200/80 rounded-2xl p-6 sm:p-10 shadow-xs max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 items-center">
-            {/* Input Controls (6 cols) */}
-            <div className="lg:col-span-6 space-y-7 text-start">
+        {/* Main Interactive Box */}
+        <div className="bg-[#F8FAFC] border border-slate-200/80 rounded-2xl p-6 sm:p-8 lg:p-10 shadow-xs max-w-5xl mx-auto space-y-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Left Column (6 cols): Input Parameters */}
+            <div className="lg:col-span-6 space-y-6 text-start">
               {/* 1. Area Slider */}
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs sm:text-sm font-semibold text-slate-800">
-                    {pick(T.calculator.areaSliderLabel, language)}
+                  <label className="text-xs sm:text-sm font-semibold text-slate-800 flex items-center gap-1.5">
+                    <Layers className="w-4 h-4 text-[#0EA5E9]" />
+                    <span>{pick(T.calculator.areaSliderLabel, language)}</span>
                   </label>
-                  <span className="px-3 py-1 rounded-lg bg-white border border-slate-200 text-sm font-bold text-[#0EA5E9] font-mono shadow-xs">
-                    {areaSqM} m²
+                  <span className="px-3 py-1 rounded-lg bg-white border border-slate-200 text-xs sm:text-sm font-bold text-[#0EA5E9] font-mono shadow-xs">
+                    {areaSqM} m² ({estimatedTR.toFixed(1)} TR)
                   </span>
                 </div>
-
-                {/* Range Slider styled for RTL and LTR */}
                 <input
                   type="range"
                   min={30}
@@ -105,20 +139,35 @@ export function HVACEfficiencyCalculator() {
                   onChange={(e) => setAreaSqM(Number(e.target.value))}
                   className="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#0EA5E9]"
                 />
-
                 <div className="flex justify-between text-[11px] text-slate-400 font-mono">
-                  <span>30 m² (Studio)</span>
+                  <span>30 m²</span>
                   <span>250 m² (Villa)</span>
                   <span>800 m² (Commercial)</span>
                 </div>
               </div>
 
-              {/* 2. System Tier Selector */}
-              <div className="space-y-3">
-                <label className="text-xs sm:text-sm font-semibold text-slate-800">
+              {/* 2. Existing Baseline Efficiency Dropdown */}
+              <div className="space-y-2">
+                <label className="block text-xs sm:text-sm font-semibold text-slate-800">
+                  {pick(T.calculator.baselineLabel, language)}
+                </label>
+                <select
+                  value={baselineSeer}
+                  onChange={(e) => setBaselineSeer(Number(e.target.value))}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm bg-white text-slate-800 focus:outline-none focus:border-[#0EA5E9] focus:ring-1 focus:ring-[#0EA5E9] cursor-pointer"
+                >
+                  <option value={10.5}>{pick(T.calculator.baselineLegacy, language)}</option>
+                  <option value={11.5}>{pick(T.calculator.baselineStandardCentral, language)}</option>
+                  <option value={10.0}>{pick(T.calculator.baselineChiller, language)}</option>
+                </select>
+              </div>
+
+              {/* 3. Upgraded Target System Selector */}
+              <div className="space-y-2.5">
+                <label className="block text-xs sm:text-sm font-semibold text-slate-800">
                   {pick(T.calculator.tierLabel, language)}
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {(
                     [
                       'split_standard',
@@ -130,23 +179,23 @@ export function HVACEfficiencyCalculator() {
                     <button
                       key={t}
                       type="button"
-                      onClick={() => setTier(t)}
-                      className={`p-3 rounded-xl text-xs font-semibold text-start border transition-all cursor-pointer ${
-                        tier === t
+                      onClick={() => setTargetTier(t)}
+                      className={`p-2.5 rounded-xl text-xs font-semibold text-start border transition-all cursor-pointer ${
+                        targetTier === t
                           ? 'bg-[#0EA5E9] text-white border-[#0EA5E9] shadow-xs'
                           : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                       }`}
                     >
-                      <div className="flex items-center justify-between">
-                        <span>{tierConfig[t].label}</span>
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="truncate">{targetTierConfig[t].label}</span>
                         <span
-                          className={`text-[10px] px-1.5 py-0.5 rounded ${
-                            tier === t
+                          className={`text-[10px] font-mono px-1.5 py-0.5 rounded shrink-0 ${
+                            targetTier === t
                               ? 'bg-white/20 text-white'
                               : 'bg-slate-100 text-[#0EA5E9]'
                           }`}
                         >
-                          +{tierConfig[t].savingsPercent}%
+                          {targetTierConfig[t].seerDisplay}
                         </span>
                       </div>
                     </button>
@@ -154,25 +203,90 @@ export function HVACEfficiencyCalculator() {
                 </div>
               </div>
 
-              {/* Disclaimer */}
-              <p className="text-[11px] text-slate-400 leading-relaxed">
-                {pick(T.calculator.disclaimer, language)}
-              </p>
+              {/* 4. Daily Operating Hours Selector */}
+              <div className="space-y-2">
+                <label className="text-xs sm:text-sm font-semibold text-slate-800 flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-[#0EA5E9]" />
+                  <span>{pick(T.calculator.hoursLabel, language)}</span>
+                </label>
+                <div className="grid grid-cols-4 gap-2 text-xs font-semibold">
+                  {[8, 12, 16, 24].map((hrs) => (
+                    <button
+                      key={hrs}
+                      type="button"
+                      onClick={() => setDailyHours(hrs)}
+                      className={`py-2 rounded-xl border transition-all cursor-pointer ${
+                        dailyHours === hrs
+                          ? 'bg-[#002B49] text-white border-[#002B49]'
+                          : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      {hrs} {isAr ? 'ساعات' : 'hrs/day'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 5. SEC Electricity Tariff Category Dropdown */}
+              <div className="space-y-2">
+                <label className="text-xs sm:text-sm font-semibold text-slate-800 flex items-center gap-1.5">
+                  <Building2 className="w-4 h-4 text-[#0EA5E9]" />
+                  <span>{pick(T.calculator.tariffLabel, language)}</span>
+                </label>
+                <select
+                  value={tariffRate}
+                  onChange={(e) => setTariffRate(Number(e.target.value))}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm bg-white text-slate-800 focus:outline-none focus:border-[#0EA5E9] focus:ring-1 focus:ring-[#0EA5E9] cursor-pointer"
+                >
+                  <option value={0.18}>{pick(T.calculator.tariffResidential, language)}</option>
+                  <option value={0.30}>{pick(T.calculator.tariffResidentialTier2, language)}</option>
+                  <option value={0.20}>{pick(T.calculator.tariffCommercial, language)}</option>
+                  <option value={0.26}>{pick(T.calculator.tariffGovernment, language)}</option>
+                </select>
+              </div>
+
+              {/* 6. Calculation Horizon Period Buttons */}
+              <div className="space-y-2">
+                <label className="text-xs sm:text-sm font-semibold text-slate-800 flex items-center gap-1.5">
+                  <Calendar className="w-4 h-4 text-[#0EA5E9]" />
+                  <span>{pick(T.calculator.periodLabel, language)}</span>
+                </label>
+                <div className="grid grid-cols-3 gap-2 text-xs font-semibold">
+                  {[
+                    { yrs: 1, key: 'period1Yr' },
+                    { yrs: 3, key: 'period3Yr' },
+                    { yrs: 5, key: 'period5Yr' },
+                  ].map((p) => (
+                    <button
+                      key={p.yrs}
+                      type="button"
+                      onClick={() => setHorizonYears(p.yrs)}
+                      className={`py-2 px-2 rounded-xl border transition-all cursor-pointer text-center ${
+                        horizonYears === p.yrs
+                          ? 'bg-[#0EA5E9] text-white border-[#0EA5E9]'
+                          : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      {pick(T.calculator[p.key as keyof typeof T.calculator], language)}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            {/* Output Metric Cards (6 cols) */}
+            {/* Right Column (6 cols): Output Metrics & Model Parameters */}
             <div className="lg:col-span-6 space-y-4">
-              {/* Metric 1: Annual Electricity Savings */}
+              {/* Metric 1: Financial Savings */}
               <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs text-start flex items-center justify-between gap-4">
                 <div className="space-y-1">
                   <span className="text-xs font-semibold text-slate-500 flex items-center gap-1.5">
                     <Zap className="w-3.5 h-3.5 text-amber-500" />
-                    <span>{pick(T.calculator.annualSavingsTitle, language)}</span>
+                    <span>{pick(T.calculator.annualSavingsTitle, language)} ({horizonYears} {isAr ? 'سنة' : 'Yr'})</span>
                   </span>
                   <div className="text-2xl sm:text-3xl font-bold text-slate-900 font-mono">
-                    <bdi dir="ltr">{annualSavingsSAR.toLocaleString()}</bdi>
+                    <bdi dir="ltr">{formattedFinancialSavings}</bdi>
                     <span className="text-xs text-slate-500 font-normal ms-1">
-                      {isAr ? 'ريال / سنوياً' : 'SAR / year'}
+                      {isAr ? 'ريال وفر مالي' : 'SAR savings'}
                     </span>
                   </div>
                 </div>
@@ -181,22 +295,22 @@ export function HVACEfficiencyCalculator() {
                 </div>
               </div>
 
-              {/* Metric 2: Estimated Incentive / Rebate */}
+              {/* Metric 2: Electrical Energy Saved (kWh) */}
               <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs text-start flex items-center justify-between gap-4">
                 <div className="space-y-1">
                   <span className="text-xs font-semibold text-slate-500 flex items-center gap-1.5">
-                    <Coins className="w-3.5 h-3.5 text-[#0EA5E9]" />
-                    <span>{pick(T.calculator.incentiveEstimateTitle, language)}</span>
+                    <Gauge className="w-3.5 h-3.5 text-[#0EA5E9]" />
+                    <span>{pick(T.calculator.kwhSavedTitle, language)}</span>
                   </span>
-                  <div className="text-2xl sm:text-3xl font-bold text-[#0EA5E9] font-mono">
-                    <bdi dir="ltr">{estimatedRebateSAR.toLocaleString()}</bdi>
+                  <div className="text-xl sm:text-2xl font-bold text-[#0EA5E9] font-mono">
+                    <bdi dir="ltr">{formattedKWhSaved}</bdi>
                     <span className="text-xs text-slate-500 font-normal ms-1">
-                      {isAr ? 'ريال قيمة تقديرية' : 'SAR est. value'}
+                      kWh ({efficiencyGainPercent > 0 ? `+${efficiencyGainPercent}%` : ''} SEER)
                     </span>
                   </div>
                 </div>
                 <div className="w-12 h-12 rounded-xl bg-sky-50 text-[#0EA5E9] flex items-center justify-center shrink-0">
-                  <Sparkles className="w-6 h-6" />
+                  <Gauge className="w-6 h-6" />
                 </div>
               </div>
 
@@ -208,15 +322,60 @@ export function HVACEfficiencyCalculator() {
                     <span>{pick(T.calculator.carbonOffsetTitle, language)}</span>
                   </span>
                   <div className="text-xl sm:text-2xl font-bold text-emerald-700 font-mono">
-                    <bdi dir="ltr">{co2ReductionTons}</bdi>
+                    <bdi dir="ltr">{formattedCo2Tons}</bdi>
                     <span className="text-xs text-slate-500 font-normal ms-1">
-                      {isAr ? 'طن انبعاثات سنوية' : 'Tons CO₂ / year'}
+                      {isAr ? 'طن انبعاثات' : 'Tons CO₂'}
                     </span>
                   </div>
                 </div>
                 <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
                   <Leaf className="w-6 h-6" />
                 </div>
+              </div>
+
+              {/* Model Assumptions Summary Box */}
+              <div className="p-4 rounded-xl bg-white border border-slate-200 text-xs text-start space-y-2 shadow-2xs">
+                <div className="flex items-center gap-1.5 font-bold text-slate-900 border-b border-slate-100 pb-2">
+                  <Info className="w-4 h-4 text-[#0EA5E9]" />
+                  <span>{pick(T.calculator.assumptionsCardTitle, language)}</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-600 pt-1 font-mono">
+                  <div>
+                    <span className="text-slate-400 block">{isAr ? 'حمل التبريد:' : 'Cooling Load:'}</span>
+                    <span className="font-semibold text-slate-800">{estimatedTR.toFixed(1)} TR ({coolingLoadBTUh.toLocaleString()} BTU/h)</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block">{isAr ? 'كفاءة النظام الحالي:' : 'Baseline Efficiency:'}</span>
+                    <span className="font-semibold text-slate-800">{baselineSeer} SEER</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block">{isAr ? 'كفاءة النظام الجديد:' : 'Target Efficiency:'}</span>
+                    <span className="font-semibold text-[#0EA5E9]">{selectedTarget.seerDisplay}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block">{isAr ? 'ساعات التشغيل:' : 'Operating Hours:'}</span>
+                    <span className="font-semibold text-slate-800">{dailyHours} h/d ({annualOperatingHours.toLocaleString()} h/yr)</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block">{isAr ? 'تعرفة الكهرباء:' : 'SEC Tariff Rate:'}</span>
+                    <span className="font-semibold text-slate-800">{tariffRate} SAR/kWh</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block">{isAr ? 'مدة الحساب:' : 'Horizon Period:'}</span>
+                    <span className="font-semibold text-slate-800">{horizonYears} {isAr ? 'سنة/سنوات' : 'Yr(s)'}</span>
+                  </div>
+                </div>
+
+                <p className="text-[10px] text-slate-400 pt-1 border-t border-slate-100 leading-normal">
+                  {pick(T.calculator.methodologyDesc, language)}
+                </p>
+              </div>
+
+              {/* Measured M&V Protocol Notice */}
+              <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200/80 text-amber-900 text-[11px] leading-relaxed flex items-start gap-2">
+                <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <p>{pick(T.calculator.measuredSavingsNotice, language)}</p>
               </div>
 
               {/* Action Button */}

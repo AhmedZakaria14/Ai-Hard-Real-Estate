@@ -18,8 +18,10 @@ import { translations } from '../lib/translations';
 import { mockProperties } from '../data/mockData';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
-import { formatCurrency } from '../lib/utils';
+import { formatCurrency, formatPropertyArea, getNormalizedAmenities } from '../lib/utils';
 import { PropertyInquiryForm } from '../components/forms/PropertyInquiryForm';
+import { getPageHref, handleSemanticClick } from '../lib/navigation';
+import { getPropertyTypeLabel } from '../lib/propertyTaxonomy';
 
 interface PropertyDetailPageProps {
   property: Property;
@@ -47,13 +49,14 @@ export function PropertyDetailPage({
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
       {/* Back button */}
-      <button
-        onClick={onBack}
-        className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-blue-700 transition-colors cursor-pointer"
+      <a
+        href={getPageHref('properties')}
+        onClick={(e) => handleSemanticClick(e, onBack)}
+        className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-blue-700 transition-colors cursor-pointer focus-visible:outline-none focus-visible:underline"
       >
         <ArrowIcon className="w-4 h-4" />
         <span>{t.propertyDetails.backToListings}</span>
-      </button>
+      </a>
 
       {/* Main Header & Title Bar */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-slate-200">
@@ -66,7 +69,7 @@ export function PropertyDetailPage({
                 ? t.properties.filters.forRent
                 : t.properties.filters.offPlan}
             </Badge>
-            <Badge variant="outline">{property.type.toUpperCase()}</Badge>
+            <Badge variant="outline">{getPropertyTypeLabel(property.type, language)}</Badge>
             <span className="text-xs text-slate-400">ID: {property.id}</span>
           </div>
 
@@ -87,7 +90,7 @@ export function PropertyDetailPage({
               {t.propertyDetails.price}
             </span>
             <div className="text-2xl sm:text-3xl font-extrabold text-blue-700 font-display-serif">
-              {property.price.formattedSAR || `${property.price.sar?.toLocaleString()} SAR`}
+              {formatCurrency(property.price.sar, 'SAR', language)}
               {property.price.period && (
                 <span className="text-sm font-normal text-slate-500">
                   {' '}
@@ -105,7 +108,11 @@ export function PropertyDetailPage({
         <div className="relative aspect-16/9 sm:aspect-21/9 rounded-3xl overflow-hidden bg-slate-900 shadow-lg">
           <img
             src={property.images[activeImageIndex] || property.images[0]}
-            alt={property.title[language]}
+            alt={
+              language === 'ar'
+                ? `${property.title[language]} - صورة ${activeImageIndex + 1} من ${property.images.length}`
+                : `${property.title[language]} - Photo ${activeImageIndex + 1} of ${property.images.length}`
+            }
             referrerPolicy="no-referrer"
             className="w-full h-full object-cover transition-all duration-300"
           />
@@ -113,20 +120,41 @@ export function PropertyDetailPage({
 
         {/* Thumbnails */}
         {property.images.length > 1 && (
-          <div className="flex items-center gap-3 overflow-x-auto pb-2">
-            {property.images.map((img, idx) => (
-              <button
-                key={idx}
-                onClick={() => setActiveImageIndex(idx)}
-                className={`relative w-24 sm:w-32 aspect-16/10 rounded-xl overflow-hidden shrink-0 border-2 transition-all cursor-pointer ${
-                  activeImageIndex === idx
-                    ? 'border-blue-600 ring-2 ring-blue-500/30'
-                    : 'border-transparent opacity-70 hover:opacity-100'
-                }`}
-              >
-                <img src={img} alt="thumbnail" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
-              </button>
-            ))}
+          <div
+            className="flex items-center gap-3 overflow-x-auto pb-2"
+            role="region"
+            aria-label={language === 'ar' ? 'معرض صور العقار' : 'Property photo gallery'}
+          >
+            {property.images.map((img, idx) => {
+              const isSelected = activeImageIndex === idx;
+              const imagePositionLabel = language === 'ar'
+                ? `صورة العقار ${idx + 1} من ${property.images.length}`
+                : `Property photo ${idx + 1} of ${property.images.length}`;
+              const selectionStatus = isSelected
+                ? (language === 'ar' ? 'محددة حالياً' : 'currently selected')
+                : (language === 'ar' ? 'انقر للرؤية' : 'click to select');
+
+              return (
+                <button
+                  key={idx}
+                  onClick={() => setActiveImageIndex(idx)}
+                  aria-label={`${imagePositionLabel} - ${selectionStatus}`}
+                  aria-pressed={isSelected}
+                  className={`relative w-24 sm:w-32 aspect-16/10 rounded-xl overflow-hidden shrink-0 border-2 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 ${
+                    isSelected
+                      ? 'border-blue-600 ring-2 ring-blue-500/30'
+                      : 'border-transparent opacity-70 hover:opacity-100'
+                  }`}
+                >
+                  <img
+                    src={img}
+                    alt={imagePositionLabel}
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
@@ -143,7 +171,7 @@ export function PropertyDetailPage({
                 {t.propertyDetails.quickFacts.bedrooms}
               </span>
               <p className="text-base font-bold text-slate-900">
-                {property.bedrooms > 0 ? property.bedrooms : 'Commercial'}
+                {property.bedrooms > 0 ? `${property.bedrooms} ${t.properties.beds}` : (language === 'ar' ? 'تجاري' : 'Commercial')}
               </p>
             </div>
 
@@ -152,7 +180,7 @@ export function PropertyDetailPage({
                 <Bath className="w-3.5 h-3.5 text-blue-600" />
                 {t.propertyDetails.quickFacts.bathrooms}
               </span>
-              <p className="text-base font-bold text-slate-900">{property.bathrooms}</p>
+              <p className="text-base font-bold text-slate-900">{property.bathrooms} {t.properties.baths}</p>
             </div>
 
             <div className="space-y-1">
@@ -161,7 +189,7 @@ export function PropertyDetailPage({
                 {t.propertyDetails.quickFacts.area}
               </span>
               <p className="text-base font-bold text-slate-900">
-                {property.areaSqFt.toLocaleString()} {t.properties.sqft} ({property.areaSqM} {t.properties.sqm})
+                {formatPropertyArea(property, language, { showSecondary: true })}
               </p>
             </div>
 
@@ -170,7 +198,12 @@ export function PropertyDetailPage({
                 <Car className="w-3.5 h-3.5 text-blue-600" />
                 {t.propertyDetails.quickFacts.parking}
               </span>
-              <p className="text-base font-bold text-slate-900">{property.features.parkingSpaces} Slots</p>
+              <p className="text-base font-bold text-slate-900">
+                {property.features.parkingSpaces}{' '}
+                {language === 'ar'
+                  ? (property.features.parkingSpaces === 1 ? 'موقف' : 'مواقف')
+                  : (property.features.parkingSpaces === 1 ? 'Space' : 'Spaces')}
+              </p>
             </div>
           </div>
 
@@ -192,7 +225,7 @@ export function PropertyDetailPage({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
               <div className="flex justify-between py-2 border-b border-slate-100">
                 <span className="text-slate-500">{t.propertyDetails.quickFacts.propertyType}:</span>
-                <span className="font-semibold text-slate-900 capitalize">{property.type}</span>
+                <span className="font-semibold text-slate-900">{getPropertyTypeLabel(property.type, language)}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-slate-100">
                 <span className="text-slate-500">{t.propertyDetails.quickFacts.yearBuilt}:</span>
@@ -215,7 +248,7 @@ export function PropertyDetailPage({
               {t.propertyDetails.amenities}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {property.amenities[language].map((amenity, idx) => (
+              {getNormalizedAmenities(property, language).map((amenity, idx) => (
                 <div key={idx} className="flex items-center gap-2.5 text-xs sm:text-sm text-slate-700">
                   <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
                   <span>{amenity}</span>
@@ -251,7 +284,7 @@ export function PropertyDetailPage({
             </Button>
 
             {/* Mandatory "Chat on WhatsApp" Direct CTA */}
-            <a
+            <Button
               href={`https://wa.me/966556125711?text=${encodeURIComponent(
                 language === 'en'
                   ? `Hello HARD Real Estate, I'm inquiring about "${property.title.en}" (Ref: ${property.id}).`
@@ -259,13 +292,13 @@ export function PropertyDetailPage({
               )}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex w-full"
+              variant="whatsapp"
+              size="lg"
+              className="w-full justify-center"
             >
-              <Button variant="whatsapp" size="lg" className="w-full justify-center">
-                <MessageSquare className="w-4 h-4" />
-                <span>{t.cta.chatOnWhatsApp}</span>
-              </Button>
-            </a>
+              <MessageSquare className="w-4 h-4" />
+              <span>{t.cta.chatOnWhatsApp}</span>
+            </Button>
 
             <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-[11px] text-slate-500 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -285,13 +318,16 @@ export function PropertyDetailPage({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {similarProperties.map((sim) => (
-            <div
+            <a
               key={sim.id}
-              onClick={() => {
-                onSelectProperty(sim);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+              href={getPageHref('property-details', `id=${encodeURIComponent(sim.id)}`)}
+              onClick={(e) => {
+                handleSemanticClick(e, () => {
+                  onSelectProperty(sim);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
               }}
-              className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md cursor-pointer transition-all flex flex-col sm:flex-row group"
+              className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md cursor-pointer transition-all flex flex-col sm:flex-row group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
             >
               <div className="relative sm:w-48 aspect-16/10 sm:aspect-auto overflow-hidden bg-slate-100">
                 <img
@@ -312,7 +348,7 @@ export function PropertyDetailPage({
                   {sim.price.formattedSAR || `${sim.price.sar?.toLocaleString()} SAR`}
                 </div>
               </div>
-            </div>
+            </a>
           ))}
         </div>
       </div>
