@@ -175,22 +175,39 @@ function AppContent() {
           if (hash === 'portal') {
             window.history.replaceState(null, '', '/' + window.location.search);
           }
-        } else if (hash === 'construction' || hash.startsWith('construction/')) {
+        } else if (
+          hash === 'admin' ||
+          hash === 'cms' ||
+          hash === '/admin' ||
+          hash === '/cms'
+        ) {
+          detectedPage = 'admin';
+          window.history.replaceState(null, '', '/admin' + window.location.search);
+        } else if (
+          hash === 'properties' ||
+          hash === '/properties'
+        ) {
+          detectedPage = 'properties';
+          window.history.replaceState(null, '', '/properties' + window.location.search);
+        } else if (
+          hash === 'construction' ||
+          hash === '/construction' ||
+          hash.startsWith('construction/') ||
+          hash.startsWith('/construction')
+        ) {
           detectedPage = 'construction';
-          const cleanSub = hash.split('?')[0].replace(/\/+$/, '');
-          const target = '/' + (cleanSub || 'construction');
-          window.history.replaceState(null, '', target + window.location.search);
+          window.history.replaceState(null, '', '/construction' + window.location.search);
         } else if (
           hash === 'hvac' ||
+          hash === '/hvac' ||
           hash === 'maintenance' ||
+          hash === '/maintenance' ||
           hash.startsWith('hvac/') ||
+          hash.startsWith('/hvac') ||
           hash.startsWith('maintenance/')
         ) {
           detectedPage = 'hvac';
           window.history.replaceState(null, '', '/hvac' + window.location.search);
-        } else if (hash === 'admin' || hash === 'cms') {
-          detectedPage = 'admin';
-          window.history.replaceState(null, '', '/admin' + window.location.search);
         } else if (hash.startsWith('realestate')) {
           let sub = hash.substring('realestate'.length).replace(/^\/+/, '');
           sub = sub.split('?')[0].replace(/\/+$/, '');
