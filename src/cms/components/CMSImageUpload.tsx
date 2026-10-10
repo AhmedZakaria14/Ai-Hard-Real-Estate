@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Upload, Link2, X, Image as ImageIcon, Check, Trash2, Plus, Sparkles } from 'lucide-react';
 import { Language } from '../../types';
+import { uploadCmsFile } from '../../lib/firebaseService';
 
 interface SingleImageUploadProps {
   value: string;
@@ -40,13 +41,12 @@ export const CMSImageUpload: React.FC<SingleImageUploadProps> = ({
     }
   };
 
-  const processFile = (file: File) => {
+  const processFile = async (file: File) => {
     if (!file.type.startsWith('image/')) {
       setError(isAr ? 'يرجى اختيار ملف صورة صالح (PNG, JPG, WebP)' : 'Please select a valid image file (PNG, JPG, WebP)');
       return;
     }
 
-    // Limit check (e.g. 10MB)
     if (file.size > 10 * 1024 * 1024) {
       setError(isAr ? 'حجم الصورة كبير جداً (الحد الأقصى 10MB)' : 'File size exceeds 10MB limit');
       return;
@@ -55,14 +55,19 @@ export const CMSImageUpload: React.FC<SingleImageUploadProps> = ({
     setError(null);
     setFileName(file.name);
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const result = event.target?.result as string;
-      if (result) {
-        onChange(result);
-      }
-    };
-    reader.readAsDataURL(file);
+    try {
+      const downloadUrl = await uploadCmsFile(file, 'property_cms');
+      onChange(downloadUrl);
+    } catch {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const result = event.target?.result as string;
+        if (result) {
+          onChange(result);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {

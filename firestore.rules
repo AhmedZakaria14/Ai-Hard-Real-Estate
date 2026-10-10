@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        getUserData().role == 'admin' ||
+        getUserData().role == 'superadmin' ||
+        getUserData().role == 'editor'
+      );
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow write: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+    }
+
+    // Properties
+    match /properties/{propertyId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Construction Projects
+    match /construction_projects/{projectId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // HVAC Services
+    match /hvac_services/{serviceId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Site Content (CMS)
+    match /site_content/{sectionId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Blog Posts
+    match /blog_posts/{postId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Customer Leads & Bookings
+    match /leads/{leadId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Newsletter Subscribers
+    match /subscribers/{subscriberId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}

@@ -1,0 +1,172 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Admin and editor user credentials and permissions",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["superadmin", "admin", "editor"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Property": {
+      "title": "Real Estate Property",
+      "description": "Real estate properties for sale or rent",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "object" },
+        "description": { "type": "object" },
+        "price": { "type": "number" },
+        "currency": { "type": "string" },
+        "location": { "type": "object" },
+        "type": { "type": "string" },
+        "status": { "type": "string" },
+        "specs": { "type": "object" },
+        "features": { "type": "array" },
+        "images": { "type": "array" },
+        "isPublished": { "type": "boolean" },
+        "draft": { "type": "object" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "price", "type", "status"]
+    },
+    "ConstructionProject": {
+      "title": "Construction Project",
+      "description": "Commercial and residential construction developments",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "object" },
+        "description": { "type": "object" },
+        "category": { "type": "string" },
+        "location": { "type": "object" },
+        "status": { "type": "string" },
+        "specs": { "type": "object" },
+        "gallery": { "type": "array" },
+        "isPublished": { "type": "boolean" },
+        "draft": { "type": "object" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "category", "status"]
+    },
+    "HVACService": {
+      "title": "HVAC Service",
+      "description": "Heating, ventilation, and air conditioning service package",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "object" },
+        "description": { "type": "object" },
+        "category": { "type": "string" },
+        "features": { "type": "array" },
+        "pricing": { "type": "object" },
+        "isPublished": { "type": "boolean" },
+        "draft": { "type": "object" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "category"]
+    },
+    "SiteContent": {
+      "title": "Site Content Section",
+      "description": "CMS manageable site content section for portal, real estate, construction, and HVAC",
+      "type": "object",
+      "properties": {
+        "sectionId": { "type": "string" },
+        "sector": { "type": "string" },
+        "published": { "type": "object" },
+        "draft": { "type": "object" },
+        "updatedAt": { "type": "string" },
+        "updatedBy": { "type": "string" }
+      },
+      "required": ["sectionId", "sector"]
+    },
+    "BlogPost": {
+      "title": "Blog Article",
+      "description": "News and educational articles across real estate, construction, and HVAC",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "slug": { "type": "string" },
+        "title": { "type": "object" },
+        "excerpt": { "type": "object" },
+        "content": { "type": "object" },
+        "category": { "type": "string" },
+        "image": { "type": "string" },
+        "author": { "type": "string" },
+        "isPublished": { "type": "boolean" },
+        "draft": { "type": "object" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "slug", "category"]
+    },
+    "Lead": {
+      "title": "Customer Lead / Request",
+      "description": "Customer inquiry, booking, or request submission",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "trackingCode": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "sector": { "type": "string" },
+        "type": { "type": "string" },
+        "details": { "type": "object" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "email", "sector"]
+    },
+    "Subscriber": {
+      "title": "Newsletter Subscriber",
+      "description": "Subscriber email address",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "email": { "type": "string" },
+        "source": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "email"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profile and permissions"
+    },
+    "/properties/{propertyId}": {
+      "schema": { "$ref": "#/entities/Property" },
+      "description": "Real estate properties collection"
+    },
+    "/construction_projects/{projectId}": {
+      "schema": { "$ref": "#/entities/ConstructionProject" },
+      "description": "Construction projects collection"
+    },
+    "/hvac_services/{serviceId}": {
+      "schema": { "$ref": "#/entities/HVACService" },
+      "description": "HVAC service catalog collection"
+    },
+    "/site_content/{sectionId}": {
+      "schema": { "$ref": "#/entities/SiteContent" },
+      "description": "CMS site content sections"
+    },
+    "/blog_posts/{postId}": {
+      "schema": { "$ref": "#/entities/BlogPost" },
+      "description": "Blog and insights articles"
+    },
+    "/leads/{leadId}": {
+      "schema": { "$ref": "#/entities/Lead" },
+      "description": "Customer inquiries and viewing requests"
+    },
+    "/subscribers/{subscriberId}": {
+      "schema": { "$ref": "#/entities/Subscriber" },
+      "description": "Newsletter subscribers"
+    }
+  }
+}

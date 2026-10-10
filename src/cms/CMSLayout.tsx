@@ -24,6 +24,7 @@ export type CMSTab =
   | 'dashboard'
   | 'properties'
   | 'projects'
+  | 'content'
   | 'blog'
   | 'testimonials'
   | 'subscribers'
@@ -59,6 +60,7 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
     { id: 'dashboard', labelEn: 'Executive Dashboard', labelAr: 'لوحة التحكم والمؤشرات', icon: LayoutDashboard },
     { id: 'properties', labelEn: 'Properties & Listings', labelAr: 'إدارة العقارات والأصول', icon: Building },
     { id: 'projects', labelEn: 'Major Projects & Off-Plan', labelAr: 'المشاريع التطويرية والواجهات', icon: Layers },
+    { id: 'content', labelEn: 'Site Content & Drafts', labelAr: 'إدارة المحتوى والمسودات', icon: Sparkles },
     { id: 'blog', labelEn: 'Blog & Market Insights', labelAr: 'المدونة والتقارير العقارية', icon: BookOpen },
     { id: 'testimonials', labelEn: 'Client Success Stories', labelAr: 'قصص نجاح العملاء', icon: Award },
     { id: 'subscribers', labelEn: 'Join List', labelAr: 'قائمة الانضمام', icon: MailCheck },

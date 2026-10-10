@@ -25,6 +25,7 @@ import { CMSTestimonialFormModal } from './testimonials/CMSTestimonialFormModal'
 import { CMSJoinList } from './subscribers/CMSJoinList';
 import { CMSAddSubscriberModal } from './subscribers/CMSAddSubscriberModal';
 import { CMSLeadsList } from './leads/CMSLeadsList';
+import { CMSSiteContentEditor } from './content/CMSSiteContentEditor';
 import { CMSSettings } from './settings/CMSSettings';
 
 import { notifyAdminAuthChange } from '../lib/adminAuth';
@@ -386,6 +387,11 @@ export const CMSApp: React.FC<CMSAppProps> = ({
           onViewLive={handleViewProjectLive}
           language={language}
         />
+      )}
+
+      {/* 3.5. Site Content & Drafts */}
+      {activeTab === 'content' && (
+        <CMSSiteContentEditor language={language} />
       )}
 
       {/* 4. Blog & Market Insights */}
