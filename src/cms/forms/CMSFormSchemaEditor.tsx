@@ -20,6 +20,10 @@ import {
 } from 'lucide-react';
 import { Language } from '../../types';
 import { CustomerFormType } from '../../lib/forms/formSubmissionService';
+import { useDraftAutosave } from '../../lib/cms/useDraftAutosave';
+import { DraftStatusBadge } from '../components/DraftStatusBadge';
+import { PublishValidationModal } from '../components/PublishValidationModal';
+import { PublisherUser } from '../../lib/cms/publicationTypes';
 import {
   FormSchemaConfig,
   FormFieldConfig,
@@ -58,6 +62,20 @@ export const CMSFormSchemaEditor: React.FC<CMSFormSchemaEditorProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<{ success: boolean; message: string } | null>(null);
   const [activeSubTab, setActiveSubTab] = useState<'fields' | 'copy' | 'workflow'>('fields');
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+
+  const draftState = useDraftAutosave({
+    entityType: 'form_schema',
+    entityId: selectedFormType,
+    currentData: schemaConfig,
+    userEmail: currentAdminEmail,
+    debounceMs: 1500,
+    onDraftLoaded: (record) => {
+      if (record.data && record.data.fields) {
+        setSchemaConfig(record.data);
+      }
+    },
+  });
 
   // Load active form schema when form type changes
   useEffect(() => {
@@ -224,9 +242,22 @@ export const CMSFormSchemaEditor: React.FC<CMSFormSchemaEditorProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <DraftStatusBadge
+            status={draftState.saveStatus}
+            revision={draftState.revision}
+            lastSavedAt={draftState.lastSavedAt}
+            errorMessage={draftState.errorMessage}
+            isOffline={draftState.isOffline}
+            conflictRemoteRecord={draftState.conflictRemoteRecord}
+            language={language}
+            onForceSave={draftState.forceSave}
+            onResolveUseRemote={draftState.resolveConflictUseRemote}
+            onResolveForceOverwrite={draftState.resolveConflictForceOverwrite}
+          />
+
           <button
-            onClick={handleSaveConfig}
+            onClick={() => setIsPublishModalOpen(true)}
             disabled={isSaving || isLoading}
             className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white font-bold text-xs sm:text-sm shadow-lg shadow-blue-900/40 transition-all cursor-pointer disabled:opacity-50"
           >
@@ -731,6 +762,31 @@ export const CMSFormSchemaEditor: React.FC<CMSFormSchemaEditorProps> = ({
           </div>
         )}
       </div>
+
+      {/* Pre-Publication Audit & Validation Modal */}
+      <PublishValidationModal
+        isOpen={isPublishModalOpen}
+        onClose={() => setIsPublishModalOpen(false)}
+        onSuccess={(v) => {
+          setSaveStatus({
+            success: true,
+            message: isAr
+              ? `تم تحديث ونشر نموذج الخدمة بنجاح (v${v})`
+              : `Form schema published successfully as version v${v}`,
+          });
+          setSchemaConfig((prev) => ({ ...prev, schemaVersion: v }));
+        }}
+        entityType="form_schema"
+        entityId={selectedFormType}
+        sector="global"
+        draftData={schemaConfig}
+        publisherUser={{
+          uid: 'admin-1',
+          email: currentAdminEmail,
+          role: 'superadmin',
+        }}
+        language={language}
+      />
     </div>
   );
 };

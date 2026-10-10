@@ -196,6 +196,10 @@ service cloud.firestore {
       allow write: if isEditor();
     }
 
+    match /cms_drafts/{draftId} {
+      allow read, write: if isEditor();
+    }
+
     // ==========================================
     // 2. PRIVATE OPERATIONAL DATA (LEADS & APPOINTMENTS)
     // ==========================================

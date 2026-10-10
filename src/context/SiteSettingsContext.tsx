@@ -227,10 +227,13 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
         (snap) => {
           if (snap.exists()) {
             const data = snap.data() as PublicBrandingSettings;
-            setAllSectorSettings((prev) => ({
-              ...prev,
-              [sec]: { ...prev[sec], ...data, sector: sec },
-            }));
+            // Public visitors ONLY adopt settings if published or default
+            if (!data.publicationStatus || data.publicationStatus === 'published') {
+              setAllSectorSettings((prev) => ({
+                ...prev,
+                [sec]: { ...prev[sec], ...data, sector: sec },
+              }));
+            }
           }
         },
         (err) => {

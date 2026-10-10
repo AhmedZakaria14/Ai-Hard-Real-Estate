@@ -42,6 +42,7 @@ import {
   getCrmSyncLogs,
 } from '../lib/integrations/crmSync';
 import { isSupabaseConfigured } from '../lib/db/supabaseClient';
+import { PublicDataReader } from '../lib/firebase/dataAccess';
 
 interface DataContextType {
   properties: Property[];
@@ -230,10 +231,31 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     refreshData();
-    const unsubscribe = subscribeToCrmLogs((newLogs) => {
+
+    // 1. Scoped real-time listener for published properties
+    const unsubProps = PublicDataReader.subscribeToPublishedCollection<any>('properties', (publishedProps) => {
+      if (publishedProps && publishedProps.length > 0) {
+        setProperties(publishedProps);
+      }
+    });
+
+    // 2. Scoped real-time listener for published construction projects
+    const unsubProjects = PublicDataReader.subscribeToPublishedCollection<any>('construction_projects', (publishedProjects) => {
+      if (publishedProjects && publishedProjects.length > 0) {
+        setProjects(publishedProjects);
+      }
+    });
+
+    // 3. Listener for CRM sync logs
+    const unsubCrm = subscribeToCrmLogs((newLogs) => {
       setCrmLogs(newLogs);
     });
-    return () => unsubscribe();
+
+    return () => {
+      unsubProps();
+      unsubProjects();
+      unsubCrm();
+    };
   }, [refreshData]);
 
   // Properties CRUD

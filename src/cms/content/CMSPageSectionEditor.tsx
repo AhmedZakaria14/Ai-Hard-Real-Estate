@@ -36,9 +36,15 @@ import { DynamicPageSectionRenderer } from '../../components/ui/DynamicPageSecti
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { withServerTimestamps } from '../../lib/firebase/serializers';
+import { useDraftAutosave } from '../../lib/cms/useDraftAutosave';
+import { DraftStatusBadge } from '../components/DraftStatusBadge';
+import { PublishValidationModal } from '../components/PublishValidationModal';
+import { DraftPreviewModal } from '../components/DraftPreviewModal';
+import { PublisherUser } from '../../lib/cms/publicationTypes';
 
 interface CMSPageSectionEditorProps {
   language: Language;
+  adminUser?: PublisherUser;
 }
 
 const PAGES_CATALOG: { id: string; slug: string; nameAr: string; nameEn: string; sector: 'portal' | 'realestate' | 'construction' | 'hvac' }[] = [
@@ -49,18 +55,38 @@ const PAGES_CATALOG: { id: string; slug: string; nameAr: string; nameEn: string;
   { id: 'page_hvac', slug: '/hvac', nameAr: 'صفحة أنظمة التكييف HVAC', nameEn: 'HVAC Engineering Landing Page', sector: 'hvac' },
 ];
 
-export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({ language }) => {
+export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
+  language,
+  adminUser = { uid: 'admin-1', email: 'admin@hard.sa', role: 'superadmin' },
+}) => {
   const isAr = language === 'ar';
 
   const [selectedPageId, setSelectedPageId] = useState<string>('page_portal');
   const [sections, setSections] = useState<PageSection[]>([]);
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
   const [isCatalogModalOpen, setIsCatalogModalOpen] = useState(false);
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showLivePreview, setShowLivePreview] = useState(true);
 
   const currentPageMeta = PAGES_CATALOG.find((p) => p.id === selectedPageId) || PAGES_CATALOG[0];
+
+  const draftState = useDraftAutosave({
+    entityType: 'page_document',
+    entityId: selectedPageId,
+    sector: currentPageMeta.sector,
+    currentData: { sections },
+    userEmail: 'admin@hardgp.com',
+    debounceMs: 1500,
+    onDraftLoaded: (record) => {
+      if (record.data?.sections && Array.isArray(record.data.sections) && record.data.sections.length > 0) {
+        setSections(record.data.sections.sort((a: PageSection, b: PageSection) => a.order - b.order));
+        setSelectedSectionId(record.data.sections[0].id);
+      }
+    },
+  });
 
   // Load page document sections from Firestore
   useEffect(() => {
@@ -261,20 +287,55 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({ lang
           </div>
         </div>
 
-        {/* Page Selector Dropdown */}
-        <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 w-full sm:w-auto">
-          <Globe className="w-4 h-4 text-sky-600 shrink-0 ml-1" />
-          <select
-            value={selectedPageId}
-            onChange={(e) => setSelectedPageId(e.target.value)}
-            className="bg-white font-bold text-xs text-slate-800 rounded-xl px-3 py-2 border border-slate-200 cursor-pointer w-full"
-          >
-            {PAGES_CATALOG.map((p) => (
-              <option key={p.id} value={p.id}>
-                {isAr ? p.nameAr : p.nameEn} ({p.slug})
-              </option>
-            ))}
-          </select>
+        {/* Page Selector, Preview & Publish Actions */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+          <DraftStatusBadge
+            status={draftState.saveStatus}
+            revision={draftState.revision}
+            lastSavedAt={draftState.lastSavedAt}
+            errorMessage={draftState.errorMessage}
+            isOffline={draftState.isOffline}
+            conflictRemoteRecord={draftState.conflictRemoteRecord}
+            language={language}
+            onForceSave={draftState.forceSave}
+            onResolveUseRemote={draftState.resolveConflictUseRemote}
+            onResolveForceOverwrite={draftState.resolveConflictForceOverwrite}
+          />
+
+          <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+            <Globe className="w-4 h-4 text-sky-600 shrink-0 ml-1" />
+            <select
+              value={selectedPageId}
+              onChange={(e) => setSelectedPageId(e.target.value)}
+              className="bg-white font-bold text-xs text-slate-800 rounded-xl px-3 py-2 border border-slate-200 cursor-pointer w-full"
+            >
+              {PAGES_CATALOG.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {isAr ? p.nameAr : p.nameEn} ({p.slug})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsPreviewModalOpen(true)}
+              type="button"
+              className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+            >
+              <Eye className="w-3.5 h-3.5 text-amber-400" />
+              <span>{isAr ? 'معاينة المسودة' : 'Preview Draft'}</span>
+            </button>
+
+            <button
+              onClick={() => setIsPublishModalOpen(true)}
+              type="button"
+              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>{isAr ? 'اعتماد والنشر' : 'Publish Live'}</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -533,6 +594,37 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({ lang
           </div>
         </div>
       )}
+      {/* Publish Validation & Audit Modal */}
+      <PublishValidationModal
+        isOpen={isPublishModalOpen}
+        onClose={() => setIsPublishModalOpen(false)}
+        onSuccess={(v) => setSaveStatus({ type: 'success', text: isAr ? `تم النشر بنجاح كإصدار v${v}` : `Published live as v${v}` })}
+        entityType="page_document"
+        entityId={selectedPageId}
+        sector={currentPageMeta.sector}
+        draftData={{
+          id: selectedPageId,
+          slug: currentPageMeta.slug,
+          sector: currentPageMeta.sector,
+          title: { ar: currentPageMeta.nameAr, en: currentPageMeta.nameEn },
+          sections,
+        }}
+        publisherUser={adminUser}
+        language={language}
+      />
+
+      {/* Secure Draft Preview Viewport Modal */}
+      <DraftPreviewModal
+        isOpen={isPreviewModalOpen}
+        onClose={() => setIsPreviewModalOpen(false)}
+        onOpenPublishModal={() => {
+          setIsPreviewModalOpen(false);
+          setIsPublishModalOpen(true);
+        }}
+        title={isAr ? currentPageMeta.nameAr : currentPageMeta.nameEn}
+        sections={sections}
+        language={language}
+      />
     </div>
   );
 };
