@@ -127,6 +127,22 @@ function AppContent() {
         }
       } else if (rawPath === '/portal') {
         detectedPage = 'portal';
+      } else if (rawPath === '/properties' || rawPath === '/properties/') {
+        detectedPage = 'properties';
+      } else if (rawPath.startsWith('/properties/')) {
+        detectedPage = 'property-details';
+      } else if (rawPath === '/projects' || rawPath === '/projects/') {
+        detectedPage = 'projects';
+      } else if (rawPath === '/blog' || rawPath === '/blog/') {
+        detectedPage = 'blog';
+      } else if (rawPath.startsWith('/blog/')) {
+        detectedPage = 'blog';
+      } else if (rawPath === '/about' || rawPath === '/about/') {
+        detectedPage = 'about';
+      } else if (rawPath === '/contact' || rawPath === '/contact/') {
+        detectedPage = 'contact';
+      } else if (rawPath === '/marketing' || rawPath === '/services') {
+        detectedPage = 'marketing';
       } else if (rawPath === '/realestate' || rawPath.startsWith('/realestate/')) {
         let sub = rawPath.substring('/realestate'.length).replace(/^\/+/, '');
         sub = sub.split('?')[0].replace(/\/+$/, '');

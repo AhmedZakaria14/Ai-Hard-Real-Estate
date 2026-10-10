@@ -3,47 +3,7 @@
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/portal",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/realestate",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/realestate/:path*",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/construction",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/construction/:path*",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/hvac",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/hvac/:path*",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/maintenance",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/maintenance/:path*",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/admin",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/admin/:path*",
+      "source": "/:path*",
       "destination": "/index.html"
     }
   ]
