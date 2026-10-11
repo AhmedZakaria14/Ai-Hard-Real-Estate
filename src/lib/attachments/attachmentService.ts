@@ -14,6 +14,7 @@ import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage
 import { db, storage, auth } from '../firebase';
 import { FormAttachmentDoc, FormAttachmentMeta, canManageLeads } from '../../types/firestore-schema';
 import { getAdminUser } from '../adminAuth';
+import { generateCorrelationId, logProductionEvent } from '../monitoring/productionLogger';
 
 export interface AttachmentConfig {
   maxCount: number;
@@ -140,8 +141,19 @@ export async function uploadFormAttachment(
       },
     });
     downloadUrl = await getDownloadURL(snapshot.ref);
-  } catch (storageErr) {
-    console.warn('[AttachmentService] Firebase storage write notice, falling back to secure Firestore document payload:', storageErr);
+  } catch (storageErr: any) {
+    const corrId = generateCorrelationId('upload');
+    logProductionEvent({
+      correlationId: corrId,
+      level: 'WARN',
+      category: 'upload_error',
+      errorCode: 'ERR_STORAGE_FALLBACK_BASE64',
+      component: 'attachmentService',
+      message: `Firebase Storage write notice for file ${file.name} (${file.size} bytes). Falling back to secure document payload: ${storageErr?.message || 'Storage Restricted'}`,
+      statusClassification: 'TEMPORARILY_UNKNOWN',
+      meta: { fileName: file.name, fileSizeBytes: file.size, mimeType: file.type },
+    }).catch(() => {});
+
     // If Firebase Storage bucket isn't provisioned or restricted, encode base64
     base64Fallback = await fileToBase64(file);
   }

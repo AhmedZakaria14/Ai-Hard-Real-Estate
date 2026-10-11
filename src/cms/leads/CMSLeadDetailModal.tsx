@@ -27,8 +27,10 @@ import {
   Paperclip,
   Download,
   Image as ImageIcon,
+  Trash2,
 } from 'lucide-react';
 import { Language } from '../../types';
+import { deleteCustomerRequestAndAttachments } from '../../lib/cms/customerRetentionService';
 import {
   FirestoreLead,
   updateLeadStatus,
@@ -834,9 +836,30 @@ export const CMSLeadDetailModal: React.FC<CMSLeadDetailModalProps> = ({
 
         {/* Modal Footer */}
         <div className="bg-slate-50 px-6 py-4 border-t border-slate-200 flex items-center justify-between shrink-0">
-          <div className="text-[11px] text-slate-500 font-medium">
-            Lead ID: <span className="font-mono text-slate-800">{lead.id}</span>
-          </div>
+          <button
+            type="button"
+            onClick={async () => {
+              const confirmMsg = isAr
+                ? `هل أنت أكتأد من حذف الطلب (${lead.trackingCode || lead.id}) نهائياً والمرفقات الخاصة المتعلقة به؟`
+                : `Are you sure you want to permanently delete customer request (${lead.trackingCode || lead.id}) and all private attachments?`;
+              if (!window.confirm(confirmMsg)) return;
+
+              const res = await deleteCustomerRequestAndAttachments(lead, {
+                email: currentAdminEmail,
+                role: 'superadmin',
+              });
+              if (res.success) {
+                if (onLeadUpdated) onLeadUpdated();
+                onClose();
+              } else {
+                alert(res.message);
+              }
+            }}
+            className="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5"
+          >
+            <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+            <span>{isAr ? 'حذف السجل والمرفقات نهائياً' : 'Delete Record & Attachments'}</span>
+          </button>
 
           <button
             onClick={onClose}

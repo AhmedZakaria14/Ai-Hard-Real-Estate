@@ -30,7 +30,9 @@ import {
 import { Language } from '../../types';
 import { canManageLeads } from '../../types/firestore-schema';
 import { FirestoreLead, subscribeToLeads } from '../../lib/leads/leadService';
+import { exportCustomerLeadsCsvSafely } from '../../lib/cms/customerRetentionService';
 import { CMSLeadDetailModal } from './CMSLeadDetailModal';
+import { CMSCustomerRetentionModal } from './CMSCustomerRetentionModal';
 
 interface CMSLeadsListProps {
   leads?: any[];
@@ -54,6 +56,7 @@ export const CMSLeadsList: React.FC<CMSLeadsListProps> = ({
   // Selected lead for modal detail view
   const [selectedLead, setSelectedLead] = useState<FirestoreLead | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRetentionModalOpen, setIsRetentionModalOpen] = useState(false);
 
   // Filter States
   const [search, setSearch] = useState('');
@@ -213,47 +216,15 @@ export const CMSLeadsList: React.FC<CMSLeadsListProps> = ({
       l.status !== 'archived'
   ).length;
 
-  const handleExportCSV = () => {
-    const headers = [
-      'Tracking Code',
-      'Created At',
-      'Full Name',
-      'Phone',
-      'Email',
-      'Sector',
-      'Form Type',
-      'Entity Title',
-      'Status',
-      'Assigned To',
-      'Follow-Up Date',
-      'Message',
-    ];
-
-    const rows = filteredLeads.map((l) => [
-      l.trackingCode,
-      l.createdAt,
-      `"${(l.fullName || l.name || '').replace(/"/g, '""')}"`,
-      `"${l.phone}"`,
-      `"${l.email}"`,
-      l.sector,
-      l.formType,
-      `"${(l.entityTitle || '').replace(/"/g, '""')}"`,
-      l.status,
-      `"${(l.assignedToName || l.assignedTo || '').replace(/"/g, '""')}"`,
-      l.followUpDate || '',
-      `"${(l.message || '').replace(/"/g, '""')}"`,
-    ]);
-
-    const csvContent =
-      'data:text/csv;charset=utf-8,\uFEFF' +
-      [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `HARD_Customer_Leads_${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleExportCSV = async () => {
+    const res = await exportCustomerLeadsCsvSafely(filteredLeads, {
+      name: currentAdminUser?.name || 'Admin',
+      email: currentAdminUser?.email || 'admin@hard.sa',
+      role: userRole,
+    });
+    if (!res.success) {
+      alert(res.message);
+    }
   };
 
   const handleOpenLeadModal = (lead: FirestoreLead) => {
@@ -377,11 +348,20 @@ export const CMSLeadsList: React.FC<CMSLeadsListProps> = ({
 
           <div className="flex items-center gap-2">
             <button
+              type="button"
+              onClick={() => setIsRetentionModalOpen(true)}
+              className="px-4 py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300/80 text-xs font-bold rounded-2xl transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs shrink-0"
+            >
+              <ShieldAlert className="w-4 h-4 text-amber-600" />
+              <span>{isAr ? 'حماية البيانات وسياسة الاحتفاظ' : 'Retention & Privacy Governance'}</span>
+            </button>
+
+            <button
               onClick={handleExportCSV}
               className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-2xl transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs shrink-0"
             >
               <Download className="w-4 h-4" />
-              <span>{isAr ? 'تصدير CSV' : 'Export CSV'}</span>
+              <span>{isAr ? 'تصدير CSV مَحمِي' : 'Export CSV (Protected)'}</span>
             </button>
           </div>
         </div>
@@ -813,6 +793,19 @@ export const CMSLeadsList: React.FC<CMSLeadsListProps> = ({
           currentAdminEmail={currentAdminUser?.email || 'admin@hard.sa'}
         />
       )}
+
+      {/* Customer Data Retention & Governance Modal */}
+      <CMSCustomerRetentionModal
+        isOpen={isRetentionModalOpen}
+        onClose={() => setIsRetentionModalOpen(false)}
+        leads={firestoreLeads}
+        language={language}
+        currentAdminUser={{
+          name: currentAdminUser?.name || 'Admin',
+          email: currentAdminUser?.email || 'admin@hard.sa',
+          role: userRole,
+        }}
+      />
     </div>
   );
 };

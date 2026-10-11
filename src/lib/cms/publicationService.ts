@@ -10,21 +10,48 @@ import { db } from '../firebase';
 import { canPublish } from '../../types/firestore-schema';
 import { PublicationParams, PublicationResult } from './publicationTypes';
 import { validateEntityForPublish } from './publicationValidation';
+import { generateCorrelationId, logProductionEvent } from '../monitoring/productionLogger';
 
 export async function publishEntityWithAtomicBatch(params: PublicationParams): Promise<PublicationResult> {
   const { entityType, entityId, sector = 'portal', draftData, publisherUser, targetCollectionName } = params;
+  const correlationId = generateCorrelationId('pub');
 
   // 1. Authorization Enforcement
   if (!canPublish(publisherUser.role)) {
-    throw new Error(
-      `PERMISSION_DENIED: Role '${publisherUser.role}' is not authorized to publish content. Only Super Admins and Publishers can perform publication.`
-    );
+    const errMsg = `PERMISSION_DENIED: Role '${publisherUser.role}' is not authorized to publish content.`;
+    logProductionEvent({
+      correlationId,
+      level: 'WARN',
+      category: 'publication_failure',
+      errorCode: 'ERR_PUBLISH_PERMISSION_DENIED',
+      component: 'publicationService',
+      message: errMsg,
+      statusClassification: 'DEFINITIVE_FAILURE',
+      userRole: publisherUser.role,
+      userEmail: publisherUser.email,
+      meta: { entityType, entityId },
+    }).catch(() => {});
+
+    throw new Error(errMsg);
   }
 
   // 2. Pre-Publication Policy Validation
   const validation = validateEntityForPublish(entityType, draftData);
   if (!validation.isValid) {
     const errList = validation.errors.map((e) => `[${e.field}]: ${e.messageEn}`).join(' | ');
+    logProductionEvent({
+      correlationId,
+      level: 'WARN',
+      category: 'publication_failure',
+      errorCode: 'ERR_PUBLISH_VALIDATION_FAILED',
+      component: 'publicationService',
+      message: `Publication validation failed for ${entityType} ${entityId}: ${errList}`,
+      statusClassification: 'DEFINITIVE_FAILURE',
+      userRole: publisherUser.role,
+      userEmail: publisherUser.email,
+      meta: { entityType, entityId, errors: validation.errors },
+    }).catch(() => {});
+
     throw new Error(`PUBLICATION_VALIDATION_FAILED: ${errList}`);
   }
 
@@ -124,7 +151,24 @@ export async function publishEntityWithAtomicBatch(params: PublicationParams): P
   batch.set(revisionDocRef, revisionPayload);
 
   // Execute batch atomically
-  await batch.commit();
+  try {
+    await batch.commit();
+  } catch (commitErr: any) {
+    logProductionEvent({
+      correlationId,
+      level: 'ERROR',
+      category: 'publication_failure',
+      errorCode: 'ERR_FIRESTORE_BATCH_COMMIT_FAILED',
+      component: 'publicationService',
+      message: `Batch commit failed for ${entityType} ${entityId}: ${commitErr?.message || 'Firestore Write Error'}`,
+      statusClassification: 'TEMPORARILY_UNKNOWN',
+      userRole: publisherUser.role,
+      userEmail: publisherUser.email,
+      meta: { entityType, entityId, newVersion },
+    }).catch(() => {});
+
+    throw new Error(`PUBLICATION_BATCH_COMMIT_FAILED: ${commitErr?.message || 'Firestore atomic batch write failed.'}`);
+  }
 
   return {
     success: true,

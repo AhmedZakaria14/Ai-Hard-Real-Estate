@@ -28,6 +28,7 @@ import { validateFirestoreConnection } from '../../lib/firebase';
 import { CMSAdminManagement } from './CMSAdminManagement';
 import { CMSBrandingSettings } from './CMSBrandingSettings';
 import { CMSBackupManager } from './CMSBackupManager';
+import { CMSProductionMonitoring } from './CMSProductionMonitoring';
 
 interface CMSSettingsProps {
   language: Language;
@@ -297,6 +298,9 @@ export const CMSSettings: React.FC<CMSSettingsProps> = ({
         language={language}
         currentAdminUser={currentAdminUser || { name: 'Executive Admin', email: 'admin@hard.sa', role: 'superadmin' }}
       />
+
+      {/* Production Telemetry, Failures & System Health Dashboard */}
+      <CMSProductionMonitoring language={language} />
 
       <div className="bg-white rounded-3xl border border-slate-200 shadow-xs p-6 space-y-6">
         <div className="space-y-1 pb-4 border-b border-slate-100">

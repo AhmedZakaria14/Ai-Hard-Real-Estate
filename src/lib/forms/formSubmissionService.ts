@@ -15,6 +15,11 @@ import { FormAttachmentMeta } from '../../types/firestore-schema';
 import { getFormSchemaConfig } from './formSchemaService';
 import { linkAttachmentsToSubmission } from '../attachments/attachmentService';
 import { processLeadNotification } from '../notifications/notificationService';
+import {
+  generateCorrelationId,
+  logProductionEvent,
+  verifyUnknownSubmissionStatus,
+} from '../monitoring/productionLogger';
 
 export type CustomerFormType =
   | 'general_contact'
@@ -169,10 +174,27 @@ export async function submitCustomerForm(
 ): Promise<FormSubmissionResult> {
   const lang = payload.language || 'ar';
   const isAr = lang === 'ar';
+  const correlationId = generateCorrelationId('form_sub');
 
   // 1. SERVER/BACKEND VALIDATION
   const fieldErrors = validateFormPayload(payload, lang);
   if (Object.keys(fieldErrors).length > 0) {
+    // Log rejected submission (Definitive Failure - Input error)
+    logProductionEvent({
+      correlationId,
+      level: 'WARN',
+      category: 'rejected_submission',
+      errorCode: 'ERR_FORM_VALIDATION_REJECTED',
+      component: 'formSubmissionService',
+      message: `Customer form submission rejected due to validation errors (${Object.keys(fieldErrors).join(', ')})`,
+      statusClassification: 'DEFINITIVE_FAILURE',
+      meta: {
+        formType: payload.formType,
+        sector: payload.sector,
+        invalidFields: Object.keys(fieldErrors),
+      },
+    }).catch(() => {});
+
     throw new FormValidationError(
       isAr ? 'يرجى تصحيح الأخطاء الموضحة أدناه.' : 'Please fix the validation errors below.',
       fieldErrors
@@ -377,7 +399,60 @@ export async function submitCustomerForm(
         : 'Your request has been successfully submitted and dispatched to our team.',
     };
   } catch (err: any) {
-    console.error('Failed to write lead to Firestore:', err);
-    throw new DataAccessError(err?.message || 'Database write error for lead', 'DATABASE_ERROR', err);
+    console.error(`[${correlationId}] Failed to write lead to Firestore:`, err);
+
+    // Check if operation was processed during a network timeout/drop (TEMPORARILY UNKNOWN STATUS RECOVERY)
+    const verification = await verifyUnknownSubmissionStatus(idempotencyKey);
+    if (verification.isProcessed && verification.leadData) {
+      logProductionEvent({
+        correlationId,
+        level: 'INFO',
+        category: 'backend_failure',
+        errorCode: 'RECOVERED_NETWORK_TIMEOUT',
+        component: 'formSubmissionService',
+        message: `Submission recovered from network drop. Lead ${verification.leadData.trackingCode} already created in Firestore.`,
+        statusClassification: 'SUCCESS',
+        meta: { trackingCode: verification.leadData.trackingCode, idempotencyKey },
+      }).catch(() => {});
+
+      saveLocalIdempotencyCache(idempotencyKey, {
+        leadId: verification.leadData.id,
+        trackingCode: verification.leadData.trackingCode,
+      });
+
+      return {
+        success: true,
+        leadId: verification.leadData.id,
+        trackingCode: verification.leadData.trackingCode,
+        isDuplicate: true,
+        message: isAr
+          ? 'تم استلام طلبك بنجاح وتم التأكد منه في النظام.'
+          : 'Your request was successfully received and verified in our records.',
+      };
+    }
+
+    // Unrecovered Backend Write Failure (TEMPORARILY UNKNOWN / BACKEND WRITE ERROR)
+    logProductionEvent({
+      correlationId,
+      level: 'ERROR',
+      category: 'backend_failure',
+      errorCode: 'ERR_FIRESTORE_LEAD_WRITE_FAILED',
+      component: 'formSubmissionService',
+      message: `Database write error for form submission (${payload.formType}): ${err?.message || 'Network Timeout'}`,
+      statusClassification: 'TEMPORARILY_UNKNOWN',
+      meta: {
+        formType: payload.formType,
+        sector: payload.sector,
+        errorMessage: err?.message,
+      },
+    }).catch(() => {});
+
+    throw new DataAccessError(
+      isAr
+        ? `تعذر حفظ الطلب بسبب انقطاع الاتصال الخادمي. (رمز التتبع التشخيصي: ${correlationId})`
+        : `Unable to save request due to a backend connection timeout. (Diagnostic Correlation ID: ${correlationId})`,
+      'DATABASE_ERROR',
+      err
+    );
   }
 }

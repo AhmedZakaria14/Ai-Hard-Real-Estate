@@ -58,6 +58,7 @@ export interface FirestoreLead {
   crmSystem?: string;
   notificationStatus?: 'delivered' | 'failed' | 'unconfigured' | 'pending_retry' | 'duplicate_skipped' | string;
   notificationProvider?: string;
+  attachments?: any[];
   notificationLastAttemptAt?: string;
   notificationError?: string;
   submittedAt?: any;
