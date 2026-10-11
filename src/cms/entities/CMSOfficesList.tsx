@@ -144,7 +144,7 @@ export const CMSOfficesList: React.FC<CMSOfficesListProps> = ({
                       </span>
                     )}
                     <span className="px-2.5 py-1 rounded-full bg-slate-900/80 text-white font-bold text-[10px] backdrop-blur-md">
-                      {isAr ? office.city.ar : office.city.en}
+                      {isAr ? (office.city?.ar || office.city?.en || 'الخبر') : (office.city?.en || office.city?.ar || 'Khobar')}
                     </span>
                   </div>
 

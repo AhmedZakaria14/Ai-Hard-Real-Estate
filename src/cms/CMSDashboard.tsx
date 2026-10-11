@@ -462,18 +462,18 @@ export const CMSDashboard: React.FC<CMSDashboardProps> = ({
                     <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
                       <img
                         src={prop.images?.[0] || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=300&q=80'}
-                        alt={prop.title.en}
+                        alt={prop.title?.en || 'Property'}
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="min-w-0 space-y-0.5">
                       <h4 className="text-xs font-bold text-slate-900 truncate">
-                        {isAr ? prop.title.ar : prop.title.en}
+                        {isAr ? (prop.title?.ar || prop.title?.en) : (prop.title?.en || prop.title?.ar)}
                       </h4>
                       <div className="flex items-center gap-2 text-[11px] text-slate-500">
                         <span className="flex items-center gap-1">
                           <MapPin className="w-3 h-3 text-blue-500" />
-                          {isAr ? prop.location.city.ar : prop.location.city.en}
+                          {isAr ? (prop.location?.city?.ar || prop.location?.city?.en || 'الخبر') : (prop.location?.city?.en || prop.location?.city?.ar || 'Khobar')}
                         </span>
                         <span>•</span>
                         <span className="capitalize">{prop.type}</span>

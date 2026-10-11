@@ -40,6 +40,32 @@ interface CMSPropertiesListProps {
   language: Language;
 }
 
+const safePropTitle = (prop: Property, lang: 'ar' | 'en') => {
+  if (!prop || !prop.title) return 'Un-titled Listing';
+  if (typeof prop.title === 'string') return prop.title;
+  return (lang === 'ar' ? prop.title.ar : prop.title.en) || prop.title.en || prop.title.ar || 'Un-titled Listing';
+};
+
+const safePropLocation = (prop: Property, lang: 'ar' | 'en') => {
+  if (!prop || !prop.location) return 'Saudi Arabia';
+  if (typeof prop.location === 'string') return prop.location;
+  const city = typeof prop.location.city === 'string'
+    ? prop.location.city
+    : (lang === 'ar' ? prop.location.city?.ar : prop.location.city?.en) || 'Saudi Arabia';
+  const area = typeof prop.location.area === 'string'
+    ? prop.location.area
+    : (lang === 'ar' ? prop.location.area?.ar : prop.location.area?.en) || '';
+  return area ? `${city} - ${area}` : city;
+};
+
+const safePropPrice = (prop: Property) => {
+  if (!prop || !prop.price) return '0';
+  if (typeof (prop as any).price === 'number') return (prop as any).price.toLocaleString();
+  const rawSar = (prop.price as any)?.sar ?? (prop.price as any)?.amount ?? 0;
+  const num = Number(rawSar);
+  return isNaN(num) ? String(rawSar || '0') : num.toLocaleString();
+};
+
 export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
   properties,
   onAddProperty,
@@ -125,14 +151,14 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
     const headers = ['ID', 'Title EN', 'Title AR', 'Type', 'Status', 'Price SAR', 'City', 'Bedrooms', 'Area SqM', 'Featured'];
     const rows = filteredProperties.map((p) => [
       p.id,
-      `"${p.title.en.replace(/"/g, '""')}"`,
-      `"${p.title.ar.replace(/"/g, '""')}"`,
-      p.type,
-      p.status,
-      p.price.sar,
-      `"${p.location.city.en}"`,
-      p.bedrooms,
-      p.areaSqM,
+      `"${safePropTitle(p, 'en').replace(/"/g, '""')}"`,
+      `"${safePropTitle(p, 'ar').replace(/"/g, '""')}"`,
+      p.type || '',
+      p.status || '',
+      safePropPrice(p),
+      `"${safePropLocation(p, 'en').replace(/"/g, '""')}"`,
+      p.bedrooms || 0,
+      p.areaSqM || 0,
       p.featured ? 'Yes' : 'No',
     ]);
 
@@ -412,13 +438,13 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
                         <div className="w-14 h-11 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
                           <img
                             src={prop.images?.[0] || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=400&q=80'}
-                            alt={prop.title.en}
+                            alt={safePropTitle(prop, 'en')}
                             className="w-full h-full object-cover"
                           />
                         </div>
                         <div className="space-y-0.5 max-w-[260px]">
                           <span className="font-bold text-slate-900 hover:text-blue-600 transition-colors line-clamp-1 text-xs">
-                            {isAr ? prop.title.ar : prop.title.en}
+                            {safePropTitle(prop, language)}
                           </span>
                           <span className="font-mono text-[10px] text-slate-400 block">
                             ID: {prop.id}
@@ -431,21 +457,21 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
                     <td className="py-3 px-3 whitespace-nowrap">
                       <div className="flex items-center gap-1 text-slate-600">
                         <MapPin className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                        <span>{isAr ? `${prop.location.city.ar} - ${prop.location.area.ar}` : `${prop.location.city.en}, ${prop.location.area.en}`}</span>
+                        <span>{safePropLocation(prop, language)}</span>
                       </div>
                     </td>
 
                     {/* Type */}
                     <td className="py-3 px-3 whitespace-nowrap">
                       <span className="capitalize px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg text-[11px] font-semibold border border-slate-200/80">
-                        {prop.type}
+                        {prop.type || 'residential'}
                       </span>
                     </td>
 
                     {/* Price */}
                     <td className="py-3 px-3 whitespace-nowrap">
                       <div className="font-bold text-blue-700 text-xs sm:text-sm">
-                        {prop.price.sar.toLocaleString()}{' '}
+                        {safePropPrice(prop)}{' '}
                         <span className="text-[10px] font-semibold text-slate-500">SAR</span>
                       </div>
                       {prop.price.period && (
@@ -572,12 +598,12 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
               <div className="relative aspect-[16/10] bg-slate-100 overflow-hidden">
                 <img
                   src={prop.images?.[0] || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'}
-                  alt={prop.title.en}
+                  alt={safePropTitle(prop, 'en')}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute top-3 start-3 flex items-center gap-1.5">
                   <span className="px-2.5 py-1 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold rounded-lg uppercase tracking-wider">
-                    {prop.type}
+                    {prop.type || 'residential'}
                   </span>
                   <span className={`px-2.5 py-1 text-[10px] font-bold rounded-lg backdrop-blur-md ${
                     prop.status === 'for-sale'
@@ -604,13 +630,13 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-1 text-slate-500 text-xs">
                     <MapPin className="w-3.5 h-3.5 text-blue-600" />
-                    <span>{isAr ? `${prop.location.city.ar} - ${prop.location.area.ar}` : `${prop.location.city.en}, ${prop.location.area.en}`}</span>
+                    <span>{safePropLocation(prop, language)}</span>
                   </div>
                   <h4 className="text-sm font-bold text-slate-900 line-clamp-1 font-display-serif">
-                    {isAr ? prop.title.ar : prop.title.en}
+                    {safePropTitle(prop, language)}
                   </h4>
                   <div className="text-base font-extrabold text-blue-700">
-                    {prop.price.sar.toLocaleString()} <span className="text-xs font-semibold text-slate-500">SAR</span>
+                    {safePropPrice(prop)} <span className="text-xs font-semibold text-slate-500">SAR</span>
                   </div>
                 </div>
 

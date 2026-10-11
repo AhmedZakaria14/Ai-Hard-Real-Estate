@@ -67,10 +67,10 @@ export function PropertyMapView({
     if (!hasValidCoordinates(p)) return false;
     if (activeAreaFilter === 'all') return true;
 
-    const cityEn = (p.location.city.en || '').toLowerCase();
-    const areaEn = (p.location.area.en || '').toLowerCase();
-    const cityAr = p.location.city.ar || '';
-    const areaAr = p.location.area.ar || '';
+    const cityEn = (p.location?.city?.en || (typeof p.location?.city === 'string' ? p.location.city : '')).toLowerCase();
+    const areaEn = (p.location?.area?.en || (typeof p.location?.area === 'string' ? p.location.area : '')).toLowerCase();
+    const cityAr = p.location?.city?.ar || (typeof p.location?.city === 'string' ? p.location.city : '');
+    const areaAr = p.location?.area?.ar || (typeof p.location?.area === 'string' ? p.location.area : '');
     const filterLower = activeAreaFilter.toLowerCase();
 
     return (
@@ -85,10 +85,10 @@ export function PropertyMapView({
     if (hasValidCoordinates(p)) return false;
     if (activeAreaFilter === 'all') return true;
 
-    const cityEn = (p.location.city.en || '').toLowerCase();
-    const areaEn = (p.location.area.en || '').toLowerCase();
-    const cityAr = p.location.city.ar || '';
-    const areaAr = p.location.area.ar || '';
+    const cityEn = (p.location?.city?.en || (typeof p.location?.city === 'string' ? p.location.city : '')).toLowerCase();
+    const areaEn = (p.location?.area?.en || (typeof p.location?.area === 'string' ? p.location.area : '')).toLowerCase();
+    const cityAr = p.location?.city?.ar || (typeof p.location?.city === 'string' ? p.location.city : '');
+    const areaAr = p.location?.area?.ar || (typeof p.location?.area === 'string' ? p.location.area : '');
     const filterLower = activeAreaFilter.toLowerCase();
 
     return (

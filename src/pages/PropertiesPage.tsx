@@ -243,10 +243,10 @@ export function PropertiesPage({
         const searchAr = cityObj ? cityObj.ar.toLowerCase() : locLower;
         const searchEn = cityObj ? cityObj.en.toLowerCase() : locLower;
 
-        const itemAreaEn = item.location.area.en.toLowerCase();
-        const itemAreaAr = item.location.area.ar.toLowerCase();
-        const itemCityEn = item.location.city.en.toLowerCase();
-        const itemCityAr = item.location.city.ar.toLowerCase();
+        const itemAreaEn = (item.location?.area?.en || (typeof item.location?.area === 'string' ? item.location.area : '')).toLowerCase();
+        const itemAreaAr = (item.location?.area?.ar || (typeof item.location?.area === 'string' ? item.location.area : '')).toLowerCase();
+        const itemCityEn = (item.location?.city?.en || (typeof item.location?.city === 'string' ? item.location.city : '')).toLowerCase();
+        const itemCityAr = (item.location?.city?.ar || (typeof item.location?.city === 'string' ? item.location.city : '')).toLowerCase();
         
         const matches =
           itemCityAr === searchAr ||
