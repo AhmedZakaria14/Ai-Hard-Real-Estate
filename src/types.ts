@@ -126,22 +126,63 @@ export interface Project {
   brochureUrl?: string;
 }
 
+export interface BlogCategory {
+  id: string;
+  slug: { en: string; ar: string } | string;
+  name: { en: string; ar: string };
+  description?: { en: string; ar: string };
+  color?: string;
+  order?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface BlogAuthor {
+  id: string;
+  slug?: { en: string; ar: string } | string;
+  name: { en: string; ar: string };
+  role?: { en: string; ar: string };
+  bio?: { en: string; ar: string };
+  avatar?: string;
+  email?: string;
+  linkedin?: string;
+  order?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface BlogPostSEO {
+  metaTitle?: { en: string; ar: string };
+  metaDescription?: { en: string; ar: string };
+  canonicalUrl?: string;
+  keywords?: { en: string[]; ar: string[] };
+  ogImage?: string;
+}
+
 export interface BlogPost {
   id: string;
-  slug?: string;
+  slug?: string | { en: string; ar: string };
+  slugLocalized?: { en?: string; ar?: string };
   title: { en: string; ar: string };
   excerpt: { en: string; ar: string };
   category: { en: string; ar: string };
+  categoryId?: string;
   date: string;
+  publishedAt?: string;
+  updatedAt?: string;
+  createdAt?: string;
   readTime: { en: string; ar: string };
   author: { en: string; ar: string };
+  authorId?: string;
   authorRole?: { en: string; ar: string };
   authorAvatar?: string;
   image: string;
+  imageAlt?: { en: string; ar: string };
   content: { en: string; ar: string };
   status?: BlogStatus;
   featured?: boolean;
   tags?: string[];
+  seo?: BlogPostSEO;
 }
 
 export interface FilterState {

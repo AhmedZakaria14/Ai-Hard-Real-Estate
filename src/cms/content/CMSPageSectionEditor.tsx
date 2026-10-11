@@ -16,6 +16,7 @@ import {
   Edit3,
   Globe,
   Sliders,
+  History,
 } from 'lucide-react';
 import { Language } from '../../types';
 import {
@@ -40,6 +41,7 @@ import { useDraftAutosave } from '../../lib/cms/useDraftAutosave';
 import { DraftStatusBadge } from '../components/DraftStatusBadge';
 import { PublishValidationModal } from '../components/PublishValidationModal';
 import { DraftPreviewModal } from '../components/DraftPreviewModal';
+import { RevisionHistoryModal } from '../components/RevisionHistoryModal';
 import { PublisherUser } from '../../lib/cms/publicationTypes';
 
 interface CMSPageSectionEditorProps {
@@ -67,6 +69,7 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
   const [isCatalogModalOpen, setIsCatalogModalOpen] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [isRevisionModalOpen, setIsRevisionModalOpen] = useState(false);
   const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showLivePreview, setShowLivePreview] = useState(true);
@@ -319,9 +322,18 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
 
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setIsRevisionModalOpen(true)}
+              type="button"
+              className="px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 border border-amber-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+            >
+              <History className="w-3.5 h-3.5 text-amber-600" />
+              <span>{isAr ? 'السجل التاريخي' : 'Revision History'}</span>
+            </button>
+
+            <button
               onClick={() => setIsPreviewModalOpen(true)}
               type="button"
-              className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+              className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
             >
               <Eye className="w-3.5 h-3.5 text-amber-400" />
               <span>{isAr ? 'معاينة المسودة' : 'Preview Draft'}</span>
@@ -624,6 +636,27 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
         title={isAr ? currentPageMeta.nameAr : currentPageMeta.nameEn}
         sections={sections}
         language={language}
+      />
+
+      {/* Revision History & Version Control Modal */}
+      <RevisionHistoryModal
+        isOpen={isRevisionModalOpen}
+        onClose={() => setIsRevisionModalOpen(false)}
+        entityType="page_document"
+        entityId={selectedPageId}
+        language={language}
+        userEmail={adminUser?.email || 'admin@hard.sa'}
+        onRestoreSuccess={(restoredContent, newVer) => {
+          if (Array.isArray(restoredContent)) {
+            setSections(restoredContent);
+          } else if (restoredContent?.sections) {
+            setSections(restoredContent.sections);
+          }
+          setSaveStatus({
+            type: 'success',
+            text: isAr ? `تم استرجاع الاصدار بنجاح كمسودة جديدة رقم v${newVer}` : `Restored version as new draft v${newVer}`,
+          });
+        }}
       />
     </div>
   );
