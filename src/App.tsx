@@ -320,10 +320,10 @@ function AppContent() {
       const titleOptions = {
         page: currentPage,
         language,
-        propertyTitle: selectedProperty
+        propertyTitle: selectedProperty && selectedProperty.title
           ? {
-              ar: selectedProperty.title.ar,
-              en: selectedProperty.title.en,
+              ar: selectedProperty.title.ar || selectedProperty.title.en || '',
+              en: selectedProperty.title.en || selectedProperty.title.ar || '',
             }
           : null,
       };

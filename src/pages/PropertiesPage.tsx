@@ -217,17 +217,17 @@ export function PropertiesPage({
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const matchesTitle =
-          item.title.en.toLowerCase().includes(q) ||
-          item.title.ar.toLowerCase().includes(q);
+          (item.title?.en || '').toLowerCase().includes(q) ||
+          (item.title?.ar || '').toLowerCase().includes(q);
         const matchesArea =
-          item.location.area.en.toLowerCase().includes(q) ||
-          item.location.area.ar.toLowerCase().includes(q);
+          (item.location?.area?.en || '').toLowerCase().includes(q) ||
+          (item.location?.area?.ar || '').toLowerCase().includes(q);
         const matchesCity =
-          item.location.city.en.toLowerCase().includes(q) ||
-          item.location.city.ar.toLowerCase().includes(q);
+          (item.location?.city?.en || '').toLowerCase().includes(q) ||
+          (item.location?.city?.ar || '').toLowerCase().includes(q);
         const matchesDesc =
-          item.description.en.toLowerCase().includes(q) ||
-          item.description.ar.toLowerCase().includes(q);
+          (item.description?.en || '').toLowerCase().includes(q) ||
+          (item.description?.ar || '').toLowerCase().includes(q);
         if (!matchesTitle && !matchesArea && !matchesCity && !matchesDesc) return false;
       }
 

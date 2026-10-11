@@ -87,11 +87,11 @@ export function PropertyCard({
             href={detailsHref}
             onClick={(e) => handleSemanticClick(e, () => onSelectProperty(property))}
             className="block w-full h-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded-2xl overflow-hidden"
-            aria-label={property.title[language]}
+            aria-label={property?.title?.[language] || (language === 'ar' ? 'عقار' : 'Property')}
           >
             <img
-              src={property.images[activeImageIdx] || property.images[0]}
-              alt={property.title[language]}
+              src={property?.images?.[activeImageIdx] || property?.images?.[0] || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'}
+              alt={property?.title?.[language] || (language === 'ar' ? 'عقار' : 'Property')}
               loading="lazy"
               decoding="async"
               referrerPolicy="no-referrer"
@@ -141,7 +141,7 @@ export function PropertyCard({
             <div className="flex items-center gap-1.5 text-xs text-slate-500">
               <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
               <span>
-                {property.location.area[language]}, {property.location.city[language]}
+                {property?.location?.area?.[language] || ''}, {property?.location?.city?.[language] || ''}
               </span>
               <span className="text-slate-300">•</span>
               <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md font-medium text-[11px]">
@@ -156,12 +156,12 @@ export function PropertyCard({
                 onClick={(e) => handleSemanticClick(e, () => onSelectProperty(property))}
                 className="hover:text-blue-600 transition-colors cursor-pointer focus-visible:outline-none focus-visible:underline"
               >
-                {property.title[language]}
+                {property?.title?.[language] || ''}
               </a>
             </h3>
 
             <p className="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed">
-              {property.description[language]}
+              {property?.description?.[language] || ''}
             </p>
 
             {/* Key Specs */}
@@ -223,8 +223,8 @@ export function PropertyCard({
               <a
                 href={`https://wa.me/966556125711?text=${encodeURIComponent(
                   language === 'en'
-                    ? `Hello HARD Real Estate, I would like more information on "${property.title.en}" (Ref: ${property.id}).`
-                    : `مرحباً هارد للعقارات، أود الاستفسار عن عقار "${property.title.ar}" (رقم المرجع: ${property.id}).`
+                    ? `Hello HARD Real Estate, I would like more information on "${property?.title?.en || ''}" (Ref: ${property?.id || ''}).`
+                    : `مرحباً هارد للعقارات، أود الاستفسار عن عقار "${property?.title?.ar || ''}" (رقم المرجع: ${property?.id || ''}).`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -254,11 +254,11 @@ export function PropertyCard({
             href={detailsHref}
             onClick={(e) => handleSemanticClick(e, () => onSelectProperty(property))}
             className="block w-full h-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
-            aria-label={property.title[language]}
+            aria-label={property?.title?.[language] || (language === 'ar' ? 'عقار' : 'Property')}
           >
             <img
-              src={property.images[activeImageIdx] || property.images[0]}
-              alt={property.title[language]}
+              src={property?.images?.[activeImageIdx] || property?.images?.[0] || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'}
+              alt={property?.title?.[language] || (language === 'ar' ? 'عقار' : 'Property')}
               loading="lazy"
               decoding="async"
               referrerPolicy="no-referrer"
@@ -313,21 +313,21 @@ export function PropertyCard({
           <div className="flex items-center gap-1.5 text-xs text-slate-500">
             <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
             <span className="truncate font-medium">
-              {property.location.area[language]}, {property.location.city[language]}
+              {property?.location?.area?.[language] || ''}, {property?.location?.city?.[language] || ''}
             </span>
           </div>
 
           {/* Property Title */}
           <h3
             className="text-base sm:text-lg font-bold text-slate-900 font-display-serif line-clamp-1"
-            title={property.title[language]}
+            title={property?.title?.[language] || ''}
           >
             <a
               href={detailsHref}
               onClick={(e) => handleSemanticClick(e, () => onSelectProperty(property))}
               className="hover:text-blue-600 transition-colors cursor-pointer focus-visible:outline-none focus-visible:underline"
             >
-              {property.title[language]}
+              {property?.title?.[language] || ''}
             </a>
           </h3>
 
@@ -382,8 +382,8 @@ export function PropertyCard({
           <a
             href={`https://wa.me/966556125711?text=${encodeURIComponent(
               language === 'en'
-                ? `Hello HARD Real Estate, I am inquiring about "${property.title.en}" (Ref: ${property.id}).`
-                : `مرحباً هارد للعقارات، أود الاستفسار عن عقار "${property.title.ar}" (رقم المرجع: ${property.id}).`
+                ? `Hello HARD Real Estate, I am inquiring about "${property?.title?.en || ''}" (Ref: ${property?.id || ''}).`
+                : `مرحباً هارد للعقارات، أود الاستفسار عن عقار "${property?.title?.ar || ''}" (رقم المرجع: ${property?.id || ''}).`
             )}`}
             target="_blank"
             rel="noopener noreferrer"

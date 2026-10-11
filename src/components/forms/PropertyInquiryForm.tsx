@@ -40,8 +40,8 @@ export function PropertyInquiryForm({
   const [inquiryTopic, setInquiryTopic] = useState('scheduleTour');
   const [message, setMessage] = useState(
     isAr
-      ? `مرحباً، أود الاستفسار عن العقار "${property.title.ar}" (المعرف: ${property.id}). يرجى تزويدي بمزيد من المعلومات حول التوفر وخيارات الدفع.`
-      : `Hello, I am interested in inquiring about "${property.title.en}" (ID: ${property.id}). Please send me full floorplans and available viewing windows.`
+      ? `مرحباً، أود الاستفسار عن العقار "${property?.title?.ar || ''}" (المعرف: ${property?.id || ''}). يرجى تزويدي بمزيد من المعلومات حول التوفر وخيارات الدفع.`
+      : `Hello, I am interested in inquiring about "${property?.title?.en || ''}" (ID: ${property?.id || ''}). Please send me full floorplans and available viewing windows.`
   );
   const [attachments, setAttachments] = useState<FormAttachmentMeta[]>([]);
 
@@ -107,8 +107,8 @@ export function PropertyInquiryForm({
     const finalMessage = message.trim()
       ? message.trim()
       : isAr
-      ? `مرحباً، أود الاستفسار عن العقار "${property.title.ar}" (المعرف: ${property.id}).`
-      : `Hello, I am interested in inquiring about "${property.title.en}" (ID: ${property.id}).`;
+      ? `مرحباً، أود الاستفسار عن العقار "${property?.title?.ar || ''}" (المعرف: ${property?.id || ''}).`
+      : `Hello, I am interested in inquiring about "${property?.title?.en || ''}" (ID: ${property?.id || ''}).`;
 
     setIsSubmitting(true);
     setSubmitError('');
@@ -120,7 +120,7 @@ export function PropertyInquiryForm({
         email: email.trim(),
         phone: phone.trim(),
         entityId: property.id,
-        entityTitle: property.title[language] || property.title.en,
+        entityTitle: property?.title?.[language] || property?.title?.en || '',
         language,
         message: `Topic: ${inquiryTopic}\n\n${finalMessage}`,
         attachments,
@@ -235,8 +235,8 @@ export function PropertyInquiryForm({
             <Button
               href={`https://wa.me/966556125711?text=${encodeURIComponent(
                 isAr
-                  ? `مرحباً هارد للعقارات، لقد أرسلت استفساراً بخصوص "${property.title.ar}" (رقم المرجع: ${referenceNumber}).`
-                  : `Hello HARD Real Estate, I just submitted an inquiry for "${property.title.en}" (Ref: ${referenceNumber}).`
+                  ? `مرحباً هارد للعقارات، لقد أرسلت استفساراً بخصوص "${property?.title?.ar || ''}" (رقم المرجع: ${referenceNumber}).`
+                  : `Hello HARD Real Estate, I just submitted an inquiry for "${property?.title?.en || ''}" (Ref: ${referenceNumber}).`
               )}`}
               target="_blank"
               rel="noopener noreferrer"

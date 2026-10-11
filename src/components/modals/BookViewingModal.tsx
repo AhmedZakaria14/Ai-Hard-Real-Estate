@@ -61,7 +61,7 @@ export function BookViewingModal({
         email: email.trim(),
         phone: phone.trim(),
         entityId: property.id,
-        entityTitle: property.title[language] || property.title.en,
+        entityTitle: property?.title?.[language] || property?.title?.en || '',
         language,
         message: `Format: ${tourType}\nPreferred Date: ${preferredDate}\nPreferred Time: ${preferredTime}\nNotes: ${notes}`,
         attachments,
@@ -103,7 +103,7 @@ export function BookViewingModal({
       isOpen={isOpen}
       onClose={handleReset}
       title={t.modals.bookViewingTitle}
-      subtitle={property.title[language]}
+      subtitle={property?.title?.[language] || ''}
       maxWidth="lg"
     >
       {submitted ? (
@@ -119,7 +119,7 @@ export function BookViewingModal({
           </p>
           <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 text-start text-xs space-y-1.5 text-slate-600">
             <p><strong>{language === 'en' ? 'Reference Code:' : 'رقم المرجع:'}</strong> <span className="font-mono font-bold text-slate-900">{leadRef}</span></p>
-            <p><strong>{language === 'en' ? 'Property:' : 'العقار:'}</strong> {property.title[language]}</p>
+            <p><strong>{language === 'en' ? 'Property:' : 'العقار:'}</strong> {property?.title?.[language] || ''}</p>
             <p><strong>{language === 'en' ? 'Format:' : 'النوع:'}</strong> {tourType === 'in-person' ? t.modals.inPerson : t.modals.virtual}</p>
             <p className="flex items-center gap-1.5 text-blue-600 font-semibold pt-1 border-t border-slate-200">
               <Sparkles className="w-3.5 h-3.5" />
@@ -130,8 +130,8 @@ export function BookViewingModal({
             <Button
               href={`https://wa.me/966556125711?text=${encodeURIComponent(
                 language === 'en'
-                  ? `Hello HARD Real Estate, I have booked a viewing for "${property.title.en}" (Ref: ${leadRef}). Please confirm.`
-                  : `مرحباً هارد للعقارات، لقد حجزت موعداً لمعاينة "${property.title.ar}" (رقم المرجع: ${leadRef}). يرجى التأكيد.`
+                  ? `Hello HARD Real Estate, I have booked a viewing for "${property?.title?.en || ''}" (Ref: ${leadRef}). Please confirm.`
+                  : `مرحباً هارد للعقارات، لقد حجزت موعداً لمعاينة "${property?.title?.ar || ''}" (رقم المرجع: ${leadRef}). يرجى التأكيد.`
               )}`}
               target="_blank"
               rel="noopener noreferrer"

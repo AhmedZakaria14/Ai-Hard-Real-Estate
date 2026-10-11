@@ -27,6 +27,7 @@ import { validateFirestoreConnection } from '../../lib/firebase';
 
 import { CMSAdminManagement } from './CMSAdminManagement';
 import { CMSBrandingSettings } from './CMSBrandingSettings';
+import { CMSBackupManager } from './CMSBackupManager';
 
 interface CMSSettingsProps {
   language: Language;
@@ -287,6 +288,12 @@ export const CMSSettings: React.FC<CMSSettingsProps> = ({
 
       {/* Super Administrator Governance Section */}
       <CMSAdminManagement
+        language={language}
+        currentAdminUser={currentAdminUser || { name: 'Executive Admin', email: 'admin@hard.sa', role: 'superadmin' }}
+      />
+
+      {/* Backup, Storage Sync & Disaster Recovery Section */}
+      <CMSBackupManager
         language={language}
         currentAdminUser={currentAdminUser || { name: 'Executive Admin', email: 'admin@hard.sa', role: 'superadmin' }}
       />
