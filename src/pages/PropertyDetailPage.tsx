@@ -18,6 +18,7 @@ import { Language, PageId, Property } from '../types';
 import { translations } from '../lib/translations';
 import { mockProperties } from '../data/mockData';
 import { Button } from '../components/ui/Button';
+import { getLocalizedText } from '../lib/utils';
 import { Badge } from '../components/ui/Badge';
 import { formatCurrency, formatPropertyArea, getNormalizedAmenities } from '../lib/utils';
 import { PropertyInquiryForm } from '../components/forms/PropertyInquiryForm';
@@ -88,12 +89,12 @@ export function PropertyDetailPage({
           </div>
 
           <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 font-display-serif tracking-tight leading-tight">
-            {property.title[language]}
+            {getLocalizedText(property.title, language)}
           </h1>
 
           <div className="flex items-center gap-2 text-sm text-slate-600">
             <MapPin className="w-4 h-4 text-blue-600 shrink-0" />
-            <span>{property.location.address[language]}</span>
+            <span>{getLocalizedText(property.location?.address || property.location?.city, language)}</span>
           </div>
         </div>
 
@@ -227,7 +228,7 @@ export function PropertyDetailPage({
               {t.propertyDetails.overview}
             </h2>
             <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-              {property.description[language]}
+              {getLocalizedText(property.description, language)}
             </p>
           </div>
 
@@ -243,15 +244,15 @@ export function PropertyDetailPage({
               </div>
               <div className="flex justify-between py-2 border-b border-slate-100">
                 <span className="text-slate-500">{t.propertyDetails.quickFacts.yearBuilt}:</span>
-                <span className="font-semibold text-slate-900">{property.features.yearBuilt}</span>
+                <span className="font-semibold text-slate-900">{property.features?.yearBuilt}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-slate-100">
                 <span className="text-slate-500">{t.propertyDetails.quickFacts.furnishing}:</span>
-                <span className="font-semibold text-slate-900">{property.features.furnishing[language]}</span>
+                <span className="font-semibold text-slate-900">{getLocalizedText(property.features?.furnishing, language)}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-slate-100">
                 <span className="text-slate-500">{t.propertyDetails.quickFacts.view}:</span>
-                <span className="font-semibold text-slate-900">{property.features.view[language]}</span>
+                <span className="font-semibold text-slate-900">{getLocalizedText(property.features?.view, language)}</span>
               </div>
             </div>
           </div>
@@ -346,16 +347,16 @@ export function PropertyDetailPage({
               <div className="relative sm:w-48 aspect-16/10 sm:aspect-auto overflow-hidden bg-slate-100">
                 <img
                   src={sim.images[0]}
-                  alt={sim.title[language]}
+                  alt={getLocalizedText(sim.title, language)}
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
               <div className="p-4 flex-1 flex flex-col justify-between space-y-2">
                 <div>
-                  <span className="text-[11px] text-blue-600 font-semibold">{sim.location.area[language]}</span>
+                  <span className="text-[11px] text-blue-600 font-semibold">{getLocalizedText(sim.location?.area || sim.location?.city, language)}</span>
                   <h4 className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1">
-                    {sim.title[language]}
+                    {getLocalizedText(sim.title, language)}
                   </h4>
                 </div>
                 <div className="text-sm font-bold text-slate-900 font-display-serif">

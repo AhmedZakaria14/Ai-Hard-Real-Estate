@@ -54,7 +54,9 @@ export const PreDeleteReferenceModal: React.FC<PreDeleteReferenceModalProps> = (
   const [isArchiving, setIsArchiving] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const titleString = typeof entityTitle === 'object' ? (isAr ? entityTitle.ar : entityTitle.en) : entityTitle;
+  const titleString = typeof entityTitle === 'object' && entityTitle !== null
+    ? (isAr ? (entityTitle.ar || entityTitle.en || '') : (entityTitle.en || entityTitle.ar || ''))
+    : String(entityTitle || '');
 
   useEffect(() => {
     if (isOpen && entityType && entityId) {

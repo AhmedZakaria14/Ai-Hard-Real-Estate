@@ -205,7 +205,10 @@ export function PropertiesPage({
   const uniqueLocations = useMemo(() => {
     const locations = new Set<string>();
     liveProperties.forEach((p) => {
-      locations.add(p.location.area[language] || p.location.area.en);
+      const areaText = typeof p.location?.area === 'string'
+        ? p.location.area
+        : (p.location?.area?.[language] || p.location?.area?.en || p.location?.area?.ar || '');
+      if (areaText) locations.add(areaText);
     });
     return Array.from(locations);
   }, [liveProperties, language]);

@@ -20,7 +20,7 @@ import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { getPageHref, handleSemanticClick } from '../../lib/navigation';
 import { useGoogleMaps } from '../../lib/integrations/useGoogleMaps';
-import { formatCurrency } from '../../lib/utils';
+import { formatCurrency, getLocalizedText } from '../../lib/utils';
 import { getPropertyTypeLabel } from '../../lib/propertyTaxonomy';
 
 interface PropertyMapViewProps {
@@ -218,7 +218,7 @@ export function PropertyMapView({
             const marker = new window.google.maps.Marker({
               position: { lat: coords.lat, lng: coords.lng },
               map: googleMapRef.current,
-              title: prop.title[language],
+              title: getLocalizedText(prop.title, language),
             });
 
             marker.addListener('click', () => {
@@ -521,7 +521,7 @@ export function PropertyMapView({
           <div className="relative z-20 m-4 p-4 bg-slate-900/95 backdrop-blur-md rounded-2xl border border-slate-700 shadow-2xl max-w-xl self-center sm:self-end flex flex-col sm:flex-row items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
             <img
               src={selectedProperty.images[0]}
-              alt={selectedProperty.title[language]}
+              alt={getLocalizedText(selectedProperty.title, language)}
               className="w-full sm:w-28 h-24 object-cover rounded-xl border border-slate-700 shrink-0"
             />
 
@@ -542,13 +542,13 @@ export function PropertyMapView({
               </div>
 
               <h4 className="text-sm font-bold text-white truncate">
-                {selectedProperty.title[language]}
+                {getLocalizedText(selectedProperty.title, language)}
               </h4>
               <p className="text-xs text-slate-400 flex items-center gap-1">
                 <MapPin className="w-3 h-3 text-slate-500 shrink-0" />
                 <span className="truncate">
-                  {selectedProperty.location.area[language]},{' '}
-                  {selectedProperty.location.city[language]}
+                  {getLocalizedText(selectedProperty.location?.area, language)},{' '}
+                  {getLocalizedText(selectedProperty.location?.city, language)}
                 </span>
               </p>
 
@@ -627,7 +627,7 @@ export function PropertyMapView({
                 className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 text-[11px] flex items-center gap-1 cursor-pointer transition-colors"
               >
                 <Building className="w-3 h-3 text-amber-500" />
-                <span>{p.title[language]}</span>
+                <span>{getLocalizedText(p.title, language)}</span>
               </button>
             ))}
           </div>

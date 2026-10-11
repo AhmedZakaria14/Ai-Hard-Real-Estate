@@ -39,7 +39,6 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
 
   const [activeTab, setActiveTab] = useState<'basic' | 'location' | 'pricing' | 'media' | 'amenities' | 'licensing' | 'agent' | 'preview'>('basic');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [aiGenerating, setAiGenerating] = useState(false);
 
   // Form State
   const [titleEn, setTitleEn] = useState('');
@@ -165,27 +164,6 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
   }, [initialData, isOpen]);
 
   if (!isOpen) return null;
-
-  // AI Smart Polishing feature
-  const handleGenerateAiDescription = () => {
-    setAiGenerating(true);
-    setTimeout(() => {
-      const typeLabelEn = type.charAt(0).toUpperCase() + type.slice(1);
-      const typeLabelAr = type === 'villa' ? 'فيلا فاخرة' : type === 'penthouse' ? 'بنتهاوس استثنائي' : 'عقار راقي';
-
-      const generatedTitleEn = `${typeLabelEn} with Panoramic Views in ${areaEn || 'Al Khobar'}`;
-      const generatedTitleAr = `${typeLabelAr} بإطلالة خلابة في ${areaAr || 'الخُبر'}`;
-
-      const generatedDescEn = `An architectural masterpiece offering ${bedrooms} opulent en-suite bedrooms, bespoke Italian finishes, and panoramic views. Highlights include private infinity pool, advanced automated smart home infrastructure, and private elevator.`;
-      const generatedDescAr = `تحفة معمارية استثنائية تضم ${bedrooms} أجنحة نوم فاخرة بتشطيبات إيطالية حصرية وإطلالات بانورامية ساحرة. يتميز العقار بمسبح خاص، نظام ذكي متكامل، ومصعد خاص لتجربة معيشية لا مثيل لها.`;
-
-      if (!titleEn) setTitleEn(generatedTitleEn);
-      if (!titleAr) setTitleAr(generatedTitleAr);
-      setDescEn(generatedDescEn);
-      setDescAr(generatedDescAr);
-      setAiGenerating(false);
-    }, 600);
-  };
 
   const handleAddImage = () => {
     if (newImageUrl.trim()) {
@@ -326,16 +304,6 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleGenerateAiDescription}
-              disabled={aiGenerating}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-600 to-sky-500 hover:brightness-105 text-white rounded-xl text-xs font-semibold shadow-xs cursor-pointer disabled:opacity-50"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>{aiGenerating ? (isAr ? 'جاري التوليد...' : 'Generating...') : isAr ? 'توليد ذكي بالذكاء الاصطناعي' : 'AI Smart Polish'}</span>
-            </button>
-
             <button
               onClick={onClose}
               className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-xl transition-colors cursor-pointer"

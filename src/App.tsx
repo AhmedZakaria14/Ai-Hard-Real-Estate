@@ -323,8 +323,12 @@ function AppContent() {
         language,
         propertyTitle: selectedProperty && selectedProperty.title
           ? {
-              ar: selectedProperty.title.ar || selectedProperty.title.en || '',
-              en: selectedProperty.title.en || selectedProperty.title.ar || '',
+              ar: typeof selectedProperty.title === 'string'
+                ? selectedProperty.title
+                : (selectedProperty.title?.ar || selectedProperty.title?.en || ''),
+              en: typeof selectedProperty.title === 'string'
+                ? selectedProperty.title
+                : (selectedProperty.title?.en || selectedProperty.title?.ar || ''),
             }
           : null,
       };

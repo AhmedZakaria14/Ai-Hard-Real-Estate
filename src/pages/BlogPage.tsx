@@ -15,6 +15,7 @@ import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Modal } from '../components/ui/Modal';
 import { getPageTitle, updateDocumentTitle } from '../lib/pageTitles';
+import { getLocalizedText } from '../lib/utils';
 
 interface BlogPageProps {
   onNavigate: (page: PageId) => void;
@@ -33,10 +34,14 @@ export function BlogPage({ onNavigate, language }: BlogPageProps) {
     const title = getPageTitle({
       page: 'blog',
       language,
-      articleTitle: selectedPost
+      articleTitle: selectedPost && selectedPost.title
         ? {
-            ar: selectedPost.title.ar,
-            en: selectedPost.title.en,
+            ar: typeof selectedPost.title === 'string'
+              ? selectedPost.title
+              : (selectedPost.title?.ar || selectedPost.title?.en || ''),
+            en: typeof selectedPost.title === 'string'
+              ? selectedPost.title
+              : (selectedPost.title?.en || selectedPost.title?.ar || ''),
           }
         : null,
     });
@@ -48,7 +53,14 @@ export function BlogPage({ onNavigate, language }: BlogPageProps) {
 
   const filteredPosts = livePosts.filter((post) => {
     if (activeCategory === 'All' || activeCategory === 'الكل') return true;
-    return post.category.en.includes(activeCategory) || post.category.ar.includes(activeCategory);
+    if (!post.category) return false;
+    const catVal = post.category as any;
+    if (typeof catVal === 'string') {
+      return catVal.includes(activeCategory);
+    }
+    const catEn = catVal?.en || '';
+    const catAr = catVal?.ar || '';
+    return catEn.includes(activeCategory) || catAr.includes(activeCategory);
   });
 
   return (
@@ -93,12 +105,12 @@ export function BlogPage({ onNavigate, language }: BlogPageProps) {
               <div className="relative aspect-16/10 overflow-hidden bg-slate-900">
                 <img
                   src={post.image || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'}
-                  alt={post.title[language]}
+                  alt={getLocalizedText(post.title, language)}
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute top-3 start-3">
-                  <Badge variant="gradient">{post.category[language]}</Badge>
+                  <Badge variant="gradient">{getLocalizedText(post.category, language)}</Badge>
                 </div>
               </div>
 
@@ -106,21 +118,21 @@ export function BlogPage({ onNavigate, language }: BlogPageProps) {
                 <div className="flex items-center gap-3 text-xs text-slate-400">
                   <span>{post.date}</span>
                   <span>•</span>
-                  <span>{post.readTime[language]}</span>
+                  <span>{getLocalizedText(post.readTime, language)}</span>
                 </div>
 
                 <h3 className="text-base sm:text-lg font-bold text-slate-900 font-display-serif group-hover:text-blue-600 transition-colors line-clamp-2">
-                  {post.title[language]}
+                  {getLocalizedText(post.title, language)}
                 </h3>
 
                 <p className="text-xs sm:text-sm text-slate-500 line-clamp-3 leading-relaxed">
-                  {post.excerpt[language]}
+                  {getLocalizedText(post.excerpt, language)}
                 </p>
               </div>
             </div>
 
             <div className="p-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-blue-600">
-              <span>{post.author[language]}</span>
+              <span>{getLocalizedText(post.author, language)}</span>
               <span className="flex items-center gap-1 group-hover:gap-1.5 transition-all">
                 {t.blog.readArticle} <ArrowIcon className="w-3.5 h-3.5" />
               </span>
@@ -134,24 +146,24 @@ export function BlogPage({ onNavigate, language }: BlogPageProps) {
         <Modal
           isOpen={!!selectedPost}
           onClose={() => setSelectedPost(null)}
-          title={selectedPost.title[language]}
-          subtitle={`${selectedPost.author[language]} • ${selectedPost.date}`}
+          title={getLocalizedText(selectedPost.title, language)}
+          subtitle={`${getLocalizedText(selectedPost.author, language)} • ${selectedPost.date}`}
           maxWidth="2xl"
         >
           <div className="space-y-4">
             <div className="relative aspect-16/9 rounded-2xl overflow-hidden bg-slate-900">
               <img
                 src={selectedPost.image || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'}
-                alt={selectedPost.title[language]}
+                alt={getLocalizedText(selectedPost.title, language)}
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover"
               />
             </div>
             <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
-              {selectedPost.excerpt[language]}
+              {getLocalizedText(selectedPost.excerpt, language)}
             </p>
             <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
-              {selectedPost.content[language]}
+              {getLocalizedText(selectedPost.content, language)}
             </p>
             <div className="pt-3 border-t border-slate-100 flex justify-end">
               <Button variant="secondary" size="sm" onClick={() => setSelectedPost(null)}>

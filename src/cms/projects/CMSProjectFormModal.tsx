@@ -39,7 +39,6 @@ export const CMSProjectFormModal: React.FC<CMSProjectFormModalProps> = ({
   const isAr = language === 'ar';
   const [activeTab, setActiveTab] = useState<TabType>('basic');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [aiGenerating, setAiGenerating] = useState(false);
 
   // Form State
   const [titleEn, setTitleEn] = useState('');
@@ -147,22 +146,6 @@ export const CMSProjectFormModal: React.FC<CMSProjectFormModalProps> = ({
 
   if (!isOpen) return null;
 
-  // AI Polish
-  const handleAIPolish = () => {
-    setAiGenerating(true);
-    setTimeout(() => {
-      if (titleEn) {
-        setDescriptionEn(
-          `A world-class architectural masterpiece developed by ${developerEn || 'HARD Real Estate'}. Situated in ${locationEn || 'Al Khobar'}, this visionary project blends contemporary aesthetics with state-of-the-art sustainability and high-yielding investment security.`
-        );
-        setDescriptionAr(
-          `تحفة معمارية استثنائية من تطوير ${developerAr || 'شركة هارد العقارية'}. يقع المشروع في ${locationAr || 'الخُبر'} ليجمع بين الفخامة العصرية، البنية التحتية الذكية، وعوائد الاستثمار الواعدة المدعومة بضمانات رسمية.`
-        );
-      }
-      setAiGenerating(false);
-    }, 900);
-  };
-
   const handleAddGalleryUrl = () => {
     if (newGalleryUrl.trim()) {
       setGalleryUrls([...galleryUrls, newGalleryUrl.trim()]);
@@ -257,16 +240,6 @@ export const CMSProjectFormModal: React.FC<CMSProjectFormModalProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleAIPolish}
-              disabled={aiGenerating}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
-            >
-              <Sparkles className={`w-3.5 h-3.5 ${aiGenerating ? 'animate-spin' : ''}`} />
-              <span>{aiGenerating ? (isAr ? 'جاري التحسين...' : 'Polishing...') : (isAr ? 'صياغة ذكية بالذكاء الاصطناعي' : 'AI Polish')}</span>
-            </button>
-
             <button
               onClick={onClose}
               className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"

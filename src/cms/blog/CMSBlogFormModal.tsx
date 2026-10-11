@@ -37,7 +37,6 @@ export const CMSBlogFormModal: React.FC<CMSBlogFormModalProps> = ({
   const isAr = language === 'ar';
   const [activeTab, setActiveTab] = useState<TabType>('details');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [aiGenerating, setAiGenerating] = useState(false);
   const [previewContentMode, setPreviewContentMode] = useState(false);
 
   // Form State
@@ -136,18 +135,6 @@ Investors allocating capital towards premium coastal assets are experiencing str
 
   if (!isOpen) return null;
 
-  // AI Generation & Polish
-  const handleAIGenerate = () => {
-    setAiGenerating(true);
-    setTimeout(() => {
-      if (titleEn) {
-        setExcerptEn(`A comprehensive executive analysis on ${titleEn}. Covering market yield benchmarks, macroeconomic trends, and legislative frameworks.`);
-        setExcerptAr(`تقرير تحليلي تنفيذي حول ${titleAr || titleEn}. يغطي مؤشرات العوائد والاتجاهات الاستثمارية الواعدة في السوق العقاري السعودي.`);
-      }
-      setAiGenerating(false);
-    }, 900);
-  };
-
   const handleAddTag = () => {
     if (newTag.trim() && !tags.includes(newTag.trim())) {
       setTags([...tags, newTag.trim()]);
@@ -223,16 +210,6 @@ Investors allocating capital towards premium coastal assets are experiencing str
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleAIGenerate}
-              disabled={aiGenerating}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
-            >
-              <Sparkles className={`w-3.5 h-3.5 ${aiGenerating ? 'animate-spin' : ''}`} />
-              <span>{aiGenerating ? (isAr ? 'جاري الصياغة...' : 'Generating...') : (isAr ? 'صياغة المحتوى بالذكاء الاصطناعي' : 'AI Writer')}</span>
-            </button>
-
             <button
               onClick={onClose}
               className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"

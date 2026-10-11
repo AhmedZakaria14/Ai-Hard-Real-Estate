@@ -33,6 +33,7 @@ import { CMSTestimonialsList } from "./testimonials/CMSTestimonialsList";
 import { CMSTestimonialFormModal } from "./testimonials/CMSTestimonialFormModal";
 import { CMSJoinList } from "./subscribers/CMSJoinList";
 import { CMSAddSubscriberModal } from "./subscribers/CMSAddSubscriberModal";
+import { getLocalizedText } from "../lib/utils";
 import { CMSLeadsList } from "./leads/CMSLeadsList";
 import { CMSAppointmentsList } from "./appointments/CMSAppointmentsList";
 import { CMSSiteContentEditor } from "./content/CMSSiteContentEditor";
@@ -293,11 +294,13 @@ export const CMSApp: React.FC<CMSAppProps> = ({
     }
   };
   const handleDuplicateProperty = async (property: Property) => {
+    const titleEn = getLocalizedText(property.title, 'en');
+    const titleAr = getLocalizedText(property.title, 'ar');
     const duplicatedData: Partial<Property> = {
       ...property,
       title: {
-        en: `${property.title.en} (Copy)`,
-        ar: `${property.title.ar} (نسخة)`,
+        en: `${titleEn} (Copy)`,
+        ar: `${titleAr} (نسخة)`,
       },
       slug: `${property.slug}-copy-${Date.now()}`,
       featured: false,
@@ -336,11 +339,13 @@ export const CMSApp: React.FC<CMSAppProps> = ({
     }
   };
   const handleDuplicateProject = async (project: Project) => {
+    const titleEn = getLocalizedText(project.title, 'en');
+    const titleAr = getLocalizedText(project.title, 'ar');
     const duplicated: Partial<Project> = {
       ...project,
       title: {
-        en: `${project.title.en} (Copy)`,
-        ar: `${project.title.ar} (نسخة)`,
+        en: `${titleEn} (Copy)`,
+        ar: `${titleAr} (نسخة)`,
       },
       slug: `${project.slug}-copy-${Date.now()}`,
       featured: false,
@@ -379,11 +384,13 @@ export const CMSApp: React.FC<CMSAppProps> = ({
     }
   };
   const handleDuplicateBlogPost = async (post: BlogPost) => {
+    const titleEn = getLocalizedText(post.title, 'en');
+    const titleAr = getLocalizedText(post.title, 'ar');
     const duplicated: Partial<BlogPost> = {
       ...post,
       title: {
-        en: `${post.title.en} (Copy)`,
-        ar: `${post.title.ar} (نسخة)`,
+        en: `${titleEn} (Copy)`,
+        ar: `${titleAr} (نسخة)`,
       },
       slug: `${post.slug}-copy-${Date.now()}`,
       featured: false,

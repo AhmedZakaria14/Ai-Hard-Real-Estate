@@ -20,7 +20,7 @@ import {
   Menu,
   X,
   ShieldCheck,
-  Sparkles,
+  FileEdit,
   Award,
   MailCheck,
   UserCheck,
@@ -115,7 +115,7 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
       id: "content",
       labelEn: "Site Content & Drafts",
       labelAr: "إدارة المحتوى والمسودات",
-      icon: Sparkles,
+      icon: FileEdit,
       roleGuard: canEditContent,
     },
     {

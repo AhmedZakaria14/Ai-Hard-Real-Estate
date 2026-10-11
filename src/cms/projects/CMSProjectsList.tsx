@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { Language, Project, ProjectStatus } from '../../types';
 import { PreDeleteReferenceModal } from '../components/PreDeleteReferenceModal';
+import { getLocalizedText } from '../../lib/utils';
 
 interface CMSProjectsListProps {
   projects: Project[];
@@ -64,14 +65,21 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
   const filteredProjects = useMemo(() => {
     return projects.filter((project) => {
       const q = searchQuery.toLowerCase().trim();
+      const titleEn = getLocalizedText(project.title, 'en').toLowerCase();
+      const titleAr = getLocalizedText(project.title, 'ar').toLowerCase();
+      const devEn = getLocalizedText(project.developer, 'en').toLowerCase();
+      const devAr = getLocalizedText(project.developer, 'ar').toLowerCase();
+      const locEn = getLocalizedText(project.location, 'en').toLowerCase();
+      const locAr = getLocalizedText(project.location, 'ar').toLowerCase();
+
       const matchesSearch =
         !q ||
-        project.title.en.toLowerCase().includes(q) ||
-        project.title.ar.toLowerCase().includes(q) ||
-        project.developer.en.toLowerCase().includes(q) ||
-        project.developer.ar.toLowerCase().includes(q) ||
-        project.location.en.toLowerCase().includes(q) ||
-        project.location.ar.toLowerCase().includes(q);
+        titleEn.includes(q) ||
+        titleAr.includes(q) ||
+        devEn.includes(q) ||
+        devAr.includes(q) ||
+        locEn.includes(q) ||
+        locAr.includes(q);
 
       const matchesStatus =
         statusFilter === 'all' || (project.status || 'under-construction') === statusFilter;
@@ -100,10 +108,10 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
     const headers = ['ID', 'Title_EN', 'Title_AR', 'Developer', 'Location', 'StartingPrice', 'UnitsTotal', 'UnitsAvailable', 'Progress%', 'Status'];
     const rows = filteredProjects.map((p) => [
       p.id,
-      `"${p.title.en.replace(/"/g, '""')}"`,
-      `"${p.title.ar.replace(/"/g, '""')}"`,
-      `"${p.developer.en.replace(/"/g, '""')}"`,
-      `"${p.location.en.replace(/"/g, '""')}"`,
+      `"${getLocalizedText(p.title, 'en').replace(/"/g, '""')}"`,
+      `"${getLocalizedText(p.title, 'ar').replace(/"/g, '""')}"`,
+      `"${getLocalizedText(p.developer, 'en').replace(/"/g, '""')}"`,
+      `"${getLocalizedText(p.location, 'en').replace(/"/g, '""')}"`,
       `"${p.startingPriceSAR}"`,
       p.unitsTotal,
       p.unitsAvailable,
@@ -322,13 +330,13 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
                         <div className="flex items-center gap-3">
                           <img
                             src={project.image}
-                            alt={project.title[language]}
+                            alt={getLocalizedText(project.title, language)}
                             className="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0"
                           />
                           <div className="min-w-0">
                             <div className="flex items-center gap-1.5">
                               <span className="font-bold text-slate-900 text-xs truncate max-w-xs block">
-                                {project.title[language]}
+                                {getLocalizedText(project.title, language)}
                               </span>
                               {project.featured && (
                                 <span className="p-0.5 rounded bg-amber-100 text-amber-700" title="Featured">
@@ -337,7 +345,7 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
                               )}
                             </div>
                             <span className="text-[10px] text-slate-500 truncate block">
-                              {project.developer[language]}
+                              {getLocalizedText(project.developer, language)}
                             </span>
                           </div>
                         </div>
@@ -345,7 +353,7 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
 
                       {/* Location */}
                       <td className="py-3.5 px-4 text-slate-600">
-                        <span className="truncate max-w-[140px] block">{project.location[language]}</span>
+                        <span className="truncate max-w-[140px] block">{getLocalizedText(project.location, language)}</span>
                       </td>
 
                       {/* Price */}
@@ -370,7 +378,7 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
                         <div className="space-y-1">
                           <div className="flex items-center justify-between text-[10px] text-slate-600">
                             <span className="font-bold">{progress}%</span>
-                            <span className="text-[9px] text-slate-400">{project.handoverDate[language]}</span>
+                            <span className="text-[9px] text-slate-400">{getLocalizedText(project.handoverDate, language)}</span>
                           </div>
                           <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
                             <div
@@ -461,7 +469,7 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
                   <div className="relative aspect-16/10 bg-slate-900 overflow-hidden">
                     <img
                       src={project.image}
-                      alt={project.title[language]}
+                      alt={getLocalizedText(project.title, language)}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute top-3 start-3">
@@ -481,12 +489,12 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
                   <div className="p-4 space-y-3">
                     <div className="space-y-0.5">
                       <span className="text-[10px] text-blue-600 font-bold uppercase tracking-wider block">
-                        {project.category[language]}
+                        {getLocalizedText(project.category, language)}
                       </span>
                       <h3 className="font-bold text-slate-900 text-sm font-display-serif line-clamp-1">
-                        {project.title[language]}
+                        {getLocalizedText(project.title, language)}
                       </h3>
-                      <p className="text-xs text-slate-500 line-clamp-1">{project.developer[language]}</p>
+                      <p className="text-xs text-slate-500 line-clamp-1">{getLocalizedText(project.developer, language)}</p>
                     </div>
 
                     {/* Pricing & Units metric */}
@@ -505,7 +513,7 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
                     <div className="space-y-1">
                       <div className="flex items-center justify-between text-[11px] text-slate-600">
                         <span>{isAr ? 'نسبة الإنجاز' : 'Completion'}: <strong className="text-slate-900">{progress}%</strong></span>
-                        <span className="text-[10px] text-slate-400">{project.handoverDate[language]}</span>
+                        <span className="text-[10px] text-slate-400">{getLocalizedText(project.handoverDate, language)}</span>
                       </div>
                       <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                         <div

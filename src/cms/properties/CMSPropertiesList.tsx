@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import { Property, PropertyType, ListingStatus, Language } from '../../types';
 import { SAUDI_CITIES } from '../../data/cities';
-import { getPropertyAreaSqM } from '../../lib/utils';
+import { getPropertyAreaSqM, getLocalizedText } from '../../lib/utils';
 import { PreDeleteReferenceModal } from '../components/PreDeleteReferenceModal';
 
 interface CMSPropertiesListProps {
@@ -93,10 +93,14 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
       // Search
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        const matchesTitleEn = item.title?.en?.toLowerCase().includes(q);
-        const matchesTitleAr = item.title?.ar?.toLowerCase().includes(q);
-        const matchesCityEn = item.location?.city?.en?.toLowerCase().includes(q);
-        const matchesCityAr = item.location?.city?.ar?.toLowerCase().includes(q);
+        const titleEn = getLocalizedText(item.title, 'en').toLowerCase();
+        const titleAr = getLocalizedText(item.title, 'ar').toLowerCase();
+        const cityEn = getLocalizedText(item.location?.city, 'en').toLowerCase();
+        const cityAr = getLocalizedText(item.location?.city, 'ar').toLowerCase();
+        const matchesTitleEn = titleEn.includes(q);
+        const matchesTitleAr = titleAr.includes(q);
+        const matchesCityEn = cityEn.includes(q);
+        const matchesCityAr = cityAr.includes(q);
         const matchesId = item.id.toLowerCase().includes(q);
         if (!matchesTitleEn && !matchesTitleAr && !matchesCityEn && !matchesCityAr && !matchesId) {
           return false;
@@ -112,8 +116,8 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
       // City
       if (selectedCity !== 'all') {
         const selLower = selectedCity.toLowerCase();
-        const enLower = item.location?.city?.en?.toLowerCase() || '';
-        const arLower = item.location?.city?.ar?.toLowerCase() || '';
+        const enLower = getLocalizedText(item.location?.city, 'en').toLowerCase();
+        const arLower = getLocalizedText(item.location?.city, 'ar').toLowerCase();
         const cityMatch = enLower === selLower || arLower === selLower || arLower.includes(selLower) || enLower.includes(selLower) || selLower.includes(arLower) || selLower.includes(enLower);
         if (!cityMatch) return false;
       }

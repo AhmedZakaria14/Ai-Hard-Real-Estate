@@ -30,6 +30,21 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * Safely extracts a localized string from an object, string, or undefined value.
+ */
+export function getLocalizedText(
+  value: Record<string, any> | string | null | undefined,
+  lang: Language = 'en'
+): string {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object') {
+    return value[lang] || value['en'] || value['ar'] || '';
+  }
+  return String(value);
+}
+
+/**
  * Returns square meters for a property, prioritizing areaSqM and falling back to converting areaSqFt once.
  */
 export function getPropertyAreaSqM(property: { areaSqM?: number; areaSqFt?: number }): number {
