@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PartnerBrand, SectorScope } from '../../types/businessEntities';
 import { Language } from '../../types';
+import { getLocalizedText } from '../../lib/utils';
 import {
   Building2,
   Plus,
@@ -133,18 +134,18 @@ export const CMSPartnersList: React.FC<CMSPartnersListProps> = ({
                 <div className="h-20 flex items-center justify-center p-2 rounded-2xl bg-slate-50 border border-slate-100 overflow-hidden">
                   <img
                     src={partner.logoUrl}
-                    alt={isAr ? partner.name.ar : partner.name.en}
+                    alt={getLocalizedText(partner.name, language)}
                     className="max-h-full max-w-full object-contain"
                   />
                 </div>
 
                 <h3 className="text-sm font-bold text-slate-900 truncate">
-                  {isAr ? partner.name.ar : partner.name.en}
+                  {getLocalizedText(partner.name, language)}
                 </h3>
 
                 {partner.category && (
                   <p className="text-xs text-slate-500 truncate">
-                    {isAr ? partner.category.ar : partner.category.en}
+                    {getLocalizedText(partner.category, language)}
                   </p>
                 )}
               </div>

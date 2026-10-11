@@ -19,6 +19,7 @@ import {
   History,
 } from 'lucide-react';
 import { Language } from '../../types';
+import { getLocalizedText } from '../../lib/utils';
 import {
   PageSection,
   PageDocument,
@@ -171,8 +172,8 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
       ...JSON.parse(JSON.stringify(target)),
       id: `sec-${Date.now()}-copy`,
       title: {
-        ar: `${target.title.ar} (نسخة)`,
-        en: `${target.title.en} (Copy)`,
+        ar: `${getLocalizedText(target.title, 'ar')} (نسخة)`,
+        en: `${getLocalizedText(target.title, 'en')} (Copy)`,
       },
       order: sections.length + 1,
       createdAt: new Date().toISOString(),
@@ -389,7 +390,7 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
                       </span>
                       <div className="truncate">
                         <span className="font-bold text-slate-900 block truncate">
-                          {isAr ? sec.title.ar : sec.title.en}
+                          {getLocalizedText(sec.title, language)}
                         </span>
                         <span className="text-[10px] text-sky-700 font-mono block">
                           {sec.type}
@@ -492,7 +493,7 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
                     <label className="block font-bold text-slate-700 mb-1">{isAr ? 'العنوان الرئيسي (بالعربية)' : 'Hero Title (Arabic)'}</label>
                     <input
                       type="text"
-                      value={(activeSection.content as HeroContent).title.ar}
+                      value={(activeSection.content as HeroContent).title?.ar || ''}
                       onChange={(e) => handleUpdateActiveSectionContent({ ...activeSection.content, title: { ...(activeSection.content as HeroContent).title, ar: e.target.value } })}
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
                     />
@@ -501,7 +502,7 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
                     <label className="block font-bold text-slate-700 mb-1">{isAr ? 'العنوان الرئيسي (بالإنجليزية)' : 'Hero Title (English)'}</label>
                     <input
                       type="text"
-                      value={(activeSection.content as HeroContent).title.en}
+                      value={(activeSection.content as HeroContent).title?.en || ''}
                       onChange={(e) => handleUpdateActiveSectionContent({ ...activeSection.content, title: { ...(activeSection.content as HeroContent).title, en: e.target.value } })}
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
                     />
@@ -510,7 +511,7 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
                     <label className="block font-bold text-slate-700 mb-1">{isAr ? 'الوصف الفرعي (بالعربية)' : 'Hero Subtitle (Arabic)'}</label>
                     <textarea
                       rows={2}
-                      value={(activeSection.content as HeroContent).subtitle.ar}
+                      value={(activeSection.content as HeroContent).subtitle?.ar || ''}
                       onChange={(e) => handleUpdateActiveSectionContent({ ...activeSection.content, subtitle: { ...(activeSection.content as HeroContent).subtitle, ar: e.target.value } })}
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
                     />
@@ -519,7 +520,7 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
                     <label className="block font-bold text-slate-700 mb-1">{isAr ? 'رابط صورة الخلفية (Background Image URL)' : 'Background Image URL'}</label>
                     <input
                       type="text"
-                      value={(activeSection.content as HeroContent).bgImageUrl}
+                      value={(activeSection.content as HeroContent).bgImageUrl || ''}
                       onChange={(e) => handleUpdateActiveSectionContent({ ...activeSection.content, bgImageUrl: e.target.value })}
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono"
                     />
@@ -533,7 +534,7 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
                     <label className="block font-bold text-slate-700 mb-1">{isAr ? 'العنوان الرئيسي (بالعربية)' : 'Heading (Arabic)'}</label>
                     <input
                       type="text"
-                      value={(activeSection.content as TextBlockContent).heading.ar}
+                      value={(activeSection.content as TextBlockContent).heading?.ar || ''}
                       onChange={(e) => handleUpdateActiveSectionContent({ ...activeSection.content, heading: { ...(activeSection.content as TextBlockContent).heading, ar: e.target.value } })}
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
                     />
@@ -542,7 +543,7 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
                     <label className="block font-bold text-slate-700 mb-1">{isAr ? 'محتوى الفقرة (بالعربية)' : 'Paragraph Body (Arabic)'}</label>
                     <textarea
                       rows={4}
-                      value={(activeSection.content as TextBlockContent).bodyParagraphs.ar}
+                      value={(activeSection.content as TextBlockContent).bodyParagraphs?.ar || ''}
                       onChange={(e) => handleUpdateActiveSectionContent({ ...activeSection.content, bodyParagraphs: { ...(activeSection.content as TextBlockContent).bodyParagraphs, ar: e.target.value } })}
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
                     />

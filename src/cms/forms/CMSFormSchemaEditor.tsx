@@ -338,7 +338,7 @@ export const CMSFormSchemaEditor: React.FC<CMSFormSchemaEditorProps> = ({
             </div>
             <div>
               <h3 className="text-base font-bold text-slate-900 font-display-serif">
-                {isAr ? schemaConfig.title.ar : schemaConfig.title.en}
+                {isAr ? (schemaConfig.title?.ar || schemaConfig.title?.en || '') : (schemaConfig.title?.en || schemaConfig.title?.ar || '')}
               </h3>
               <span className="text-xs text-slate-500 font-mono">
                 {isAr ? 'نوع النموذج:' : 'Form Type:'} {schemaConfig.formType} | {isAr ? 'القطاع:' : 'Sector:'} {schemaConfig.sector}
@@ -500,7 +500,7 @@ export const CMSFormSchemaEditor: React.FC<CMSFormSchemaEditorProps> = ({
                       </label>
                       <input
                         type="text"
-                        value={field.label.ar}
+                        value={field.label?.ar || ''}
                         onChange={(e) =>
                           handleUpdateField(idx, {
                             label: { ...field.label, ar: e.target.value },
@@ -516,7 +516,7 @@ export const CMSFormSchemaEditor: React.FC<CMSFormSchemaEditorProps> = ({
                       </label>
                       <input
                         type="text"
-                        value={field.label.en}
+                        value={field.label?.en || ''}
                         onChange={(e) =>
                           handleUpdateField(idx, {
                             label: { ...field.label, en: e.target.value },
@@ -588,7 +588,7 @@ export const CMSFormSchemaEditor: React.FC<CMSFormSchemaEditorProps> = ({
                   </label>
                   <input
                     type="text"
-                    value={schemaConfig.title.ar}
+                    value={schemaConfig.title?.ar || ''}
                     onChange={(e) => handleUpdateLocalized('title', 'ar', e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-900 font-bold"
                   />
@@ -600,7 +600,7 @@ export const CMSFormSchemaEditor: React.FC<CMSFormSchemaEditorProps> = ({
                   </label>
                   <input
                     type="text"
-                    value={schemaConfig.title.en}
+                    value={schemaConfig.title?.en || ''}
                     onChange={(e) => handleUpdateLocalized('title', 'en', e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-900 font-bold"
                   />
@@ -612,7 +612,7 @@ export const CMSFormSchemaEditor: React.FC<CMSFormSchemaEditorProps> = ({
                   </label>
                   <textarea
                     rows={2}
-                    value={schemaConfig.description.ar}
+                    value={schemaConfig.description?.ar || ''}
                     onChange={(e) => handleUpdateLocalized('description', 'ar', e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-800"
                   />
@@ -624,7 +624,7 @@ export const CMSFormSchemaEditor: React.FC<CMSFormSchemaEditorProps> = ({
                   </label>
                   <textarea
                     rows={2}
-                    value={schemaConfig.description.en}
+                    value={schemaConfig.description?.en || ''}
                     onChange={(e) => handleUpdateLocalized('description', 'en', e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-800"
                   />
@@ -646,7 +646,7 @@ export const CMSFormSchemaEditor: React.FC<CMSFormSchemaEditorProps> = ({
                   </label>
                   <input
                     type="text"
-                    value={schemaConfig.confirmationCopy.title.ar}
+                    value={schemaConfig.confirmationCopy?.title?.ar || ''}
                     onChange={(e) => handleUpdateLocalized('confirmationTitle', 'ar', e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-900 font-bold"
                   />
@@ -658,7 +658,7 @@ export const CMSFormSchemaEditor: React.FC<CMSFormSchemaEditorProps> = ({
                   </label>
                   <input
                     type="text"
-                    value={schemaConfig.confirmationCopy.title.en}
+                    value={schemaConfig.confirmationCopy?.title?.en || ''}
                     onChange={(e) => handleUpdateLocalized('confirmationTitle', 'en', e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-900 font-bold"
                   />
@@ -670,7 +670,7 @@ export const CMSFormSchemaEditor: React.FC<CMSFormSchemaEditorProps> = ({
                   </label>
                   <textarea
                     rows={3}
-                    value={schemaConfig.confirmationCopy.message.ar}
+                    value={schemaConfig.confirmationCopy?.message?.ar || ''}
                     onChange={(e) => handleUpdateLocalized('confirmationMessage', 'ar', e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-800"
                   />

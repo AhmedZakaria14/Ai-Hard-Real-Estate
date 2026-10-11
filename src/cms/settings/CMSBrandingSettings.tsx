@@ -338,7 +338,7 @@ export const CMSBrandingSettings: React.FC<CMSBrandingSettingsProps> = ({
                     </label>
                     <input
                       type="text"
-                      value={formData.siteName.ar}
+                      value={formData.siteName?.ar || ''}
                       onChange={(e) => setFormData({ ...formData, siteName: { ...formData.siteName, ar: e.target.value } })}
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:ring-2 focus:ring-sky-500"
                     />
@@ -350,7 +350,7 @@ export const CMSBrandingSettings: React.FC<CMSBrandingSettingsProps> = ({
                     </label>
                     <input
                       type="text"
-                      value={formData.siteName.en}
+                      value={formData.siteName?.en || ''}
                       onChange={(e) => setFormData({ ...formData, siteName: { ...formData.siteName, en: e.target.value } })}
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:ring-2 focus:ring-sky-500"
                     />
@@ -364,7 +364,7 @@ export const CMSBrandingSettings: React.FC<CMSBrandingSettingsProps> = ({
                     </label>
                     <input
                       type="text"
-                      value={formData.tagline.ar}
+                      value={formData.tagline?.ar || ''}
                       onChange={(e) => setFormData({ ...formData, tagline: { ...formData.tagline, ar: e.target.value } })}
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:ring-2 focus:ring-sky-500"
                     />
@@ -376,7 +376,7 @@ export const CMSBrandingSettings: React.FC<CMSBrandingSettingsProps> = ({
                     </label>
                     <input
                       type="text"
-                      value={formData.tagline.en}
+                      value={formData.tagline?.en || ''}
                       onChange={(e) => setFormData({ ...formData, tagline: { ...formData.tagline, en: e.target.value } })}
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:ring-2 focus:ring-sky-500"
                     />
@@ -389,7 +389,7 @@ export const CMSBrandingSettings: React.FC<CMSBrandingSettingsProps> = ({
                   </label>
                   <textarea
                     rows={2}
-                    value={formData.aboutSummary.ar}
+                    value={formData.aboutSummary?.ar || ''}
                     onChange={(e) => setFormData({ ...formData, aboutSummary: { ...formData.aboutSummary, ar: e.target.value } })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:ring-2 focus:ring-sky-500"
                   />
@@ -464,7 +464,7 @@ export const CMSBrandingSettings: React.FC<CMSBrandingSettingsProps> = ({
                     </label>
                     <input
                       type="text"
-                      value={formData.workingHours.ar}
+                      value={formData.workingHours?.ar || ''}
                       onChange={(e) => setFormData({ ...formData, workingHours: { ...formData.workingHours, ar: e.target.value } })}
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:ring-2 focus:ring-sky-500"
                     />
@@ -476,7 +476,7 @@ export const CMSBrandingSettings: React.FC<CMSBrandingSettingsProps> = ({
                     </label>
                     <input
                       type="text"
-                      value={formData.workingHours.en}
+                      value={formData.workingHours?.en || ''}
                       onChange={(e) => setFormData({ ...formData, workingHours: { ...formData.workingHours, en: e.target.value } })}
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:ring-2 focus:ring-sky-500"
                     />
@@ -500,8 +500,8 @@ export const CMSBrandingSettings: React.FC<CMSBrandingSettingsProps> = ({
                     </label>
                     <input
                       type="text"
-                      value={formData.office.address.ar}
-                      onChange={(e) => setFormData({ ...formData, office: { ...formData.office, address: { ...formData.office.address, ar: e.target.value } } })}
+                      value={formData.office?.address?.ar || ''}
+                      onChange={(e) => setFormData({ ...formData, office: { ...formData.office, address: { ...formData.office?.address, ar: e.target.value } } })}
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:ring-2 focus:ring-sky-500"
                     />
                   </div>
@@ -512,7 +512,7 @@ export const CMSBrandingSettings: React.FC<CMSBrandingSettingsProps> = ({
                     </label>
                     <input
                       type="text"
-                      value={formData.office.address.en}
+                      value={formData.office?.address?.en || ''}
                       onChange={(e) => setFormData({ ...formData, office: { ...formData.office, address: { ...formData.office.address, en: e.target.value } } })}
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:ring-2 focus:ring-sky-500"
                     />
@@ -800,9 +800,9 @@ export const CMSBrandingSettings: React.FC<CMSBrandingSettingsProps> = ({
                       onError={(e: any) => { e.target.src = '/logo.svg'; }}
                     />
                     <div>
-                      <h4 className="text-xs font-bold text-white">{isAr ? formData.siteName.ar : formData.siteName.en}</h4>
+                      <h4 className="text-xs font-bold text-white">{isAr ? (formData.siteName?.ar || formData.siteName?.en || '') : (formData.siteName?.en || formData.siteName?.ar || '')}</h4>
                       <p className="text-[9px] text-slate-400 truncate max-w-[150px]">
-                        {isAr ? formData.tagline.ar : formData.tagline.en}
+                        {isAr ? (formData.tagline?.ar || formData.tagline?.en || '') : (formData.tagline?.en || formData.tagline?.ar || '')}
                       </p>
                     </div>
                   </div>
@@ -835,7 +835,7 @@ export const CMSBrandingSettings: React.FC<CMSBrandingSettingsProps> = ({
               <div className="bg-slate-950/80 rounded-2xl p-3 border border-slate-800 space-y-2 text-[10px]">
                 <span className="text-[10px] text-slate-500 font-mono block">FOOTER LEGAL</span>
                 <p className="text-slate-300 font-sans">
-                  {isAr ? formData.footerContent.copyrightText.ar : formData.footerContent.copyrightText.en}
+                  {isAr ? (formData.footerContent?.copyrightText?.ar || formData.footerContent?.copyrightText?.en || '') : (formData.footerContent?.copyrightText?.en || formData.footerContent?.copyrightText?.ar || '')}
                 </p>
                 <div className="flex flex-wrap gap-2 pt-1 font-mono text-[9px] text-slate-400">
                   {formData.footerContent.crNumber && (

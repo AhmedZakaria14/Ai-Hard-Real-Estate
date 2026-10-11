@@ -19,6 +19,7 @@ import {
   Eye,
 } from 'lucide-react';
 import { Language, Testimonial } from '../../types';
+import { getLocalizedText } from '../../lib/utils';
 
 interface CMSTestimonialsListProps {
   testimonials: Testimonial[];
@@ -54,18 +55,29 @@ export const CMSTestimonialsList: React.FC<CMSTestimonialsListProps> = ({
   const filteredStories = useMemo(() => {
     return testimonials.filter((story) => {
       const q = searchQuery.toLowerCase().trim();
+      const nameEn = getLocalizedText(story.name, 'en').toLowerCase();
+      const nameAr = getLocalizedText(story.name, 'ar').toLowerCase();
+      const roleEn = getLocalizedText(story.role, 'en').toLowerCase();
+      const roleAr = getLocalizedText(story.role, 'ar').toLowerCase();
+      const highlightEn = getLocalizedText(story.dealHighlight, 'en').toLowerCase();
+      const highlightAr = getLocalizedText(story.dealHighlight, 'ar').toLowerCase();
+      const quoteEn = getLocalizedText(story.quote, 'en').toLowerCase();
+      const quoteAr = getLocalizedText(story.quote, 'ar').toLowerCase();
+      const locationEn = getLocalizedText(story.location, 'en').toLowerCase();
+      const locationAr = getLocalizedText(story.location, 'ar').toLowerCase();
+
       const matchSearch =
         !q ||
-        story.name.en.toLowerCase().includes(q) ||
-        story.name.ar.toLowerCase().includes(q) ||
-        story.role.en.toLowerCase().includes(q) ||
-        story.role.ar.toLowerCase().includes(q) ||
-        story.dealHighlight.en.toLowerCase().includes(q) ||
-        story.dealHighlight.ar.toLowerCase().includes(q) ||
-        story.quote.en.toLowerCase().includes(q) ||
-        story.quote.ar.toLowerCase().includes(q) ||
-        story.location.en.toLowerCase().includes(q) ||
-        story.location.ar.toLowerCase().includes(q);
+        nameEn.includes(q) ||
+        nameAr.includes(q) ||
+        roleEn.includes(q) ||
+        roleAr.includes(q) ||
+        highlightEn.includes(q) ||
+        highlightAr.includes(q) ||
+        quoteEn.includes(q) ||
+        quoteAr.includes(q) ||
+        locationEn.includes(q) ||
+        locationAr.includes(q);
 
       const matchCategory = categoryFilter === 'all' || story.category === categoryFilter;
       const matchRating = ratingFilter === 'all' || story.rating.toString() === ratingFilter;
@@ -79,15 +91,15 @@ export const CMSTestimonialsList: React.FC<CMSTestimonialsListProps> = ({
     const headers = ['ID', 'Client_Name_EN', 'Client_Name_AR', 'Role_EN', 'Role_AR', 'Location', 'Category', 'Rating', 'Deal_Highlight', 'Quote'];
     const rows = filteredStories.map((t) => [
       t.id,
-      `"${t.name.en.replace(/"/g, '""')}"`,
-      `"${t.name.ar.replace(/"/g, '""')}"`,
-      `"${t.role.en.replace(/"/g, '""')}"`,
-      `"${t.role.ar.replace(/"/g, '""')}"`,
-      `"${t.location.en.replace(/"/g, '""')}"`,
+      `"${getLocalizedText(t.name, 'en').replace(/"/g, '""')}"`,
+      `"${getLocalizedText(t.name, 'ar').replace(/"/g, '""')}"`,
+      `"${getLocalizedText(t.role, 'en').replace(/"/g, '""')}"`,
+      `"${getLocalizedText(t.role, 'ar').replace(/"/g, '""')}"`,
+      `"${getLocalizedText(t.location, 'en').replace(/"/g, '""')}"`,
       t.category,
       t.rating,
-      `"${t.dealHighlight.en.replace(/"/g, '""')}"`,
-      `"${t.quote.en.replace(/"/g, '""')}"`,
+      `"${getLocalizedText(t.dealHighlight, 'en').replace(/"/g, '""')}"`,
+      `"${getLocalizedText(t.quote, 'en').replace(/"/g, '""')}"`,
     ]);
 
     const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
@@ -245,7 +257,7 @@ export const CMSTestimonialsList: React.FC<CMSTestimonialsListProps> = ({
                   <div className="flex items-center gap-3">
                     <img
                       src={story.avatar}
-                      alt={story.name.en}
+                      alt={getLocalizedText(story.name, language)}
                       className="w-12 h-12 rounded-2xl object-cover border-2 border-slate-100 shadow-xs shrink-0"
                       onError={(e) => {
                         (e.currentTarget as HTMLImageElement).src =
@@ -254,10 +266,10 @@ export const CMSTestimonialsList: React.FC<CMSTestimonialsListProps> = ({
                     />
                     <div>
                       <h3 className="font-bold text-sm text-slate-900 group-hover:text-blue-600 transition-colors">
-                        {isAr ? story.name.ar : story.name.en}
+                        {getLocalizedText(story.name, language)}
                       </h3>
                       <p className="text-xs text-slate-500 line-clamp-1">
-                        {isAr ? story.role.ar : story.role.en}
+                        {getLocalizedText(story.role, language)}
                       </p>
                     </div>
                   </div>
@@ -279,21 +291,21 @@ export const CMSTestimonialsList: React.FC<CMSTestimonialsListProps> = ({
                   </div>
                   <div className="flex items-center gap-1 text-slate-400 text-[11px]">
                     <MapPin className="w-3 h-3" />
-                    <span>{isAr ? story.location.ar : story.location.en}</span>
+                    <span>{getLocalizedText(story.location, language)}</span>
                   </div>
                 </div>
 
                 {/* Deal Highlight Badge */}
                 <div className="bg-blue-50/80 border border-blue-100 rounded-xl px-3 py-2 flex items-center gap-2 text-xs font-semibold text-blue-900">
                   <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                  <span className="line-clamp-1">{isAr ? story.dealHighlight.ar : story.dealHighlight.en}</span>
+                  <span className="line-clamp-1">{getLocalizedText(story.dealHighlight, language)}</span>
                 </div>
 
                 {/* Quote */}
                 <div className="relative text-xs text-slate-600 italic bg-slate-50/70 p-3.5 rounded-2xl border border-slate-100 flex-1">
                   <Quote className="w-4 h-4 text-slate-300 absolute top-2 end-2 opacity-50" />
                   <p className="line-clamp-4 leading-relaxed">
-                    "{isAr ? story.quote.ar : story.quote.en}"
+                    "{getLocalizedText(story.quote, language)}"
                   </p>
                 </div>
               </div>

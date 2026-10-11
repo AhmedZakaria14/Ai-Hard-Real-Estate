@@ -23,6 +23,7 @@ import {
   FileCheck,
 } from 'lucide-react';
 import { Language } from '../../types';
+import { getLocalizedText } from '../../lib/utils';
 import { useData } from '../../context/DataContext';
 import {
   PageSeoConfig,
@@ -425,10 +426,10 @@ export const CMSSeoLegalEditor: React.FC<CMSSeoLegalEditorProps> = ({ language }
                       {origin}{activeSeo.canonicalPath}
                     </span>
                     <h5 className="font-bold text-slate-900 text-xs line-clamp-1">
-                      {isAr ? activeSeo.title.ar || activeSeo.title.en : activeSeo.title.en || activeSeo.title.ar}
+                      {getLocalizedText(activeSeo.title, language)}
                     </h5>
                     <p className="text-[11px] text-slate-600 line-clamp-2 leading-relaxed">
-                      {isAr ? activeSeo.description.ar || activeSeo.description.en : activeSeo.description.en || activeSeo.description.ar}
+                      {getLocalizedText(activeSeo.description, language)}
                     </p>
                   </div>
                 </div>

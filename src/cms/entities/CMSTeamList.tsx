@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TeamMember, SectorScope } from '../../types/businessEntities';
 import { Language } from '../../types';
+import { getLocalizedText } from '../../lib/utils';
 import {
   Users,
   Plus,
@@ -131,7 +132,7 @@ export const CMSTeamList: React.FC<CMSTeamListProps> = ({
                 <div className="flex items-start gap-3">
                   <img
                     src={member.avatar}
-                    alt={isAr ? member.name.ar : member.name.en}
+                    alt={getLocalizedText(member.name, language)}
                     className="w-14 h-14 rounded-2xl object-cover border border-slate-200 shrink-0"
                   />
                   <div className="min-w-0 flex-1">
@@ -151,10 +152,10 @@ export const CMSTeamList: React.FC<CMSTeamListProps> = ({
                     </div>
 
                     <h3 className="text-sm font-bold text-slate-900 truncate">
-                      {isAr ? member.name.ar : member.name.en}
+                      {getLocalizedText(member.name, language)}
                     </h3>
                     <p className="text-xs text-slate-500 truncate">
-                      {isAr ? member.role.ar : member.role.en}
+                      {getLocalizedText(member.role, language)}
                     </p>
                   </div>
                 </div>

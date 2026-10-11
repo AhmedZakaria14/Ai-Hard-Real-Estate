@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Certification, SectorScope } from '../../types/businessEntities';
 import { Language } from '../../types';
+import { getLocalizedText } from '../../lib/utils';
 import {
   Award,
   Plus,
@@ -152,16 +153,16 @@ export const CMSCertificationsList: React.FC<CMSCertificationsListProps> = ({
                   {cert.image && (
                     <img
                       src={cert.image}
-                      alt={isAr ? cert.title.ar : cert.title.en}
+                      alt={getLocalizedText(cert.title, language)}
                       className="w-12 h-12 rounded-2xl object-cover border border-slate-200 shrink-0"
                     />
                   )}
                   <div>
                     <h3 className="text-sm font-bold text-slate-900 leading-snug">
-                      {isAr ? cert.title.ar : cert.title.en}
+                      {getLocalizedText(cert.title, language)}
                     </h3>
                     <p className="text-xs text-slate-500 font-semibold mt-0.5">
-                      {isAr ? cert.issuer.ar : cert.issuer.en}
+                      {getLocalizedText(cert.issuer, language)}
                     </p>
                   </div>
                 </div>

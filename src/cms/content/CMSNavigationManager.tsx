@@ -23,6 +23,7 @@ import {
   Search,
 } from 'lucide-react';
 import { Language } from '../../types';
+import { getLocalizedText } from '../../lib/utils';
 import { SectorId } from '../../types/firestore-schema';
 import {
   NavItem,
@@ -411,7 +412,7 @@ export const CMSNavigationManager: React.FC<CMSNavigationManagerProps> = ({ lang
                     </span>
                     <div className="truncate">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-slate-900">{isAr ? item.label.ar : item.label.en}</span>
+                        <span className="font-bold text-slate-900">{getLocalizedText(item.label, language)}</span>
                         <span className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold ${
                           item.type === 'internal' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'
                         }`}>
@@ -601,7 +602,7 @@ export const CMSNavigationManager: React.FC<CMSNavigationManagerProps> = ({ lang
                 <div className="space-y-1">
                   {brokenLinks.map((b) => (
                     <div key={b.id} className="text-amber-900 font-mono text-[11px]">
-                      ⚠️ {isAr ? b.label.ar : b.label.en} ➔ <span className="underline">{b.targetPath}</span> ({isAr ? 'وجهة غير معروفة' : 'Unknown target'})
+                      ⚠️ {getLocalizedText(b.label, language)} ➔ <span className="underline">{b.targetPath}</span> ({isAr ? 'وجهة غير معروفة' : 'Unknown target'})
                     </div>
                   ))}
                 </div>

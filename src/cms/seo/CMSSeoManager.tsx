@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Language, PageId } from '../../types';
+import { getLocalizedText } from '../../lib/utils';
 import { useData } from '../../context/DataContext';
 import {
   PageSeoConfig,
@@ -346,10 +347,10 @@ export const CMSSeoManager: React.FC<CMSSeoManagerProps> = ({ language }) => {
                       {window.location.origin}{currentSeo.canonicalPath}
                     </span>
                     <h4 className="text-sm font-bold text-white line-clamp-1">
-                      {sanitizeSeoString(isAr ? currentSeo.title.ar : currentSeo.title.en)}
+                      {sanitizeSeoString(getLocalizedText(currentSeo.title, language))}
                     </h4>
                     <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
-                      {sanitizeSeoString(isAr ? currentSeo.description.ar : currentSeo.description.en)}
+                      {sanitizeSeoString(getLocalizedText(currentSeo.description, language))}
                     </p>
                   </div>
                 </div>

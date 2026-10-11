@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaqEntity, SectorScope } from '../../types/businessEntities';
 import { Language } from '../../types';
+import { getLocalizedText } from '../../lib/utils';
 import {
   HelpCircle,
   Plus,
@@ -138,7 +139,7 @@ export const CMSFaqList: React.FC<CMSFaqListProps> = ({
                       {faq.sector}
                     </span>
                     <h3 className="text-sm font-bold text-slate-900 truncate">
-                      {isAr ? faq.question.ar : faq.question.en}
+                      {getLocalizedText(faq.question, language)}
                     </h3>
                   </div>
 
