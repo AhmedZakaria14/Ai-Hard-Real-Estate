@@ -92,7 +92,7 @@ export function BlogPage({ onNavigate, language }: BlogPageProps) {
             <div className="space-y-4">
               <div className="relative aspect-16/10 overflow-hidden bg-slate-900">
                 <img
-                  src={post.image}
+                  src={post.image || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'}
                   alt={post.title[language]}
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -141,7 +141,7 @@ export function BlogPage({ onNavigate, language }: BlogPageProps) {
           <div className="space-y-4">
             <div className="relative aspect-16/9 rounded-2xl overflow-hidden bg-slate-900">
               <img
-                src={selectedPost.image}
+                src={selectedPost.image || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'}
                 alt={selectedPost.title[language]}
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover"

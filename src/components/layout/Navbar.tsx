@@ -194,7 +194,7 @@ export function Navbar({
                   </div>
                   <div className="p-1.5 space-y-1">
                     {HARD_GROUP_SECTORS.map((sector) => {
-                      const Icon = SECTOR_ICONS[sector.iconName];
+                      const Icon = SECTOR_ICONS[sector.iconName] || Building2;
                       const isCurrent = sector.id === 'realestate';
                       return (
                         <a
@@ -291,7 +291,7 @@ export function Navbar({
             </div>
             <div className="space-y-1">
               {HARD_GROUP_SECTORS.map((sector) => {
-                const Icon = SECTOR_ICONS[sector.iconName];
+                const Icon = SECTOR_ICONS[sector.iconName] || Building2;
                 const isCurrent = sector.id === 'realestate';
                 return (
                   <a
@@ -331,7 +331,7 @@ export function Navbar({
               {isAr ? 'صفحات العقارات' : 'Real Estate Pages'}
             </div>
             {navItems.map((item) => {
-              const Icon = item.icon;
+              const Icon = item.icon || Building2;
               const isActive = currentPage === item.id;
               const href = getPageHref(item.id);
               return (

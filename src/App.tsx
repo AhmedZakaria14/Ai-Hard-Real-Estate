@@ -27,6 +27,7 @@ import { parsePropertyQueryParams, serializePropertyQueryParams } from './lib/pr
 import { getPageTitle, getPageDescription, updateDocumentTitle } from './lib/pageTitles';
 import { getStoredSeoConfigs, applyPageSeoToHead } from './lib/seo/seoManager';
 import { PrivacyTermsModal } from './components/modals/PrivacyTermsModal';
+import { mockProperties } from './data/mockData';
 
 /**
  * Detects if a URL hash fragment is a copy of a route path or an old SPA route fragment
@@ -68,12 +69,200 @@ function isRouteDuplicateHash(hash: string, pathname: string): boolean {
   return false;
 }
 
+function detectRouteFromLocation(): {
+  page: PageId;
+  attemptedPath: string;
+  filters: PropertyFilterParams | null;
+} {
+  let rawPath = window.location.pathname.toLowerCase().replace(/\/+$/, '');
+  const rawHash = window.location.hash.toLowerCase();
+  const hash = rawHash.replace(/^#\/?/, '');
+  const attemptedPath = window.location.pathname;
+
+  let detectedPage: PageId = 'portal';
+
+  // 1. Sector landing pages & specific top-level paths (path-based routing takes precedence)
+  if (rawPath === '/construction' || rawPath === '/construction/') {
+    detectedPage = 'construction';
+  } else if (rawPath.startsWith('/construction/')) {
+    const sub = rawPath.substring('/construction/'.length).split('?')[0].replace(/\/+$/, '');
+    if (sub === '' || sub === 'cms' || sub === 'projects' || sub === 'project') {
+      detectedPage = 'construction';
+    } else {
+      detectedPage = 'not-found';
+    }
+  } else if (
+    rawPath === '/hvac' ||
+    rawPath === '/hvac/' ||
+    rawPath === '/maintenance' ||
+    rawPath === '/maintenance/'
+  ) {
+    detectedPage = 'hvac';
+  } else if (rawPath.startsWith('/hvac/') || rawPath.startsWith('/maintenance/')) {
+    const prefix = rawPath.startsWith('/hvac/') ? '/hvac/' : '/maintenance/';
+    const sub = rawPath.substring(prefix.length).split('?')[0].replace(/\/+$/, '');
+    if (sub === '' || sub === 'cms') {
+      detectedPage = 'hvac';
+    } else {
+      detectedPage = 'not-found';
+    }
+  } else if (rawPath === '/admin' || rawPath === '/admin/') {
+    detectedPage = 'admin';
+  } else if (rawPath.startsWith('/admin/')) {
+    const sub = rawPath.substring('/admin/'.length).split('?')[0].replace(/\/+$/, '');
+    if (sub === '' || sub === 'cms') {
+      detectedPage = 'admin';
+    } else {
+      detectedPage = 'not-found';
+    }
+  } else if (rawPath === '/portal') {
+    detectedPage = 'portal';
+  } else if (rawPath === '/properties' || rawPath === '/properties/') {
+    detectedPage = 'properties';
+  } else if (rawPath.startsWith('/properties/')) {
+    detectedPage = 'property-details';
+  } else if (rawPath === '/projects' || rawPath === '/projects/') {
+    detectedPage = 'projects';
+  } else if (rawPath === '/blog' || rawPath === '/blog/') {
+    detectedPage = 'blog';
+  } else if (rawPath.startsWith('/blog/')) {
+    detectedPage = 'blog';
+  } else if (rawPath === '/about' || rawPath === '/about/') {
+    detectedPage = 'about';
+  } else if (rawPath === '/contact' || rawPath === '/contact/') {
+    detectedPage = 'contact';
+  } else if (rawPath === '/marketing' || rawPath === '/services') {
+    detectedPage = 'marketing';
+  } else if (rawPath === '/privacy' || rawPath === '/privacy/') {
+    detectedPage = 'privacy';
+  } else if (rawPath === '/terms' || rawPath === '/terms/') {
+    detectedPage = 'terms';
+  } else if (rawPath === '/realestate' || rawPath.startsWith('/realestate/')) {
+    let sub = rawPath.substring('/realestate'.length).replace(/^\/+/, '');
+    sub = sub.split('?')[0].replace(/\/+$/, '');
+
+    if (sub === '' || sub === 'home') {
+      detectedPage = 'home';
+    } else if (sub === 'admin' || sub === 'cms') {
+      detectedPage = 'admin';
+    } else if (sub === 'properties') {
+      detectedPage = 'properties';
+    } else if (sub === 'projects') {
+      detectedPage = 'projects';
+    } else if (sub === 'about') {
+      detectedPage = 'about';
+    } else if (sub === 'contact') {
+      detectedPage = 'contact';
+    } else if (sub === 'marketing' || sub === 'services') {
+      detectedPage = 'marketing';
+    } else if (sub === 'blog') {
+      detectedPage = 'blog';
+    } else if (sub === 'property-details') {
+      detectedPage = 'property-details';
+    } else {
+      detectedPage = 'not-found';
+    }
+  } else if (rawPath === '' || rawPath === '/') {
+    // Root path: check hash for backward compatibility with legacy anchor/hash links
+    if (hash === '' || hash === 'portal') {
+      detectedPage = 'portal';
+    } else if (
+      hash === 'admin' ||
+      hash === 'cms' ||
+      hash === '/admin' ||
+      hash === '/cms'
+    ) {
+      detectedPage = 'admin';
+    } else if (
+      hash === 'properties' ||
+      hash === '/properties'
+    ) {
+      detectedPage = 'properties';
+    } else if (
+      hash === 'construction' ||
+      hash === '/construction' ||
+      hash.startsWith('construction/') ||
+      hash.startsWith('/construction')
+    ) {
+      detectedPage = 'construction';
+    } else if (
+      hash === 'hvac' ||
+      hash === '/hvac' ||
+      hash === 'maintenance' ||
+      hash === '/maintenance' ||
+      hash.startsWith('hvac/') ||
+      hash.startsWith('/hvac') ||
+      hash.startsWith('maintenance/')
+    ) {
+      detectedPage = 'hvac';
+    } else if (hash.startsWith('realestate')) {
+      let sub = hash.substring('realestate'.length).replace(/^\/+/, '');
+      sub = sub.split('?')[0].replace(/\/+$/, '');
+      if (sub === '' || sub === 'home') {
+        detectedPage = 'home';
+      } else if (sub === 'properties') {
+        detectedPage = 'properties';
+      } else if (sub === 'projects') {
+        detectedPage = 'projects';
+      } else if (sub === 'about') {
+        detectedPage = 'about';
+      } else if (sub === 'contact') {
+        detectedPage = 'contact';
+      } else if (sub === 'marketing' || sub === 'services') {
+        detectedPage = 'marketing';
+      } else if (sub === 'blog') {
+        detectedPage = 'blog';
+      } else if (sub === 'property-details') {
+        detectedPage = 'property-details';
+      } else if (sub === 'admin' || sub === 'cms') {
+        detectedPage = 'admin';
+      } else {
+        detectedPage = 'not-found';
+      }
+    } else {
+      detectedPage = 'portal';
+    }
+  } else {
+    detectedPage = 'not-found';
+  }
+
+  // Strip duplicate route hash if present
+  if (hash && isRouteDuplicateHash(hash, rawPath)) {
+    try {
+      const cleanUrl = window.location.pathname + window.location.search;
+      window.history.replaceState(window.history.state, '', cleanUrl);
+    } catch {
+      // ignore
+    }
+  }
+
+  let filters: PropertyFilterParams | null = null;
+  if (detectedPage === 'properties') {
+    const parsed = parsePropertyQueryParams(window.location.search);
+    filters = {
+      searchQuery: parsed.searchQuery,
+      city: parsed.city,
+      type: parsed.type,
+      status: parsed.status,
+      rentalPeriod: parsed.rentalPeriod,
+      minPrice: parsed.minPrice,
+      maxPrice: parsed.maxPrice,
+      bedroom: parsed.bedroom,
+      sortBy: parsed.sortBy,
+      viewMode: parsed.viewMode,
+    };
+  }
+
+  return { page: detectedPage, attemptedPath, filters };
+}
+
 function AppContent() {
   const [language, setLanguage] = useState<Language>('ar');
-  const [currentPage, setCurrentPage] = useState<PageId>('portal');
-  const [attemptedPath, setAttemptedPath] = useState('');
+  const [initialRoute] = useState(() => detectRouteFromLocation());
+  const [currentPage, setCurrentPage] = useState<PageId>(initialRoute.page);
+  const [attemptedPath, setAttemptedPath] = useState<string>(initialRoute.attemptedPath);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
-  const [propertyFilters, setPropertyFilters] = useState<PropertyFilterParams | null>(null);
+  const [propertyFilters, setPropertyFilters] = useState<PropertyFilterParams | null>(initialRoute.filters);
   const { properties } = useData();
 
   // Modals state
@@ -84,216 +273,35 @@ function AppContent() {
   const [projectInquiryModalOpen, setProjectInquiryModalOpen] = useState(false);
   const [selectedProjectForInquiry, setSelectedProjectForInquiry] = useState<Project | null>(null);
 
-  // Handle URL pathname and hash routing
+  // Handle URL pathname and hash routing dynamically on navigation events
   useEffect(() => {
     const handleUrlRoute = () => {
-      let rawPath = window.location.pathname.toLowerCase().replace(/\/+$/, '');
-      const rawHash = window.location.hash.toLowerCase();
-      const hash = rawHash.replace(/^#\/?/, '');
-      setAttemptedPath(window.location.pathname);
-
-      let detectedPage: PageId = 'portal';
-
-      // 1. Sector landing pages & specific top-level paths (path-based routing takes precedence)
-      if (rawPath === '/construction' || rawPath === '/construction/') {
-        detectedPage = 'construction';
-      } else if (rawPath.startsWith('/construction/')) {
-        const sub = rawPath.substring('/construction/'.length).split('?')[0].replace(/\/+$/, '');
-        if (sub === '' || sub === 'cms' || sub === 'projects' || sub === 'project') {
-          detectedPage = 'construction';
-        } else {
-          detectedPage = 'not-found';
-        }
-      } else if (
-        rawPath === '/hvac' ||
-        rawPath === '/hvac/' ||
-        rawPath === '/maintenance' ||
-        rawPath === '/maintenance/'
-      ) {
-        detectedPage = 'hvac';
-      } else if (rawPath.startsWith('/hvac/') || rawPath.startsWith('/maintenance/')) {
-        const prefix = rawPath.startsWith('/hvac/') ? '/hvac/' : '/maintenance/';
-        const sub = rawPath.substring(prefix.length).split('?')[0].replace(/\/+$/, '');
-        if (sub === '' || sub === 'cms') {
-          detectedPage = 'hvac';
-        } else {
-          detectedPage = 'not-found';
-        }
-      } else if (rawPath === '/admin' || rawPath === '/admin/') {
-        detectedPage = 'admin';
-      } else if (rawPath.startsWith('/admin/')) {
-        const sub = rawPath.substring('/admin/'.length).split('?')[0].replace(/\/+$/, '');
-        if (sub === '' || sub === 'cms') {
-          detectedPage = 'admin';
-        } else {
-          detectedPage = 'not-found';
-        }
-      } else if (rawPath === '/portal') {
-        detectedPage = 'portal';
-      } else if (rawPath === '/properties' || rawPath === '/properties/') {
-        detectedPage = 'properties';
-      } else if (rawPath.startsWith('/properties/')) {
-        detectedPage = 'property-details';
-      } else if (rawPath === '/projects' || rawPath === '/projects/') {
-        detectedPage = 'projects';
-      } else if (rawPath === '/blog' || rawPath === '/blog/') {
-        detectedPage = 'blog';
-      } else if (rawPath.startsWith('/blog/')) {
-        detectedPage = 'blog';
-      } else if (rawPath === '/about' || rawPath === '/about/') {
-        detectedPage = 'about';
-      } else if (rawPath === '/contact' || rawPath === '/contact/') {
-        detectedPage = 'contact';
-      } else if (rawPath === '/marketing' || rawPath === '/services') {
-        detectedPage = 'marketing';
-      } else if (rawPath === '/privacy' || rawPath === '/privacy/') {
-        detectedPage = 'privacy';
-      } else if (rawPath === '/terms' || rawPath === '/terms/') {
-        detectedPage = 'terms';
-      } else if (rawPath === '/realestate' || rawPath.startsWith('/realestate/')) {
-        let sub = rawPath.substring('/realestate'.length).replace(/^\/+/, '');
-        sub = sub.split('?')[0].replace(/\/+$/, '');
-
-        if (sub === '' || sub === 'home') {
-          detectedPage = 'home';
-        } else if (sub === 'admin' || sub === 'cms') {
-          detectedPage = 'admin';
-        } else if (sub === 'properties') {
-          detectedPage = 'properties';
-        } else if (sub === 'projects') {
-          detectedPage = 'projects';
-        } else if (sub === 'about') {
-          detectedPage = 'about';
-        } else if (sub === 'contact') {
-          detectedPage = 'contact';
-        } else if (sub === 'marketing' || sub === 'services') {
-          detectedPage = 'marketing';
-        } else if (sub === 'blog') {
-          detectedPage = 'blog';
-        } else if (sub === 'property-details') {
-          detectedPage = 'property-details';
-        } else {
-          detectedPage = 'not-found';
-        }
-      } else if (rawPath === '' || rawPath === '/') {
-        // Root path: check hash for backward compatibility with legacy anchor/hash links
-        if (hash === '' || hash === 'portal') {
-          detectedPage = 'portal';
-          if (hash === 'portal') {
-            window.history.replaceState(null, '', '/' + window.location.search);
-          }
-        } else if (
-          hash === 'admin' ||
-          hash === 'cms' ||
-          hash === '/admin' ||
-          hash === '/cms'
-        ) {
-          detectedPage = 'admin';
-          window.history.replaceState(null, '', '/admin' + window.location.search);
-        } else if (
-          hash === 'properties' ||
-          hash === '/properties'
-        ) {
-          detectedPage = 'properties';
-          window.history.replaceState(null, '', '/properties' + window.location.search);
-        } else if (
-          hash === 'construction' ||
-          hash === '/construction' ||
-          hash.startsWith('construction/') ||
-          hash.startsWith('/construction')
-        ) {
-          detectedPage = 'construction';
-          window.history.replaceState(null, '', '/construction' + window.location.search);
-        } else if (
-          hash === 'hvac' ||
-          hash === '/hvac' ||
-          hash === 'maintenance' ||
-          hash === '/maintenance' ||
-          hash.startsWith('hvac/') ||
-          hash.startsWith('/hvac') ||
-          hash.startsWith('maintenance/')
-        ) {
-          detectedPage = 'hvac';
-          window.history.replaceState(null, '', '/hvac' + window.location.search);
-        } else if (hash.startsWith('realestate')) {
-          let sub = hash.substring('realestate'.length).replace(/^\/+/, '');
-          sub = sub.split('?')[0].replace(/\/+$/, '');
-          const targetPath = sub === '' || sub === 'home' ? '/realestate' : `/realestate/${sub}`;
-          window.history.replaceState(null, '', targetPath + window.location.search);
-          if (sub === '' || sub === 'home') {
-            detectedPage = 'home';
-          } else if (sub === 'properties') {
-            detectedPage = 'properties';
-          } else if (sub === 'projects') {
-            detectedPage = 'projects';
-          } else if (sub === 'about') {
-            detectedPage = 'about';
-          } else if (sub === 'contact') {
-            detectedPage = 'contact';
-          } else if (sub === 'marketing' || sub === 'services') {
-            detectedPage = 'marketing';
-          } else if (sub === 'blog') {
-            detectedPage = 'blog';
-          } else if (sub === 'property-details') {
-            detectedPage = 'property-details';
-          } else if (sub === 'admin' || sub === 'cms') {
-            detectedPage = 'admin';
-          } else {
-            detectedPage = 'not-found';
-          }
-        } else {
-          // Default root page is portal
-          detectedPage = 'portal';
-        }
-      } else {
-        // Genuinely unrecognized top-level route (e.g. /unknown-page)
-        detectedPage = 'not-found';
+      const routeInfo = detectRouteFromLocation();
+      setAttemptedPath(routeInfo.attemptedPath);
+      setCurrentPage(routeInfo.page);
+      if (routeInfo.filters) {
+        setPropertyFilters(routeInfo.filters);
       }
-
-      // Automatically strip duplicate route hashes (e.g. /realestate/projects#realestate/projects)
-      // while strictly preserving genuine in-page section anchors (e.g. #services, #about, #calculator)
-      if (hash && isRouteDuplicateHash(hash, rawPath)) {
-        const cleanUrl = window.location.pathname + window.location.search;
-        window.history.replaceState(window.history.state, '', cleanUrl);
-      }
-
-      // Check query params if on property-details
-      const params = new URLSearchParams(window.location.search);
-      const propId = params.get('id');
-      if (propId && properties.length > 0) {
-        const match = properties.find((p) => p.id === propId || p.slug === propId);
-        if (match) {
-          setSelectedProperty(match);
-        }
-      }
-
-      // Check query params if on properties
-      if (detectedPage === 'properties') {
-        const parsed = parsePropertyQueryParams(window.location.search);
-        setPropertyFilters({
-          searchQuery: parsed.searchQuery,
-          city: parsed.city,
-          type: parsed.type,
-          status: parsed.status,
-          rentalPeriod: parsed.rentalPeriod,
-          minPrice: parsed.minPrice,
-          maxPrice: parsed.maxPrice,
-          bedroom: parsed.bedroom,
-          sortBy: parsed.sortBy,
-          viewMode: parsed.viewMode,
-        });
-      }
-
-      setCurrentPage(detectedPage);
     };
 
-    handleUrlRoute();
     window.addEventListener('hashchange', handleUrlRoute);
     window.addEventListener('popstate', handleUrlRoute);
     return () => {
       window.removeEventListener('hashchange', handleUrlRoute);
       window.removeEventListener('popstate', handleUrlRoute);
     };
+  }, []);
+
+  // Synchronize selected property when properties collection or URL query param updates
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const propId = params.get('id');
+    if (propId && properties.length > 0) {
+      const match = properties.find((p) => p.id === propId || p.slug === propId);
+      if (match) {
+        setSelectedProperty(match);
+      }
+    }
   }, [properties]);
 
   // Synchronize document dir and lang attributes
@@ -506,7 +514,12 @@ function AppContent() {
 
         {currentPage === 'property-details' && (
           <PropertyDetailPage
-            property={selectedProperty || properties[0]}
+            property={
+              selectedProperty ||
+              properties.find((p) => p.id === new URLSearchParams(window.location.search).get('id')) ||
+              properties[0] ||
+              mockProperties[0]
+            }
             onBack={() => handleNavigate('properties')}
             onNavigate={handleNavigate}
             onSelectProperty={handleSelectProperty}

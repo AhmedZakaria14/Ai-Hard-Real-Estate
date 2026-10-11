@@ -248,7 +248,7 @@ export const DynamicPageSectionRenderer: React.FC<DynamicPageSectionRendererProp
                     >
                       <div className="space-y-3 text-center">
                         <img
-                          src={member.avatar}
+                          src={member.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'}
                           alt={isAr ? member.name.ar : member.name.en}
                           className="w-20 h-20 rounded-2xl object-cover border border-slate-200 mx-auto shadow-xs"
                         />
@@ -479,7 +479,7 @@ export const DynamicPageSectionRenderer: React.FC<DynamicPageSectionRendererProp
                       className="bg-white rounded-2xl border border-slate-200/80 p-4 h-24 flex items-center justify-center shadow-2xs hover:shadow-md transition-all group"
                     >
                       <img
-                        src={partner.logoUrl}
+                        src={partner.logoUrl || '/logo.svg'}
                         alt={isAr ? partner.name.ar : partner.name.en}
                         className="max-h-full max-w-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
                       />
@@ -705,7 +705,7 @@ export const DynamicPageSectionRenderer: React.FC<DynamicPageSectionRendererProp
                         {card.imageUrl && (
                           <div className="h-48 overflow-hidden relative">
                             <img
-                              src={card.imageUrl}
+                              src={card.imageUrl || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80'}
                               alt="Card"
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             />
@@ -786,7 +786,7 @@ export const DynamicPageSectionRenderer: React.FC<DynamicPageSectionRendererProp
                   {content.images?.map((img) => (
                     <div key={img.id} className="group relative rounded-2xl overflow-hidden border border-slate-200 shadow-2xs h-64">
                       <img
-                        src={img.imageUrl}
+                        src={img.imageUrl || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'}
                         alt="Gallery"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />

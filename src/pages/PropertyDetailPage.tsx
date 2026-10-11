@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   Building,
   Car,
+  RefreshCw,
 } from 'lucide-react';
 import { Language, PageId, Property } from '../types';
 import { translations } from '../lib/translations';
@@ -43,6 +44,19 @@ export function PropertyDetailPage({
   const t = translations[language];
   const ArrowIcon = language === 'ar' ? ArrowRight : ArrowLeft;
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  if (!property) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-20 text-center space-y-4 font-ui-sans">
+        <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto animate-spin">
+          <RefreshCw className="w-5 h-5" />
+        </div>
+        <p className="text-xs font-bold text-slate-600">
+          {language === 'ar' ? 'جاري تحميل تفاصيل العقار...' : 'Loading property details...'}
+        </p>
+      </div>
+    );
+  }
 
   const similarProperties = mockProperties.filter((p) => p.id !== property.id).slice(0, 2);
 

@@ -53,25 +53,26 @@ export function ProjectsSection() {
     return matchesCategory && matchesSearch;
   });
 
-  const getStatusBadge = (status: ConstructionProject['status']) => {
+  const getStatusBadge = (status?: ConstructionProject['status']) => {
     switch (status) {
       case 'completed':
         return {
-          label: t.projects.statusCompleted,
+          label: t.projects.statusCompleted || (isAr ? 'مكتمل' : 'Completed'),
           classes: 'bg-emerald-50 text-emerald-700 border-emerald-200',
           icon: CheckCircle2,
         };
-      case 'in-progress':
-        return {
-          label: t.projects.statusInProgress,
-          classes: 'bg-amber-50 text-amber-700 border-amber-200',
-          icon: Clock,
-        };
       case 'delivered':
         return {
-          label: t.projects.statusDelivered,
+          label: t.projects.statusDelivered || (isAr ? 'تم التسليم' : 'Delivered'),
           classes: 'bg-sky-50 text-[#0072b8] border-sky-200',
           icon: CheckCircle2,
+        };
+      case 'in-progress':
+      default:
+        return {
+          label: t.projects.statusInProgress || (isAr ? 'قيد التنفيذ' : 'In Progress'),
+          classes: 'bg-amber-50 text-amber-700 border-amber-200',
+          icon: Clock,
         };
     }
   };
@@ -143,8 +144,12 @@ export function ProjectsSection() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {filteredProjects.map((proj) => {
-              const statusInfo = getStatusBadge(proj.status);
-              const StatusIcon = statusInfo.icon;
+              const statusInfo = getStatusBadge(proj.status) || {
+                label: isAr ? 'قيد التنفيذ' : 'In Progress',
+                classes: 'bg-amber-50 text-amber-700 border-amber-200',
+                icon: Clock,
+              };
+              const StatusIcon = statusInfo?.icon || Clock;
               const projectUrl = buildConstructionProjectUrl(proj.id, {
                 category: activeCategory,
                 search: searchQuery,
@@ -163,11 +168,11 @@ export function ProjectsSection() {
                       openProjectModal(proj);
                     }}
                     className="relative aspect-16/10 overflow-hidden bg-slate-900 block cursor-pointer"
-                    aria-label={isAr ? proj.titleAr : proj.titleEn}
+                    aria-label={isAr ? proj.titleAr || '' : proj.titleEn || ''}
                   >
                     <img
-                      src={proj.image}
-                      alt={isAr ? proj.titleAr : proj.titleEn}
+                      src={proj.image || 'https://images.unsplash.com/photo-1541888946425-d0fbb186156a?auto=format&fit=crop&w=800&q=80'}
+                      alt={isAr ? proj.titleAr || '' : proj.titleEn || ''}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       loading="lazy"
                     />
@@ -175,10 +180,10 @@ export function ProjectsSection() {
 
                     {/* Status Pill */}
                     <div
-                      className={`absolute top-3 end-3 px-3 py-1 rounded-lg text-[11px] font-bold border backdrop-blur-md flex items-center gap-1.5 shadow-2xs ${statusInfo.classes}`}
+                      className={`absolute top-3 end-3 px-3 py-1 rounded-lg text-[11px] font-bold border backdrop-blur-md flex items-center gap-1.5 shadow-2xs ${statusInfo.classes || ''}`}
                     >
                       <StatusIcon className="w-3.5 h-3.5" />
-                      <span>{statusInfo.label}</span>
+                      <span>{statusInfo.label || ''}</span>
                     </div>
 
                     {/* Category & City Label */}

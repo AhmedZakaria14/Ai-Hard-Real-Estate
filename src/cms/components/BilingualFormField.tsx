@@ -96,8 +96,14 @@ export const BilingualFormField: React.FC<BilingualFormFieldProps> = ({
     },
   };
 
-  const currentBadge = statusBadgeMap[status];
-  const BadgeIcon = currentBadge.icon;
+  const currentBadge = statusBadgeMap[status] || statusBadgeMap.empty || {
+    labelAr: 'فارغ',
+    labelEn: 'Empty',
+    bgClass: 'bg-slate-100 border-slate-200',
+    textClass: 'text-slate-600',
+    icon: Languages,
+  };
+  const BadgeIcon = currentBadge.icon || Languages;
 
   return (
     <div className="space-y-2 p-4 bg-slate-50/70 border border-slate-200 rounded-2xl">

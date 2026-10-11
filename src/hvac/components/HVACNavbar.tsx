@@ -196,7 +196,7 @@ export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
                 </div>
                 {HARD_GROUP_SECTORS.map((sector) => {
                   const isCurrent = sector.id === currentSectorId;
-                  const SectorIcon = SECTOR_ICONS[sector.iconName];
+                  const SectorIcon = SECTOR_ICONS[sector.iconName] || ThermometerSnowflake;
                   return (
                     <a
                       key={sector.id}
@@ -277,7 +277,7 @@ export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
             <div className="grid grid-cols-1 gap-1">
               {HARD_GROUP_SECTORS.map((sector) => {
                 const isCurrent = sector.id === currentSectorId;
-                const SectorIcon = SECTOR_ICONS[sector.iconName];
+                const SectorIcon = SECTOR_ICONS[sector.iconName] || ThermometerSnowflake;
                 return (
                   <a
                     key={sector.id}
@@ -314,7 +314,7 @@ export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
 
           <nav className="flex flex-col space-y-2 text-start">
             {navLinks.map((link) => {
-              const Icon = link.icon;
+              const Icon = link.icon || ThermometerSnowflake;
               return (
                 <a
                   key={link.href}

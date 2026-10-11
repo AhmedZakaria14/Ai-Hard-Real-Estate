@@ -90,7 +90,7 @@ export function ServicesSection({
               >
                 <div className="relative rounded-3xl overflow-hidden shadow-xl aspect-16/11 bg-slate-950 group">
                   <img
-                    src={service.image}
+                    src={service.image || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'}
                     alt={service.title[language]}
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"

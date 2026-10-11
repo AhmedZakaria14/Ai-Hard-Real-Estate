@@ -178,7 +178,7 @@ export function Footer({ onNavigate, language }: FooterProps) {
             </h4>
             <ul className="space-y-2 text-xs sm:text-sm">
               {HARD_GROUP_SECTORS.map((sector) => {
-                const Icon = SECTOR_ICONS[sector.iconName];
+                const Icon = SECTOR_ICONS[sector.iconName] || Building2;
                 const isCurrent = sector.id === 'realestate';
                 return (
                   <li key={sector.id}>

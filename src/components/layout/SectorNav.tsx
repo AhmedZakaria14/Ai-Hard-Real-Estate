@@ -73,7 +73,7 @@ export function SectorNav({
           {/* Sector Links Strip */}
           <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar py-1">
             {HARD_GROUP_SECTORS.map((sector: SectorDefinition) => {
-              const Icon = ICONS[sector.iconName];
+              const Icon = ICONS[sector.iconName] || Building2;
               const isCurrent = sector.id === activeSectorId;
               const sectorName = sector.name[language];
               const shortName = sector.shortName[language];

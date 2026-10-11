@@ -75,7 +75,7 @@ export function ProjectsPage({
             {/* Image side (5 cols) */}
             <div className="lg:col-span-5 relative aspect-16/10 lg:aspect-auto bg-slate-950 overflow-hidden">
               <img
-                src={project.image}
+                src={project.image || 'https://images.unsplash.com/photo-1541888946425-d0fbb186156a?auto=format&fit=crop&w=800&q=80'}
                 alt={project.title[language]}
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover"
