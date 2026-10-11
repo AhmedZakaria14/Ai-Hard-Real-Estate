@@ -31,8 +31,10 @@ import {
   FileText,
   Calendar,
   Sliders,
+  Trash2,
 } from "lucide-react";
 import { Language } from "../types";
+import { CMSTrashBinModal } from "./components/CMSTrashBinModal";
 
 export type CMSTab =
   | "dashboard"
@@ -78,6 +80,7 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
   const isAr = language === "ar";
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [isTrashBinOpen, setIsTrashBinOpen] = useState(false);
 
   const userRole = (adminUser.role || "superadmin") as AdminRole;
 
@@ -416,6 +419,15 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Trash & Archive Management Button */}
+            <button
+              onClick={() => setIsTrashBinOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-colors cursor-pointer"
+            >
+              <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+              <span>{isAr ? "سلة المهملات والأرشيف" : "Trash & Recovery"}</span>
+            </button>
+
             {/* Language Switcher */}
             <button
               onClick={() => onLanguageChange(isAr ? "en" : "ar")}
@@ -440,6 +452,19 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
           {children}
         </main>
+
+        {/* Trash & Archival Recovery Modal */}
+        <CMSTrashBinModal
+          isOpen={isTrashBinOpen}
+          onClose={() => setIsTrashBinOpen(false)}
+          language={language}
+          currentUser={{
+            uid: 'admin-1',
+            email: adminUser.email || 'admin@hard.sa',
+            name: adminUser.name,
+            role: userRole,
+          }}
+        />
       </div>
     </div>
   );

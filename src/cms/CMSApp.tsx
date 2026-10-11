@@ -594,6 +594,8 @@ export const CMSApp: React.FC<CMSAppProps> = ({
           onNavigateToTestimonials={() => setActiveTab("testimonials")}
           onNavigateToSubscribers={() => setActiveTab("subscribers")}
           onNavigateToLeads={() => setActiveTab("leads")}
+          onNavigateToAppointments={() => setActiveTab("appointments")}
+          onNavigateToContent={() => setActiveTab("content")}
           onAddProperty={handleOpenAddProperty}
           onAddProject={handleOpenAddProject}
           onAddBlogPost={handleOpenAddBlogPost}

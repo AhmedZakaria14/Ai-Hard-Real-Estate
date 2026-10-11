@@ -22,6 +22,7 @@ import {
   Percent,
 } from 'lucide-react';
 import { Language, Project, ProjectStatus } from '../../types';
+import { PreDeleteReferenceModal } from '../components/PreDeleteReferenceModal';
 
 interface CMSProjectsListProps {
   projects: Project[];
@@ -50,7 +51,7 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
-  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [projectForDelete, setProjectForDelete] = useState<Project | null>(null);
 
   const statusOptions: { value: ProjectStatus; labelEn: string; labelAr: string; color: string }[] = [
     { value: 'planning', labelEn: 'Planning & Design', labelAr: 'مرحلة التخطيط والتصميم', color: 'bg-amber-100 text-amber-800 border-amber-200' },
@@ -426,33 +427,13 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
                             <Copy className="w-3.5 h-3.5" />
                           </button>
 
-                          {deleteConfirmId === project.id ? (
-                            <div className="flex items-center gap-1">
-                              <button
-                                onClick={() => {
-                                  onDeleteProject(project.id);
-                                  setDeleteConfirmId(null);
-                                }}
-                                className="px-2 py-1 bg-red-600 text-white text-[10px] font-bold rounded-md hover:bg-red-700 cursor-pointer"
-                              >
-                                {isAr ? 'تأكيد' : 'Confirm'}
-                              </button>
-                              <button
-                                onClick={() => setDeleteConfirmId(null)}
-                                className="px-2 py-1 bg-slate-200 text-slate-700 text-[10px] font-bold rounded-md hover:bg-slate-300 cursor-pointer"
-                              >
-                                {isAr ? 'إلغاء' : 'Cancel'}
-                              </button>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => setDeleteConfirmId(project.id)}
-                              className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
-                              title={isAr ? 'حذف' : 'Delete'}
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          )}
+                          <button
+                            onClick={() => setProjectForDelete(project)}
+                            className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                            title={isAr ? 'أرشفة ونقل لسلة المهملات' : 'Move to Trash'}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -567,9 +548,9 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
                     </button>
 
                     <button
-                      onClick={() => onDeleteProject(project.id)}
-                      className="p-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold transition-colors cursor-pointer"
-                      title={isAr ? 'حذف' : 'Delete'}
+                      onClick={() => setProjectForDelete(project)}
+                      className="p-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold transition-colors cursor-pointer"
+                      title={isAr ? 'أرشفة ونقل لسلة المهملات' : 'Move to Trash'}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -579,6 +560,29 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
             );
           })}
         </div>
+      )}
+
+      {/* Pre-Deletion Reference Check & Soft Delete Modal */}
+      {projectForDelete && (
+        <PreDeleteReferenceModal
+          isOpen={!!projectForDelete}
+          onClose={() => setProjectForDelete(null)}
+          entityType="project"
+          entityId={projectForDelete.id}
+          entityTitle={projectForDelete.title}
+          originalCollection="construction_projects"
+          originalData={projectForDelete}
+          currentUser={{
+            uid: 'admin-1',
+            email: 'admin@hard.sa',
+            role: 'superadmin',
+          }}
+          language={language}
+          onSoftDeleteSuccess={() => {
+            onDeleteProject(projectForDelete.id);
+            setProjectForDelete(null);
+          }}
+        />
       )}
     </div>
   );

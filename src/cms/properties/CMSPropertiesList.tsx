@@ -26,6 +26,7 @@ import {
 import { Property, PropertyType, ListingStatus, Language } from '../../types';
 import { SAUDI_CITIES } from '../../data/cities';
 import { getPropertyAreaSqM } from '../../lib/utils';
+import { PreDeleteReferenceModal } from '../components/PreDeleteReferenceModal';
 
 interface CMSPropertiesListProps {
   properties: Property[];
@@ -58,8 +59,7 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
   const [selectedCity, setSelectedCity] = useState<string>('all');
   const [onlyFeatured, setOnlyFeatured] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [propertyForDelete, setPropertyForDelete] = useState<Property | null>(null);
 
   // Filtered properties
   const filteredProperties = useMemo(() => {
@@ -144,13 +144,6 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  };
-
-  const handleDeleteConfirm = async (id: string) => {
-    setDeletingId(id);
-    await onDeleteProperty(id);
-    setDeletingId(null);
-    setConfirmDeleteId(null);
   };
 
   return (
@@ -518,54 +511,36 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
 
                     {/* Actions */}
                     <td className="py-3 px-4 text-end whitespace-nowrap">
-                      {confirmDeleteId === prop.id ? (
-                        <div className="inline-flex items-center gap-1.5 animate-in fade-in">
-                          <button
-                            onClick={() => handleDeleteConfirm(prop.id)}
-                            disabled={deletingId === prop.id}
-                            className="px-2.5 py-1 bg-red-600 text-white rounded-lg text-[10px] font-bold hover:bg-red-700 cursor-pointer disabled:opacity-50"
-                          >
-                            {deletingId === prop.id ? '...' : isAr ? 'تأكيد الحذف' : 'Confirm'}
-                          </button>
-                          <button
-                            onClick={() => setConfirmDeleteId(null)}
-                            className="px-2 py-1 bg-slate-200 text-slate-700 rounded-lg text-[10px] font-semibold hover:bg-slate-300 cursor-pointer"
-                          >
-                            {isAr ? 'إلغاء' : 'Cancel'}
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="inline-flex items-center gap-1">
-                          <button
-                            onClick={() => onViewLive(prop)}
-                            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
-                            title={isAr ? 'معاينة في الموقع الحي' : 'Preview on Live Site'}
-                          >
-                            <ExternalLink className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => onDuplicateProperty(prop)}
-                            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-                            title={isAr ? 'نسخ العقار' : 'Duplicate Listing'}
-                          >
-                            <Copy className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => onEditProperty(prop)}
-                            className="p-1.5 text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
-                            title={isAr ? 'تعديل البيانات' : 'Edit Property'}
-                          >
-                            <Edit2 className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => setConfirmDeleteId(prop.id)}
-                            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                            title={isAr ? 'حذف العقار' : 'Delete Property'}
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      )}
+                      <div className="inline-flex items-center gap-1">
+                        <button
+                          onClick={() => onViewLive(prop)}
+                          className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
+                          title={isAr ? 'معاينة في الموقع الحي' : 'Preview on Live Site'}
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => onDuplicateProperty(prop)}
+                          className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                          title={isAr ? 'نسخ العقار' : 'Duplicate Listing'}
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => onEditProperty(prop)}
+                          className="p-1.5 text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
+                          title={isAr ? 'تعديل البيانات' : 'Edit Property'}
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => setPropertyForDelete(prop)}
+                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                          title={isAr ? 'أرشفة ونقل لسلة المهملات' : 'Move to Trash'}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -674,9 +649,9 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
                     <button
-                      onClick={() => handleDeleteConfirm(prop.id)}
-                      className="p-1.5 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 cursor-pointer"
-                      title="Delete"
+                      onClick={() => setPropertyForDelete(prop)}
+                      className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 cursor-pointer"
+                      title={isAr ? 'أرشفة ونقل لسلة المهملات' : 'Move to Trash'}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -686,6 +661,29 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
             </div>
           ))}
         </div>
+      )}
+
+      {/* Pre-Deletion Reference Check & Soft Delete Modal */}
+      {propertyForDelete && (
+        <PreDeleteReferenceModal
+          isOpen={!!propertyForDelete}
+          onClose={() => setPropertyForDelete(null)}
+          entityType="property"
+          entityId={propertyForDelete.id}
+          entityTitle={propertyForDelete.title}
+          originalCollection="properties"
+          originalData={propertyForDelete}
+          currentUser={{
+            uid: 'admin-1',
+            email: 'admin@hard.sa',
+            role: 'superadmin',
+          }}
+          language={language}
+          onSoftDeleteSuccess={() => {
+            onDeleteProperty(propertyForDelete.id);
+            setPropertyForDelete(null);
+          }}
+        />
       )}
     </div>
   );
