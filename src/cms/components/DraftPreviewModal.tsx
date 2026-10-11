@@ -130,15 +130,10 @@ export const DraftPreviewModal: React.FC<DraftPreviewModalProps> = ({
         >
           {sections && sections.length > 0 ? (
             <div className="divide-y divide-slate-100">
-              {sections
-                .filter((sec) => sec.isVisible !== false)
-                .map((sec) => (
-                  <DynamicPageSectionRenderer
-                    key={sec.id}
-                    section={sec}
-                    language={language}
-                  />
-                ))}
+              <DynamicPageSectionRenderer
+                sections={sections.filter((sec) => sec.isVisible !== false)}
+                language={language}
+              />
             </div>
           ) : (
             <div className="p-12 text-center text-slate-400 space-y-3">

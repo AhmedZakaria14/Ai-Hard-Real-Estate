@@ -485,15 +485,15 @@ export const CMSAppointmentDetailModal: React.FC<CMSAppointmentDetailModalProps>
               </div>
 
               {/* Private Attachments Section */}
-              {appointment.attachments && appointment.attachments.length > 0 && (
+              {(appointment as any).attachments && (appointment as any).attachments.length > 0 && (
                 <div className="md:col-span-2 bg-emerald-950/30 border border-emerald-500/30 rounded-xl p-5 space-y-3">
                   <div className="flex items-center justify-between">
                     <h4 className="text-sm font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-2">
                       <Paperclip className="w-4 h-4 text-emerald-400" />
                       <span>
                         {isAr
-                          ? `المرفقات والمستندات الخاصة (${appointment.attachments.length})`
-                          : `Private Inspection Attachments (${appointment.attachments.length})`}
+                          ? `المرفقات والمستندات الخاصة (${(appointment as any).attachments.length})`
+                          : `Private Inspection Attachments (${(appointment as any).attachments.length})`}
                       </span>
                     </h4>
                     <span className="text-xs bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded-full font-bold border border-emerald-500/30">
@@ -502,7 +502,7 @@ export const CMSAppointmentDetailModal: React.FC<CMSAppointmentDetailModalProps>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {appointment.attachments.map((att) => (
+                    {((appointment as any).attachments as any[]).map((att) => (
                       <div
                         key={att.id}
                         className="bg-slate-900 p-3 rounded-lg border border-slate-800 flex items-center justify-between"

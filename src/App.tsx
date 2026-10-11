@@ -28,6 +28,7 @@ import { getPageTitle, getPageDescription, updateDocumentTitle } from './lib/pag
 import { getStoredSeoConfigs, applyPageSeoToHead } from './lib/seo/seoManager';
 import { PrivacyTermsModal } from './components/modals/PrivacyTermsModal';
 import { mockProperties } from './data/mockData';
+import { ErrorBoundary } from './components/ui/ErrorBoundary';
 
 /**
  * Detects if a URL hash fragment is a copy of a route path or an old SPA route fragment
@@ -432,47 +433,55 @@ function AppContent() {
   // 1. Root HARD Group Corporate Multi-Division Dashboard (assigned to /)
   if (currentPage === 'portal') {
     return (
-      <GroupPortalDashboard
-        language={language}
-        onLanguageChange={setLanguage}
-        onNavigateToRealEstate={(targetPage = 'home') => handleNavigate(targetPage)}
-        onNavigateToConstruction={() => handleNavigate('construction')}
-        onNavigateToHVAC={() => handleNavigate('hvac')}
-      />
+      <ErrorBoundary>
+        <GroupPortalDashboard
+          language={language}
+          onLanguageChange={setLanguage}
+          onNavigateToRealEstate={(targetPage = 'home') => handleNavigate(targetPage)}
+          onNavigateToConstruction={() => handleNavigate('construction')}
+          onNavigateToHVAC={() => handleNavigate('hvac')}
+        />
+      </ErrorBoundary>
     );
   }
 
   // 2. HARD Construction Division Page (/construction)
   if (currentPage === 'construction') {
     return (
-      <ConstructionPage
-        language={language}
-        onLanguageChange={setLanguage}
-        onNavigate={handleNavigate}
-      />
+      <ErrorBoundary>
+        <ConstructionPage
+          language={language}
+          onLanguageChange={setLanguage}
+          onNavigate={handleNavigate}
+        />
+      </ErrorBoundary>
     );
   }
 
   // 3. HARD HVAC Maintenance Division Page (/hvac or /maintenance)
   if (currentPage === 'hvac') {
     return (
-      <HVACPage
-        language={language}
-        onLanguageChange={setLanguage}
-        onNavigatePage={handleNavigate}
-      />
+      <ErrorBoundary>
+        <HVACPage
+          language={language}
+          onLanguageChange={setLanguage}
+          onNavigatePage={handleNavigate}
+        />
+      </ErrorBoundary>
     );
   }
 
   // 3. Dedicated Full-Screen Enterprise CMS Mode (/realestate/admin or /admin)
   if (currentPage === 'admin') {
     return (
-      <CMSApp
-        onReturnToSite={() => handleNavigate('home')}
-        onViewPropertyOnSite={(prop) => handleSelectProperty(prop)}
-        language={language}
-        onLanguageChange={setLanguage}
-      />
+      <ErrorBoundary>
+        <CMSApp
+          onReturnToSite={() => handleNavigate('home')}
+          onViewPropertyOnSite={(prop) => handleSelectProperty(prop)}
+          language={language}
+          onLanguageChange={setLanguage}
+        />
+      </ErrorBoundary>
     );
   }
 
@@ -619,12 +628,14 @@ function AppContent() {
 
 export default function App() {
   return (
-    <DataProvider>
-      <SiteSettingsProvider>
-        <TextOverrideProvider>
-          <AppContent />
-        </TextOverrideProvider>
-      </SiteSettingsProvider>
-    </DataProvider>
+    <ErrorBoundary>
+      <DataProvider>
+        <SiteSettingsProvider>
+          <TextOverrideProvider>
+            <AppContent />
+          </TextOverrideProvider>
+        </SiteSettingsProvider>
+      </DataProvider>
+    </ErrorBoundary>
   );
 }

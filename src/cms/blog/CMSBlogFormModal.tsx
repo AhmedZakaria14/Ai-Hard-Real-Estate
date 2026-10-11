@@ -69,7 +69,8 @@ export const CMSBlogFormModal: React.FC<CMSBlogFormModalProps> = ({
     if (initialData) {
       setTitleEn(initialData.title?.en || '');
       setTitleAr(initialData.title?.ar || '');
-      setSlug(initialData.slug || '');
+      const rawSlug = typeof initialData.slug === 'string' ? initialData.slug : ((initialData.slug as any)?.en || (initialData.slug as any)?.ar);
+      setSlug(rawSlug || '');
       setExcerptEn(initialData.excerpt?.en || '');
       setExcerptAr(initialData.excerpt?.ar || '');
       setCategoryEn(initialData.category?.en || 'Market Intelligence');
@@ -79,8 +80,10 @@ export const CMSBlogFormModal: React.FC<CMSBlogFormModalProps> = ({
       setDate(initialData.date || '');
       setReadTimeEn(initialData.readTime?.en || '5 min read');
       setReadTimeAr(initialData.readTime?.ar || 'قراءة 5 دقائق');
-      setAuthorEn(initialData.author?.en || 'Faisal Al-Otaibi');
-      setAuthorAr(initialData.author?.ar || 'فيصل العتيبي');
+      const rawAuthorEn = typeof initialData.author === 'string' ? initialData.author : initialData.author?.en;
+      const rawAuthorAr = typeof initialData.author === 'string' ? initialData.author : initialData.author?.ar;
+      setAuthorEn(rawAuthorEn || 'Faisal Al-Otaibi');
+      setAuthorAr(rawAuthorAr || 'فيصل العتيبي');
       setAuthorRoleEn(initialData.authorRole?.en || 'Senior Real Estate Strategist');
       setAuthorRoleAr(initialData.authorRole?.ar || 'كبير المستشارين الاستراتيجيين');
       setAuthorAvatar(initialData.authorAvatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80');

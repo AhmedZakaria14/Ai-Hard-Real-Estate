@@ -67,7 +67,7 @@ export function HVACCMS({ onExit }: HVACCMSProps) {
   const [pinInput, setPinInput] = useState('');
   const [pinError, setPinError] = useState(false);
   const [activeTab, setActiveTab] = useState<
-    'leads' | 'services' | 'service_areas' | 'hero_booking' | 'portfolio' | 'testimonials' | 'hours_contact'
+    'leads' | 'services' | 'service_areas' | 'hero_booking' | 'portfolio' | 'testimonials' | 'hours_contact' | 'gallery' | 'reviews'
   >('leads');
 
   // Form states

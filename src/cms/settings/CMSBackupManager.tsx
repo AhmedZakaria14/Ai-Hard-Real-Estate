@@ -139,7 +139,12 @@ export const CMSBackupManager: React.FC<CMSBackupManagerProps> = ({
   const handleRunMediaAudit = async () => {
     setIsAuditingMedia(true);
     try {
-      const snapshot = latestSnapshot || (await generateFullDatabaseSnapshot(currentAdminUser));
+      const userParam = {
+        uid: currentAdminUser.uid || 'admin-master',
+        email: currentAdminUser.email,
+        name: currentAdminUser.name,
+      };
+      const snapshot = latestSnapshot || (await generateFullDatabaseSnapshot(userParam));
       const res = auditMediaReferences(snapshot);
       setMediaAudit(res);
     } catch (err) {

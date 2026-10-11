@@ -65,7 +65,11 @@ export const CMSAuth: React.FC<CMSAuthProps> = ({
 
     try {
       // Bootstrap initial superadmin if first run
-      await bootstrapAdminAccount();
+      try {
+        await bootstrapAdminAccount();
+      } catch (bErr) {
+        console.warn('Bootstrap admin catch:', bErr);
+      }
       const profile = await loginAdmin(email.trim(), password);
       
       onLoginSuccess({

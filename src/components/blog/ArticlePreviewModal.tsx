@@ -138,11 +138,11 @@ export const ArticlePreviewModal: React.FC<ArticlePreviewModalProps> = ({
           </div>
 
           {/* Cover Image */}
-          {(post.image || post.coverImage) && (
+          {post.image && (
             <div className="max-w-3xl mx-auto rounded-3xl overflow-hidden border border-slate-200 shadow-md aspect-16/9 bg-slate-900">
               <img
-                src={post.coverImage || post.image}
-                alt={post.coverImageAlt?.[language] || post.title?.[language]}
+                src={post.image}
+                alt={post.title?.[language] || 'Article Banner'}
                 className="w-full h-full object-cover"
               />
             </div>

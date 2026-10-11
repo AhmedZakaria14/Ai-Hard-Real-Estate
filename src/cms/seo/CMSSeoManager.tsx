@@ -258,8 +258,7 @@ export const CMSSeoManager: React.FC<CMSSeoManagerProps> = ({ language }) => {
               {/* Title & Description Fields */}
               <div className="space-y-4 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
                 <BilingualFormField
-                  labelEn="SEO Page Title (<title>)"
-                  labelAr="عنوان الصفحة المخصص للمحركات"
+                  label={isAr ? 'عنوان الصفحة المخصص للمحركات' : 'SEO Page Title (<title>)'}
                   value={currentSeo.title}
                   onChange={(val) => handleUpdateCurrentSeo('title', val)}
                   required
@@ -267,8 +266,7 @@ export const CMSSeoManager: React.FC<CMSSeoManagerProps> = ({ language }) => {
                 />
 
                 <BilingualFormField
-                  labelEn="Meta Description (<meta name='description'>)"
-                  labelAr="الوصف المختصر المخصص للمحركات"
+                  label={isAr ? 'الوصف المختصر المخصص للمحركات' : "Meta Description (<meta name='description'>)"}
                   value={currentSeo.description}
                   onChange={(val) => handleUpdateCurrentSeo('description', val)}
                   type="textarea"
@@ -477,8 +475,7 @@ export const CMSSeoManager: React.FC<CMSSeoManagerProps> = ({ language }) => {
                   </div>
 
                   <BilingualFormField
-                    labelEn="Clause Heading"
-                    labelAr="عنوان البند"
+                    label={isAr ? 'عنوان البند' : 'Clause Heading'}
                     value={sec.heading}
                     onChange={(val) => {
                       const updatedSecs = [...legalPolicy.privacyPolicy.sections];
@@ -492,8 +489,7 @@ export const CMSSeoManager: React.FC<CMSSeoManagerProps> = ({ language }) => {
                   />
 
                   <BilingualFormField
-                    labelEn="Clause Body Paragraphs"
-                    labelAr="نص البند القانوني"
+                    label={isAr ? 'نص البند القانوني' : 'Clause Body Paragraphs'}
                     value={sec.body}
                     onChange={(val) => {
                       const updatedSecs = [...legalPolicy.privacyPolicy.sections];

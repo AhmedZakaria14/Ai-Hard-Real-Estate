@@ -8,29 +8,41 @@ import {
 } from '../../lib/bilingualUtils';
 
 interface BilingualFormFieldProps {
-  label: string;
+  label?: string;
+  labelEn?: string;
+  labelAr?: string;
   value: LocalizedText;
   onChange: (value: LocalizedText) => void;
   type?: 'text' | 'textarea';
+  multiline?: boolean;
   rows?: number;
   placeholderAr?: string;
   placeholderEn?: string;
+  helpTextEn?: string;
+  helpTextAr?: string;
   required?: boolean;
   language?: 'ar' | 'en';
 }
 
 export const BilingualFormField: React.FC<BilingualFormFieldProps> = ({
-  label,
+  label = '',
+  labelEn,
+  labelAr,
   value,
   onChange,
   type = 'text',
+  multiline = false,
   rows = 3,
   placeholderAr = 'أدخل النص بالعربية...',
   placeholderEn = 'Enter text in English...',
+  helpTextEn,
+  helpTextAr,
   required = false,
   language = 'ar',
 }) => {
   const isArUi = language === 'ar';
+  const computedLabel = isArUi ? (labelAr || label || labelEn || '') : (labelEn || label || labelAr || '');
+  const computedType = multiline ? 'textarea' : type;
   const status = getTranslationStatus(value);
   const [hasDraftNotice, setHasDraftNotice] = useState(false);
 
@@ -110,7 +122,7 @@ export const BilingualFormField: React.FC<BilingualFormFieldProps> = ({
       {/* Field Header & Status Badge */}
       <div className="flex items-center justify-between flex-wrap gap-2">
         <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-          <span>{label}</span>
+          <span>{computedLabel}</span>
           {required && <span className="text-rose-500 font-bold">*</span>}
         </label>
 
@@ -148,7 +160,7 @@ export const BilingualFormField: React.FC<BilingualFormFieldProps> = ({
             <span className="text-[10px] text-slate-400 font-mono">RTL</span>
           </div>
 
-          {type === 'textarea' ? (
+          {computedType === 'textarea' ? (
             <textarea
               dir="rtl"
               rows={rows}
@@ -178,7 +190,7 @@ export const BilingualFormField: React.FC<BilingualFormFieldProps> = ({
             <span className="text-[10px] text-slate-400 font-mono">LTR</span>
           </div>
 
-          {type === 'textarea' ? (
+          {computedType === 'textarea' ? (
             <textarea
               dir="ltr"
               rows={rows}

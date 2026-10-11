@@ -774,7 +774,7 @@ export const CMSFormSchemaEditor: React.FC<CMSFormSchemaEditorProps> = ({
               ? `تم تحديث ونشر نموذج الخدمة بنجاح (v${v})`
               : `Form schema published successfully as version v${v}`,
           });
-          setSchemaConfig((prev) => ({ ...prev, schemaVersion: v }));
+          setSchemaConfig((prev) => ({ ...prev, schemaVersion: String(v) }));
         }}
         entityType="form_schema"
         entityId={selectedFormType}

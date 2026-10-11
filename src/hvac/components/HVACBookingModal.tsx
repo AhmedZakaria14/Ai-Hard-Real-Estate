@@ -473,8 +473,9 @@ City: ${cityName}`;
                 uploadSessionId="hvac-booking-modal"
                 attachments={attachments}
                 onChange={setAttachments}
-                isAr={isAr}
-                label={isAr ? 'صور الموقع أو الوحدة إن وجدت (اختياري)' : 'Site or Unit Photos (Optional)'}
+                language={language}
+                labelAr="صور الموقع أو الوحدة إن وجدت (اختياري)"
+                labelEn="Site or Unit Photos (Optional)"
               />
 
               {/* Submit Button */}

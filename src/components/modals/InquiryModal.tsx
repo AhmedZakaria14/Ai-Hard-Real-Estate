@@ -233,7 +233,7 @@ export function InquiryModal({
             uploadSessionId="inquiry-modal"
             attachments={attachments}
             onChange={setAttachments}
-            isAr={language === 'ar'}
+            language={language}
           />
 
           <div className="pt-2">

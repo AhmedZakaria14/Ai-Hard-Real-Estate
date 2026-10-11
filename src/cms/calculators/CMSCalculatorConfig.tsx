@@ -49,14 +49,17 @@ import {
 
 interface CMSCalculatorConfigProps {
   language: Language;
-  adminEmail: string;
+  adminEmail?: string;
+  currentAdminEmail?: string;
 }
 
 export const CMSCalculatorConfig: React.FC<CMSCalculatorConfigProps> = ({
   language,
   adminEmail,
+  currentAdminEmail,
 }) => {
   const isAr = language === 'ar';
+  const effectiveEmail = currentAdminEmail || adminEmail || 'admin@hard.sa';
   const [activeType, setActiveType] = useState<'construction' | 'hvac'>('construction');
 
   // Config States

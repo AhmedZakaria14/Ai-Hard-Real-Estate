@@ -362,28 +362,23 @@ export const CMSSeoLegalEditor: React.FC<CMSSeoLegalEditorProps> = ({ language }
               {/* Title & Description Fields */}
               <div className="space-y-4">
                 <BilingualFormField
-                  labelEn="Page Search Title (<title> & og:title)"
-                  labelAr="عنوان الصفحة في نتائج البحث والتواصل"
+                  label={isAr ? 'عنوان الصفحة في نتائج البحث والتواصل' : 'Page Search Title (<title> & og:title)'}
                   value={activeSeo.title}
                   onChange={(val) => handleUpdateSeoField('title', val)}
                   language={language}
                   placeholderEn="e.g., HARD Real Estate | Certified Saudi Brokerage"
                   placeholderAr="مثال: هارد للعقارات | الوساطة والاستثمار المعتمد"
-                  helpTextEn="Ideal length: 30-60 characters for search snippet rendering."
-                  helpTextAr="الموصى به: من 30 إلى 60 حرفاً لضمان عدم الاقتصاص في البحث."
                 />
 
                 <BilingualFormField
-                  labelEn="Meta Description (<meta name='description'>)"
-                  labelAr="الوصف المختصر للصفحة في محركات البحث"
+                  label={isAr ? 'الوصف المختصر للصفحة في محركات البحث' : "Meta Description (<meta name='description'>)"}
                   value={activeSeo.description}
                   onChange={(val) => handleUpdateSeoField('description', val)}
                   language={language}
-                  multiline
+                  type="textarea"
+                  rows={3}
                   placeholderEn="e.g., REGA certified real estate marketing and luxury property acquisitions."
                   placeholderAr="مثال: منصة تسويق ووساطة عقارية معتمدة من الهيئة العامة للعقار (فال)."
-                  helpTextEn="Ideal length: 120-160 characters. Script tags and unsanitized HTML are automatically stripped."
-                  helpTextAr="الموصى به: من 120 إلى 160 حرفاً. يتم تنقية الحقول تلقائياً لمنع أي نصوص برمجية."
                 />
               </div>
 
@@ -606,8 +601,7 @@ export const CMSSeoLegalEditor: React.FC<CMSSeoLegalEditorProps> = ({ language }
                       </div>
 
                       <BilingualFormField
-                        labelEn="Clause Heading"
-                        labelAr="عنوان البند"
+                        label={isAr ? 'عنوان البند' : 'Clause Heading'}
                         value={sec.heading}
                         onChange={(val) => {
                           setLegalPolicy((prev) => ({
@@ -624,8 +618,7 @@ export const CMSSeoLegalEditor: React.FC<CMSSeoLegalEditorProps> = ({ language }
                       />
 
                       <BilingualFormField
-                        labelEn="Approved Body Text"
-                        labelAr="النص المعتمد للبند"
+                        label={isAr ? 'النص المعتمد للبند' : 'Approved Body Text'}
                         value={sec.body}
                         onChange={(val) => {
                           setLegalPolicy((prev) => ({
@@ -713,8 +706,7 @@ export const CMSSeoLegalEditor: React.FC<CMSSeoLegalEditorProps> = ({ language }
                       </div>
 
                       <BilingualFormField
-                        labelEn="Condition Heading"
-                        labelAr="عنوان الشرط"
+                        label={isAr ? 'عنوان الشرط' : 'Condition Heading'}
                         value={sec.heading}
                         onChange={(val) => {
                           setLegalPolicy((prev) => ({
@@ -731,8 +723,7 @@ export const CMSSeoLegalEditor: React.FC<CMSSeoLegalEditorProps> = ({ language }
                       />
 
                       <BilingualFormField
-                        labelEn="Approved Text"
-                        labelAr="النص المعتمد للشرط"
+                        label={isAr ? 'النص المعتمد للشرط' : 'Approved Text'}
                         value={sec.body}
                         onChange={(val) => {
                           setLegalPolicy((prev) => ({

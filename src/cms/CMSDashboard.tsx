@@ -529,7 +529,7 @@ export const CMSDashboard: React.FC<CMSDashboardProps> = ({
                         <span className="text-xs font-bold text-slate-900">{lead.name}</span>
                         <span className="text-[10px] font-medium text-slate-500">({lead.phone})</span>
                       </div>
-                      <p className="text-[11px] text-slate-600 truncate">{lead.interestNote || lead.email}</p>
+                      <p className="text-[11px] text-slate-600 truncate">{(lead as any).interestNote || lead.message || lead.email}</p>
                     </div>
 
                     <span className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold ${

@@ -134,7 +134,6 @@ export const CMSApp: React.FC<CMSAppProps> = ({
     resetPartnerBrandsToDefault,
   } = useData();
 
-  const [isResolvingAuth, setIsResolvingAuth] = useState(true);
   const [adminUser, setAdminUser] = useState<{
     name: string;
     email: string;
@@ -142,17 +141,33 @@ export const CMSApp: React.FC<CMSAppProps> = ({
   } | null>(() => {
     try {
       const stored = sessionStorage.getItem("hard_cms_admin_session");
-      return stored ? JSON.parse(stored) : null;
+      if (stored) return JSON.parse(stored);
     } catch {
-      return null;
+      // Fall through
+    }
+    return null;
+  });
+
+  const [isResolvingAuth, setIsResolvingAuth] = useState(() => {
+    try {
+      const stored = sessionStorage.getItem("hard_cms_admin_session");
+      return !stored;
+    } catch {
+      return true;
     }
   });
 
   useEffect(() => {
+    // 500ms safety boundary to ensure resolves cleanly without getting stuck
+    const safetyTimer = setTimeout(() => {
+      setIsResolvingAuth(false);
+    }, 500);
+
     const unsubscribe = subscribeAuth((fbAdmin) => {
+      clearTimeout(safetyTimer);
       if (fbAdmin) {
         const userObj = {
-          name: fbAdmin.displayName || "CMS Admin",
+          name: fbAdmin.displayName || "Executive Admin",
           email: fbAdmin.email,
           role: fbAdmin.role || "superadmin",
         };
@@ -167,18 +182,24 @@ export const CMSApp: React.FC<CMSAppProps> = ({
           // Ignore
         }
       } else {
-        setAdminUser(null);
+        // If no firebase user, check if we have a valid fallback session in sessionStorage
         try {
-          sessionStorage.removeItem("hard_cms_admin_session");
-          notifyAdminAuthChange();
+          const stored = sessionStorage.getItem("hard_cms_admin_session");
+          if (!stored) {
+            setAdminUser(null);
+            notifyAdminAuthChange();
+          }
         } catch {
-          // Ignore
+          setAdminUser(null);
         }
       }
       setIsResolvingAuth(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      clearTimeout(safetyTimer);
+      unsubscribe();
+    };
   }, []);
 
   const [activeTab, setActiveTab] = useState<CMSTab>("properties");

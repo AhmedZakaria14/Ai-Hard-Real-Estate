@@ -679,14 +679,15 @@ export function ListPropertyModal({
                 uploadSessionId="list-property-modal"
                 attachments={attachments}
                 onChange={setAttachments}
-                isAr={isAr}
-                label={
+                language={language}
+                labelAr={
                   userRole === 'owner'
-                    ? isAr
-                      ? 'مستندات العقار والصور (اختياري: الصك، الكروكي، الصور)'
-                      : 'Property Documents & Photos (Optional: Title Deed, Site Plan, Photos)'
-                    : isAr
-                    ? 'المستندات الداعمة (اختياري)'
+                    ? 'مستندات العقار والصور (اختياري: الصك، الكروكي، الصور)'
+                    : 'المستندات الداعمة (اختياري)'
+                }
+                labelEn={
+                  userRole === 'owner'
+                    ? 'Property Documents & Photos (Optional: Title Deed, Site Plan, Photos)'
                     : 'Supporting Documents (Optional)'
                 }
               />
