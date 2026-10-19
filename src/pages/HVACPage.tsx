@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { HVACProvider, useHVAC } from '../hvac/context/HVACContext';
 import { EmergencyTopBar } from '../hvac/components/EmergencyTopBar';
 import { HVACNavbar } from '../hvac/components/HVACNavbar';
@@ -16,7 +16,6 @@ import { HVACFooter } from '../hvac/components/HVACFooter';
 import { HVACFloatingWidgets } from '../hvac/components/HVACFloatingWidgets';
 import { HVACQuoteDialog } from '../hvac/components/HVACQuoteDialog';
 import { HVACBookingModal } from '../hvac/components/HVACBookingModal';
-import { HVACCMS } from '../hvac/components/HVACCMS';
 import { Language, PageId } from '../types';
 import { getPageTitle, updateDocumentTitle } from '../lib/pageTitles';
 import { SectorNav } from '../components/layout/SectorNav';
@@ -28,7 +27,6 @@ interface HVACPageProps {
 }
 
 function HVACPageContent({ onNavigatePage }: HVACPageProps) {
-  const [showCMS, setShowCMS] = useState(false);
   const { language } = useHVAC();
 
   // Synchronize document title based on HVAC state
@@ -36,10 +34,9 @@ function HVACPageContent({ onNavigatePage }: HVACPageProps) {
     const title = getPageTitle({
       page: 'hvac',
       language,
-      isHvacCMS: showCMS,
     });
     updateDocumentTitle(title);
-  }, [language, showCMS]);
+  }, [language]);
 
   useEffect(() => {
     const handleUrlState = () => {
@@ -48,12 +45,8 @@ function HVACPageContent({ onNavigatePage }: HVACPageProps) {
       const hash = rawHash.replace(/^#\/?/, '');
 
       if (pathname.endsWith('/cms') || hash === 'cms' || hash === 'hvac/cms') {
-        setShowCMS(true);
-        if (hash) {
-          window.history.replaceState(null, '', '/hvac/cms' + window.location.search);
-        }
+        onNavigatePage?.('admin');
       } else {
-        setShowCMS(false);
         // Clean duplicate route hash #hvac or #maintenance if present
         if (hash === 'hvac' || hash === 'maintenance') {
           window.history.replaceState(null, '', '/hvac' + window.location.search);
@@ -75,11 +68,11 @@ function HVACPageContent({ onNavigatePage }: HVACPageProps) {
       window.removeEventListener('popstate', handleUrlState);
       window.removeEventListener('hashchange', handleUrlState);
     };
-  }, []);
+  }, [onNavigatePage]);
 
-  if (showCMS) {
-    return <HVACCMS onExit={() => setShowCMS(false)} />;
-  }
+  const handleOpenCMS = () => {
+    onNavigatePage?.('admin');
+  };
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col font-ui-sans selection:bg-[#0EA5E9] selection:text-white">
@@ -96,7 +89,7 @@ function HVACPageContent({ onNavigatePage }: HVACPageProps) {
       {/* 2. Main HVAC Navbar (Sticky header with brand lockup & links) */}
       <HVACNavbar
         onNavigatePage={onNavigatePage}
-        onOpenCMS={() => setShowCMS(true)}
+        onOpenCMS={handleOpenCMS}
       />
 
       {/* Main Single Page Sections */}
@@ -135,7 +128,7 @@ function HVACPageContent({ onNavigatePage }: HVACPageProps) {
       {/* 13. Footer */}
       <HVACFooter
         onNavigatePage={onNavigatePage}
-        onOpenCMS={() => setShowCMS(true)}
+        onOpenCMS={handleOpenCMS}
       />
 
       {/* 14. Floating Widgets (WhatsApp + Blue Back to Top) */}

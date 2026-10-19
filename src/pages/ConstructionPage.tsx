@@ -12,7 +12,6 @@ import { CostEstimatorModal } from '../construction/components/CostEstimatorModa
 import { QuoteModal } from '../construction/components/QuoteModal';
 import { ProjectDetailModal } from '../construction/components/ProjectDetailModal';
 import { FloatingWidgets } from '../construction/components/FloatingWidgets';
-import { ConstructionCMS } from '../construction/components/cms/ConstructionCMS';
 import { getPageTitle, updateDocumentTitle } from '../lib/pageTitles';
 import { SectorNav } from '../components/layout/SectorNav';
 
@@ -27,7 +26,6 @@ function ConstructionPageInner({
 }: {
   onNavigate: (page: PageId) => void;
 }) {
-  const [isCMSActive, setIsCMSActive] = useState(false);
   const { language, selectedProjectForModal, unknownProjectId } = useConstruction();
 
   // Synchronize document title based on construction state
@@ -39,7 +37,6 @@ function ConstructionPageInner({
     const title = getPageTitle({
       page: 'construction',
       language,
-      isConstructionCMS: isCMSActive,
       constructionProjectTitle: selectedProjectForModal
         ? {
             ar: selectedProjectForModal.titleAr,
@@ -52,9 +49,9 @@ function ConstructionPageInner({
     });
 
     updateDocumentTitle(title);
-  }, [language, isCMSActive, selectedProjectForModal, unknownProjectId]);
+  }, [language, selectedProjectForModal, unknownProjectId]);
 
-  // Listen for route/hash changes (CMS or genuine section anchors like #services, #projects)
+  // Listen for route/hash changes (genuine section anchors like #services, #projects)
   useEffect(() => {
     const handleUrlState = () => {
       const pathname = window.location.pathname.toLowerCase();
@@ -62,12 +59,9 @@ function ConstructionPageInner({
       const hash = rawHash.replace(/^#\/?/, '');
 
       if (pathname.endsWith('/cms') || hash === 'cms' || hash === 'construction/cms') {
-        setIsCMSActive(true);
-        if (hash) {
-          window.history.replaceState(null, '', '/construction/cms' + window.location.search);
-        }
+        // Redirect legacy construction CMS URL to canonical admin dashboard
+        onNavigate('admin');
       } else {
-        setIsCMSActive(false);
         // Clean duplicate route hash #construction if present
         if (hash === 'construction') {
           window.history.replaceState(null, '', window.location.pathname + window.location.search);
@@ -95,29 +89,11 @@ function ConstructionPageInner({
       window.removeEventListener('popstate', handleUrlState);
       window.removeEventListener('hashchange', handleUrlState);
     };
-  }, []);
+  }, [onNavigate]);
 
   const handleOpenCMS = () => {
-    setIsCMSActive(true);
-    try {
-      window.history.pushState({ page: 'construction', cms: true }, '', '/construction/cms');
-    } catch {
-      // fallback
-    }
+    onNavigate('admin');
   };
-
-  const handleExitCMS = () => {
-    setIsCMSActive(false);
-    try {
-      window.history.pushState({ page: 'construction' }, '', '/construction');
-    } catch {
-      // fallback
-    }
-  };
-
-  if (isCMSActive) {
-    return <ConstructionCMS onExit={handleExitCMS} />;
-  }
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-ui-sans selection:bg-[#009ee2] selection:text-white">
