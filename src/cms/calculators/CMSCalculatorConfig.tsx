@@ -793,11 +793,11 @@ export const CMSCalculatorConfig: React.FC<CMSCalculatorConfigProps> = ({
                   <div className="space-y-1 text-xs text-slate-200">
                     <div className="flex justify-between">
                       <span className="text-slate-400">Avg Total Cost:</span>
-                      <span className="font-bold text-white font-mono">{draftConstResult.avgTotalSAR.toLocaleString()} SAR</span>
+                      <span className="font-bold text-white font-mono">{Number(draftConstResult.avgTotalSAR || 0).toLocaleString()} SAR</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-400">Price / m²:</span>
-                      <span className="font-mono text-blue-300">{draftConstResult.pricePerM2SAR.toLocaleString()} SAR/m²</span>
+                      <span className="font-mono text-blue-300">{Number(draftConstResult.pricePerM2SAR || 0).toLocaleString()} SAR/m²</span>
                     </div>
                   </div>
                 )}
@@ -807,12 +807,12 @@ export const CMSCalculatorConfig: React.FC<CMSCalculatorConfigProps> = ({
                     <div className="flex justify-between">
                       <span className="text-slate-400">Annual Savings:</span>
                       <span className="font-bold text-emerald-400 font-mono">
-                        {Math.round(draftHvacResult.totalFinancialSavingsSAR).toLocaleString()} SAR
+                        {Math.round(draftHvacResult.totalFinancialSavingsSAR || 0).toLocaleString()} SAR
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-400">Total KWh Saved:</span>
-                      <span className="font-mono text-sky-300">{Math.round(draftHvacResult.totalKWhSaved).toLocaleString()} kWh</span>
+                      <span className="font-mono text-sky-300">{Math.round(draftHvacResult.totalKWhSaved || 0).toLocaleString()} kWh</span>
                     </div>
                   </div>
                 )}
@@ -829,11 +829,11 @@ export const CMSCalculatorConfig: React.FC<CMSCalculatorConfigProps> = ({
                   <div className="space-y-1 text-xs text-slate-300">
                     <div className="flex justify-between">
                       <span className="text-slate-400">Avg Total Cost:</span>
-                      <span className="font-bold font-mono">{pubConstResult.avgTotalSAR.toLocaleString()} SAR</span>
+                      <span className="font-bold font-mono">{Number(pubConstResult.avgTotalSAR || 0).toLocaleString()} SAR</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-400">Price / m²:</span>
-                      <span className="font-mono text-slate-300">{pubConstResult.pricePerM2SAR.toLocaleString()} SAR/m²</span>
+                      <span className="font-mono text-slate-300">{Number(pubConstResult.pricePerM2SAR || 0).toLocaleString()} SAR/m²</span>
                     </div>
                   </div>
                 )}
@@ -843,7 +843,7 @@ export const CMSCalculatorConfig: React.FC<CMSCalculatorConfigProps> = ({
                     <div className="flex justify-between">
                       <span className="text-slate-400">Annual Savings:</span>
                       <span className="font-bold font-mono">
-                        {Math.round(pubHvacResult.totalFinancialSavingsSAR).toLocaleString()} SAR
+                        {Math.round(pubHvacResult.totalFinancialSavingsSAR || 0).toLocaleString()} SAR
                       </span>
                     </div>
                   </div>

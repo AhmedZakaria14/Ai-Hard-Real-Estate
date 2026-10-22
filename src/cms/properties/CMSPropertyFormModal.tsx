@@ -209,7 +209,7 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
         sanitizedPeriod = 'year';
       }
 
-      const formattedPrice = `${priceSAR.toLocaleString()} SAR${sanitizedPeriod ? ` / ${sanitizedPeriod}` : ''}`;
+      const formattedPrice = `${Number(priceSAR || 0).toLocaleString()} SAR${sanitizedPeriod ? ` / ${sanitizedPeriod}` : ''}`;
       const areaSqFt = Math.round(areaSqM * 10.7639);
 
       const propertyPayload: Partial<Property> = {
@@ -996,7 +996,7 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
                 <div className="h-48 relative overflow-hidden bg-slate-100">
                   <img src={images[0] || 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=800&q=80'} alt="Preview" className="w-full h-full object-cover" />
                   <span className="absolute top-3 left-3 bg-slate-900/80 text-white text-[10px] font-mono px-2 py-1 rounded-lg">
-                    {priceSAR.toLocaleString()} SAR
+                    {Number(priceSAR || 0).toLocaleString()} SAR
                   </span>
                 </div>
                 <div className="p-4 space-y-2">

@@ -377,7 +377,7 @@ export const CMSBackupManager: React.FC<CMSBackupManagerProps> = ({
               <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/80 space-y-1">
                 <span className="text-slate-400 text-[11px] block">{isAr ? 'تاريخ آخر تصدير ناجح' : 'Last Automated Export'}</span>
                 <span className="font-mono text-emerald-400 font-bold block">
-                  {new Date(DEFAULT_BACKUP_CONFIG.lastSuccessfulExportAt!).toLocaleString()}
+                  {DEFAULT_BACKUP_CONFIG.lastSuccessfulExportAt ? new Date(DEFAULT_BACKUP_CONFIG.lastSuccessfulExportAt).toLocaleString() : 'N/A'}
                 </span>
               </div>
 

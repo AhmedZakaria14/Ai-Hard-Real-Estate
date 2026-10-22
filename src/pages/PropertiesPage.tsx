@@ -841,17 +841,17 @@ export function PropertiesPage({
                     maxPrice >= DEFAULT_RENTAL_MONTH_MAX && minPrice === 0 ? (
                       language === 'en' ? 'Any Monthly Budget' : 'جميع ميزانيات الإيجار الشهري'
                     ) : minPrice > 0 ? (
-                      `${minPrice.toLocaleString()} - ${maxPrice.toLocaleString()} ${language === 'ar' ? 'ر.س / شهرياً' : 'SAR / mo'}`
+                      `${(minPrice || 0).toLocaleString()} - ${(maxPrice || 0).toLocaleString()} ${language === 'ar' ? 'ر.س / شهرياً' : 'SAR / mo'}`
                     ) : (
-                      `${language === 'en' ? 'Up to' : 'حتى'} ${maxPrice.toLocaleString()} ${language === 'ar' ? 'ر.س / شهرياً' : 'SAR / mo'}`
+                      `${language === 'en' ? 'Up to' : 'حتى'} ${(maxPrice || 0).toLocaleString()} ${language === 'ar' ? 'ر.س / شهرياً' : 'SAR / mo'}`
                     )
                   ) : (
                     maxPrice >= DEFAULT_RENTAL_YEAR_MAX && minPrice === 0 ? (
                       language === 'en' ? 'Any Annual Budget' : 'جميع ميزانيات الإيجار السنوي'
                     ) : minPrice > 0 ? (
-                      `${minPrice.toLocaleString()} - ${maxPrice.toLocaleString()} ${language === 'ar' ? 'ر.س / سنوياً' : 'SAR / yr'}`
+                      `${(minPrice || 0).toLocaleString()} - ${(maxPrice || 0).toLocaleString()} ${language === 'ar' ? 'ر.س / سنوياً' : 'SAR / yr'}`
                     ) : (
-                      `${language === 'en' ? 'Up to' : 'حتى'} ${maxPrice.toLocaleString()} ${language === 'ar' ? 'ر.س / سنوياً' : 'SAR / yr'}`
+                      `${language === 'en' ? 'Up to' : 'حتى'} ${(maxPrice || 0).toLocaleString()} ${language === 'ar' ? 'ر.س / سنوياً' : 'SAR / yr'}`
                     )
                   )
                 ) : (
@@ -1162,12 +1162,12 @@ export function PropertiesPage({
                   {statusFilter === 'for-rent' ? (
                     rentalPeriod === 'month' ? (
                       minPrice > 0
-                        ? `${minPrice.toLocaleString()} - ${maxPrice.toLocaleString()} SAR / mo`
-                        : `≤ ${maxPrice.toLocaleString()} SAR / mo`
+                        ? `${(minPrice || 0).toLocaleString()} - ${(maxPrice || 0).toLocaleString()} SAR / mo`
+                        : `≤ ${(maxPrice || 0).toLocaleString()} SAR / mo`
                     ) : (
                       minPrice > 0
-                        ? `${minPrice.toLocaleString()} - ${maxPrice.toLocaleString()} SAR / yr`
-                        : `≤ ${maxPrice.toLocaleString()} SAR / yr`
+                        ? `${(minPrice || 0).toLocaleString()} - ${(maxPrice || 0).toLocaleString()} SAR / yr`
+                        : `≤ ${(maxPrice || 0).toLocaleString()} SAR / yr`
                     )
                   ) : (
                     minPrice > 0 && maxPrice < DEFAULT_PURCHASE_MAX

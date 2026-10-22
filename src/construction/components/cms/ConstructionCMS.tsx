@@ -715,7 +715,7 @@ export function ConstructionCMS({ onExit }: ConstructionCMSProps) {
                         {isAr ? proj.titleAr : proj.titleEn}
                       </h4>
                       <p className="text-xs text-slate-500">
-                        {proj.buaM2.toLocaleString()} m² • {proj.year} • {isAr ? proj.cityAr : proj.cityEn}
+                        {Number(proj.buaM2 || 0).toLocaleString()} m² • {proj.year} • {isAr ? proj.cityAr : proj.cityEn}
                       </p>
                     </div>
 

@@ -360,7 +360,7 @@ export function PropertyDetailPage({
                   </h4>
                 </div>
                 <div className="text-sm font-bold text-slate-900 font-display-serif">
-                  {sim.price.formattedSAR || `${sim.price.sar?.toLocaleString()} SAR`}
+                  {sim.price?.formattedSAR || (typeof (sim as any).price === 'number' ? `${(sim as any).price.toLocaleString()} SAR` : `${(sim.price?.sar ?? 0).toLocaleString()} SAR`)}
                 </div>
               </div>
             </a>

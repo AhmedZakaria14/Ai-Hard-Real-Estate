@@ -826,7 +826,7 @@ export const CMSAppointmentDetailModal: React.FC<CMSAppointmentDetailModalProps>
                               {log.action}
                             </span>
                             <span className="text-slate-500">
-                              {new Date(log.timestamp).toLocaleString(isAr ? 'ar-SA' : 'en-US')}
+                              {log.timestamp ? new Date(log.timestamp).toLocaleString(isAr ? 'ar-SA' : 'en-US') : ''}
                             </span>
                           </div>
                           <p className="text-xs text-slate-300 font-medium">{log.notes || 'No description provided.'}</p>

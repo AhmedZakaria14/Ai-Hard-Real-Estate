@@ -43,7 +43,8 @@ export function formatNormalizedPrice(
   period?: 'year' | 'month',
   language: 'en' | 'ar' = 'en'
 ): string {
-  const formatted = amount.toLocaleString();
+  const safeAmount = Number(amount || 0);
+  const formatted = isNaN(safeAmount) ? '0' : safeAmount.toLocaleString();
   if (!period) return language === 'ar' ? `${formatted} ر.س` : `${formatted} SAR`;
   if (language === 'ar') {
     return period === 'year' ? `${formatted} ر.س / سنوياً` : `${formatted} ر.س / شهرياً`;

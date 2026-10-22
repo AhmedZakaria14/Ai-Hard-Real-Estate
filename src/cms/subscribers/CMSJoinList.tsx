@@ -76,7 +76,7 @@ export const CMSJoinList: React.FC<CMSJoinListProps> = ({
       `"${s.email}"`,
       s.status,
       `"${s.source || 'Website Footer'}"`,
-      `"${new Date(s.createdAt).toLocaleString('en-US')}"`,
+      `"${s.createdAt ? new Date(s.createdAt).toLocaleString('en-US') : ''}"`,
       `"${(s.notes || '').replace(/"/g, '""')}"`,
     ]);
 

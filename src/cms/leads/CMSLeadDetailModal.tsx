@@ -629,7 +629,7 @@ export const CMSLeadDetailModal: React.FC<CMSLeadDetailModalProps> = ({
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-slate-400 font-medium">{isAr ? 'تاريخ التقديم' : 'Submission Timestamp'}:</span>
                       <span className="text-slate-600 font-medium">
-                        {new Date(lead.createdAt).toLocaleString()}
+                        {lead.createdAt ? new Date(lead.createdAt).toLocaleString() : ''}
                       </span>
                     </div>
 
@@ -776,7 +776,7 @@ export const CMSLeadDetailModal: React.FC<CMSLeadDetailModalProps> = ({
                       <div key={note.id} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
                         <div className="flex items-center justify-between text-[11px] text-slate-400 border-b border-slate-100 pb-2">
                           <span className="font-bold text-slate-800">{note.author}</span>
-                          <span>{new Date(note.createdAt).toLocaleString()}</span>
+                          <span>{note.createdAt ? new Date(note.createdAt).toLocaleString() : ''}</span>
                         </div>
                         <p className="text-xs font-medium text-slate-700 leading-relaxed whitespace-pre-wrap">
                           {note.text}
@@ -817,7 +817,7 @@ export const CMSLeadDetailModal: React.FC<CMSLeadDetailModalProps> = ({
                           </span>
                         </div>
                         <span className="text-slate-400 text-[10px]">
-                          {new Date(item.timestamp).toLocaleString()}
+                          {item.timestamp ? new Date(item.timestamp).toLocaleString() : ''}
                         </span>
                       </div>
                       <div className="text-xs font-medium text-slate-700">

@@ -483,7 +483,15 @@ export const CMSDashboard: React.FC<CMSDashboardProps> = ({
 
                   <div className="text-end shrink-0">
                     <div className="text-xs font-extrabold text-blue-700">
-                      {prop.price.sar.toLocaleString()} SAR
+                      {(() => {
+                        if (!prop) return '0 SAR';
+                        if (typeof (prop as any).price === 'number') {
+                          return `${(prop as any).price.toLocaleString()} SAR`;
+                        }
+                        const raw = prop.price?.sar ?? (prop.price as any)?.amount ?? 0;
+                        const num = Number(raw);
+                        return `${isNaN(num) ? '0' : num.toLocaleString()} SAR`;
+                      })()}
                     </div>
                     <span className={`inline-block px-2 py-0.5 rounded-md text-[10px] font-bold ${
                       prop.status === 'for-sale' ? 'bg-emerald-50 text-emerald-700' : 'bg-sky-50 text-sky-700'

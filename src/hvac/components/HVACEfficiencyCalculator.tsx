@@ -91,9 +91,9 @@ export function HVACEfficiencyCalculator() {
   const efficiencyGainPercent = calcResult.efficiencyGainPercent;
 
   // Realistic Precision Formatting
-  const formattedFinancialSavings = (Math.round(totalFinancialSavingsSAR / 10) * 10).toLocaleString();
-  const formattedKWhSaved = (Math.round(totalKWhSaved / 100) * 100).toLocaleString();
-  const formattedCo2Tons = totalCo2OffsetTons.toFixed(1);
+  const formattedFinancialSavings = (Math.round((totalFinancialSavingsSAR || 0) / 10) * 10).toLocaleString();
+  const formattedKWhSaved = (Math.round((totalKWhSaved || 0) / 100) * 100).toLocaleString();
+  const formattedCo2Tons = (totalCo2OffsetTons || 0).toFixed(1);
 
   return (
     <section id="calculator" className="py-16 sm:py-24 bg-white border-y border-slate-200/80">
@@ -349,7 +349,7 @@ export function HVACEfficiencyCalculator() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-600 pt-1 font-mono">
                   <div>
                     <span className="text-slate-400 block">{isAr ? 'حمل التبريد:' : 'Cooling Load:'}</span>
-                    <span className="font-semibold text-slate-800">{estimatedTR.toFixed(1)} TR ({coolingLoadBTUh.toLocaleString()} BTU/h)</span>
+                    <span className="font-semibold text-slate-800">{(estimatedTR || 0).toFixed(1)} TR ({Number(coolingLoadBTUh || 0).toLocaleString()} BTU/h)</span>
                   </div>
                   <div>
                     <span className="text-slate-400 block">{isAr ? 'كفاءة النظام الحالي:' : 'Baseline Efficiency:'}</span>
@@ -361,7 +361,7 @@ export function HVACEfficiencyCalculator() {
                   </div>
                   <div>
                     <span className="text-slate-400 block">{isAr ? 'ساعات التشغيل:' : 'Operating Hours:'}</span>
-                    <span className="font-semibold text-slate-800">{dailyHours} h/d ({annualOperatingHours.toLocaleString()} h/yr)</span>
+                    <span className="font-semibold text-slate-800">{dailyHours} h/d ({Number(annualOperatingHours || 0).toLocaleString()} h/yr)</span>
                   </div>
                   <div>
                     <span className="text-slate-400 block">{isAr ? 'تعرفة الكهرباء:' : 'SEC Tariff Rate:'}</span>

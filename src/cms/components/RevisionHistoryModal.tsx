@@ -305,7 +305,7 @@ export const RevisionHistoryModal: React.FC<RevisionHistoryModalProps> = ({
                       </h3>
                       <p className="text-xs text-slate-400 mt-1">
                         {isAr ? 'تم الإنشاء بتاريخ: ' : 'Created at: '}
-                        {new Date(selectedRevision.changedAt).toLocaleString()}
+                        {selectedRevision.changedAt ? new Date(selectedRevision.changedAt).toLocaleString() : ''}
                       </p>
                     </div>
 
