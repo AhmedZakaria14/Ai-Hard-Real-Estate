@@ -6,8 +6,7 @@
  * producing misleading results.
  */
 
-import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
-import { db } from '../firebase';
+import { readPublicCalculator, readAdminConfig, writeAdminConfig } from '../db/hardRuntimeConfig';
 import {
   CalculatorType,
   ConstructionCalculatorCoefficients,
@@ -178,7 +177,7 @@ export function validateHVACCoefficients(
 }
 
 // ----------------------------------------------------------------------
-// FIRESTORE OPERATIONS
+// SUPABASE CONFIGURATION
 // ----------------------------------------------------------------------
 
 export async function getPublishedCalculatorConfig(
@@ -186,10 +185,8 @@ export async function getPublishedCalculatorConfig(
 ): Promise<AnyCalculatorConfigDoc> {
   const docId = `${type}_published`;
   try {
-    const snap = await getDoc(doc(db, 'calculator_configs', docId));
-    if (snap.exists()) {
-      return snap.data() as AnyCalculatorConfigDoc;
-    }
+    const config = await readPublicCalculator<AnyCalculatorConfigDoc>(docId);
+    if (config) return config;
   } catch (err) {
     console.warn(`[CalculatorConfig] Failed to fetch published ${type} config, using default fallback:`, err);
   }
@@ -201,10 +198,8 @@ export async function getDraftCalculatorConfig(
 ): Promise<AnyCalculatorConfigDoc> {
   const docId = `${type}_draft`;
   try {
-    const snap = await getDoc(doc(db, 'calculator_configs', docId));
-    if (snap.exists()) {
-      return snap.data() as AnyCalculatorConfigDoc;
-    }
+    const config = await readAdminConfig<AnyCalculatorConfigDoc>('calculator', docId);
+    if (config) return config;
   } catch (err) {
     console.warn(`[CalculatorConfig] Failed to fetch draft ${type} config, deriving from published:`, err);
   }
@@ -243,7 +238,7 @@ export async function saveDraftCalculatorConfig(
     updatedAt: new Date().toISOString(),
   };
 
-  await setDoc(doc(db, 'calculator_configs', payload.id), payload);
+  await writeAdminConfig('calculator', [{ key: payload.id, body: payload }]);
 }
 
 export async function publishCalculatorConfig(
@@ -251,7 +246,9 @@ export async function publishCalculatorConfig(
   publishedByEmail: string
 ): Promise<AnyCalculatorConfigDoc> {
   // 1. Get current draft or published config
-  const draft = await getDraftCalculatorConfig(type);
+  const published = await readPublicCalculator<AnyCalculatorConfigDoc>(type + '_published')
+    ?? (type === 'construction' ? DEFAULT_CONSTRUCTION_CONFIG : DEFAULT_HVAC_CONFIG);
+  const draft = await readAdminConfig<AnyCalculatorConfigDoc>('calculator', type + '_draft') ?? published;
 
   // Validate draft before publishing
   if (type === 'construction') {
@@ -263,7 +260,7 @@ export async function publishCalculatorConfig(
   }
 
   // 2. Increment version number
-  const newVersion = (draft.version || 1) + 1;
+  const newVersion = Math.max(draft.version || 1, published.version || 1) + 1;
   const nowIso = new Date().toISOString();
 
   // 3. Save snapshot version doc: calculator_configs/{type}_v{newVersion}
@@ -277,15 +274,13 @@ export async function publishCalculatorConfig(
     publishedBy: publishedByEmail,
   };
 
-  await setDoc(doc(db, 'calculator_configs', versionedDoc.id), versionedDoc);
-
   // 4. Overwrite active published doc pointer: calculator_configs/{type}_published
   const publishedDoc: AnyCalculatorConfigDoc = {
     ...versionedDoc,
     id: `${type}_published`,
   };
 
-  await setDoc(doc(db, 'calculator_configs', publishedDoc.id), publishedDoc);
+  delete publishedDoc.publishedBy;
 
   // 5. Update draft doc version indicator
   const updatedDraftDoc: AnyCalculatorConfigDoc = {
@@ -296,7 +291,10 @@ export async function publishCalculatorConfig(
     updatedAt: nowIso,
   };
 
-  await setDoc(doc(db, 'calculator_configs', updatedDraftDoc.id), updatedDraftDoc);
+  await writeAdminConfig('calculator', [versionedDoc, publishedDoc, updatedDraftDoc].map((body) => ({
+    key: body.id,
+    body,
+  })));
 
   return publishedDoc;
 }
@@ -305,22 +303,26 @@ export function subscribeToPublishedCalculatorConfig(
   type: CalculatorType,
   onUpdate: (config: AnyCalculatorConfigDoc) => void
 ): () => void {
-  const docRef = doc(db, 'calculator_configs', `${type}_published`);
-  
-  const unsubscribe = onSnapshot(
-    docRef,
-    (snap) => {
-      if (snap.exists()) {
-        onUpdate(snap.data() as AnyCalculatorConfigDoc);
-      } else {
-        onUpdate(type === 'construction' ? DEFAULT_CONSTRUCTION_CONFIG : DEFAULT_HVAC_CONFIG);
+  const controller = new AbortController();
+  const fallback = type === 'construction' ? DEFAULT_CONSTRUCTION_CONFIG : DEFAULT_HVAC_CONFIG;
+  async function load() {
+    try {
+      const config = await readPublicCalculator<AnyCalculatorConfigDoc>(type + '_published', controller.signal);
+      if (!controller.signal.aborted) onUpdate(config ?? fallback);
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        console.warn('Could not load Supabase calculator; using default configuration', error);
+        onUpdate(fallback);
       }
-    },
-    (err) => {
-      console.warn(`[CalculatorConfig] Subscription error for ${type}, falling back:`, err);
-      onUpdate(type === 'construction' ? DEFAULT_CONSTRUCTION_CONFIG : DEFAULT_HVAC_CONFIG);
     }
-  );
-
-  return unsubscribe;
+  }
+  function refresh() {
+    if (document.visibilityState === 'visible') void load();
+  }
+  document.addEventListener('visibilitychange', refresh);
+  void load();
+  return () => {
+    controller.abort();
+    document.removeEventListener('visibilitychange', refresh);
+  };
 }

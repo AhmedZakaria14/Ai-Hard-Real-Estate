@@ -1,5 +1,4 @@
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../firebase';
+import { readAdminConfig, writeAdminConfig } from '../db/hardRuntimeConfig';
 import { CustomerFormType, SectorId } from './formSubmissionService';
 
 // Whitelist of supported field types
@@ -474,7 +473,7 @@ export const DEFAULT_FORM_SCHEMAS: Record<CustomerFormType, FormSchemaConfig> = 
 const schemaCache: Partial<Record<CustomerFormType, FormSchemaConfig>> = {};
 
 /**
- * Retrieves the form schema configuration for a given form type (from Firestore with fallback)
+ * Reads the administrator form template from Supabase
  */
 export async function getFormSchemaConfig(formType: CustomerFormType): Promise<FormSchemaConfig> {
   if (schemaCache[formType]) {
@@ -482,10 +481,8 @@ export async function getFormSchemaConfig(formType: CustomerFormType): Promise<F
   }
 
   try {
-    const docRef = doc(db, 'forms', formType);
-    const snap = await getDoc(docRef);
-    if (snap.exists()) {
-      const data = snap.data() as FormSchemaConfig;
+    const data = await readAdminConfig<FormSchemaConfig>('form', formType);
+    if (data) {
       // Sanitize text content to ensure no injected scripts exist in cached data
       const sanitizedSchema: FormSchemaConfig = {
         ...data,
@@ -527,16 +524,15 @@ export async function getFormSchemaConfig(formType: CustomerFormType): Promise<F
       return sanitizedSchema;
     }
   } catch (e) {
-    console.warn(`[formSchemaService] Firestore read failed for form '${formType}', using default:`, e);
+    console.warn(`[formSchemaService] Supabase read failed for form '${formType}', using default:`, e);
   }
 
   const defaultSchema = DEFAULT_FORM_SCHEMAS[formType] || DEFAULT_FORM_SCHEMAS.general_contact;
-  schemaCache[formType] = defaultSchema;
   return defaultSchema;
 }
 
 /**
- * Saves an updated form schema configuration to Firestore after server/schema validation
+ * Saves an updated form schema configuration to Supabase after schema validation
  */
 export async function saveFormSchemaConfig(
   formType: CustomerFormType,
@@ -604,8 +600,7 @@ export async function saveFormSchemaConfig(
   };
 
   try {
-    const docRef = doc(db, 'forms', formType);
-    await setDoc(docRef, finalSchema);
+    await writeAdminConfig('form', [{ key: formType, body: finalSchema }]);
     schemaCache[formType] = finalSchema;
     return {
       success: true,
