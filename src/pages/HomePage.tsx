@@ -5,7 +5,6 @@ import {
   MapPin,
   ArrowRight,
   ArrowLeft,
-  Sparkles,
   Home,
   CheckCircle2,
   Building,
@@ -14,19 +13,17 @@ import {
   SlidersHorizontal,
   Compass,
   ShieldAlert,
-  ShieldCheck,
 } from 'lucide-react';
 import { Language, PageId, Property, PropertyFilterParams, Project } from '../types';
 import { translations as defaultTranslations } from '../lib/translations';
 import { mockTestimonials } from '../data/mockData';
-import { SAUDI_CITIES } from '../data/cities';
+import { getHeroPropertyFilters } from '../lib/heroPropertySearch';
 import { CitySearchDropdown } from '../components/ui/CitySearchDropdown';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { PropertyCard } from '../components/ui/PropertyCard';
 import { TestimonialSlider } from '../components/ui/TestimonialSlider';
 import { ServicesSection } from '../components/home/ServicesSection';
-import { ComplianceVerificationModal } from '../components/modals/ComplianceVerificationModal';
 import { loadPublishedProjects } from '../lib/db/hardCatalog';
 import { useData } from '../context/DataContext';
 import { useTextOverride } from '../context/TextOverrideContext';
@@ -64,10 +61,6 @@ export function HomePage({
   const [searchType, setSearchType] = useState('all');
   const [searchBudget, setSearchBudget] = useState('all');
 
-  // Compliance & Evidence Verification Modal State
-  const [isComplianceModalOpen, setIsComplianceModalOpen] = useState(false);
-  const [complianceTab, setComplianceTab] = useState<'licensing' | 'reviews' | 'financials' | 'stats'>('stats');
-
   // Featured properties: 3-column top listings fetched directly from the database layer
   const featuredProperties = properties.filter((p) => p.featured).slice(0, 3).length > 0
     ? properties.filter((p) => p.featured).slice(0, 3)
@@ -84,56 +77,7 @@ export function HomePage({
   const handleHeroSearch = (e: React.FormEvent) => {
     e.preventDefault();
 
-    let min = 0;
-    let max = activeTab === 'rent' ? 500000 : 50000000;
-
-    if (activeTab === 'rent') {
-      if (searchBudget === 'rent-under-100k') {
-        min = 0;
-        max = 100000;
-      } else if (searchBudget === 'rent-100k-200k') {
-        min = 100000;
-        max = 200000;
-      } else if (searchBudget === 'rent-200k-350k') {
-        min = 200000;
-        max = 350000;
-      } else if (searchBudget === 'rent-350k+') {
-        min = 350000;
-        max = 500000;
-      }
-    } else {
-      if (searchBudget === '500k-1m') {
-        min = 500000;
-        max = 1000000;
-      } else if (searchBudget === '1m-3m') {
-        min = 1000000;
-        max = 3000000;
-      } else if (searchBudget === '3m-6m') {
-        min = 3000000;
-        max = 6000000;
-      } else if (searchBudget === '6m-12m') {
-        min = 6000000;
-        max = 12000000;
-      } else if (searchBudget === '12m+') {
-        min = 12000000;
-        max = 50000000;
-      }
-    }
-
-    const statusMap: Record<string, string> = {
-      buy: 'for-sale',
-      rent: 'for-rent',
-    };
-
-    onNavigate('properties', {
-      city: searchLocation || 'all',
-      type: searchType,
-      status: statusMap[activeTab] || 'all',
-      rentalPeriod: 'year',
-      minPrice: min,
-      maxPrice: max,
-      priceRange: searchBudget,
-    });
+    onNavigate('properties', getHeroPropertyFilters(activeTab, searchLocation, searchType, searchBudget));
   };
 
   const statList = [
@@ -168,7 +112,6 @@ export function HomePage({
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 w-full space-y-10 overflow-visible">
           <div className="max-w-3xl space-y-5">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-blue-200 shadow-sm">
-              <Sparkles className="w-4 h-4 text-blue-400" />
               <span>{t.home.heroTag}</span>
             </div>
 
@@ -216,7 +159,7 @@ export function HomePage({
             <form onSubmit={handleHeroSearch} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 relative z-30 overflow-visible">
               {/* Location / City Input with embedded 50 Saudi cities dropdown & search */}
               <div>
-                <label className="block text-[11px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
+                <label htmlFor="hero-city-search" className="block text-[11px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
                   {t.properties.filters.city}
                 </label>
                 <CitySearchDropdown
@@ -224,17 +167,18 @@ export function HomePage({
                   onChange={(city) => setSearchLocation(city === 'all' ? '' : city)}
                   language={language}
                   placeholder={language === 'en' ? 'Search by city name' : 'ابحث باسم المدينة'}
-                  showAllOption={false}
+                  showAllOption
                   id="hero-city-search"
                 />
               </div>
 
               {/* Property Type Dropdown */}
               <div>
-                <label className="block text-[11px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
+                <label htmlFor="hero-property-type" className="block text-[11px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
                   {t.properties.filters.type}
                 </label>
                 <select
+                  id="hero-property-type"
                   value={searchType}
                   onChange={(e) => setSearchType(e.target.value)}
                   className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
@@ -251,10 +195,11 @@ export function HomePage({
 
               {/* Price Range Dropdown */}
               <div>
-                <label className="block text-[11px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
+                <label htmlFor="hero-property-budget" className="block text-[11px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
                   {t.properties.filters.priceRange}
                 </label>
                 <select
+                  id="hero-property-budget"
                   value={searchBudget}
                   onChange={(e) => setSearchBudget(e.target.value)}
                   className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
@@ -305,7 +250,7 @@ export function HomePage({
               className="flex flex-col items-center justify-center text-center space-y-1.5 px-3 py-2"
             >
               <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-blue-700 font-display-serif tracking-tight text-center">
-                {stat.value}
+                <bdi dir="ltr">{stat.value}</bdi>
               </div>
               <div className="text-xs sm:text-sm text-slate-600 font-medium text-center leading-snug">
                 {stat.label}
@@ -314,23 +259,6 @@ export function HomePage({
           ))}
         </div>
 
-        <div className="flex justify-center">
-          <button
-            type="button"
-            onClick={() => {
-              setComplianceTab('stats');
-              setIsComplianceModalOpen(true);
-            }}
-            className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-blue-700 font-semibold transition-colors cursor-pointer"
-          >
-            <ShieldCheck className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-            <span>
-              {language === 'en'
-                ? 'Audited Corporate Metrics & Evidence Basis (Q3 2026 Audit)'
-                : 'إحصائيات موثقة وأدلة الاعتماد والتراخيص (تحديث أكتوبر 2026)'}
-            </span>
-          </button>
-        </div>
       </section>
 
       {/* 2. FEATURED LISTINGS GRID (3-Column Card Layout) */}
@@ -384,7 +312,6 @@ export function HomePage({
       <section id="testimonials-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <Badge variant="primary" className="mx-auto">
-            <Sparkles className="w-3 h-3 me-1 inline" />
             {t.home.testimonialsTag}
           </Badge>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 font-display-serif tracking-tight">
@@ -535,13 +462,6 @@ export function HomePage({
         </div>
       </section>
 
-      {/* Compliance & Verification Audit Modal */}
-      <ComplianceVerificationModal
-        isOpen={isComplianceModalOpen}
-        onClose={() => setIsComplianceModalOpen(false)}
-        language={language}
-        initialTab={complianceTab}
-      />
     </div>
   );
 }

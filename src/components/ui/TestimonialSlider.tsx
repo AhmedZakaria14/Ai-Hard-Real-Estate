@@ -6,7 +6,6 @@ import {
   Quote,
   ShieldCheck,
   Building2,
-  Sparkles,
   ArrowRight,
   ArrowLeft,
 } from 'lucide-react';
@@ -79,7 +78,6 @@ export function TestimonialSlider({ testimonials, language }: TestimonialSliderP
 
           <div className="flex items-center gap-2">
             <Badge variant="primary" className="text-xs">
-              <Sparkles className="w-3 h-3 me-1 inline" />
               {categoryBadgeLabel[current.category]}
             </Badge>
             <button

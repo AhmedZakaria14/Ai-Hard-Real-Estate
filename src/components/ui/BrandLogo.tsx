@@ -15,6 +15,7 @@ interface BrandLogoProps {
   variant?: 'light' | 'dark';
   className?: string;
   isIconOnly?: boolean;
+  compactTagline?: boolean;
   sector?: 'portal' | 'realestate' | 'construction' | 'hvac';
 }
 
@@ -25,6 +26,7 @@ export function BrandLogo({
   variant = 'dark',
   className = '',
   isIconOnly = false,
+  compactTagline = false,
   sector = 'realestate',
 }: BrandLogoProps) {
   let settings;
@@ -85,7 +87,7 @@ export function BrandLogo({
 
       {/* Accompanying Brand Wordmark Typography */}
       {showText && !isIconOnly && (
-        <div className="flex flex-col justify-center leading-tight">
+        <div className="flex min-w-0 flex-col justify-center leading-tight">
           <div className="flex items-baseline gap-1.5">
             <span
               className={`font-bold tracking-tight font-display-serif ${currentSize.textClass} ${
@@ -96,7 +98,7 @@ export function BrandLogo({
             </span>
           </div>
           <span
-            className={`tracking-wider uppercase font-semibold font-ui-sans ${currentSize.subTextClass} ${
+            className={`tracking-wider uppercase font-semibold font-ui-sans ${compactTagline && !isAr ? 'max-w-36 text-[8px] tracking-normal sm:text-[9px]' : currentSize.subTextClass} ${
               variant === 'light' ? 'text-sky-300/80' : 'text-slate-500'
             }`}
           >

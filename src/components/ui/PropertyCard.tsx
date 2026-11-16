@@ -8,7 +8,6 @@ import {
   ArrowLeft,
   Calendar,
   MessageSquare,
-  Sparkles,
   ShieldCheck,
   Eye,
   Share2,
@@ -104,7 +103,6 @@ export function PropertyCard({
           <div className="absolute top-3 start-3 flex flex-wrap gap-1.5 z-10 pointer-events-none">
             {displayBadge && (
               <Badge variant={displayBadge.variant} className="shadow-sm">
-                <Sparkles className="w-3 h-3 me-1 inline" />
                 {displayBadge.text}
               </Badge>
             )}
@@ -271,7 +269,6 @@ export function PropertyCard({
           <div className="absolute top-3 start-3 flex flex-wrap items-center gap-1.5 z-10 pointer-events-none">
             {displayBadge && (
               <Badge variant={displayBadge.variant} className="shadow-md">
-                <Sparkles className="w-3 h-3 me-1 inline" />
                 {displayBadge.text}
               </Badge>
             )}

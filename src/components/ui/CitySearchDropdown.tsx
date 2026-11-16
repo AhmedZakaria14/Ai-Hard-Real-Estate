@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Search, ChevronDown, X, Check } from 'lucide-react';
-import { SAUDI_CITIES, SaudiCity } from '../../data/cities';
+import { normalizePropertySearch } from '../../lib/propertySearch';
+import { SAUDI_CITIES } from '../../data/cities';
 import { Language } from '../../types';
 
 interface CitySearchDropdownProps {
@@ -44,10 +45,10 @@ export const CitySearchDropdown: React.FC<CitySearchDropdownProps> = ({
   const filteredCities = useMemo(() => {
     if (!searchTerm.trim()) return SAUDI_CITIES;
 
-    const q = searchTerm.trim().toLowerCase();
+    const q = normalizePropertySearch(searchTerm);
     return SAUDI_CITIES.filter((c) => {
-      const ar = c.ar.toLowerCase();
-      const en = c.en.toLowerCase();
+      const ar = normalizePropertySearch(c.ar);
+      const en = normalizePropertySearch(c.en);
       return ar.includes(q) || en.includes(q);
     });
   }, [searchTerm]);
@@ -90,8 +91,8 @@ export const CitySearchDropdown: React.FC<CitySearchDropdownProps> = ({
     if (!value || value === 'all') return null;
     return SAUDI_CITIES.find(
       (c) =>
-        c.ar.toLowerCase() === value.toLowerCase() ||
-        c.en.toLowerCase() === value.toLowerCase()
+        normalizePropertySearch(c.ar) === normalizePropertySearch(value) ||
+        normalizePropertySearch(c.en) === normalizePropertySearch(value)
     );
   }, [value]);
 
@@ -104,15 +105,16 @@ export const CitySearchDropdown: React.FC<CitySearchDropdownProps> = ({
   }, [value, selectedCityObj, isAr]);
 
   return (
-    <div ref={containerRef} className={`relative text-start ${className}`} id={id}>
+    <div ref={containerRef} className={`relative text-start ${className}`}>
       {label && (
-        <label className="block text-[11px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
+        <label htmlFor={id} className="block text-[11px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
           {label}
         </label>
       )}
 
       {/* Main Trigger / Field matching background of main search fields */}
       <button
+        id={id}
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         className={`w-full ps-3.5 pe-8 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-between text-start cursor-pointer hover:bg-slate-100/80 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white ${
@@ -160,6 +162,17 @@ export const CitySearchDropdown: React.FC<CitySearchDropdownProps> = ({
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
+                    event.preventDefault();
+                    if (filteredCities.length === 1) handleSelect(isAr ? filteredCities[0].ar : filteredCities[0].en);
+                  }
+                  if (event.key === 'Escape') {
+                    event.preventDefault();
+                    setIsOpen(false);
+                    document.getElementById(id)?.focus();
+                  }
+                }}
                 placeholder={isAr ? 'ابحث باسم المدينة' : 'Search by city name'}
                 className="w-full ps-9 pe-8 py-2 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-start"
               />

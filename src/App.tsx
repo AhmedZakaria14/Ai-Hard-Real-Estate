@@ -281,9 +281,7 @@ function AppContent() {
       const routeInfo = detectRouteFromLocation();
       setAttemptedPath(routeInfo.attemptedPath);
       setCurrentPage(routeInfo.page);
-      if (routeInfo.filters) {
-        setPropertyFilters(routeInfo.filters);
-      }
+      setPropertyFilters(routeInfo.page === 'properties' ? routeInfo.filters ?? null : null);
     };
 
     window.addEventListener('hashchange', handleUrlRoute);
