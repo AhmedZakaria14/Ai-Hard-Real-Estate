@@ -339,10 +339,6 @@ export function HomePage({
       <section id="featured-listings-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div className="space-y-2 max-w-2xl">
-            <Badge variant="primary">
-              <Sparkles className="w-3 h-3 me-1 inline" />
-              {language === 'en' ? 'Prime Selection' : 'مختارات مميزة'}
-            </Badge>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 font-display-serif tracking-tight">
               {t.home.featuredSectionTitle}
             </h2>
