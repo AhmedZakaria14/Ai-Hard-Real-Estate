@@ -53,8 +53,8 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
   const [featured, setFeatured] = useState(false);
 
   // Licensing & REGA Compliance
-  const [regaLicenseNumber, setRegaLicenseNumber] = useState('1200018923');
-  const [adLicenseNumber, setAdLicenseNumber] = useState('7200018942');
+  const [regaLicenseNumber, setRegaLicenseNumber] = useState('');
+  const [adLicenseNumber, setAdLicenseNumber] = useState('');
   const [wafiPermitNumber, setWafiPermitNumber] = useState('');
 
   // Location
@@ -117,6 +117,9 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
       setDescAr(initialData.description?.ar || '');
       setType(initialData.type || 'villa');
       setStatus(initialData.status || 'for-sale');
+      setRegaLicenseNumber(initialData.regaLicenseNumber ?? '');
+      setAdLicenseNumber(initialData.adLicenseNumber ?? '');
+      setWafiPermitNumber(initialData.wafiPermitNumber ?? '');
       setFeatured(!!initialData.featured);
 
       setCityEn(initialData.location?.city?.en || 'Al Khobar');
@@ -137,8 +140,8 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
       setAreaSqM(initialData.areaSqM || 500);
       setYearBuilt(initialData.features?.yearBuilt || 2025);
       setParkingSpaces(initialData.features?.parkingSpaces ?? 2);
-      setFurnishingEn(initialData.features?.furnishing?.en || 'Fully Furnished');
-      setFurnishingAr(initialData.features?.furnishing?.ar || 'مفروش بالكامل');
+      setFurnishingEn(initialData.features?.furnishing?.en ?? '');
+      setFurnishingAr(initialData.features?.furnishing?.ar ?? '');
       setViewEn(initialData.features?.view?.en || 'Sea View');
       setViewAr(initialData.features?.view?.ar || 'إطلالة بحرية');
 
@@ -231,6 +234,9 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
         type,
         status,
         featured,
+        regaLicenseNumber: regaLicenseNumber.trim(),
+        adLicenseNumber: adLicenseNumber.trim(),
+        wafiPermitNumber: wafiPermitNumber.trim(),
         price: {
           sar: Number(priceSAR),
           formattedSAR: formattedPrice,
@@ -250,12 +256,15 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
         images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1600&q=85'],
         amenities: {
           en: amenitiesEn,
-          ar: amenitiesEn.map((item) => (isAr ? item : `${item}`)),
+          ar: amenitiesEn.map((item) => {
+            const index = initialData?.amenities?.en?.indexOf(item) ?? -1;
+            return (index >= 0 ? initialData?.amenities?.ar?.[index] : undefined) ?? item;
+          }),
         },
         features: {
           yearBuilt: Number(yearBuilt),
           parkingSpaces: Number(parkingSpaces),
-          furnishing: { en: furnishingEn, ar: furnishingAr },
+          furnishing: { en: furnishingEn.trim(), ar: furnishingAr.trim() },
           view: { en: viewEn, ar: viewAr },
         },
         agent: {
@@ -769,23 +778,19 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1 text-start">
-                    {isAr ? 'حالة التأثيث' : 'Furnishing'}
+                <fieldset className="space-y-2">
+                  <legend className="text-xs font-bold text-slate-700">{isAr ? 'حالة التأثيث' : 'Furnishing status'}</legend>
+                  <label className="block text-xs">
+                    {isAr ? 'بالعربية' : 'Arabic'}
+                    <input dir="rtl" className="mt-1 block w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm"
+                      value={furnishingAr} onChange={(event) => setFurnishingAr(event.target.value)} placeholder="مفروش بالكامل (تصميم إيطالي فاخر)" />
                   </label>
-                  <select
-                    value={furnishingEn}
-                    onChange={(e) => {
-                      setFurnishingEn(e.target.value);
-                      setFurnishingAr(e.target.value === 'Fully Furnished' ? 'مفروش بالكامل' : 'غير مفروش');
-                    }}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm"
-                  >
-                    <option value="Fully Furnished">{isAr ? 'مفروش بالكامل' : 'Fully Furnished'}</option>
-                    <option value="Semi Furnished">{isAr ? 'مفروش جزئياً' : 'Semi Furnished'}</option>
-                    <option value="Unfurnished">{isAr ? 'غير مفروش' : 'Unfurnished'}</option>
-                  </select>
-                </div>
+                  <label className="block text-xs">
+                    {isAr ? 'بالإنجليزية' : 'English'}
+                    <input dir="ltr" className="mt-1 block w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm"
+                      value={furnishingEn} onChange={(event) => setFurnishingEn(event.target.value)} placeholder="Fully furnished (luxury Italian design)" />
+                  </label>
+                </fieldset>
               </div>
             </div>
           )}

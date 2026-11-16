@@ -7,7 +7,6 @@ import {
   ArrowRight,
   ArrowLeft,
   Calendar,
-  MessageSquare,
   ShieldCheck,
   Eye,
   Share2,
@@ -20,6 +19,12 @@ import { Badge } from './Badge';
 import { getPageHref, handleSemanticClick } from '../../lib/navigation';
 import { getNormalizedPropertyPrice, RentalPeriod } from '../../lib/priceNormalization';
 import { formatCurrency, formatPropertyArea } from '../../lib/utils';
+
+function WhatsAppIcon() {
+  return <svg viewBox="0 0 24 24" fill="currentColor" className="size-4 shrink-0" aria-hidden="true">
+    <path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.49s1.07 2.89 1.22 3.09c.15.2 2.1 3.2 5.09 4.49.71.31 1.27.49 1.7.63.71.23 1.36.2 1.87.12.57-.08 1.76-.72 2-1.42.25-.7.25-1.3.17-1.42-.07-.13-.27-.2-.57-.35zM12.05 2a9.95 9.95 0 0 0-8.63 14.9L2 22l5.25-1.38A9.95 9.95 0 1 0 12.05 2zm0 18.23a8.25 8.25 0 0 1-4.2-1.15l-.3-.18-3.11.82.83-3.03-.2-.31a8.26 8.26 0 1 1 6.98 3.85z"/>
+  </svg>;
+}
 
 interface PropertyCardProps {
   key?: React.Key;
@@ -176,7 +181,7 @@ export function PropertyCard({
               <span className="text-slate-300">•</span>
               <div className="flex items-center gap-1.5 font-medium">
                 <Maximize className="w-4 h-4 text-blue-600" />
-                <span>{formatPropertyArea(property, language, { showSecondary: true })}</span>
+                <span>{formatPropertyArea(property, language)}</span>
               </div>
             </div>
           </div>
@@ -197,7 +202,7 @@ export function PropertyCard({
               <a
                 href={detailsHref}
                 onClick={(e) => handleSemanticClick(e, () => onSelectProperty(property))}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#002B49] hover:bg-[#0f243e] text-white text-xs font-bold flex-1 sm:flex-none justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 min-h-[40px] shadow-xs cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 hover:bg-slate-100 text-xs font-bold flex-1 sm:flex-none justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 min-h-[40px] shadow-xs cursor-pointer"
               >
                 <Eye className="w-3.5 h-3.5" />
                 <span>{t.cta.viewDetails}</span>
@@ -211,9 +216,9 @@ export function PropertyCard({
                     e.stopPropagation();
                     onOpenBookViewingModal(property);
                   }}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200/90 text-xs font-semibold flex-1 sm:flex-none justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 min-h-[40px] cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-hard-gradient text-white hover:brightness-105 border border-blue-700 text-xs font-semibold flex-1 sm:flex-none justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 min-h-[40px] cursor-pointer"
                 >
-                  <Calendar className="w-3.5 h-3.5 text-slate-600" />
+                  <Calendar className="w-3.5 h-3.5 text-white" />
                   <span>{t.cta.bookViewing}</span>
                 </button>
               )}
@@ -227,9 +232,9 @@ export function PropertyCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/90 text-xs font-semibold flex-1 sm:flex-none justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 min-h-[40px] cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white border border-emerald-700 text-xs font-semibold flex-1 sm:flex-none justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 min-h-[40px] cursor-pointer"
               >
-                <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
+                <WhatsAppIcon />
                 <span>{t.nav.whatsapp}</span>
               </a>
             </div>
@@ -354,7 +359,7 @@ export function PropertyCard({
         <a
           href={detailsHref}
           onClick={(e) => handleSemanticClick(e, () => onSelectProperty(property))}
-          className="w-full inline-flex items-center gap-2 justify-center px-4 py-2.5 rounded-xl bg-[#002B49] hover:bg-[#0f243e] text-white text-xs sm:text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 min-h-[40px] shadow-xs cursor-pointer group/btn"
+          className="w-full inline-flex items-center gap-2 justify-center px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 hover:bg-slate-100 text-xs sm:text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 min-h-[40px] shadow-xs cursor-pointer group/btn"
         >
           <span>{t.cta.viewDetails}</span>
           <ArrowIcon className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
@@ -369,9 +374,9 @@ export function PropertyCard({
                 e.stopPropagation();
                 onOpenBookViewingModal(property);
               }}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200/90 text-xs font-semibold justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 min-h-[40px] cursor-pointer w-full"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-hard-gradient text-white hover:brightness-105 border border-blue-700 text-xs font-semibold justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 min-h-[40px] cursor-pointer w-full"
             >
-              <Calendar className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+              <Calendar className="w-3.5 h-3.5 text-white shrink-0" />
               <span className="truncate">{t.cta.bookViewing}</span>
             </button>
           )}
@@ -385,9 +390,9 @@ export function PropertyCard({
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/90 text-xs font-semibold justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 min-h-[40px] cursor-pointer w-full"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white border border-emerald-700 text-xs font-semibold justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 min-h-[40px] cursor-pointer w-full"
           >
-            <MessageSquare className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+            <WhatsAppIcon />
             <span className="truncate">{t.nav.whatsapp}</span>
           </a>
         </div>

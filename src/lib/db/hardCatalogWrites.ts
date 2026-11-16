@@ -5,7 +5,7 @@ import type { PublicProperty, CatalogEntry } from './hardCatalog';
 
 const editableFields = {
   properties: ['slug', 'title', 'description', 'location', 'price', 'type', 'status', 'bedrooms', 'bathrooms',
-    'areaSqFt', 'areaSqM', 'featured', 'images', 'amenities', 'features'],
+    'areaSqFt', 'areaSqM', 'featured', 'images', 'amenities', 'features', 'regaLicenseNumber', 'adLicenseNumber', 'wafiPermitNumber'],
   projects: ['slug', 'title', 'developer', 'location', 'city', 'startingPriceSAR', 'handoverDate', 'unitsTotal',
     'unitsAvailable', 'roiProjected', 'image', 'gallery', 'category', 'status', 'progressPercentage',
     'lastUpdated', 'description', 'highlights', 'featured', 'brochureUrl'],
@@ -63,6 +63,9 @@ function buildPublicContent(collection: EditableCollection, id: string, updates:
     }
   }
 
+  if (collection === 'properties' && changes.features && previous.features) {
+    content.features = { ...(previous.features as object), ...(changes.features as object) };
+  }
   if (collection === 'properties' && content.location) {
     const location = content.location as Property['location'];
     if (typeof location.city?.ar === 'string') {

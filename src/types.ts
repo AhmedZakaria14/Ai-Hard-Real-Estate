@@ -51,6 +51,9 @@ export interface Property {
   areaSqM: number;
   featured: boolean;
   images: string[];
+  regaLicenseNumber?: string;
+  adLicenseNumber?: string;
+  wafiPermitNumber?: string;
   amenities: {
     en: string[];
     ar: string[];

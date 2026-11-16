@@ -114,8 +114,8 @@ export const translations = {
 
     // Properties Page
     properties: {
-      pageTitle: 'Available Property Listings',
-      pageSubtitle: 'Explore verified apartments, luxury villas, modern penthouses, and commercial real estate.',
+      pageTitle: 'Exceptional Real Estate Opportunities',
+      pageSubtitle: 'Explore verified apartments, luxury villas, modern penthouses, and verified commercial and industrial spaces.',
       filters: {
         search: 'Search by title, location or keywords',
         status: 'Listing Status',
@@ -517,8 +517,8 @@ export const translations = {
 
     // Properties Page
     properties: {
-      pageTitle: 'العقارات المتاحة للبيع والإيجار',
-      pageSubtitle: 'استعرض فلل فاخرة، شقق عصرية، بنتهاوس راقية، ومساحات تجارية معتمدة.',
+      pageTitle: 'فرص عقارية استثنائية بين يديك',
+      pageSubtitle: 'استعرض فلل فاخرة، شقق عصرية، بنتهاوس راقية، ومساحات تجارية وصناعية معتمدة.',
       filters: {
         search: 'ابحث بالاسم، الموقع، أو الكلمات المفتاحية',
         status: 'حالة العرض',
@@ -629,7 +629,7 @@ export const translations = {
         area: 'المساحة الإجمالية',
         parking: 'مواقف السيارات',
         yearBuilt: 'سنة البناء',
-        furnishing: 'حالة الفرش',
+        furnishing: 'حالة التأثيث',
         view: 'الإطلالة',
       },
       mortgageCalculator: 'حاسبة التمويل العقاري التقديرية',

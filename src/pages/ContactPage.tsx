@@ -35,20 +35,29 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
   const [crmRef, setCrmRef] = useState('');
   const [loading, setLoading] = useState(false);
   const [contactError, setContactError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<'name' | 'email' | 'phone' | 'type' | 'message', string>>>({});
+  const ar = language === 'ar';
+  const requiredMark = <span className="text-red-600" aria-hidden="true"> *</span>;
+  const fieldError = (field: keyof typeof fieldErrors) => fieldErrors[field] &&
+    <p role="alert" id={`contact-error-${field}`} className="mt-1 text-xs font-medium text-red-700">{fieldErrors[field]}</p>;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setContactError('');
 
-    if (!fullName.trim()) return;
     const normalizedPhone = phone.trim().replace(/[٠-٩۰-۹]/g, (digit) => String(digit.charCodeAt(0) % 16));
-    const isValidPhone = /^\+?[0-9][0-9 ().-]*$/.test(normalizedPhone) && /^(?:\d{7,15})$/.test(normalizedPhone.replace(/\D/g, ''));
-    if (!isValidPhone) {
-      setContactError(language === 'en' ? 'Enter a valid phone number without letters.' : 'أدخل رقم هاتف صحيحًا دون حروف.');
-      return;
+    const errors: typeof fieldErrors = {};
+    if (fullName.trim().length < 2) errors.name = ar ? 'أدخل الاسم بالكامل.' : 'Enter your full name.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) errors.email = ar ? 'أدخل بريدًا إلكترونيًا صحيحًا.' : 'Enter a valid email address.';
+    if (!/^\+?[0-9][0-9 ().-]*$/.test(normalizedPhone) || !/^\d{7,15}$/.test(normalizedPhone.replace(/\D/g, ''))) {
+      errors.phone = ar ? 'أدخل رقم هاتف صحيحًا دون حروف.' : 'Enter a valid phone number without letters.';
     }
-    if (!inquiryType) {
-      setContactError(language === 'en' ? 'Choose an inquiry type.' : 'اختر نوع الاستفسار.');
+    if (!inquiryType) errors.type = ar ? 'اختر نوع الاستفسار.' : 'Choose an inquiry type.';
+    if (!message.trim()) errors.message = ar ? 'اكتب تفاصيل رسالتك.' : 'Enter your message.';
+    setFieldErrors(errors);
+    const firstError = Object.keys(errors)[0];
+    if (firstError) {
+      e.currentTarget.querySelector<HTMLElement>(`[data-field="${firstError}"]`)?.focus();
       return;
     }
 
@@ -64,12 +73,6 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
       ? subject.trim()
       : typeLabels[inquiryType]?.[language] || (language === 'en' ? 'General Inquiry' : 'استفسار عام');
 
-    const finalMessage = message.trim()
-      ? message.trim()
-      : language === 'en'
-      ? `Contact request for: ${derivedSubject}`
-      : `طلب تواصل بخصوص: ${derivedSubject}`;
-
     setLoading(true);
     try {
       const result = await submitCustomerForm({
@@ -79,7 +82,7 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
         email: email.trim(),
         phone: normalizedPhone,
         language,
-        message: `Inquiry Type: ${inquiryType}\nSubject: ${derivedSubject}\n\n${finalMessage}`,
+        message: `Inquiry Type: ${inquiryType}\nSubject: ${derivedSubject}\n\n${message.trim()}`,
         details: {
           inquiryType,
           subject: derivedSubject,
@@ -109,6 +112,7 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
     setInquiryType('');
     setSubject('');
     setMessage('');
+    setFieldErrors({});
   };
 
   return (
@@ -155,13 +159,14 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
               </div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form noValidate onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="contact-page-fullname" className="block text-xs font-semibold text-slate-700 mb-1">
-                  {t.contact.fullName} *
+                  {t.contact.fullName}{requiredMark}
                 </label>
                 <input
-                  id="contact-page-fullname"
+                  id="contact-page-fullname" data-field="name" aria-invalid={Boolean(fieldErrors.name)}
+                    aria-describedby={fieldErrors.name ? 'contact-error-name' : undefined}
                   type="text"
                   required
                   aria-required="true"
@@ -170,15 +175,17 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                   onChange={(e) => setFullName(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                 />
+                  {fieldError('name')}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="contact-page-email" className="block text-xs font-semibold text-slate-700 mb-1">
-                    {t.contact.email}
+                    {t.contact.email}{requiredMark}
                   </label>
                   <input
-                    id="contact-page-email"
+                    id="contact-page-email" data-field="email" aria-invalid={Boolean(fieldErrors.email)}
+                    aria-describedby={fieldErrors.email ? 'contact-error-email' : undefined}
                     type="email"
                     required
                     pattern="[^\s@]+@[^\s@]+\.[^\s@]+"
@@ -191,13 +198,15 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                     }}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                   />
+                  {fieldError('email')}
                 </div>
                 <div>
                   <label htmlFor="contact-page-phone" className="block text-xs font-semibold text-slate-700 mb-1">
-                    {t.contact.phone}
+                    {t.contact.phone}{requiredMark}
                   </label>
                   <input
-                    id="contact-page-phone"
+                    id="contact-page-phone" data-field="phone" aria-invalid={Boolean(fieldErrors.phone)}
+                    aria-describedby={fieldErrors.phone ? 'contact-error-phone' : undefined}
                     type="tel"
                     required
                     autoComplete="tel"
@@ -209,6 +218,7 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                     }}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                   />
+                  {fieldError('phone')}
                 </div>
               </div>
 
@@ -219,10 +229,11 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="contact-page-inquiry-type" className="block text-xs font-semibold text-slate-700 mb-1">
-                    {t.contact.inquiryType}
+                    {t.contact.inquiryType}{requiredMark}
                   </label>
                   <select
-                    id="contact-page-inquiry-type"
+                    id="contact-page-inquiry-type" data-field="type" aria-invalid={Boolean(fieldErrors.type)}
+                    aria-describedby={fieldErrors.type ? 'contact-error-type' : undefined}
                     required
                     value={inquiryType}
                     onChange={(e) => setInquiryType(e.target.value)}
@@ -235,15 +246,16 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                     <option value="investment">{language === 'en' ? 'Investment Advisory' : 'استشارات استثمارية'}</option>
                     <option value="consultation">{language === 'en' ? 'General Consultation' : 'استشارة عامة'}</option>
                   </select>
+                  {fieldError('type')}
                 </div>
                 <div>
                   <label htmlFor="contact-page-subject" className="block text-xs font-semibold text-slate-700 mb-1">
-                    {t.contact.subject} <span className="text-slate-400 font-normal">({language === 'en' ? 'Auto / Optional' : 'تلقائي / اختياري'})</span>
+                    {t.contact.subject}
                   </label>
                   <input
                     id="contact-page-subject"
                     type="text"
-                    placeholder={language === 'en' ? 'Derived from topic if empty...' : 'يُحدد تلقائياً إن ترك فارغاً...'}
+                    placeholder={ar ? 'موضوع الرسالة' : 'Message subject'}
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
@@ -253,16 +265,19 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
 
               <div>
                 <label htmlFor="contact-page-message" className="block text-xs font-semibold text-slate-700 mb-1">
-                  {t.contact.message} <span className="text-slate-400 font-normal">({language === 'en' ? 'Optional' : 'اختياري'})</span>
+                  {ar ? 'تفاصيل رسالتك' : 'Message details'}{requiredMark}
                 </label>
                 <textarea
-                  id="contact-page-message"
+                  id="contact-page-message" data-field="message" aria-invalid={Boolean(fieldErrors.message)}
+                    aria-describedby={fieldErrors.message ? 'contact-error-message' : undefined}
+                  required
                   rows={4}
                   placeholder={language === 'en' ? 'Please provide detailed specifications, questions, or target budgets...' : 'يرجى كتابة تفاصيل استفسارك أو ميزانيتك المقترحة...'}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
                 />
+                  {fieldError('message')}
               </div>
 
               <Button type="submit" isLoading={loading} className="w-full font-bold">
@@ -310,7 +325,7 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                 <Phone className="w-5 h-5 text-blue-400 shrink-0" />
                 <div>
                   <strong className="text-white block font-semibold">
-                    {language === 'en' ? 'Direct Brokerage Line' : 'الخط المباشر للوساطة'}
+                    {language === 'en' ? 'Direct Line' : 'الخط المباشر'}
                   </strong>
                   <a href="tel:+966556125711" dir="ltr" className="text-blue-300 hover:underline inline-block text-left">
                     <bdi dir="ltr">{t.contact.phoneValue}</bdi>
@@ -346,6 +361,13 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
               </Button>
             </div>
           </div>
+          <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+            <h3 className="px-5 py-4 font-bold">{ar ? 'موقع المكتب على الخريطة' : 'Office location on the map'}</h3>
+            <iframe title={ar ? 'خريطة مقر هارد للعقارات في حي هجر بالدمام' : 'Map of HARD Real Estate office, Hajr, Dammam'}
+              className="h-60 w-full border-0 sm:h-64" loading="lazy" allowFullScreen
+              referrerPolicy="no-referrer-when-downgrade"
+              src={`https://maps.google.com/maps?q=${encodeURIComponent('طريق الأمير متعب بن عبد العزيز، حي هجر، الدمام، السعودية')}&hl=${language}&z=15&output=embed`} />
+          </section>
         </div>
       </div>
     </div>

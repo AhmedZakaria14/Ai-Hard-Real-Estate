@@ -191,6 +191,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    const refreshOnFocus = () => { void refreshProperties(); };
+    window.addEventListener('focus', refreshOnFocus);
+    return () => window.removeEventListener('focus', refreshOnFocus);
+  }, [refreshProperties]);
+
+  useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
     let version = 0;
     const { data: { subscription } } = hardAdminClient.auth.onAuthStateChange((event, session) => {

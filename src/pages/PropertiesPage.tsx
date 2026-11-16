@@ -562,9 +562,6 @@ export function PropertiesPage({
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div className="space-y-2">
-          <Badge variant="primary">
-            {language === 'en' ? 'Verified Brokerage Inventory' : 'محفظة العقارات المعتمدة'}
-          </Badge>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 font-display-serif tracking-tight">
             {t.properties.pageTitle}
           </h1>

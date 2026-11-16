@@ -205,7 +205,7 @@ export function PropertyDetailPage({
                 {t.propertyDetails.quickFacts.area}
               </span>
               <p className="text-base font-bold text-slate-900">
-                {formatPropertyArea(property, language, { showSecondary: true })}
+                {formatPropertyArea(property, language)}
               </p>
             </div>
 
