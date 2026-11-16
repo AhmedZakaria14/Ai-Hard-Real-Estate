@@ -29,7 +29,7 @@ export default function SupabaseInbox() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [rows, setRows] = useState<Submission[]>([]);
-  const [view, setView] = useState<'requests' | 'articles'>('requests');
+  const [view, setView] = useState<'requests' | 'articles' | 'projects'>('requests');
   const [page, setPage] = useState(0);
   const [refresh, setRefresh] = useState(0);
   const isAdmin = session?.user.app_metadata.hard_role === 'superadmin';
@@ -121,6 +121,7 @@ export default function SupabaseInbox() {
       <nav aria-label="أقسام الإدارة" className="flex gap-3">
         <button aria-pressed={view === 'requests'} onClick={() => setView('requests')} className="rounded border px-3 py-1">الطلبات</button>
         <button aria-pressed={view === 'articles'} onClick={() => setView('articles')} className="rounded border px-3 py-1">المقالات المنشورة</button>
+        <button aria-pressed={view === 'projects'} onClick={() => setView('projects')} className="rounded border px-3 py-1">المشاريع العقارية</button>
       </nav>
       <div className="flex gap-3">
         <button onClick={() => setRefresh((value) => value + 1)} disabled={busy} className="rounded border px-3 py-1">تحديث</button>
@@ -130,7 +131,7 @@ export default function SupabaseInbox() {
           else setPage(0);
         }} className="rounded border px-3 py-1">خروج</button>
       </div>
-      {view === 'articles' ? <SupabaseArticleEditor client={client} /> : <>
+      {view !== 'requests' ? <SupabaseArticleEditor key={view} client={client} collection={view === 'projects' ? 'projects' : 'blog_posts'} /> : <>
       {busy ? <p role="status">جارٍ تحميل الطلبات…</p> : !error && rows.length === 0 && <p>لا توجد طلبات في هذه الصفحة.</p>}
       {rows.map((row) => <article key={row.id} className="space-y-2 rounded-lg border p-4">
         <h2 className="font-bold">{String(row.payload.name || row.tracking_code)}</h2>

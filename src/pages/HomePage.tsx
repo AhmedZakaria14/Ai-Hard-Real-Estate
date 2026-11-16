@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { Language, PageId, Property, PropertyFilterParams, Project } from '../types';
 import { translations as defaultTranslations } from '../lib/translations';
-import { mockProjects, mockTestimonials } from '../data/mockData';
+import { mockTestimonials } from '../data/mockData';
 import { SAUDI_CITIES } from '../data/cities';
 import { CitySearchDropdown } from '../components/ui/CitySearchDropdown';
 import { Button } from '../components/ui/Button';
@@ -26,6 +26,7 @@ import { PropertyCard } from '../components/ui/PropertyCard';
 import { TestimonialSlider } from '../components/ui/TestimonialSlider';
 import { ServicesSection } from '../components/home/ServicesSection';
 import { ComplianceVerificationModal } from '../components/modals/ComplianceVerificationModal';
+import { loadPublishedProjects } from '../lib/db/hardCatalog';
 import { useData } from '../context/DataContext';
 import { useTextOverride } from '../context/TextOverrideContext';
 import { BrandLogo } from '../components/ui/BrandLogo';
@@ -69,7 +70,14 @@ export function HomePage({
   const featuredProperties = properties.filter((p) => p.featured).slice(0, 3).length > 0
     ? properties.filter((p) => p.featured).slice(0, 3)
     : properties.slice(0, 3);
-  const spotlightProject = mockProjects[0];
+  const [spotlightProject, setSpotlightProject] = React.useState<Project | undefined>();
+  React.useEffect(() => {
+    const controller = new AbortController();
+    loadPublishedProjects(controller.signal).then((items) => {
+      if (!controller.signal.aborted) setSpotlightProject(items[0]?.content);
+    }).catch(() => {});
+    return () => controller.abort();
+  }, []);
 
   const handleHeroSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -456,7 +464,7 @@ export function HomePage({
                       {spotlightProject.handoverDate[language]}
                     </strong>
                     <div className="mt-1 flex items-center justify-between text-[10px] text-slate-400">
-                      <span>{t.projects.progress}: {spotlightProject.progressPercentage || 68}%</span>
+                      <span>{t.projects.progress}: {spotlightProject.progressPercentage ?? 0}%</span>
                       <span className="text-blue-400 font-semibold">{t.projects.underConstruction}</span>
                     </div>
                   </div>

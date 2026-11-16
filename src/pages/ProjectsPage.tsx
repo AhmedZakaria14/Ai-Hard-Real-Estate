@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { Language, PageId, Project } from '../types';
 import { translations } from '../lib/translations';
-import { useData } from '../context/DataContext';
+import { loadPublishedProjects } from '../lib/db/hardCatalog';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { RequestBrochureModal } from '../components/modals/RequestBrochureModal';
@@ -37,7 +37,19 @@ export function ProjectsPage({
   onOpenProjectInquiryModal,
 }: ProjectsPageProps) {
   const t = translations[language];
-  const { projects } = useData();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loadStatus, setLoadStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  React.useEffect(() => {
+    const controller = new AbortController();
+    loadPublishedProjects(controller.signal).then((items) => {
+      if (controller.signal.aborted) return;
+      setProjects(items.map(({ content }) => content));
+      setLoadStatus('ready');
+    }).catch(() => {
+      if (!controller.signal.aborted) setLoadStatus('error');
+    });
+    return () => controller.abort();
+  }, []);
   const ArrowIcon = language === 'ar' ? ArrowLeft : ArrowRight;
 
   const [selectedBrochureProject, setSelectedBrochureProject] = useState<Project | null>(null);
@@ -64,6 +76,9 @@ export function ProjectsPage({
           {t.projects.pageSubtitle}
         </p>
       </div>
+
+      {loadStatus === 'loading' && <p role="status">{language === 'ar' ? 'جارٍ تحميل المشاريع…' : 'Loading projects…'}</p>}
+      {loadStatus === 'error' && <p role="alert">{language === 'ar' ? 'تعذر تحميل المشاريع. أعد تحميل الصفحة.' : 'Unable to load projects. Reload the page.'}</p>}
 
       {/* Projects List */}
       <div className="space-y-8">
@@ -130,7 +145,7 @@ export function ProjectsPage({
                       <span>{t.projects.constructionStatus}: {t.projects.underConstruction}</span>
                     </span>
                     <span className="text-blue-700 font-bold">
-                      {project.progressPercentage || project.deliveryAudit?.progressPercentage || 65}%
+                      {project.progressPercentage ?? 0}%
                     </span>
                   </div>
                   
@@ -140,7 +155,7 @@ export function ProjectsPage({
                       className={`h-full rounded-full transition-all duration-500 ${
                         project.isOverdue ? 'bg-amber-500' : 'bg-blue-600'
                       }`}
-                      style={{ width: `${project.progressPercentage || project.deliveryAudit?.progressPercentage || 65}%` }}
+                      style={{ width: `${project.progressPercentage ?? 0}%` }}
                     />
                   </div>
 
