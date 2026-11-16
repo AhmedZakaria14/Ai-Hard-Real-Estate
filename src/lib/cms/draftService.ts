@@ -1,14 +1,13 @@
 /**
  * HARD GROUP - CMS DRAFT PERSISTENCE & CONCURRENCY SERVICE
  * 
- * Provides debounced draft storage in Firestore (`cms_drafts` collection).
+ * Provides debounced draft storage in Supabase (`cms_drafts` collection).
  * Prevents silent overwrites via numeric revision concurrency control.
  * Stores local emergency backup buffers when offline.
  * Ensures autosaving NEVER publishes draft edits to live public visitors.
  */
 
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../firebase';
+import { hardAdminClient } from '../db/hardAdminClient';
 import { CMSDraftRecord, RevisionConflictError } from './draftTypes';
 
 const LOCAL_DRAFT_PREFIX = 'hard_cms_offline_draft_v1';
@@ -47,19 +46,23 @@ export function clearLocalDraftBuffer(entityType: string, entityId: string): voi
 }
 
 /**
- * Loads current draft from Firestore, with local offline buffer fallback.
+ * Loads current draft from Supabase, with local offline buffer fallback.
  */
 export async function getCMSDraft<T = any>(
   entityType: string,
   entityId: string
 ): Promise<{ record: CMSDraftRecord<T> | null; isFromOfflineBuffer: boolean }> {
   const docId = `${entityType}_${entityId}`;
-  const docRef = doc(db, 'cms_drafts', docId);
 
   try {
-    const snap = await getDoc(docRef);
-    if (snap.exists()) {
-      const serverRecord = snap.data() as CMSDraftRecord<T>;
+    const { data, error } = await hardAdminClient.from('hard_cms_workspaces')
+      .select('draft,revision,updated_at').eq('entity_type',entityType).eq('entity_id',entityId).maybeSingle();
+    if (error) throw error;
+    if (data?.draft) {
+      const serverRecord: CMSDraftRecord<T> = {
+        id: docId, entityType, entityId, sector: 'portal', updatedByEmail: '',
+        ...data.draft, revision: data.revision, updatedAt: data.updated_at,
+      };
       const localBuffer = getLocalDraftBuffer<T>(entityType, entityId);
 
       // If local offline buffer has a higher revision or newer timestamp, inform caller
@@ -70,7 +73,7 @@ export async function getCMSDraft<T = any>(
       return { record: serverRecord, isFromOfflineBuffer: false };
     }
   } catch (err) {
-    console.warn(`[DraftService] Firestore fetch error for ${docId}, checking offline buffer:`, err);
+    console.warn(`[DraftService] Supabase fetch error for ${docId}, checking offline buffer:`, err);
   }
 
   const localBuffer = getLocalDraftBuffer<T>(entityType, entityId);
@@ -78,7 +81,7 @@ export async function getCMSDraft<T = any>(
 }
 
 /**
- * Saves draft to Firestore with revision concurrency checking.
+ * Saves draft to Supabase with revision concurrency checking.
  */
 export async function saveCMSDraft<T = any>(params: {
   entityType: string;
@@ -100,7 +103,6 @@ export async function saveCMSDraft<T = any>(params: {
   } = params;
 
   const docId = `${entityType}_${entityId}`;
-  const docRef = doc(db, 'cms_drafts', docId);
 
   // 1. Check network connectivity
   if (!navigator.onLine) {
@@ -120,22 +122,6 @@ export async function saveCMSDraft<T = any>(params: {
     throw new Error('OFFLINE_SAVED_LOCALLY');
   }
 
-  // 2. Concurrency check unless forceOverwrite is set
-  if (!forceOverwrite && expectedRevision > 0) {
-    try {
-      const snap = await getDoc(docRef);
-      if (snap.exists()) {
-        const remote = snap.data() as CMSDraftRecord<T>;
-        if (remote.revision > expectedRevision) {
-          throw new RevisionConflictError(expectedRevision, remote.revision, remote);
-        }
-      }
-    } catch (err) {
-      if (err instanceof RevisionConflictError) throw err;
-      console.warn('[DraftService] Pre-flight revision check warning:', err);
-    }
-  }
-
   // 3. Prepare next revision doc
   const nextRevision = expectedRevision + 1;
   const newRecord: CMSDraftRecord<T> = {
@@ -151,12 +137,19 @@ export async function saveCMSDraft<T = any>(params: {
   };
 
   try {
-    await setDoc(docRef, newRecord);
+    const { data: result, error } = await hardAdminClient.rpc('hard_save_cms_draft', {
+      p_type: entityType, p_id: entityId, p_expected: expectedRevision, p_record: newRecord, p_force: forceOverwrite,
+    });
+    if (error) throw error;
+    if (result?.conflict) {
+      throw new RevisionConflictError(expectedRevision, result.revision, result.record);
+    }
+    if (!result?.record) throw new Error('Supabase did not confirm the draft.');
     clearLocalDraftBuffer(entityType, entityId);
-    return newRecord;
+    return result.record;
   } catch (err) {
     // If network or permission error, cache to local buffer
-    saveLocalDraftBuffer(entityType, entityId, newRecord);
+    if (!(err instanceof RevisionConflictError)) saveLocalDraftBuffer(entityType, entityId, newRecord);
     throw err;
   }
 }

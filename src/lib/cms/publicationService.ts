@@ -5,15 +5,14 @@
  * validation, atomic write batch execution, audit logging, and historical revisions.
  */
 
-import { doc, getDoc, writeBatch } from 'firebase/firestore';
-import { db } from '../firebase';
+import { hardAdminClient } from '../db/hardAdminClient';
 import { canPublish } from '../../types/firestore-schema';
 import { PublicationParams, PublicationResult } from './publicationTypes';
 import { validateEntityForPublish } from './publicationValidation';
 import { generateCorrelationId, logProductionEvent } from '../monitoring/productionLogger';
 
 export async function publishEntityWithAtomicBatch(params: PublicationParams): Promise<PublicationResult> {
-  const { entityType, entityId, sector = 'portal', draftData, publisherUser, targetCollectionName } = params;
+  const { entityType, entityId, sector = 'portal', draftData, publisherUser } = params;
   const correlationId = generateCorrelationId('pub');
 
   // 1. Authorization Enforcement
@@ -55,127 +54,20 @@ export async function publishEntityWithAtomicBatch(params: PublicationParams): P
     throw new Error(`PUBLICATION_VALIDATION_FAILED: ${errList}`);
   }
 
-  // Determine target collection
-  let collectionName = targetCollectionName;
-  if (!collectionName) {
-    if (entityType === 'page_document') collectionName = 'pages';
-    else if (entityType === 'property') collectionName = 'properties';
-    else if (entityType === 'project') collectionName = 'construction_projects';
-    else if (entityType === 'form_schema') collectionName = 'forms';
-    else collectionName = 'site_content';
+  if (entityType !== 'page_document' && entityType !== 'form_schema') {
+    throw new Error('هذا النوع غير مدعوم في مسار النشر الجديد.');
   }
-
-  const now = new Date().toISOString();
-  const targetDocRef = doc(db, collectionName, entityId);
-  const draftDocRef = doc(db, 'cms_drafts', `${entityType}_${entityId}`);
-
-  // Determine publication version number
-  let newVersion = 1;
-  try {
-    const snap = await getDoc(targetDocRef);
-    if (snap.exists()) {
-      const existing = snap.data();
-      if (typeof existing.publicationVersion === 'number') {
-        newVersion = existing.publicationVersion + 1;
-      } else if (typeof existing.schemaVersion === 'number') {
-        newVersion = existing.schemaVersion + 1;
-      }
-    }
-  } catch (err) {
-    console.warn('[PublicationService] Failed to read existing published doc for version counter:', err);
-  }
-
-  const auditEventId = `audit_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
-  const auditDocRef = doc(db, 'audit_events', auditEventId);
-
-  const revisionId = `rev_${entityType}_${entityId}_v${newVersion}`;
-  const revisionDocRef = doc(db, 'revisions', revisionId);
-
-  const publishedPayload = {
-    ...draftData,
-    id: entityId,
-    sector,
-    publicationStatus: 'published',
-    publicationVersion: newVersion,
-    publishedAt: now,
-    publishedBy: publisherUser.email || publisherUser.uid,
-    updatedAt: now,
-  };
-
-  const auditPayload = {
-    id: auditEventId,
-    eventType: 'CONTENT_PUBLISHED',
-    entityType,
-    entityId,
-    sector,
-    publicationVersion: newVersion,
-    actorUid: publisherUser.uid,
-    actorEmail: publisherUser.email,
-    actorRole: publisherUser.role,
-    createdAt: now,
-  };
-
-  const revisionPayload = {
-    id: revisionId,
-    entityType,
-    entityId,
-    sector,
-    version: newVersion,
-    snapshotData: draftData,
-    publishedBy: publisherUser.email,
-    publishedAt: now,
-  };
-
-  // 3. Perform Atomic Batch Write
-  const batch = writeBatch(db);
-
-  // A: Write to public published collection
-  batch.set(targetDocRef, publishedPayload, { merge: true });
-
-  // B: Update draft document status in cms_drafts
-  batch.set(
-    draftDocRef,
-    {
-      status: 'published',
-      publishedVersion: newVersion,
-      updatedAt: now,
-      updatedByEmail: publisherUser.email,
-    },
-    { merge: true }
-  );
-
-  // C: Record immutable Audit Event
-  batch.set(auditDocRef, auditPayload);
-
-  // D: Record historical Revision Snapshot
-  batch.set(revisionDocRef, revisionPayload);
-
-  // Execute batch atomically
-  try {
-    await batch.commit();
-  } catch (commitErr: any) {
-    logProductionEvent({
-      correlationId,
-      level: 'ERROR',
-      category: 'publication_failure',
-      errorCode: 'ERR_FIRESTORE_BATCH_COMMIT_FAILED',
-      component: 'publicationService',
-      message: `Batch commit failed for ${entityType} ${entityId}: ${commitErr?.message || 'Firestore Write Error'}`,
-      statusClassification: 'TEMPORARILY_UNKNOWN',
-      userRole: publisherUser.role,
-      userEmail: publisherUser.email,
-      meta: { entityType, entityId, newVersion },
-    }).catch(() => {});
-
-    throw new Error(`PUBLICATION_BATCH_COMMIT_FAILED: ${commitErr?.message || 'Firestore atomic batch write failed.'}`);
-  }
-
+  const { data: release, error } = await hardAdminClient.rpc('hard_publish_cms', {
+    p_type: entityType, p_id: entityId, p_sector: sector, p_body: draftData,
+  });
+  if (error) throw error;
+  if (!release?.version || !release?.eventId) throw new Error('Supabase did not confirm the release.');
   return {
     success: true,
-    publishedVersion: newVersion,
-    publishedAt: now,
-    auditEventId,
-    messageAr: `تم نشر المحتوى بنجاح كإصدار مباشر رقم v${newVersion}!`,
-    messageEn: `Content published live successfully as version v${newVersion}!`,
+    publishedVersion: release.version,
+    publishedAt: release.publishedAt,
+    auditEventId: release.eventId,
+    messageAr: `حُفظ إصدار المحتوى رقم ${release.version} في Supabase.`,
+    messageEn: `Content release v${release.version} saved in Supabase.`,
   };
 }

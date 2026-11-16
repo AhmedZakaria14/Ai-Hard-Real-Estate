@@ -49,7 +49,7 @@ export function useDraftAutosave<T = any>({
       setIsOffline(false);
       // Attempt auto-sync if we were offline or have unsaved changes
       if (initialLoadDoneRef.current && (saveStatus === 'offline' || saveStatus === 'unsaved')) {
-        triggerSave(true);
+        triggerSave(false);
       }
     };
 
@@ -74,6 +74,7 @@ export function useDraftAutosave<T = any>({
     let isMounted = true;
     initialLoadDoneRef.current = false;
     setSaveStatus('idle');
+    setRevision(0);
 
     async function initDraft() {
       if (!entityType || !entityId) return;
@@ -151,7 +152,7 @@ export function useDraftAutosave<T = any>({
           setErrorMessage(`Conflict: Another admin saved revision ${err.remoteRevision}`);
         } else {
           setSaveStatus('failed');
-          setErrorMessage(err?.message || 'Failed to save draft to Firestore');
+          setErrorMessage(err?.message || 'Failed to save draft to Supabase');
         }
       }
     },

@@ -108,10 +108,10 @@ export const PublishValidationModal: React.FC<PublishValidationModalProps> = ({
             </div>
             <div>
               <h3 className="text-lg font-bold font-display-serif">
-                {isAr ? 'فحص واعتماد التغييرات للنشر المباشر' : 'Pre-Publication Validation Audit'}
+                {isAr ? 'فحص واعتماد إصدار المحتوى' : 'Pre-Publication Validation Audit'}
               </h3>
               <p className="text-xs text-slate-400">
-                {isAr ? 'مراجعة صلاحية الناشر والتحقق من اكتمال السياسات والترجمة' : 'Verify publisher role, bilingual policies, references, and media before live release'}
+                {isAr ? 'مراجعة صلاحية الناشر والتحقق من اكتمال السياسات والترجمة' : 'Verify publisher role, bilingual policies, references, and media before saving the release'}
               </p>
             </div>
           </div>
@@ -316,7 +316,7 @@ export const PublishValidationModal: React.FC<PublishValidationModalProps> = ({
             ) : (
               <Send className="w-4 h-4" />
             )}
-            <span>{isAr ? 'تأكيد والنشر المباشر' : 'Confirm & Publish Live'}</span>
+            <span>{isAr ? 'تأكيد وحفظ الإصدار' : 'Confirm & Save Release'}</span>
           </button>
         </div>
       </div>

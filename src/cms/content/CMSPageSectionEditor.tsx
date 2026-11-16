@@ -35,9 +35,6 @@ import {
   ImageGalleryContent,
 } from '../../lib/sectionSchemas';
 import { DynamicPageSectionRenderer } from '../../components/ui/DynamicPageSectionRenderer';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
-import { withServerTimestamps } from '../../lib/firebase/serializers';
 import { useDraftAutosave } from '../../lib/cms/useDraftAutosave';
 import { DraftStatusBadge } from '../components/DraftStatusBadge';
 import { PublishValidationModal } from '../components/PublishValidationModal';
@@ -85,31 +82,14 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
     userEmail: 'admin@hardgp.com',
     debounceMs: 1500,
     onDraftLoaded: (record) => {
-      if (record.data?.sections && Array.isArray(record.data.sections) && record.data.sections.length > 0) {
+      if (Array.isArray(record.data?.sections)) {
         setSections(record.data.sections.sort((a: PageSection, b: PageSection) => a.order - b.order));
-        setSelectedSectionId(record.data.sections[0].id);
+        setSelectedSectionId(record.data.sections[0]?.id ?? null);
       }
     },
   });
 
-  // Load page document sections from Firestore
   useEffect(() => {
-    async function loadPageDoc() {
-      try {
-        const docRef = doc(db, 'pages', selectedPageId);
-        const snap = await getDoc(docRef);
-        if (snap.exists()) {
-          const data = snap.data() as PageDocument;
-          if (data.sections && data.sections.length > 0) {
-            setSections(data.sections.sort((a, b) => a.order - b.order));
-            setSelectedSectionId(data.sections[0].id);
-            return;
-          }
-        }
-      } catch (e) {
-        console.warn(`[CMSPageSectionEditor] Failed to load ${selectedPageId}:`, e);
-      }
-
       // Default fallback sections
       const defaultSecs: PageSection[] = [
         {
@@ -135,9 +115,6 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
       ];
       setSections(defaultSecs);
       setSelectedSectionId(defaultSecs[0].id);
-    }
-
-    loadPageDoc();
   }, [selectedPageId]);
 
   const activeSection = sections.find((s) => s.id === selectedSectionId) || sections[0];
@@ -224,52 +201,16 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
   };
 
   const handleSaveDraft = async () => {
-    setIsSubmitting(true);
     setSaveStatus(null);
+    setIsSubmitting(true);
     try {
-      const pageDoc: PageDocument = {
-        id: selectedPageId,
-        slug: currentPageMeta.slug,
-        sector: currentPageMeta.sector,
-        title: { ar: currentPageMeta.nameAr, en: currentPageMeta.nameEn },
-        sections,
-        publicationStatus: 'draft',
-        updatedAt: new Date().toISOString(),
-      };
-
-      const docRef = doc(db, 'pages', selectedPageId);
-      await setDoc(docRef, withServerTimestamps(pageDoc));
-      setSaveStatus({ type: 'success', text: isAr ? 'تم حفظ مسودة الصفحة في Firestore' : 'Page draft saved to Firestore' });
-    } catch (e: any) {
-      setSaveStatus({ type: 'error', text: e?.message || (isAr ? 'فشل حفظ الصفحة' : 'Failed to save page draft') });
+      await draftState.forceSave();
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handlePublish = async () => {
-    setIsSubmitting(true);
-    setSaveStatus(null);
-    try {
-      const pageDoc: PageDocument = {
-        id: selectedPageId,
-        slug: currentPageMeta.slug,
-        sector: currentPageMeta.sector,
-        title: { ar: currentPageMeta.nameAr, en: currentPageMeta.nameEn },
-        sections,
-        publicationStatus: 'published',
-        updatedAt: new Date().toISOString(),
-      };
-
-      const docRef = doc(db, 'pages', selectedPageId);
-      await setDoc(docRef, withServerTimestamps(pageDoc));
-      setSaveStatus({ type: 'success', text: isAr ? 'تم نشر أقسام الصفحة مباشرة على الموقع!' : 'Page sections published live!' });
-    } catch (e: any) {
-      setSaveStatus({ type: 'error', text: e?.message || (isAr ? 'فشل النشر المباشر' : 'Publishing failed') });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const handlePublish = () => setIsPublishModalOpen(true);
 
   return (
     <div className="space-y-6">
@@ -346,7 +287,7 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
               className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
             >
               <Send className="w-3.5 h-3.5" />
-              <span>{isAr ? 'اعتماد والنشر' : 'Publish Live'}</span>
+              <span>{isAr ? 'اعتماد الإصدار' : 'Approve Release'}</span>
             </button>
           </div>
         </div>
@@ -463,7 +404,7 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
                   className="px-3 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1 shadow-xs"
                 >
                   <Send className="w-3.5 h-3.5" />
-                  <span>{isAr ? 'نشر مباشر' : 'Publish Live'}</span>
+                  <span>{isAr ? 'حفظ إصدار' : 'Save Release'}</span>
                 </button>
               </div>
             </div>
@@ -611,7 +552,7 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
       <PublishValidationModal
         isOpen={isPublishModalOpen}
         onClose={() => setIsPublishModalOpen(false)}
-        onSuccess={(v) => setSaveStatus({ type: 'success', text: isAr ? `تم النشر بنجاح كإصدار v${v}` : `Published live as v${v}` })}
+        onSuccess={(v) => setSaveStatus({ type: 'success', text: isAr ? `تم حفظ إصدار المحتوى v${v}` : `Content release saved as v${v}` })}
         entityType="page_document"
         entityId={selectedPageId}
         sector={currentPageMeta.sector}
