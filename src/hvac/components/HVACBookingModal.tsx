@@ -134,12 +134,10 @@ export function HVACBookingModal() {
 
   if (!isBookingModalOpen) return null;
 
-  const cityName =
-    city === 'other'
-      ? customCity || 'Eastern Province'
-      : T.citiesList.find((c) => c.id === city)
-      ? pick(T.citiesList.find((c) => c.id === city), language)
-      : city;
+  const area = serviceAreas.find((item) => item.id === city);
+  const cityName = city === 'other'
+    ? customCity || (isAr ? 'المنطقة الشرقية' : 'Eastern Province')
+    : (isAr ? area?.cityNameAr : area?.cityNameEn) || city;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -314,7 +312,7 @@ City: ${cityName}`;
                     <option value="" disabled>
                       {isAr ? '-- اختر الخدمة المطلوب تنفيذها --' : '-- Select Requested Service --'}
                     </option>
-                    {services.map((s) => (
+                    {services.filter((s) => s.active).map((s) => (
                       <option key={s.id} value={isAr ? s.titleAr : s.titleEn}>
                         {isAr ? s.titleAr : s.titleEn}
                       </option>

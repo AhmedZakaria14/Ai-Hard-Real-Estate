@@ -24,6 +24,7 @@ export function HVACQuoteDialog() {
     isQuoteDialogOpen,
     closeQuoteDialog,
     quoteInitialData,
+    serviceAreas,
   } = useHVAC();
 
   const [fullName, setFullName] = useState('');
@@ -37,6 +38,7 @@ export function HVACQuoteDialog() {
     clientName: string;
   } | null>(null);
 
+  const [quoteError, setQuoteError] = useState('');
   const modalRef = useRef<HTMLDivElement>(null);
   const triggerElementRef = useRef<HTMLElement | null>(null);
   const titleId = useId();
@@ -114,25 +116,19 @@ export function HVACQuoteDialog() {
   useEffect(() => {
     if (isQuoteDialogOpen) {
       setSubmittedLead(null);
+      setQuoteError('');
       setIsSubmitting(false);
     }
   }, [isQuoteDialogOpen]);
 
   if (!isQuoteDialogOpen) return null;
 
-  const cityName =
-    quoteInitialData?.city === 'other'
-      ? quoteInitialData.customCity || 'Eastern Province'
-      : T.citiesList.find((c) => c.id === quoteInitialData?.city)
-      ? pick(
-          T.citiesList.find((c) => c.id === quoteInitialData?.city),
-          language
-        )
-      : quoteInitialData?.city || 'Eastern Province';
+  const area = serviceAreas.find((item) => item.id === quoteInitialData?.city);
+  const cityName = quoteInitialData?.city === 'other'
+    ? quoteInitialData.customCity || (isAr ? 'المنطقة الشرقية' : 'Eastern Province')
+    : (isAr ? area?.cityNameAr : area?.cityNameEn) || quoteInitialData?.city || (isAr ? 'المنطقة الشرقية' : 'Eastern Province');
 
   const serviceName = quoteInitialData?.service || 'AC Inspection & Maintenance';
-
-  const [quoteError, setQuoteError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -103,8 +103,8 @@ export const T = {
       ar: 'صيانة وغسيل أجهزة التكييف والتبريد بأعلى معايير الدقة والاحترافية',
     },
     subheadline: {
-      en: 'Certified HVAC engineers delivering deep coil chemical cleaning, rapid troubleshooting, duct sanitization, and preventative maintenance contracts across the Eastern Province and Riyadh.',
-      ar: 'كوادر هندسية وفنية متخصصة تقدم غسيل كيميائي شامل للكويلات، صيانة الأعطال المستعصية، وتعقيم مجاري الهواء مع عقود صيانة سنوية موثوقة في المنطقة الشرقية والرياض.',
+      en: 'Specialist engineers and technicians provide comprehensive AC cleaning, complex fault repairs, air duct sanitization, and scheduled maintenance contracts in the Eastern Province.',
+      ar: 'كوادر هندسية وفنية متخصصة تقدم غسيل شامل لأجهزة التكييف، صيانة الأعطال المعقدة، وتعقيم مجاري الهواء مع عقود صيانة دورية موثوقة في المنطقة الشرقية.',
     },
     badge1: {
       en: 'SBC & SASO Compliant',
@@ -219,8 +219,8 @@ export const T = {
       ar: 'خدمات هندسية متكاملة لصيانة وتشغيل أنظمة التكييف',
     },
     subtitle: {
-      en: 'From residential split systems to heavy central VRF chillers, HARD delivers certified maintenance with precision diagnostic tools.',
-      ar: 'من المكيفات الجدارية والسبليت للمنازل، إلى أنظمة الشيلرات والمكيفات المركزية والباكج للشركات والمجمعات.',
+      en: 'From wall-mounted and split AC units for homes to central and packaged systems for companies and complexes.',
+      ar: 'من المكيفات الجدارية والسبليت للمنازل، إلى أنظمة المكيفات المركزية والباكج للشركات والمجمعات.',
     },
   },
   whyUs: {
@@ -229,8 +229,8 @@ export const T = {
       ar: 'معايير التميز',
     },
     title: {
-      en: 'Why Residential & Commercial Clients Trust HARD HVAC',
-      ar: 'لماذا يختار عملاؤنا في الشرقية خدمات هارد؟',
+      en: 'Why do our clients choose HARD HVAC Maintenance?',
+      ar: 'لماذا يختار عملاؤنا خدمات هارد لصيانة التكييف؟',
     },
     subtitle: {
       en: 'Engineered for extreme Gulf summer loads with uncompromising craftsmanship, safety certifications, and transparent pricing.',

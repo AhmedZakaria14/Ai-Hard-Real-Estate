@@ -78,6 +78,9 @@ export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
             className="flex items-center focus:outline-none cursor-pointer"
             onClick={(e) => {
               e.preventDefault();
+              if (window.location.hash) {
+                window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search);
+              }
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
           >
