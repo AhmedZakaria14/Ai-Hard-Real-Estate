@@ -7,6 +7,7 @@ const client = createClient(
   { auth: { storageKey: 'hard-admin-supabase-session' } },
 );
 const pageSize = 25;
+const statusLabels = { new: 'جديد', contacted: 'تم التواصل', closed: 'مغلق' };
 
 type Submission = {
   id: string;
@@ -14,6 +15,8 @@ type Submission = {
   sector: string;
   form_type: string;
   received_at: string;
+  status: keyof typeof statusLabels;
+  status_history: { at: string; from: keyof typeof statusLabels; to: keyof typeof statusLabels }[];
   payload: Record<string, unknown>;
 };
 
@@ -47,7 +50,7 @@ export default function SupabaseInbox() {
     const load = async () => {
       try {
         const { data, error: queryError } = await client.from('hard_form_submissions')
-          .select('id,tracking_code,sector,form_type,received_at,payload')
+          .select('id,tracking_code,sector,form_type,received_at,payload,status,status_history')
           .order('received_at', { ascending: false }).order('id')
           .range(page * pageSize, (page + 1) * pageSize - 1)
           .abortSignal(controller.signal);
@@ -63,6 +66,21 @@ export default function SupabaseInbox() {
     void load();
     return () => controller.abort();
   }, [isAdmin, page, refresh]);
+
+  async function updateStatus(id: string, status: Submission['status']) {
+    setBusy(true);
+    setError('');
+    try {
+      const { data, error: updateError } = await client.from('hard_form_submissions')
+        .update({ status }).eq('id', id).select('id,status,status_history').single();
+      if (updateError) throw updateError;
+      setRows((current) => current.map((row) => row.id === id ? { ...row, ...data } : row));
+    } catch {
+      setError('تعذر حفظ حالة الطلب.');
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function signIn(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -110,6 +128,15 @@ export default function SupabaseInbox() {
         <p><bdi>{row.tracking_code} · {row.sector} · {row.form_type}</bdi></p>
         <p><bdi>{new Date(row.received_at).toLocaleString('ar-SA')} · {String(row.payload.email || '')} · {String(row.payload.phone || '')}</bdi></p>
         {typeof row.payload.message === 'string' && <p className="whitespace-pre-wrap">{row.payload.message}</p>}
+        <label className="block">الحالة{' '}
+          <select value={row.status} disabled={busy} onChange={(event) => void updateStatus(row.id, event.target.value as Submission['status'])} className="rounded border p-1">
+            {Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+          </select>
+        </label>
+        {row.status_history.length > 0 && <details>
+          <summary>سجل تغييرات الحالة</summary>
+          <ul>{row.status_history.map((change, index) => <li key={index}>{new Date(change.at).toLocaleString('ar-SA')} · {statusLabels[change.from]} ← {statusLabels[change.to]}</li>)}</ul>
+        </details>}
       </article>)}
       <nav aria-label="صفحات الطلبات" className="flex gap-3">
         <button disabled={busy || page === 0} onClick={() => setPage((value) => value - 1)} className="rounded border px-3 py-1 disabled:opacity-40">السابق</button>
