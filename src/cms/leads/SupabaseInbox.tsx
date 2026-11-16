@@ -8,6 +8,15 @@ import { hardAdminClient as client } from '../../lib/db/hardAdminClient';
 const pageSize = 25;
 const statusLabels = { new: 'جديد', contacted: 'تم التواصل', closed: 'مغلق' };
 
+type PrivateAttachment = { id: string; backend: 'supabase'; fileName: string; storagePath: string };
+function attachmentsFor(payload: Record<string, unknown>): PrivateAttachment[] {
+  if (!Array.isArray(payload.attachments)) return [];
+  return payload.attachments.filter((item): item is PrivateAttachment =>
+    item?.backend === 'supabase' && typeof item.id === 'string' &&
+    typeof item.fileName === 'string' && item.storagePath === 'submissions/' + item.id
+  );
+}
+
 type Submission = {
   id: string;
   tracking_code: string;
@@ -70,6 +79,21 @@ export default function SupabaseInbox() {
     void load();
     return () => controller.abort();
   }, [isAdmin, isAppointments, isIntake, page, refresh]);
+
+  async function downloadAttachment(attachment: PrivateAttachment) {
+    setError('');
+    const safeName = attachment.fileName.replace(/[\/:*?"<>|]/g, '_');
+    const { data, error: fileError } = await client.storage.from('hard-form-attachments')
+      .createSignedUrl(attachment.storagePath, 60, { download: safeName });
+    if (fileError || !data) {
+      setError('تعذر فتح المرفق الخاص.');
+      return;
+    }
+    const link = document.createElement('a');
+    link.href = data.signedUrl;
+    link.rel = 'noreferrer';
+    link.click();
+  }
 
   async function updateStatus(id: string, status: Submission['status']) {
     setBusy(true);
@@ -143,6 +167,10 @@ export default function SupabaseInbox() {
         <p><bdi>{row.tracking_code} · {row.sector} · {row.form_type}</bdi></p>
         <p><bdi>{new Date(row.received_at).toLocaleString('ar-SA')} · {String(row.payload.email || '')} · {String(row.payload.phone || '')}</bdi></p>
         {typeof row.payload.message === 'string' && <p className="whitespace-pre-wrap">{row.payload.message}</p>}
+        {attachmentsFor(row.payload).map((attachment) => (
+          <button key={attachment.id} type="button" className="block text-blue-700 underline"
+            onClick={() => void downloadAttachment(attachment)}>تنزيل {attachment.fileName}</button>
+        ))}
         <label className="block">الحالة{' '}
           <select value={row.status} disabled={busy} onChange={(event) => void updateStatus(row.id, event.target.value as Submission['status'])} className="rounded border p-1">
             {Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}

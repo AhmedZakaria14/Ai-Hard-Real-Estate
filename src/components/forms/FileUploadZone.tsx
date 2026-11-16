@@ -94,11 +94,11 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
         newAttachments.push(uploadedMeta);
       }
 
-      onChange(newAttachments);
     } catch (err: any) {
       console.error('File upload error:', err);
       setUploadError(err?.message || (isAr ? 'حدث خطأ أثناء رفع الملف.' : 'Error uploading file.'));
     } finally {
+      onChange(newAttachments);
       setIsUploading(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -135,7 +135,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
   const handleRemoveAttachment = async (index: React.MouseEvent, att: FormAttachmentMeta) => {
     index.stopPropagation();
     try {
-      await deleteAttachment(att.id, att.storagePath);
+      await deleteAttachment(att.id, att.downloadToken);
     } catch (e) {
       // Non-blocking local filter
     }
