@@ -261,7 +261,7 @@ export const translations = {
     // Marketing Page
     marketing: {
       pageTitle: 'Real Estate Marketing & Brokerage Advisory',
-      pageSubtitle: 'Comprehensive marketing strategies, international buyer matchmaking, and listing services designed to sell faster and at peak market value.',
+      pageSubtitle: 'Comprehensive marketing strategies that connect properties with buyers and tenants and maximize the value of each real estate transaction.',
       services: [
         {
           title: 'Targeted Multi-Channel Marketing',
@@ -664,7 +664,7 @@ export const translations = {
     // Marketing Page
     marketing: {
       pageTitle: 'خدمات التسويق والوساطة العقارية المتقدمة',
-      pageSubtitle: 'استراتيجيات ترويجية متكاملة لربط العقارات بأفضل المشترين والمستأجرين وتحقيق أعلى قيمة بيعية.',
+      pageSubtitle: 'استراتيجيات ترويجية متكاملة لربط العقارات بأفضل المشترين والمستأجرين وتحقيق أعلى قيمة للصفقة العقارية.',
       services: [
         {
           title: 'حملات رقمية موجهة للمشترين المؤهلين',
