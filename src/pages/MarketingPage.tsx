@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   Megaphone,
-  Users,
+  HousePlus,
   BadgeCheck,
   ArrowRight,
   ArrowLeft,
@@ -11,7 +11,6 @@ import {
 import { Language, PageId } from '../types';
 import { translations } from '../lib/translations';
 import { Button } from '../components/ui/Button';
-import { Badge } from '../components/ui/Badge';
 import { BrandLogo } from '../components/ui/BrandLogo';
 
 interface MarketingPageProps {
@@ -28,7 +27,7 @@ export function MarketingPage({
   const t = translations[language];
   const ArrowIcon = language === 'ar' ? ArrowLeft : ArrowRight;
 
-  const serviceIcons = [Megaphone, Camera, Users, BadgeCheck];
+  const serviceIcons = [Megaphone, Camera, HousePlus, BadgeCheck];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
@@ -75,9 +74,6 @@ export function MarketingPage({
       {/* Valuation & Listing CTA Box */}
       <div className="bg-hard-gradient text-white rounded-3xl p-8 sm:p-12 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
         <div className="relative z-10 max-w-2xl space-y-4">
-          <Badge variant="outline" className="bg-white/20 text-white border-white/30">
-            {language === 'en' ? 'Complimentary Market Valuation' : 'تقييم عقاري مجاني معتمد'}
-          </Badge>
 
           <h2 className="text-2xl sm:text-3xl font-extrabold font-display-serif">
             {t.marketing.listFormTitle}
@@ -92,7 +88,7 @@ export function MarketingPage({
               variant="white"
               size="lg"
               onClick={onOpenListPropertyModal}
-              className="font-bold text-blue-900"
+              className="w-full min-w-48 whitespace-nowrap font-bold text-blue-900 sm:w-56"
             >
               <span>{t.cta.listProperty}</span>
               <ArrowIcon className="w-4 h-4" />
@@ -101,9 +97,9 @@ export function MarketingPage({
               href="https://wa.me/966556125711?text=Hello%20HARD%20Real%20Estate,%20I%20would%20like%20a%20property%20valuation."
               target="_blank"
               rel="noopener noreferrer"
-              variant="outline"
+              variant="whatsapp"
               size="lg"
-              className="bg-transparent border-white text-white hover:bg-white/10 w-full"
+              className="w-full min-w-48 whitespace-nowrap sm:w-56"
             >
               <span>{t.cta.chatOnWhatsApp}</span>
             </Button>
@@ -111,7 +107,7 @@ export function MarketingPage({
         </div>
 
         <div className="relative z-10 hidden md:flex items-center justify-center p-6 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 shadow-2xl">
-          <BrandLogo size="xl" isIconOnly={true} />
+          <BrandLogo size="xl" language={language} variant="light" isIconOnly />
         </div>
       </div>
     </div>

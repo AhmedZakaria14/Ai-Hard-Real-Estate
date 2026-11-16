@@ -6,6 +6,7 @@ const exportTables = {
   hard_sector_catalog: ['collection','id'],
   hard_cms_workspaces: ['entity_type','entity_id'],
   hard_cms_revisions: ['id'],
+  hard_blog_categories: ['id'],
   hard_company_content: ['kind', 'id'],
   hard_web_page_sections: ['page_id'],
   hard_form_submissions: ['id'],

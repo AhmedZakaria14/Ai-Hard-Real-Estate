@@ -1,4 +1,4 @@
-import { blogCategories, blogCategoryKey } from '../../lib/blogCategories';
+import { blogCategories, blogCategoryKey, type CatalogBlogCategory } from '../../lib/blogCategories';
 import React, { useState, useMemo } from 'react';
 import {
   BookOpen,
@@ -24,6 +24,7 @@ import {
 import { Language, BlogPost, BlogStatus } from '../../types';
 
 interface CMSBlogListProps {
+  configuredCategories: CatalogBlogCategory[];
   blogPosts: BlogPost[];
   onAddPost: () => void;
   onEditPost: (post: BlogPost) => void;
@@ -36,6 +37,7 @@ interface CMSBlogListProps {
 }
 
 export const CMSBlogList: React.FC<CMSBlogListProps> = ({
+  configuredCategories,
   blogPosts,
   onAddPost,
   onEditPost,
@@ -59,7 +61,7 @@ export const CMSBlogList: React.FC<CMSBlogListProps> = ({
     { value: 'archived', labelEn: 'Archived', labelAr: 'مؤرشف', color: 'bg-slate-100 text-slate-700 border-slate-200' },
   ];
 
-  const categories = useMemo(() => blogCategories(blogPosts), [blogPosts]);
+  const categories = useMemo(() => blogCategories(blogPosts, configuredCategories), [blogPosts, configuredCategories]);
 
   // Filtering
   const filteredPosts = useMemo(() => {

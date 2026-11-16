@@ -1,3 +1,4 @@
+import type { CatalogBlogCategory } from '../../lib/blogCategories';
 import React, { useState, useEffect } from 'react';
 import {
   X,
@@ -18,6 +19,7 @@ import { Language, BlogPost, BlogStatus } from '../../types';
 import { CMSImageUpload } from '../components/CMSImageUpload';
 
 interface CMSBlogFormModalProps {
+  categories: CatalogBlogCategory[];
   isOpen: boolean;
   onClose: () => void;
   onSave: (postData: Partial<BlogPost>) => Promise<void>;
@@ -32,6 +34,7 @@ export const CMSBlogFormModal: React.FC<CMSBlogFormModalProps> = ({
   onClose,
   onSave,
   initialData,
+  categories,
   language,
 }) => {
   const isAr = language === 'ar';
@@ -46,8 +49,7 @@ export const CMSBlogFormModal: React.FC<CMSBlogFormModalProps> = ({
   const [slug, setSlug] = useState('');
   const [excerptEn, setExcerptEn] = useState('');
   const [excerptAr, setExcerptAr] = useState('');
-  const [categoryEn, setCategoryEn] = useState('Market Intelligence');
-  const [categoryAr, setCategoryAr] = useState('تقارير وتحليلات السوق');
+  const [categoryId, setCategoryId] = useState('');
   const [contentEn, setContentEn] = useState('');
   const [contentAr, setContentAr] = useState('');
   const [date, setDate] = useState('');
@@ -73,8 +75,7 @@ export const CMSBlogFormModal: React.FC<CMSBlogFormModalProps> = ({
       setSlug(rawSlug || '');
       setExcerptEn(initialData.excerpt?.en || '');
       setExcerptAr(initialData.excerpt?.ar || '');
-      setCategoryEn(initialData.category?.en || 'Market Intelligence');
-      setCategoryAr(initialData.category?.ar || 'تقارير وتحليلات السوق');
+      setCategoryId(initialData?.categoryId ?? '');
       setContentEn(initialData.content?.en || '');
       setContentAr(initialData.content?.ar || '');
       setDate(initialData.date || '');
@@ -99,8 +100,7 @@ export const CMSBlogFormModal: React.FC<CMSBlogFormModalProps> = ({
       setSlug(`article-${Date.now()}`);
       setExcerptEn('An in-depth review of institutional demand, legislative maturity under REGA & FAL, and luxury yield trajectories across Khobar and Dammam.');
       setExcerptAr('قراءة معمقة في حركة الاستثمار المؤسسي وتنامي عوائد الأصول الفاخرة بالمنطقة الشرقية وفق مستهدفات رؤية 2030.');
-      setCategoryEn('Market Intelligence');
-      setCategoryAr('تقارير وتحليلات السوق');
+      setCategoryId(initialData?.categoryId ?? '');
       setContentEn(`The Saudi Eastern Province continues to emerge as a powerhouse for ultra-luxury residential developments and institutional real estate capital. 
 
 Driven by strategic infrastructure expansions and the Saudi Vision 2030 quality-of-life program, cities such as Al Khobar and Dammam are capturing unprecedented interest from regional high-net-worth investors.
@@ -157,11 +157,14 @@ Investors allocating capital towards premium coastal assets are experiencing str
     setIsSubmitting(true);
     try {
       if (!image.trim()) throw new Error(isAr ? 'اختر صورة الغلاف قبل الحفظ.' : 'Choose a cover image before saving.');
+      const category = categories.find((item) => item.key === categoryId);
+      if (!category) throw new Error(isAr ? 'اختر تصنيف المقال.' : 'Choose an article category.');
       const payload: Partial<BlogPost> = {
         title: { en: titleEn, ar: titleAr },
         slug: slug || `article-${Date.now()}`,
         excerpt: { en: excerptEn, ar: excerptAr },
-        category: { en: categoryEn, ar: categoryAr },
+        categoryId: category.key,
+        category: category.label,
         content: { en: contentEn, ar: contentAr },
         date: date || new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
         readTime: { en: readTimeEn, ar: readTimeAr },
@@ -289,23 +292,12 @@ Investors allocating capital towards premium coastal assets are experiencing str
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-700">
-                    {isAr ? 'تصنيف المقال (EN)' : 'Category (English)'}
+                    {isAr ? 'تصنيف المقال' : 'Article category'}
                   </label>
-                  <select
-                    value={categoryEn}
-                    onChange={(e) => {
-                      setCategoryEn(e.target.value);
-                      if (e.target.value === 'Market Intelligence') setCategoryAr('تقارير وتحليلات السوق');
-                      else if (e.target.value === 'Investment Guide') setCategoryAr('أدلة المستثمرين');
-                      else if (e.target.value === 'Regulations & Compliance') setCategoryAr('اللوائح والتنظيمات');
-                      else setCategoryAr(e.target.value);
-                    }}
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold"
-                  >
-                    <option value="Market Intelligence">Market Intelligence</option>
-                    <option value="Investment Guide">Investment Guide</option>
-                    <option value="Regulations & Compliance">Regulations & Compliance</option>
-                    <option value="Luxury Living">Luxury Living</option>
+                  <select value={categoryId} required onChange={(event) => setCategoryId(event.target.value)}
+                    className="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs font-semibold">
+                    <option value="" disabled>{isAr ? 'اختر تصنيفًا' : 'Choose a category'}</option>
+                    {categories.map((item) => <option key={item.key} value={item.key}>{item.label[language]}</option>)}
                   </select>
                 </div>
 

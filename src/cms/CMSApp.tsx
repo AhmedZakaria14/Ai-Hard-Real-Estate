@@ -1,3 +1,5 @@
+import { CMSBlogCategories } from './blog/CMSBlogCategories';
+import { useCatalogBlogCategories } from '../lib/blogCategories';
 import React, { useState, useEffect } from "react";
 import {
   Language,
@@ -74,6 +76,7 @@ export const CMSApp: React.FC<CMSAppProps> = ({
   language,
   onLanguageChange,
 }) => {
+  const blogCategories = useCatalogBlogCategories();
   const {
     properties,
     projects,
@@ -329,7 +332,7 @@ export const CMSApp: React.FC<CMSAppProps> = ({
   };
   const handleViewBlogLive = (post: BlogPost) => {
     if (onViewBlogPostOnSite) onViewBlogPostOnSite(post);
-    else onReturnToSite();
+    else window.location.assign('/realestate/blog/' + encodeURIComponent(post.id));
   };
 
   // --- TESTIMONIALS HANDLERS ---
@@ -659,8 +662,10 @@ export const CMSApp: React.FC<CMSAppProps> = ({
       )}
 
       {/* 4. Blog & Market Insights */}
-      {activeTab === "blog" && (
+      {activeTab === "blog" && (<>
+        <CMSBlogCategories categories={blogCategories.categories} language={language} refresh={blogCategories.refresh} loadError={blogCategories.error} />
         <CMSBlogList
+          configuredCategories={blogCategories.categories}
           blogPosts={blogPosts}
           onAddPost={handleOpenAddBlogPost}
           onEditPost={handleOpenEditBlogPost}
@@ -671,7 +676,7 @@ export const CMSApp: React.FC<CMSAppProps> = ({
           onViewLive={handleViewBlogLive}
           language={language}
         />
-      )}
+      </>)}
 
       {/* 5. Client Success Stories */}
       {activeTab === "testimonials" && (
@@ -753,6 +758,7 @@ export const CMSApp: React.FC<CMSAppProps> = ({
         }}
         onSave={handleSaveBlogPost}
         initialData={editingBlogPost}
+        categories={blogCategories.categories}
         language={language}
       />
 

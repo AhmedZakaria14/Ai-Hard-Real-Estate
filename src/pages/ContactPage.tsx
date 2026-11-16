@@ -27,7 +27,7 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [inquiryType, setInquiryType] = useState('buying');
+  const [inquiryType, setInquiryType] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -41,12 +41,14 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
     setContactError('');
 
     if (!fullName.trim()) return;
-    if (!email.trim() && !phone.trim()) {
-      setContactError(
-        language === 'en'
-          ? 'Please provide at least one contact method (email or phone).'
-          : 'يرجى تقديم وسيلة تواصل واحدة على الأقل (البريد الإلكتروني أو رقم الهاتف).'
-      );
+    const normalizedPhone = phone.trim().replace(/[٠-٩۰-۹]/g, (digit) => String(digit.charCodeAt(0) % 16));
+    const isValidPhone = /^\+?[0-9][0-9 ().-]*$/.test(normalizedPhone) && /^(?:\d{7,15})$/.test(normalizedPhone.replace(/\D/g, ''));
+    if (!isValidPhone) {
+      setContactError(language === 'en' ? 'Enter a valid phone number without letters.' : 'أدخل رقم هاتف صحيحًا دون حروف.');
+      return;
+    }
+    if (!inquiryType) {
+      setContactError(language === 'en' ? 'Choose an inquiry type.' : 'اختر نوع الاستفسار.');
       return;
     }
 
@@ -75,7 +77,7 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
         sector: 'group',
         name: fullName.trim(),
         email: email.trim(),
-        phone: phone.trim(),
+        phone: normalizedPhone,
         language,
         message: `Inquiry Type: ${inquiryType}\nSubject: ${derivedSubject}\n\n${finalMessage}`,
         details: {
@@ -104,6 +106,7 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
     setFullName('');
     setEmail('');
     setPhone('');
+    setInquiryType('');
     setSubject('');
     setMessage('');
   };
@@ -112,7 +115,6 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
       {/* Header */}
       <div className="space-y-3 max-w-3xl">
-        <Badge variant="primary">{language === 'en' ? 'Direct Brokerage Concierge' : 'خدمة العملاء والاستشارات'}</Badge>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 font-display-serif tracking-tight">
           {t.contact.pageTitle}
         </h1>
@@ -173,11 +175,14 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="contact-page-email" className="block text-xs font-semibold text-slate-700 mb-1">
-                    {t.contact.email} <span className="text-slate-400 font-normal">({language === 'en' ? 'or Phone' : 'أو الهاتف'})</span>
+                    {t.contact.email}
                   </label>
                   <input
                     id="contact-page-email"
                     type="email"
+                    required
+                    pattern="[^\s@]+@[^\s@]+\.[^\s@]+"
+                    autoComplete="email"
                     placeholder="name@domain.com"
                     value={email}
                     onChange={(e) => {
@@ -189,11 +194,13 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                 </div>
                 <div>
                   <label htmlFor="contact-page-phone" className="block text-xs font-semibold text-slate-700 mb-1">
-                    {t.contact.phone} <span className="text-slate-400 font-normal">({language === 'en' ? 'or Email' : 'أو البريد'})</span>
+                    {t.contact.phone}
                   </label>
                   <input
                     id="contact-page-phone"
                     type="tel"
+                    required
+                    autoComplete="tel"
                     placeholder="+966 50 000 0000"
                     value={phone}
                     onChange={(e) => {
@@ -206,7 +213,7 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
               </div>
 
               {contactError && (
-                <p className="text-xs text-rose-500 font-medium">{contactError}</p>
+                <p role="alert" className="text-xs text-rose-600 font-medium">{contactError}</p>
               )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -216,10 +223,12 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                   </label>
                   <select
                     id="contact-page-inquiry-type"
+                    required
                     value={inquiryType}
                     onChange={(e) => setInquiryType(e.target.value)}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all cursor-pointer"
                   >
+                    <option value="" disabled>{language === 'en' ? 'Choose' : 'اختر'}</option>
                     <option value="buying">{language === 'en' ? 'Property Acquisition' : 'شراء عقار'}</option>
                     <option value="renting">{language === 'en' ? 'Property Rental' : 'استئجار عقار'}</option>
                     <option value="listing">{language === 'en' ? 'Listing / Selling' : 'إدراج / بيع عقار'}</option>

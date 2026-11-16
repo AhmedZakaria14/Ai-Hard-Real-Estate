@@ -161,7 +161,7 @@ function detectRouteFromLocation(): {
       detectedPage = 'contact';
     } else if (sub === 'marketing' || sub === 'services') {
       detectedPage = 'marketing';
-    } else if (sub === 'blog') {
+    } else if (sub === 'blog' || /^blog\/[^/]+$/.test(sub)) {
       detectedPage = 'blog';
     } else if (sub === 'property-details') {
       detectedPage = 'property-details';
@@ -365,6 +365,7 @@ function AppContent() {
       setPropertyFilters(filters ?? null);
     }
     setCurrentPage(page);
+    if (page === 'blog') setAttemptedPath('/realestate/blog');
 
     // Update URL bar based on single authoritative pathname
     let newPath = '/';
@@ -579,7 +580,7 @@ function AppContent() {
         </>}
 
         {currentPage === 'blog' && (
-          <BlogPage onNavigate={handleNavigate} language={language} />
+          <BlogPage language={language} articleId={attemptedPath.match(/^\/(?:realestate\/)?blog\/([^/]+)\/?$/)?.[1] ?? null} />
         )}
 
         {currentPage === 'contact' && (

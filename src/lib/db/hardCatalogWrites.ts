@@ -9,7 +9,7 @@ const editableFields = {
   projects: ['slug', 'title', 'developer', 'location', 'city', 'startingPriceSAR', 'handoverDate', 'unitsTotal',
     'unitsAvailable', 'roiProjected', 'image', 'gallery', 'category', 'status', 'progressPercentage',
     'lastUpdated', 'description', 'highlights', 'featured', 'brochureUrl'],
-  blog_posts: ['slug', 'title', 'excerpt', 'category', 'date', 'publishedAt', 'updatedAt', 'readTime', 'author', 'authorRole',
+  blog_posts: ['slug', 'title', 'excerpt', 'category', 'categoryId', 'date', 'publishedAt', 'updatedAt', 'readTime', 'author', 'authorRole',
     'authorAvatar', 'image', 'imageAlt', 'content', 'featured', 'tags'],
 } as const;
 

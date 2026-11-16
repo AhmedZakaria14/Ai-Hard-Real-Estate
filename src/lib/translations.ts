@@ -272,16 +272,16 @@ export const translations = {
           desc: 'Cinema-grade architectural photography, drone flythroughs, and interactive 3D digital twins.',
         },
         {
-          title: 'Private Off-Market Network',
-          desc: 'Discreet matchmaking with qualified institutional funds, family offices, and verified cash buyers.',
+          title: 'Vacant Land Development and Investment',
+          desc: 'Integrated solutions for developing vacant land and turning it into value-generating assets, including licensing, subdivision, and finding investors.',
         },
         {
           title: 'Comprehensive Valuation & Legal Escrow',
           desc: 'Data-driven comparative market analyses (CMA) and complete escrow transaction advisory.',
         },
       ],
-      listFormTitle: 'List Your Property with HARD Real Estate',
-      listFormSubtitle: 'Fill out this brief specification form and a senior marketing broker will provide a complimentary valuation within 24 hours.',
+      listFormTitle: 'List or Request a Property with HARD Real Estate',
+      listFormSubtitle: 'Share your property details or describe what you need, and our real estate advisor will contact you with suitable opportunities and solutions.',
     },
 
     // About Page
@@ -312,17 +312,17 @@ export const translations = {
 
     // Blog Page
     blog: {
-      pageTitle: 'Real Estate Insights & Market Reports',
-      pageSubtitle: 'Expert analysis on property investment trends, market forecasts, legal guides, and buyer playbooks.',
+      pageTitle: 'Property Compass',
+      pageSubtitle: 'In-depth coverage of market trends, sector updates, and investment returns.',
       categories: ['All', 'Market Trends', 'Investment Guide', 'Luxury Living', 'First-Time Buyers'],
-      readArticle: 'Read Full Analysis',
+      readArticle: 'Read the Full Article',
       minRead: 'min read',
     },
 
     // Contact Page
     contact: {
       pageTitle: 'Get in Touch with HARD Real Estate',
-      pageSubtitle: 'Have questions, want to book a private consultation, or list a property? Our licensed brokers are standing by.',
+      pageSubtitle: 'Have questions, want to book a private consultation, or list or request a property? Our licensed brokers are standing by.',
       formTitle: 'Send Us a Direct Message',
       fullName: 'Full Name',
       email: 'Email Address',
@@ -675,16 +675,16 @@ export const translations = {
           desc: 'تصوير احترافي بدقة 4K وتصوير جوي بالدرون وجولات افتراضية 3D تحاكي الواقع تماماً.',
         },
         {
-          title: 'شبكة المشترين الخاصة (Off-Market)',
-          desc: 'عرض العقارات الحصرية على صناديق الاستثمار والمكاتب العائلية والمشترين النقديين المعتمدين.',
+          title: 'تطوير واستثمار الأراضي البيضاء',
+          desc: 'تقديم حلول متكاملة لتطوير الأراضي البيضاء وتحويلها إلى أصول ذات قيمة، بما في ذلك الترخيص والتقسيم والبحث عن مستثمرين.',
         },
         {
           title: 'دراسات تقييم معتمدة وضمان قانوني',
           desc: 'تحليل مقارن لأسعار السوق، واستشارات عقارية شاملة لضمان سلامة الإجراءات ونقل الملكية.',
         },
       ],
-      listFormTitle: 'أدرج عقارك مع هارد للعقارات',
-      listFormSubtitle: 'أدخل تفاصيل عقارك وسيتواصل معك أحد كبار وسطائنا لتقديم تقييم مجاني وخطة تسويقية خلال 24 ساعة.',
+      listFormTitle: 'أدرج أو أطلب عقارك مع هارد للعقارات',
+      listFormSubtitle: 'شاركنا تفاصيل عقارك أو حدّد مواصفات طلبك، وسيتواصل معك مستشارنا العقاري لتقديم أفضل الفرص والحلول.',
     },
 
     // About Page
@@ -715,17 +715,17 @@ export const translations = {
 
     // Blog Page
     blog: {
-      pageTitle: 'أخبار السوق والتقارير العقارية',
-      pageSubtitle: 'تحليلات متعمقة لاتجاهات السوق العقاري، وأدلة المشترين، ودراسات العوائد الاستثمارية.',
+      pageTitle: 'بوصلة العقار',
+      pageSubtitle: 'قراءات معمقة لاتجاهات السوق، وأحدث مستجدات القطاع، وتقارير العوائد الاستثمارية.',
       categories: ['الكل', 'اتجاهات السوق', 'دليل الاستثمار', 'الحياة الفاخرة', 'المشترون لأول مرة'],
-      readArticle: 'قراءة التحليل كاملاً',
+      readArticle: 'قراءة المقال كاملاً',
       minRead: 'دقائق للقراءة',
     },
 
     // Contact Page
     contact: {
       pageTitle: 'تواصل مع فريق هارد للعقارات',
-      pageSubtitle: 'هل لديك استفسار، ترغب في حجز استشارة خاصة، أو تريد إدراج عقارك؟ مستشارونا المعتمدون جاهزون لمساعدتك.',
+      pageSubtitle: 'هل لديك استفسار، ترغب في حجز استشارة خاصة، أو تريد إدراج أو طلب عقارك؟ مستشارونا المعتمدون جاهزون لمساعدتك.',
       formTitle: 'أرسل لنا رسالة مباشرة',
       fullName: 'الاسم بالكامل',
       email: 'البريد الإلكتروني',
