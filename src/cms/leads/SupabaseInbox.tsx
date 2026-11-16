@@ -1,3 +1,4 @@
+import SupabaseDataExport from '../catalog/SupabaseDataExport';
 import SupabaseOperations from './SupabaseOperations';
 import SupabaseSectorSections from '../catalog/SupabaseSectorSections';
 import { useEffect, useState, type FormEvent } from 'react';
@@ -37,9 +38,9 @@ export default function SupabaseInbox() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [rows, setRows] = useState<Submission[]>([]);
-  const [view, setView] = useState<'requests' | 'appointments' | 'articles' | 'projects' | 'properties' | 'construction_projects' | 'hvac_services' | 'media' | 'sector_sections' | 'archive' | 'reports' | 'notifications'>(() => {
+  const [view, setView] = useState<'requests' | 'appointments' | 'articles' | 'projects' | 'properties' | 'construction_projects' | 'hvac_services' | 'media' | 'sector_sections' | 'archive' | 'reports' | 'notifications' | 'backup'>(() => {
     const section = new URLSearchParams(window.location.search).get('section');
-    if (section === 'appointments' || section === 'reports' || section === 'archive' || section === 'notifications') return section;
+    if (section === 'appointments' || section === 'reports' || section === 'archive' || section === 'notifications' || section === 'backup' || section === 'properties') return section;
     return 'requests';
   });
   const [page, setPage] = useState(0);
@@ -181,6 +182,7 @@ export default function SupabaseInbox() {
         <button aria-pressed={isArchive} onClick={() => { setPage(0); setView('archive'); }} className="rounded border px-3 py-1">أرشيف الطلبات</button>
         <button aria-pressed={view === 'reports'} onClick={() => setView('reports')} className="rounded border px-3 py-1">التقارير</button>
         <button aria-pressed={view === 'notifications'} onClick={() => setView('notifications')} className="rounded border px-3 py-1">الإشعارات</button>
+        <button aria-pressed={view === 'backup'} onClick={() => setView('backup')} className="rounded border px-3 py-1">تصدير البيانات</button>
       </nav>
       <div className="flex gap-3">
         <button onClick={() => setRefresh((value) => value + 1)} disabled={busy} className="rounded border px-3 py-1">تحديث</button>
@@ -190,7 +192,7 @@ export default function SupabaseInbox() {
           else setPage(0);
         }} className="rounded border px-3 py-1">خروج</button>
       </div>
-      {view === 'reports' || view === 'notifications' ? <SupabaseOperations key={view} section={view} refresh={refresh} /> : view === 'sector_sections' ? <SupabaseSectorSections /> : view === 'media' ? <CMSMediaLibrary language="ar" /> : view !== 'requests' && view !== 'appointments' && view !== 'archive' ? <SupabaseArticleEditor key={view} client={client} collection={view === 'articles' ? 'blog_posts' : view} /> : <>
+      {view === 'backup' ? <SupabaseDataExport /> : view === 'reports' || view === 'notifications' ? <SupabaseOperations key={view} section={view} refresh={refresh} /> : view === 'sector_sections' ? <SupabaseSectorSections /> : view === 'media' ? <CMSMediaLibrary language="ar" /> : view !== 'requests' && view !== 'appointments' && view !== 'archive' ? <SupabaseArticleEditor key={view} client={client} collection={view === 'articles' ? 'blog_posts' : view} /> : <>
       {busy ? <p role="status">جارٍ تحميل الطلبات…</p> : !error && rows.length === 0 && <p>لا توجد طلبات في هذه الصفحة.</p>}
       {rows.map((row) => <article key={row.id} className="space-y-2 rounded-lg border p-4">
         <h2 className="font-bold">{String(row.payload.name || row.tracking_code)}</h2>

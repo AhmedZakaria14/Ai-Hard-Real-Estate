@@ -21,6 +21,7 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
   const hvac = collection === 'hvac_services';
   const heading = construction ? 'مشاريع الإنشاءات المنشورة' : hvac ? 'خدمات التكييف المنشورة'
     : projects ? 'المشاريع العقارية المنشورة' : properties ? 'العقارات المنشورة' : 'المقالات المنشورة';
+  const [showArchived, setShowArchived] = useState(false);
   const [entries, setEntries] = useState<Entry[]>([]);
   const [selected, setSelected] = useState<Entry | null>(null);
   const [notice, setNotice] = useState('');
@@ -29,13 +30,45 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
   useEffect(() => {
     const controller = new AbortController();
     const load = construction ? loadPublishedConstructionProjects : hvac ? loadPublishedHvacServices : projects ? loadPublishedProjects : properties ? loadPublishedProperties : loadPublishedArticles;
-    load(controller.signal).then((items) => {
-      if (!controller.signal.aborted) setEntries(items);
-    }).catch(() => {
-      if (!controller.signal.aborted) setNotice('تعذر تحميل ' + heading + '.');
-    });
+    setEntries([]);
+    async function list() {
+      try {
+        if (!showArchived) {
+          const items = await load(controller.signal);
+          if (!controller.signal.aborted) setEntries(items);
+          return;
+        }
+        const { data, error } = await client.from(catalogTable(collection)).select('id,content,updated_at')
+          .eq('collection', collection).not('archived_at','is',null).order('archived_at',{ascending:false})
+          .abortSignal(controller.signal);
+        if (error) throw error;
+        if (!controller.signal.aborted) setEntries(data ?? []);
+      } catch {
+        if (!controller.signal.aborted) setNotice('تعذر تحميل ' + heading + '.');
+      }
+    }
+    void list();
     return () => controller.abort();
-  }, [heading, construction, hvac, projects, properties]);
+  }, [heading, construction, hvac, projects, properties, showArchived, client, collection]);
+
+  async function toggleArchive(entry: Entry) {
+    if (saving) return;
+    setSaving(true);
+    setNotice('');
+    try {
+      const { error } = await client.from(catalogTable(collection))
+        .update({ archived_at: showArchived ? null : new Date().toISOString(), updated_at: new Date().toISOString() })
+        .eq('collection',collection).eq('id',entry.id).eq('updated_at',entry.updated_at).select('id').single();
+      if (error) throw error;
+      setEntries((previous) => previous.filter((item) => item.id !== entry.id));
+      if (selected?.id === entry.id) setSelected(null);
+      setNotice(showArchived ? 'تمت استعادة السجل ونشره.' : 'تمت الأرشفة وإخفاء السجل عن الزوار.');
+    } catch {
+      setNotice('تعذر تغيير حالة الأرشفة. أعد فتح القائمة وحاول مرة أخرى.');
+    } finally {
+      setSaving(false);
+    }
+  }
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -120,10 +153,14 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
   const inputClass = 'block w-full rounded border p-2';
   return <section className="space-y-4" aria-label={heading}>
     <h2 className="text-xl font-bold">{heading}</h2>
+    <label className="block text-sm"><input type="checkbox" checked={showArchived} disabled={saving}
+      onChange={(event) => { setShowArchived(event.target.checked); setSelected(null); setNotice(''); }} /> عرض السجلات المؤرشفة</label>
     {notice && <p role="status">{notice}</p>}
-    <ul className="space-y-2">{entries.map((article) => <li key={article.id}>
-      <button type="button" disabled={saving} className="rounded border px-3 py-1"
+    <ul className="space-y-2">{entries.map((article) => <li key={article.id} className="flex flex-wrap items-center gap-2">
+      <button type="button" disabled={saving || showArchived} className="rounded border px-3 py-1"
         onClick={() => { setSelected(article); setNotice(''); }}>{'titleAr' in article.content ? article.content.titleAr : article.content.title.ar}</button>
+      <button type="button" disabled={saving} className="rounded border px-3 py-1 text-sm"
+        onClick={() => void toggleArchive(article)}>{showArchived ? 'استعادة ونشر' : 'أرشفة'}</button>
     </li>)}</ul>
     {selected && <form key={selected.id} onSubmit={save} className="grid gap-3 rounded border p-4">
       {(['Ar', 'En'] as const).map((suffix) => {

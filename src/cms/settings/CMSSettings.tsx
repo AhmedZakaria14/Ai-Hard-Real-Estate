@@ -27,7 +27,6 @@ import { validateFirestoreConnection } from '../../lib/firebase';
 
 import { CMSAdminManagement } from './CMSAdminManagement';
 import { CMSBrandingSettings } from './CMSBrandingSettings';
-import { CMSBackupManager } from './CMSBackupManager';
 import { CMSProductionMonitoring } from './CMSProductionMonitoring';
 
 interface CMSSettingsProps {
@@ -294,10 +293,9 @@ export const CMSSettings: React.FC<CMSSettingsProps> = ({
       />
 
       {/* Backup, Storage Sync & Disaster Recovery Section */}
-      <CMSBackupManager
-        language={language}
-        currentAdminUser={currentAdminUser || { name: 'Executive Admin', email: 'admin@hard.sa', role: 'superadmin' }}
-      />
+      <a href="/admin/supabase-inbox?section=backup" className="inline-block rounded border bg-white p-3 text-sm font-semibold text-blue-700">
+        {language === 'ar' ? 'تصدير بيانات هارد من Supabase' : 'Export Hard data from Supabase'}
+      </a>
 
       {/* Production Telemetry, Failures & System Health Dashboard */}
       <CMSProductionMonitoring language={language} />

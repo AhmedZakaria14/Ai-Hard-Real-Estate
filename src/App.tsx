@@ -1,3 +1,4 @@
+import PublishedPageSections from './components/ui/PublishedPageSections';
 import React, { useState, useEffect } from 'react';
 import { Language, PageId, Property, PropertyFilterParams, Project } from './types';
 import { Navbar } from './components/layout/Navbar';
@@ -444,6 +445,7 @@ function AppContent() {
           onNavigateToConstruction={() => handleNavigate('construction')}
           onNavigateToHVAC={() => handleNavigate('hvac')}
         />
+        <PublishedPageSections page="page_portal" language={language} />
       </ErrorBoundary>
     );
   }
@@ -457,6 +459,7 @@ function AppContent() {
           onLanguageChange={setLanguage}
           onNavigate={handleNavigate}
         />
+        <PublishedPageSections page="page_construction" language={language} />
       </ErrorBoundary>
     );
   }
@@ -470,6 +473,7 @@ function AppContent() {
           onLanguageChange={setLanguage}
           onNavigatePage={handleNavigate}
         />
+        <PublishedPageSections page="page_hvac" language={language} />
       </ErrorBoundary>
     );
   }
@@ -561,6 +565,9 @@ function AppContent() {
         {currentPage === 'about' && (
           <AboutPage onNavigate={handleNavigate} language={language} />
         )}
+
+        {currentPage === 'home' && <PublishedPageSections page="page_realestate" language={language} />}
+        {currentPage === 'about' && <PublishedPageSections page="page_realestate_about" language={language} />}
 
         {currentPage === 'blog' && (
           <BlogPage onNavigate={handleNavigate} language={language} />

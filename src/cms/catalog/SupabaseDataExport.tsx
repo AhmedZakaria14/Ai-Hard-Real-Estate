@@ -1,0 +1,73 @@
+import { useState } from 'react';
+import { hardAdminClient, toHardAdmin } from '../../lib/db/hardAdminClient';
+
+const exportTables = {
+  hard_catalog: ['collection','id'],
+  hard_sector_catalog: ['collection','id'],
+  hard_cms_workspaces: ['entity_type','entity_id'],
+  hard_cms_revisions: ['id'],
+  hard_web_page_sections: ['page_id'],
+  hard_form_submissions: ['id'],
+  hard_operation_events: ['submission_id'],
+  hard_site_branding: ['sector','visibility'],
+  hard_sector_sections: ['sector','section_key'],
+  hard_navigation: ['id','visibility'],
+  hard_redirect_rules: ['id'],
+  hard_runtime_config: ['kind','key'],
+  hard_media_assets: ['id'],
+} as const;
+
+async function readRows(table: keyof typeof exportTables) {
+  const size = 200;
+  const result: object[] = [];
+  for (let start = 0; ; start += size) {
+    let query = hardAdminClient.from(table).select('*');
+    for (const column of exportTables[table]) query = query.order(column, { ascending: true });
+    const { data, error } = await query.range(start,start+size-1);
+    if (error) throw error;
+    result.push(...(data ?? []));
+    if ((data?.length ?? 0) < size) return result;
+  }
+}
+
+export default function SupabaseDataExport() {
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState('');
+  const [confirmPrivate, setConfirmPrivate] = useState(false);
+
+  async function download() {
+    if (!confirmPrivate || busy) return;
+    setBusy(true);
+    setMessage('');
+    try {
+      const { data, error } = await hardAdminClient.auth.getUser();
+      if (error || !toHardAdmin(data.user)) throw new Error('Administrator access required');
+      const tables = Object.keys(exportTables) as (keyof typeof exportTables)[];
+      const entries = [];
+      for (const table of tables) entries.push([table, await readRows(table)] as const);
+      const snapshot = { createdAt: new Date().toISOString(), format: 'hard-supabase-data-v1', tables: Object.fromEntries(entries) };
+      const blob = new Blob([JSON.stringify(snapshot,null,2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'hard-supabase-' + snapshot.createdAt.slice(0,10) + '.json';
+      link.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setMessage('اكتمل إنشاء ملف تصدير البيانات.');
+    } catch {
+      setMessage('تعذر إنشاء التصدير. لم يُنزّل ملف جزئي.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return <section className="space-y-4">
+    <h2 className="text-xl font-bold">تصدير بيانات Supabase</h2>
+    <p>ينزّل ملف JSON بجداول هارد، بما فيها الطلبات والكتالوج والإعدادات ومسودات المحتوى. يشمل مراجع الملفات فقط.</p>
+    <label className="block"><input type="checkbox" checked={confirmPrivate} disabled={busy} onChange={(event) => setConfirmPrivate(event.target.checked)} /> سأحفظ النسخة التي تتضمن بيانات العملاء في مكان خاص.</label>
+    <button type="button" disabled={busy || !confirmPrivate} onClick={() => void download()} className="rounded bg-slate-900 px-4 py-2 text-white disabled:opacity-40">
+      {busy ? 'جارٍ إعداد التصدير…' : 'تنزيل البيانات'}
+    </button>
+    {message && <p role="status">{message}</p>}
+  </section>;
+}
