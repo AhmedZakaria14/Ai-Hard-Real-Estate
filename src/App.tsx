@@ -358,8 +358,8 @@ function AppContent() {
   }, [currentPage, language, selectedProperty]);
 
   const handleNavigate = (page: PageId, filters?: PropertyFilterParams) => {
-    if (filters) {
-      setPropertyFilters(filters);
+    if (page === 'properties') {
+      setPropertyFilters(filters ?? null);
     }
     setCurrentPage(page);
 

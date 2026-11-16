@@ -56,7 +56,7 @@ export function HomePage({
   const ArrowIcon = language === 'ar' ? ArrowLeft : ArrowRight;
 
   // Search Filter State in Hero
-  const [activeTab, setActiveTab] = useState<'buy' | 'rent' | 'off-plan'>('buy');
+  const [activeTab, setActiveTab] = useState<'buy' | 'rent'>('buy');
   const [searchLocation, setSearchLocation] = useState('');
   const [searchType, setSearchType] = useState('all');
   const [searchBudget, setSearchBudget] = useState('all');
@@ -113,7 +113,6 @@ export function HomePage({
     const statusMap: Record<string, string> = {
       buy: 'for-sale',
       rent: 'for-rent',
-      'off-plan': 'off-plan',
     };
 
     onNavigate('properties', {
@@ -177,11 +176,11 @@ export function HomePage({
 
           {/* Prominent, Simplified Search Bar (Location, Property Type, Price Range) - 25% wider container with full dropdown visibility */}
           <div className="relative z-30 bg-white/95 backdrop-blur-md rounded-3xl p-5 sm:p-7 shadow-2xl border border-white/20 text-slate-900 max-w-5xl lg:max-w-6xl w-full overflow-visible">
-            {/* Search Tab Switcher: Buy, Rent, Off-Plan */}
+            {/* Search Tab Switcher: Buy and Rent */}
             <div className="flex items-center gap-2 mb-4 border-b border-slate-200/80 pb-3">
               <button
                 type="button"
-                onClick={() => setActiveTab('buy')}
+                onClick={() => { if (activeTab !== 'buy') setSearchBudget('all'); setActiveTab('buy'); }}
                 className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                   activeTab === 'buy'
                     ? 'bg-hard-gradient text-white shadow-xs'
@@ -192,7 +191,7 @@ export function HomePage({
               </button>
               <button
                 type="button"
-                onClick={() => setActiveTab('rent')}
+                onClick={() => { if (activeTab !== 'rent') setSearchBudget('all'); setActiveTab('rent'); }}
                 className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                   activeTab === 'rent'
                     ? 'bg-hard-gradient text-white shadow-xs'
