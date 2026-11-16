@@ -1,9 +1,9 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { loadPublishedArticles, loadPublishedProjects, type CatalogCollection, type CatalogEntry } from '../../lib/db/hardCatalog';
+import { loadPublishedArticles, loadPublishedProjects, loadPublishedProperties, type PublicProperty, type CatalogCollection, type CatalogEntry } from '../../lib/db/hardCatalog';
 import type { BlogPost, Project } from '../../types';
 
-type Entry = CatalogEntry<BlogPost | Project>;
+type Entry = CatalogEntry<BlogPost | Project | PublicProperty>;
 
 const imageTypes: Record<string, string> = {
   'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp',
@@ -15,7 +15,8 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
   collection?: CatalogCollection;
 }) {
   const projects = collection === 'projects';
-  const heading = projects ? 'المشاريع العقارية المنشورة' : 'المقالات المنشورة';
+  const properties = collection === 'properties';
+  const heading = projects ? 'المشاريع العقارية المنشورة' : properties ? 'العقارات المنشورة' : 'المقالات المنشورة';
   const [entries, setEntries] = useState<Entry[]>([]);
   const [selected, setSelected] = useState<Entry | null>(null);
   const [notice, setNotice] = useState('');
@@ -23,14 +24,14 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
 
   useEffect(() => {
     const controller = new AbortController();
-    const load = projects ? loadPublishedProjects : loadPublishedArticles;
+    const load = projects ? loadPublishedProjects : properties ? loadPublishedProperties : loadPublishedArticles;
     load(controller.signal).then((items) => {
       if (!controller.signal.aborted) setEntries(items);
     }).catch(() => {
       if (!controller.signal.aborted) setNotice('تعذر تحميل ' + heading + '.');
     });
     return () => controller.abort();
-  }, [heading, projects]);
+  }, [heading, projects, properties]);
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,9 +43,14 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
     content.title = { ar: field('titleAr'), en: field('titleEn') };
     if ('description' in content) {
       content.description = { ar: field('descriptionAr'), en: field('descriptionEn') };
-      content.startingPriceSAR = field('price');
-      content.progressPercentage = Number(field('progress'));
-      content.lastUpdated = new Date().toISOString().slice(0, 10);
+      if ('price' in content) {
+        const sar = Number(field('price'));
+        content.price = { ...content.price, sar, formattedSAR: new Intl.NumberFormat('en-SA', { style: 'currency', currency: 'SAR' }).format(sar) };
+      } else {
+        content.startingPriceSAR = field('price');
+        content.progressPercentage = Number(field('progress'));
+        content.lastUpdated = new Date().toISOString().slice(0, 10);
+      }
     } else {
       content.excerpt = { ar: field('excerptAr'), en: field('excerptEn') };
       content.content = { ar: field('contentAr'), en: field('contentEn') };
@@ -76,7 +82,9 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
           upsert: false,
         });
         if (uploadError) throw uploadError;
-        content.image = bucket.getPublicUrl(path).data.publicUrl;
+        const url = bucket.getPublicUrl(path).data.publicUrl;
+        if ('images' in content) content.images = [url, ...content.images.slice(1)];
+        else content.image = url;
       }
       const { data, error } = await client.from('hard_catalog')
         .update({ content, updated_at: new Date().toISOString() })
@@ -120,11 +128,12 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
           </>}
         </div>;
       })}
-      {'description' in selected.content && <>
+      {'price' in selected.content && <label>السعر بالريال<input name="price" type="number" min="0" step="0.01" required className={inputClass} defaultValue={selected.content.price.sar} /></label>}
+      {'startingPriceSAR' in selected.content && <>
         <label>السعر الابتدائي<input name="price" className={inputClass} defaultValue={selected.content.startingPriceSAR} /></label>
         <label>نسبة الإنجاز<input name="progress" type="number" min="0" max="100" required className={inputClass} defaultValue={selected.content.progressPercentage ?? 0} /></label>
       </>}
-      {selected.content.image && <img src={selected.content.image} alt="الصورة الحالية" className="max-h-40 w-fit rounded" />}
+      {('images' in selected.content ? selected.content.images[0] : selected.content.image) && <img src={'images' in selected.content ? selected.content.images[0] : selected.content.image} alt="الصورة الحالية" className="max-h-40 w-fit rounded" />}
       <label>استبدال الصورة المنشورة<input className={inputClass} type="file" name="image" accept={Object.keys(imageTypes).join(',')} /></label>
       <button type="submit" disabled={saving} className="w-fit rounded bg-slate-900 px-4 py-2 text-white">{saving ? 'جارٍ الحفظ…' : 'حفظ ونشر'}</button>
     </form>}

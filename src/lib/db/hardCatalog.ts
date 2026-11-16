@@ -1,9 +1,9 @@
-import type { BlogPost, Project } from '../../types';
+import type { BlogPost, Project, Property } from '../../types';
 
 export const hardSupabaseUrl = 'https://vlpdiyicmupghfcualoe.supabase.co';
 export const hardPublishableKey = 'sb_publishable_jam6dG2vyvPi65DHUEgqXQ_4YZfJGxF';
 
-export type CatalogCollection = 'blog_posts' | 'projects';
+export type CatalogCollection = 'blog_posts' | 'projects' | 'properties';
 
 export interface CatalogEntry<T> {
   id: string;
@@ -39,4 +39,10 @@ export async function loadPublishedArticles(signal?: AbortSignal): Promise<Catal
 
 export function loadPublishedProjects(signal?: AbortSignal) {
   return loadCatalog<Project>('projects', signal);
+}
+
+export type PublicProperty = Omit<Property, 'agent'>;
+
+export function loadPublishedProperties(signal?: AbortSignal) {
+  return loadCatalog<PublicProperty>('properties', signal);
 }

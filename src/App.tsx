@@ -27,7 +27,6 @@ import { parsePropertyQueryParams, serializePropertyQueryParams } from './lib/pr
 import { getPageTitle, getPageDescription, updateDocumentTitle } from './lib/pageTitles';
 import { getStoredSeoConfigs, applyPageSeoToHead } from './lib/seo/seoManager';
 import { PrivacyTermsModal } from './components/modals/PrivacyTermsModal';
-import { mockProperties } from './data/mockData';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 
 /**
@@ -529,9 +528,10 @@ function AppContent() {
           <PropertyDetailPage
             property={
               selectedProperty ||
-              properties.find((p) => p.id === new URLSearchParams(window.location.search).get('id')) ||
-              properties[0] ||
-              mockProperties[0]
+              properties.find((p) => {
+                const listingId = new URLSearchParams(window.location.search).get('id');
+                return p.id === listingId || p.slug === listingId;
+              })
             }
             onBack={() => handleNavigate('properties')}
             onNavigate={handleNavigate}

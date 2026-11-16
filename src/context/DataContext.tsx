@@ -42,7 +42,8 @@ import {
   getCrmSyncLogs,
 } from '../lib/integrations/crmSync';
 import { isSupabaseConfigured } from '../lib/db/supabaseClient';
-import { PublicDataReader } from '../lib/firebase/dataAccess';
+import { loadPublishedProperties } from '../lib/db/hardCatalog';
+import { SECTOR_CONTACT_DETAILS } from '../lib/sectors';
 
 interface DataContextType {
   properties: Property[];
@@ -178,9 +179,21 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   const refreshData = useCallback(async () => {
     setIsLoading(true);
+    const refreshProperties = async () => {
+      const { phone, whatsapp, email } = SECTOR_CONTACT_DETAILS.realestate;
+      const items = await loadPublishedProperties();
+      setProperties(items.map(({ content }) => ({
+        ...content,
+        agent: {
+          name: { ar: 'هارد للعقارات', en: 'HARD Real Estate' },
+          title: { ar: 'الاستشارات العقارية', en: 'Real Estate Advisory' },
+          phone, whatsapp, email, avatar: '',
+        },
+      })));
+    };
     try {
+      await refreshProperties().catch((error) => console.error('Could not load published properties:', error));
       const [
-        props,
         lds,
         projs,
         posts,
@@ -194,7 +207,6 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         partners,
         enhTests,
       ] = await Promise.all([
-        PropertiesRepository.getAll(),
         LeadsRepository.getAll(),
         ProjectsRepository.getAll(),
         BlogRepository.getAll(),
@@ -209,7 +221,6 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         FirestoreEnhancedTestimonialsRepository.getAll().catch(() => EnhancedTestimonialsRepository.getAll()),
       ]);
 
-      setProperties(props);
       setLeads(lds);
       setProjects(projs);
       setBlogPosts(posts);
@@ -232,28 +243,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     refreshData();
 
-    // 1. Scoped real-time listener for published properties
-    const unsubProps = PublicDataReader.subscribeToPublishedCollection<any>('properties', (publishedProps) => {
-      if (publishedProps && publishedProps.length > 0) {
-        setProperties(publishedProps);
-      }
-    });
-
-    // 2. Scoped real-time listener for published construction projects
-    const unsubProjects = PublicDataReader.subscribeToPublishedCollection<any>('construction_projects', (publishedProjects) => {
-      if (publishedProjects && publishedProjects.length > 0) {
-        setProjects(publishedProjects);
-      }
-    });
-
     // 3. Listener for CRM sync logs
     const unsubCrm = subscribeToCrmLogs((newLogs) => {
       setCrmLogs(newLogs);
     });
 
     return () => {
-      unsubProps();
-      unsubProjects();
       unsubCrm();
     };
   }, [refreshData]);

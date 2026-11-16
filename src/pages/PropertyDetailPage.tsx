@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { Language, PageId, Property } from '../types';
 import { translations } from '../lib/translations';
-import { mockProperties } from '../data/mockData';
+import { useData } from '../context/DataContext';
 import { Button } from '../components/ui/Button';
 import { getLocalizedText } from '../lib/utils';
 import { Badge } from '../components/ui/Badge';
@@ -45,6 +45,7 @@ export function PropertyDetailPage({
   const t = translations[language];
   const ArrowIcon = language === 'ar' ? ArrowRight : ArrowLeft;
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const { properties, isLoading } = useData();
 
   if (!property) {
     return (
@@ -53,13 +54,13 @@ export function PropertyDetailPage({
           <RefreshCw className="w-5 h-5" />
         </div>
         <p className="text-xs font-bold text-slate-600">
-          {language === 'ar' ? 'جاري تحميل تفاصيل العقار...' : 'Loading property details...'}
+          {isLoading ? (language === 'ar' ? 'جاري تحميل تفاصيل العقار...' : 'Loading property details...') : (language === 'ar' ? 'العقار غير متاح.' : 'This property is unavailable.')}
         </p>
       </div>
     );
   }
 
-  const similarProperties = mockProperties.filter((p) => p.id !== property.id).slice(0, 2);
+  const similarProperties = properties.filter((p) => p.id !== property.id).slice(0, 2);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
