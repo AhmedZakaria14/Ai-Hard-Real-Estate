@@ -286,8 +286,8 @@ export const translations = {
 
     // About Page
     about: {
-      pageTitle: 'About HARD Real Estate',
-      pageSubtitle: 'A modern brokerage and marketing power founded on integrity, data intelligence, and client-centric execution.',
+      pageTitle: 'Get to Know HARD Real Estate',
+      pageSubtitle: 'A branch of Hisham Abdul Mohsen Al-Dosari Contracting Establishment (HARD), providing real estate brokerage and marketing with a focus on transparency, accurate data, and client success.',
       missionTitle: 'Our Mission & Brokerage Ethos',
       missionText: 'At HARD Real Estate, we bridge the gap between discerning property buyers and visionary developers. We provide transparent, frictionless real estate brokerage and bespoke property marketing that delivers superior outcomes.',
       values: [
@@ -689,8 +689,8 @@ export const translations = {
 
     // About Page
     about: {
-      pageTitle: 'عن شركة هارد للعقارات',
-      pageSubtitle: 'منظومة وساطة وتسويق عقاري ترتكز على الشفافية المطلقة، والبيانات الدقيقة، والتركيز على نجاح العميل.',
+      pageTitle: 'تعرف على هارد للعقارات',
+      pageSubtitle: 'إحدى فروع مؤسسة هشام عبد المحسن الدوسري للمقاولات (هارد) حيث تمثل منظومة وساطة وتسويق عقاري تركز على الشفافية العالية والبيانات الدقيقة والاهتمام البالغ بنجاح العميل.',
       missionTitle: 'رسالتنا ورؤيتنا العقارية',
       missionText: 'في هارد للعقارات، نبتكر تجربة عقارية استثنائية تجمع بين الاحترافية العالية والتقنيات الرقمية المتقدمة لتقديم خدمات وساطة وتسويق عقاري تلبي طموحات عملائنا وتحقق أهدافهم الاستثمارية والسكنية.',
       values: [

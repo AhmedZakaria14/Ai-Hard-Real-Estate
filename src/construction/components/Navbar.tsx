@@ -1,4 +1,4 @@
-import { usePublishedBrandEmblem } from '../../components/ui/BrandLogo';
+import { BrandLogo } from '../../components/ui/BrandLogo';
 import React, { useState, useEffect } from 'react';
 import {
   HardHat,
@@ -34,7 +34,6 @@ export function Navbar({
   onNavigateToRealEstate,
   onOpenCMS,
 }: NavbarProps) {
-  const emblem = usePublishedBrandEmblem('construction', 'dark');
   const {
     language,
     toggleLanguage,
@@ -143,20 +142,7 @@ export function Navbar({
                 });
               }}
             >
-              <img
-                src={emblem} onError={({ currentTarget }) => { if (!currentTarget.src.endsWith('/logo.svg')) currentTarget.src = '/logo.svg'; }}
-                alt="HARD Group"
-                className="h-10 sm:h-11 w-auto object-contain transition-transform group-hover:scale-105"
-              />
-              <div className="flex flex-col text-start">
-                <span className="font-display-serif font-black text-base sm:text-lg text-slate-900 tracking-tight leading-tight flex items-center gap-1.5">
-                  <span className="text-[#009ee2]">{isAr ? 'هارد' : 'HARD'}</span>
-                  <span>{isAr ? 'للمقاولات العامة' : 'Contracting Co.'}</span>
-                </span>
-                <span className="text-[10px] sm:text-xs font-semibold text-slate-500 leading-tight">
-                  {isAr ? 'مقاولات عامة وتطوير إنشائي' : 'General Contracting & Development'}
-                </span>
-              </div>
+              <BrandLogo sector="construction" size="md" language={language} variant="dark" standardWordmark />
             </a>
           </div>
 

@@ -12,7 +12,6 @@ import {
 import { Language, PageId } from '../types';
 import { translations } from '../lib/translations';
 import { Button } from '../components/ui/Button';
-import { Badge } from '../components/ui/Badge';
 import { BrandLogo } from '../components/ui/BrandLogo';
 import { getPageHref, handleSemanticClick } from '../lib/navigation';
 import { ComplianceVerificationModal } from '../components/modals/ComplianceVerificationModal';
@@ -31,7 +30,6 @@ export function AboutPage({ onNavigate, language }: AboutPageProps) {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
       {/* Header */}
       <div className="space-y-4 max-w-3xl">
-        <Badge variant="primary">{language === 'en' ? 'Who We Are' : 'عن شركتنا'}</Badge>
         <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 font-display-serif tracking-tight">
           {t.about.pageTitle}
         </h1>
@@ -50,17 +48,13 @@ export function AboutPage({ onNavigate, language }: AboutPageProps) {
             {t.about.missionText}
           </p>
           <div className="pt-2 flex flex-wrap gap-4 text-xs font-semibold text-slate-700">
-            <button
-              type="button"
-              onClick={() => setIsComplianceModalOpen(true)}
-              className="flex items-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-900 px-3 py-1.5 rounded-lg border border-blue-200 transition-colors cursor-pointer"
-            >
-              <ShieldCheck className="w-4 h-4 text-blue-600" />
-              <span>{language === 'en' ? 'REGA Regulated Brokerage (View Audit)' : 'وساطة مرخصة رسمياً (عرض الاعتماد)'}</span>
-            </button>
+            <span className="flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-blue-900">
+              <ShieldCheck className="size-4 text-blue-600" aria-hidden="true" />
+              {language === 'en' ? 'Officially licensed real estate marketing and brokerage' : 'تسويق وساطة مرخصة رسمياً'}
+            </span>
             <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
               <Award className="w-4 h-4 text-blue-600" />
-              {language === 'en' ? 'Global Investor Network' : 'شبكة مستثمرين دولية'}
+              {language === 'en' ? 'Local and International Investor Network' : 'شبكة مستثمرين محلية ودولية'}
             </span>
           </div>
         </div>
@@ -79,11 +73,8 @@ export function AboutPage({ onNavigate, language }: AboutPageProps) {
       <div className="bg-slate-900 text-slate-100 rounded-3xl p-8 sm:p-10 border border-slate-800 shadow-xl space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-6">
           <div className="space-y-1">
-            <span className="text-xs font-semibold text-blue-400 uppercase tracking-wider">
-              {language === 'en' ? 'Verified Corporate Identity' : 'الهوية المؤسسية المعتمدة'}
-            </span>
             <h3 className="text-2xl font-bold font-display-serif text-white">
-              {language === 'en' ? 'HARD Real Estate Group (هارد للعقارات)' : 'مجموعة هارد العقارية'}
+              {language === 'en' ? 'HARD Real Estate' : 'هارد العقارية'}
             </h3>
           </div>
           <button

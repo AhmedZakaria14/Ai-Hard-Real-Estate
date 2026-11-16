@@ -52,19 +52,19 @@ export function SectorNav({
       className={`w-full text-xs transition-colors border-b select-none ${
         isDark
           ? 'bg-slate-950 text-slate-300 border-slate-900/90'
-          : 'bg-slate-900 text-slate-200 border-slate-800'
+          : 'bg-slate-950 text-slate-200 border-blue-900'
       } ${className}`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-9 sm:h-10 gap-2 sm:gap-4">
           {/* Label / Prefix */}
           <div className="flex items-center gap-2 shrink-0">
-            <span className="hidden md:inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+            <span className="hidden md:inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-blue-100">
               <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse" />
               <span>{isAr ? 'قطاعات مجموعة هارد' : 'HARD Group Sectors'}</span>
-              <span className="text-slate-600">:</span>
+              <span className="text-blue-100">:</span>
             </span>
-            <span className="md:hidden inline-flex items-center gap-1 text-[11px] font-bold text-sky-400">
+            <span className="md:hidden inline-flex items-center gap-1 text-[11px] font-bold text-white">
               <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
               <span>{isAr ? 'المجموعة' : 'HARD'}</span>
             </span>
@@ -84,34 +84,27 @@ export function SectorNav({
                   href={sector.href}
                   onClick={(e) =>
                     handleSemanticClick(e, () => {
-                      if (!isCurrent) {
-                        onNavigate(sector.pageId);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }
+                      onNavigate(sector.pageId);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
                     })
                   }
                   aria-current={isCurrent ? 'page' : undefined}
-                  title={`${sectorName}${isCurrent ? (isAr ? ' (القطاع الحالي)' : ' (Current Sector)') : ''}`}
+                  title={sectorName}
                   className={`relative shrink-0 inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-semibold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-sky-400 ${
                     isCurrent
-                      ? 'bg-sky-600 text-white shadow-xs font-bold'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
+                      ? 'bg-sky-200 text-blue-950 shadow-xs font-bold'
+                      : 'text-white hover:bg-blue-900'
                   }`}
                 >
                   <Icon
                     className={`w-3.5 h-3.5 shrink-0 ${
-                      isCurrent ? 'text-white' : 'text-slate-400 group-hover:text-white'
+                      isCurrent ? 'text-blue-950' : 'text-sky-100'
                     }`}
                   />
                   {/* Full name on lg+, short name on small */}
                   <span className="hidden sm:inline">{sectorName}</span>
                   <span className="sm:hidden">{shortName}</span>
 
-                  {isCurrent && (
-                    <span className="hidden xl:inline-block ms-1 text-[9px] uppercase tracking-wider font-extrabold px-1.5 py-0.2 rounded bg-black/30 text-sky-200">
-                      {isAr ? 'الحالي' : 'Active'}
-                    </span>
-                  )}
                 </a>
               );
             })}

@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme {
+  --color-slate-950: #034DA2;
+}
+
 @layer base {
   :root {
     --primary-gradient: linear-gradient(90deg, #005ec4 0%, #006cdb 50%, #0084f0 100%);

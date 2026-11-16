@@ -8,6 +8,21 @@ export function usePublishedBrandEmblem(sector: 'portal' | 'realestate' | 'const
   return (variant === 'light' ? settings.logoUrlLight : settings.logoUrlDark) || '/logo.svg';
 }
 
+const sectorWordmarks = {
+  realestate: {
+    ar: { name: 'هارد للعقارات', tagline: 'تسويق ووساطة فاخرة' },
+    en: { name: 'HARD Realestate', tagline: 'Luxury Marketing & Brokerage' },
+  },
+  construction: {
+    ar: { name: 'هارد للمقاولات', tagline: 'مقاولات وتشييد' },
+    en: { name: 'HARD Contracting', tagline: 'Contracting & Construction' },
+  },
+  hvac: {
+    ar: { name: 'هارد لصيانة التكييف', tagline: 'صيانة احترافية' },
+    en: { name: 'HARD HVAC Maintenance', tagline: 'Professional Maintenance' },
+  },
+} as const;
+
 interface BrandLogoProps {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   showText?: boolean;
@@ -16,6 +31,7 @@ interface BrandLogoProps {
   className?: string;
   isIconOnly?: boolean;
   compactTagline?: boolean;
+  standardWordmark?: boolean;
   sector?: 'portal' | 'realestate' | 'construction' | 'hvac';
 }
 
@@ -27,6 +43,7 @@ export function BrandLogo({
   className = '',
   isIconOnly = false,
   compactTagline = false,
+  standardWordmark = false,
   sector = 'realestate',
 }: BrandLogoProps) {
   let settings;
@@ -71,13 +88,15 @@ export function BrandLogo({
     ? 'تسويق ووساطة عقارية فاخرة'
     : 'Marketing & Luxury Brokerage';
 
+  const wordmark = standardWordmark && sector !== 'portal' ? sectorWordmarks[sector][language] : null;
+
   return (
     <div className={`flex items-center gap-3 select-none ${className}`}>
       {/* Official Emblem */}
       <div className={`relative shrink-0 ${currentSize.h} flex items-center justify-center transition-transform duration-200 group-hover:scale-105`}>
         <img
           src={logoSrc}
-          alt={brandName}
+          alt={wordmark?.name ?? brandName}
           className={`${currentSize.h} w-auto object-contain object-center max-w-[min(10rem,32vw)] shrink-0 py-0.5 drop-shadow-xs`}
           loading="eager"
           decoding="async"
@@ -90,19 +109,17 @@ export function BrandLogo({
         <div className="flex min-w-0 flex-col justify-center leading-tight">
           <div className="flex items-baseline gap-1.5">
             <span
-              className={`font-bold tracking-tight font-display-serif ${currentSize.textClass} ${
-                variant === 'light' ? 'text-white' : 'text-slate-900'
-              }`}
+              className={`font-bold tracking-tight font-display-serif ${wordmark ? 'text-sm text-[#0076BB] sm:text-base' : currentSize.textClass + (variant === 'light' ? ' text-white' : ' text-slate-900')}`}
             >
-              {brandName}
+              {wordmark?.name ?? brandName}
             </span>
           </div>
           <span
-            className={`tracking-wider uppercase font-semibold font-ui-sans ${compactTagline && !isAr ? 'max-w-36 text-[8px] tracking-normal sm:text-[9px]' : currentSize.subTextClass} ${
-              variant === 'light' ? 'text-sky-300/80' : 'text-slate-500'
+            className={`tracking-wider uppercase font-semibold font-ui-sans ${wordmark ? 'text-[9px] normal-case tracking-normal sm:text-[10px]' : compactTagline && !isAr ? 'max-w-36 text-[8px] tracking-normal sm:text-[9px]' : currentSize.subTextClass} ${
+              variant === 'light' ? 'text-sky-300/80' : wordmark ? 'text-slate-600' : 'text-slate-500'
             }`}
           >
-            {tagline}
+            {wordmark?.tagline ?? tagline}
           </span>
         </div>
       )}

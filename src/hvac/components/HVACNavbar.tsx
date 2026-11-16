@@ -28,7 +28,7 @@ const SECTOR_ICONS = {
   ThermometerSnowflake,
 };
 import { useHVAC } from '../context/HVACContext';
-import { HVACBrandLockup } from './HVACBrandLockup';
+import { BrandLogo } from '../../components/ui/BrandLogo';
 import { T, pick } from '../translations';
 import { PageId } from '../../types';
 import { handleSemanticClick } from '../../lib/navigation';
@@ -112,7 +112,7 @@ export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
           >
-            <HVACBrandLockup size="md" />
+            <BrandLogo sector="hvac" size="md" language={language} variant="dark" standardWordmark />
           </a>
         </div>
 

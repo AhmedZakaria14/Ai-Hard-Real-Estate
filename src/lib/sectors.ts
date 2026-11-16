@@ -63,12 +63,12 @@ export const HARD_GROUP_SECTORS: SectorDefinition[] = [
     pageId: 'construction',
     href: '/construction',
     name: {
-      en: 'HARD Construction',
-      ar: 'هارد للإنشاءات',
+      en: 'HARD Contracting',
+      ar: 'هارد للمقاولات',
     },
     shortName: {
       en: 'Construction',
-      ar: 'الإنشاءات',
+      ar: 'المقاولات',
     },
     tagline: {
       en: 'General Contracting & Engineering',

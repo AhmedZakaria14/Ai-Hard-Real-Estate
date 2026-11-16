@@ -1,3 +1,4 @@
+import { ScrollToTopButton } from '../../components/layout/SectorQuickActions';
 import React, { useState } from 'react';
 import { MessageCircle, Calculator, X } from 'lucide-react';
 import { useConstruction } from '../context/ConstructionContext';
@@ -20,7 +21,7 @@ export function FloatingWidgets() {
   return (
     <>
       {/* Floating Action Buttons Container */}
-      <div className="fixed bottom-6 end-6 z-40 flex flex-col gap-3 items-end">
+      <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="fixed bottom-5 start-4 z-40 flex flex-col items-start gap-2 sm:bottom-6 sm:start-6">
         {/* WhatsApp Template Popup */}
         {isWhatsAppOpen && (
           <div className="w-72 bg-white border border-sky-100 rounded-2xl shadow-2xl p-4 text-start space-y-3 animate-in slide-in-from-bottom-5 text-slate-900 mb-2">
@@ -103,12 +104,15 @@ export function FloatingWidgets() {
           <span className="hidden sm:inline">{t.hero.ctaEstimate}</span>
         </button>
 
+        <ScrollToTopButton language={language} />
+
         {/* WhatsApp Floating Action Button */}
         <button
           type="button"
           onClick={() => setIsWhatsAppOpen(!isWhatsAppOpen)}
-          className="w-13 h-13 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center shadow-xl shadow-emerald-950/50 hover:scale-105 transition-all cursor-pointer relative"
-          aria-label="WhatsApp Hotline"
+          className="size-12 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white flex items-center justify-center shadow-xl shadow-emerald-950/50 hover:scale-105 transition-all cursor-pointer relative"
+          aria-expanded={isWhatsAppOpen}
+          aria-label={isAr ? 'تواصل عبر واتساب' : 'Chat on WhatsApp'}
         >
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-25"></span>
           <MessageCircle className="w-6 h-6" />

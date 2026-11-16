@@ -72,7 +72,7 @@ export function Navbar({ currentPage, onNavigate, language, onLanguageChange, on
     <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-3 sm:gap-3 sm:px-6">
       <a href="/realestate" onClick={(event) => handleSemanticClick(event, () => changePage('home'))}
         className="group min-w-0 shrink" aria-label={ar ? 'الرئيسية - هارد للعقارات' : 'HARD Real Estate Home'}>
-        <BrandLogo size="md" language={language} variant="dark" compactTagline />
+        <BrandLogo size="md" language={language} variant="dark" standardWordmark />
       </a>
       <nav className="hidden shrink-0 items-center xl:flex" aria-label={ar ? 'القائمة الرئيسية' : 'Main navigation'}>
         {renderLinks()}

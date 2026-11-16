@@ -39,6 +39,7 @@ export function ProjectsPage({
 }: ProjectsPageProps) {
   const t = translations[language];
   const [projects, setProjects] = useState<Project[]>([]);
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const [loadStatus, setLoadStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   React.useEffect(() => {
     const controller = new AbortController();
@@ -50,7 +51,7 @@ export function ProjectsPage({
       if (!controller.signal.aborted) setLoadStatus('error');
     });
     return () => controller.abort();
-  }, []);
+  }, [loadAttempt]);
   const ArrowIcon = language === 'ar' ? ArrowLeft : ArrowRight;
 
   const [selectedBrochureProject, setSelectedBrochureProject] = useState<Project | null>(null);
@@ -79,7 +80,13 @@ export function ProjectsPage({
       </div>
 
       {loadStatus === 'loading' && <p role="status">{language === 'ar' ? 'جارٍ تحميل المشاريع…' : 'Loading projects…'}</p>}
-      {loadStatus === 'error' && <p role="alert">{language === 'ar' ? 'تعذر تحميل المشاريع. أعد تحميل الصفحة.' : 'Unable to load projects. Reload the page.'}</p>}
+      {loadStatus === 'error' && <div role="alert" className="flex flex-wrap items-center gap-3">
+        <span>{language === 'ar' ? 'تعذّر تحميل المشاريع.' : 'Unable to load projects.'}</span>
+        <Button type="button" variant="outline" size="sm" onClick={() => {
+          setLoadStatus('loading');
+          setLoadAttempt((attempt) => attempt + 1);
+        }}>{language === 'ar' ? 'إعادة المحاولة' : 'Try again'}</Button>
+      </div>}
 
       {/* Projects List */}
       <div className="space-y-8">
