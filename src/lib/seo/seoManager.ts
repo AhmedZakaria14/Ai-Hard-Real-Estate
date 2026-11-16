@@ -194,7 +194,7 @@ const DEFAULT_SEO_CONFIGS: Record<string, PageSeoConfig> = {
     },
     description: {
       en: 'Connect with HARD Group offices in Al Khobar, Riyadh, and Dammam for inquiries and private viewings.',
-      ar: 'تواصل مباشر مع فروع مجموعة هارد بالخُبر والرياض والدمام لاستشارات الاستثمار وحجز المعاينات.',
+      ar: 'تواصل مباشر مع فروع مجموعة هارد بالخبر والرياض والدمام لاستشارات الاستثمار وحجز المعاينات.',
     },
     ogImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
     indexable: true,
@@ -299,7 +299,7 @@ export const DEFAULT_LEGAL_POLICY: LegalPolicyContent = {
         },
         body: {
           en: 'HARD Real Estate Group (Commercial Registration #2051254311, REGA License #7200018492, Al Khobar, Saudi Arabia) acts as the Data Controller under the Saudi Personal Data Protection Law (PDPL). This policy applies to all personal data collected through our web portals.',
-          ar: 'تعد شركة هارد للعقارات (السجل التجاري رقم 2051254311 وترخيص الهيئة العامة للعقار رقم 7200018492، الخُبر، المملكة العربية السعودية) جهة التحكم بالبيانات وفق نظام حماية البيانات الشخصية (PDPL) بالمملكة.',
+          ar: 'تعد شركة هارد للعقارات (السجل التجاري رقم 2051254311 وترخيص الهيئة العامة للعقار رقم 7200018492، الخبر، المملكة العربية السعودية) جهة التحكم بالبيانات وفق نظام حماية البيانات الشخصية (PDPL) بالمملكة.',
         },
         isRequired: true,
       },

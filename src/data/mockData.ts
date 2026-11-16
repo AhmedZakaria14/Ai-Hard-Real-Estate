@@ -6,17 +6,17 @@ export const mockProperties: Property[] = [
     slug: 'the-sky-crest-penthouse-khobar-corniche',
     title: {
       en: 'The Sky Crest Penthouse with Panoramic Arabian Gulf Views',
-      ar: 'بنتهاوس ذا سكاي كريست مع إطلالات بانورامية على كورنيش الخُبر والخليج',
+      ar: 'بنتهاوس ذا سكاي كريست مع إطلالات بانورامية على كورنيش الخبر والخليج',
     },
     description: {
       en: 'An architectural masterpiece atop Al Khobar Corniche featuring double-height floor-to-ceiling glass, private infinity pool, Italian marble finishes, bespoke designer kitchen, and private direct elevator lobby.',
-      ar: 'تحفة معمارية في قمة كورنيش الخُبر تتميز بزجاج مزدوج الارتفاع من الأرض حتى السقف، ومسبح إنفينيتي خاص، وتشطيبات من الرخام الإيطالي الفاخر، ومصعد خاص مباشر بإطلالة ساحلية مفتوحة.',
+      ar: 'تحفة معمارية في قمة كورنيش الخبر تتميز بزجاج مزدوج الارتفاع من الأرض حتى السقف، ومسبح إنفينيتي خاص، وتشطيبات من الرخام الإيطالي الفاخر، ومصعد خاص مباشر بإطلالة ساحلية مفتوحة.',
     },
     location: {
-      city: { en: 'Al Khobar', ar: 'الخُبر' },
-      area: { en: 'Corniche Waterfront', ar: 'كورنيش الخُبر' },
+      city: { en: 'Al Khobar', ar: 'الخبر' },
+      area: { en: 'Corniche Waterfront', ar: 'كورنيش الخبر' },
       country: { en: 'Saudi Arabia', ar: 'المملكة العربية السعودية' },
-      address: { en: 'Prince Turki Street, Corniche, Al Khobar', ar: 'طريق الأمير تركي، الكورنيش، الخُبر' },
+      address: { en: 'Prince Turki Street, Corniche, Al Khobar', ar: 'طريق الأمير تركي، الكورنيش، الخبر' },
       coordinates: { lat: 26.2886, lng: 50.2185 },
     },
     price: {
@@ -151,17 +151,17 @@ export const mockProperties: Property[] = [
     slug: 'azure-shobaily-waterfront-residence',
     title: {
       en: 'Azure Luxury Residence in Al Shobaily Waterfront',
-      ar: 'شقة فاخرة بإطلالة مائية في الشبيلي جراند مول - الخُبر',
+      ar: 'شقة فاخرة بإطلالة مائية في الشبيلي جراند مول - الخبر',
     },
     description: {
       en: 'Sophisticated 3-bedroom residence offering uninterrupted views of Al Shobaily Bay and Al Khobar coast. Features floor-to-ceiling acoustic glass, wrap-around balcony, Miele-equipped kitchen, and luxury tower amenities.',
-      ar: 'شقة فاخرة بتصميم عصري مكونة من 3 غرف نوم توفر إطلالات ساحرة على خليج الشبيلي وواجهة الخُبر البحرية. تتميز بزجاج عازل للصوت من الأرض حتى السقف وشرفة واسعة ومطبخ حديث متكامل.',
+      ar: 'شقة فاخرة بتصميم عصري مكونة من 3 غرف نوم توفر إطلالات ساحرة على خليج الشبيلي وواجهة الخبر البحرية. تتميز بزجاج عازل للصوت من الأرض حتى السقف وشرفة واسعة ومطبخ حديث متكامل.',
     },
     location: {
-      city: { en: 'Al Khobar', ar: 'الخُبر' },
+      city: { en: 'Al Khobar', ar: 'الخبر' },
       area: { en: 'Al Shobaily District', ar: 'حي الشبيلي' },
       country: { en: 'Saudi Arabia', ar: 'المملكة العربية السعودية' },
-      address: { en: 'Al Shobaily Bay Boulevard, Al Khobar', ar: 'بوليفارد الشبيلي، الخُبر' },
+      address: { en: 'Al Shobaily Bay Boulevard, Al Khobar', ar: 'بوليفارد الشبيلي، الخبر' },
       coordinates: { lat: 26.241, lng: 50.211 },
     },
     price: {
@@ -285,17 +285,17 @@ export const mockProperties: Property[] = [
     slug: 'the-grand-rakah-executive-suite-khobar',
     title: {
       en: 'The Grand Rakah Executive Sky Suite',
-      ar: 'جناح تنفيذي راقٍ للإيجار السنوي - حي الراكة الخُبر',
+      ar: 'جناح تنفيذي راقٍ للإيجار السنوي - حي الراكة الخبر',
     },
     description: {
       en: 'Prime luxury rental home ready for immediate occupancy. High-end furnished layout, custom ambient lighting, walk-in closets, central HVAC, and immediate highway access to Dhahran Techno Valley and Al Khobar commercial core.',
-      ar: 'شقة فاخرة مؤثثة بالكامل للإيجار السنوي في حي الراكة الراقي بين الخُبر والدمام. تشطيبات فندقية فاخرة وتكييف مركزي وموقع استراتيجي ممتاز بالقرب من وادي الظهران للتقنية وأرامكو.',
+      ar: 'شقة فاخرة مؤثثة بالكامل للإيجار السنوي في حي الراكة الراقي بين الخبر والدمام. تشطيبات فندقية فاخرة وتكييف مركزي وموقع استراتيجي ممتاز بالقرب من وادي الظهران للتقنية وأرامكو.',
     },
     location: {
-      city: { en: 'Al Khobar', ar: 'الخُبر' },
+      city: { en: 'Al Khobar', ar: 'الخبر' },
       area: { en: 'Al Rakah South', ar: 'حي الراكة الجنوبية' },
       country: { en: 'Saudi Arabia', ar: 'المملكة العربية السعودية' },
-      address: { en: 'King Khalid Road, Al Rakah, Al Khobar', ar: 'طريق الملك خالد، حي الراكة، الخُبر' },
+      address: { en: 'King Khalid Road, Al Rakah, Al Khobar', ar: 'طريق الملك خالد، حي الراكة، الخبر' },
       coordinates: { lat: 26.368, lng: 50.198 },
     },
     price: {
@@ -353,17 +353,17 @@ export const mockProperties: Property[] = [
     slug: 'the-shobaily-bay-royal-villa',
     title: {
       en: 'The Royal Marina Villa in Al Shobaily Bay',
-      ar: 'فيلا المارينا الملكية المستقلة - خليج الشبيلي الخُبر',
+      ar: 'فيلا المارينا الملكية المستقلة - خليج الشبيلي الخبر',
     },
     description: {
       en: 'A premier waterfront estate located on the tranquil shores of Al Shobaily Bay. Featuring private direct boat slip, expansive marble terraces, floor-to-ceiling glass pavilions, and grand reception halls.',
       ar: 'فيلا ملكية فاخرة مستقلة مباشرة على مياه خليج الشبيلي مع مرسى خاص للقوارب واليخوت. تتميز بتراسات رخامية شاسعة وصالات استقبال فاخرة وإطلالات بحرية آسرة.',
     },
     location: {
-      city: { en: 'Al Khobar', ar: 'الخُبر' },
+      city: { en: 'Al Khobar', ar: 'الخبر' },
       area: { en: 'Al Shobaily Waterfront', ar: 'واجهة الشبيلي البحرية' },
       country: { en: 'Saudi Arabia', ar: 'المملكة العربية السعودية' },
-      address: { en: 'Marina Island Way, Al Shobaily, Al Khobar', ar: 'طريق جزيرة المارينا، الشبيلي، الخُبر' },
+      address: { en: 'Marina Island Way, Al Shobaily, Al Khobar', ar: 'طريق جزيرة المارينا، الشبيلي، الخبر' },
       coordinates: { lat: 26.235, lng: 50.219 },
     },
     price: {
@@ -558,7 +558,7 @@ export const mockProjects: Project[] = [
     id: 'proj-1',
     title: {
       en: 'The Pearl of Khobar Waterfront Towers',
-      ar: 'أبراج لؤلؤة الخُبر البحرية الفاخرة',
+      ar: 'أبراج لؤلؤة الخبر البحرية الفاخرة',
     },
     developer: {
       en: 'HARD Developments & Real Estate Assets',
@@ -566,7 +566,7 @@ export const mockProjects: Project[] = [
     },
     location: {
       en: 'Al Shobaily Waterfront, Al Khobar, Eastern Province',
-      ar: 'واجهة الشبيلي البحرية، الخُبر، المنطقة الشرقية',
+      ar: 'واجهة الشبيلي البحرية، الخبر، المنطقة الشرقية',
     },
     startingPriceSAR: '1,912,500 SAR',
     handoverDate: { en: 'Q4 2026 Target', ar: 'الربع الرابع 2026 (مستهدف)' },
@@ -768,7 +768,7 @@ export const mockBlogPosts: BlogPost[] = [
     id: 'post-1',
     title: {
       en: 'Eastern Province Real Estate Outlook 2025: Khobar & Dammam Growth Corridors',
-      ar: 'آفاق السوق العقاري في المنطقة الشرقية 2025: محاور النمو في الخُبر والدمام',
+      ar: 'آفاق السوق العقاري في المنطقة الشرقية 2025: محاور النمو في الخبر والدمام',
     },
     excerpt: {
       en: 'An in-depth market report examining luxury capital appreciation, rental yield dynamics, and infrastructure investments across Eastern Province.',
@@ -781,7 +781,7 @@ export const mockBlogPosts: BlogPost[] = [
     image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
     content: {
       en: 'The Eastern Province real estate ecosystem is experiencing unprecedented structural momentum driven by Vision 2030 initiatives, industrial expansion in Dhahran and Jubail, and robust demand for prime coastal waterfront properties in Al Khobar...',
-      ar: 'يشهد القطاع العقاري في المنطقة الشرقية زخماً استثنائياً مدفوعاً بمبادرات رؤية المملكة 2030 وتوسع مشاريع الطاقة والتقنية بالظهران، وزيادة الطلب على العقارات والواجهات البحرية الفاخرة في الخُبر والدمام...',
+      ar: 'يشهد القطاع العقاري في المنطقة الشرقية زخماً استثنائياً مدفوعاً بمبادرات رؤية المملكة 2030 وتوسع مشاريع الطاقة والتقنية بالظهران، وزيادة الطلب على العقارات والواجهات البحرية الفاخرة في الخبر والدمام...',
     },
   },
   {
@@ -808,7 +808,7 @@ export const mockBlogPosts: BlogPost[] = [
     id: 'post-3',
     title: {
       en: 'Why Luxury Waterfront Living in Al Shobaily & Khobar Corniche Outperforms',
-      ar: 'لماذا تتفوق العقارات الساحلية في الشبيلي وكورنيش الخُبر استثمارياً؟',
+      ar: 'لماذا تتفوق العقارات الساحلية في الشبيلي وكورنيش الخبر استثمارياً؟',
     },
     excerpt: {
       en: 'A strategic review of capital growth, high occupancy rates, and lifestyle premium in Eastern Province coastal communities.',
@@ -821,7 +821,7 @@ export const mockBlogPosts: BlogPost[] = [
     image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
     content: {
       en: 'Coastal properties in Al Khobar command the highest tenant retention and premium pricing across the Eastern Province...',
-      ar: 'تسجل العقارات البحرية في الخُبر أعلى نسب إقبال واستقرار إيجاري بالمنطقة الشرقية بفضل جودة الحياة والبيئة الترفيهية المتكاملة...',
+      ar: 'تسجل العقارات البحرية في الخبر أعلى نسب إقبال واستقرار إيجاري بالمنطقة الشرقية بفضل جودة الحياة والبيئة الترفيهية المتكاملة...',
     },
   },
 ];
@@ -831,16 +831,16 @@ export const mockTestimonials: Testimonial[] = [
     id: 'test-1',
     name: { en: 'Eng. Khalid Al-Zahrani', ar: 'م. خالد الزهراني' },
     role: { en: 'Managing Director, Energy Investments', ar: 'مدير تنفيذي لاستثمارات الطاقة' },
-    location: { en: 'Dhahran / Al Khobar', ar: 'الظهران / الخُبر' },
+    location: { en: 'Dhahran / Al Khobar', ar: 'الظهران / الخبر' },
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
     rating: 5,
     quote: {
       en: 'Listing my luxury villa in Al Khobar with HARD was the best decision. Their cinematic media marketing and verified buyer network brought 3 qualified cash offers in under two weeks. We closed smoothly above our initial reserve price.',
-      ar: 'كان عرض قصرنا في الخُبر مع شركة هارد للعقارات أفضل قرار اتخذته. حملتهم الإعلامية السينمائية وشبكة المشترين المعتمدين حققت 3 عروض شراء نقدية خلال أقل من أسبوعين، وتم الإفراغ بسلاسة تفوق توقعاتنا.',
+      ar: 'كان عرض قصرنا في الخبر مع شركة هارد للعقارات أفضل قرار اتخذته. حملتهم الإعلامية السينمائية وشبكة المشترين المعتمدين حققت 3 عروض شراء نقدية خلال أقل من أسبوعين، وتم الإفراغ بسلاسة تفوق توقعاتنا.',
     },
     dealHighlight: {
       en: 'Sold Khobar Waterfront Villa in 11 Days',
-      ar: 'بيع فيلا كورنيش الخُبر في 11 يوماً',
+      ar: 'بيع فيلا كورنيش الخبر في 11 يوماً',
     },
     category: 'seller',
   },
@@ -895,7 +895,7 @@ export const mockServices: ServiceDetail[] = [
     },
     description: {
       en: 'Our certified real estate advisors represent high-net-worth individuals, family offices, and discerning investors across Khobar, Dhahran, and Dammam with unmatched market intelligence and REGA compliance.',
-      ar: 'يقدم مستشارونا المعتمدون خدمات الوساطة والاستشارة للمستثمرين وكبرى العائلات في الخُبر والظهران والدمام وفق أعلى معايير الشفافية وتنظيمات الهيئة العامة للعقار.',
+      ar: 'يقدم مستشارونا المعتمدون خدمات الوساطة والاستشارة للمستثمرين وكبرى العائلات في الخبر والظهران والدمام وفق أعلى معايير الشفافية وتنظيمات الهيئة العامة للعقار.',
     },
     features: [
       {

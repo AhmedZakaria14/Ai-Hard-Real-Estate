@@ -201,17 +201,6 @@ export function HomePage({
               >
                 {t.home.searchTabs.rent}
               </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab('off-plan')}
-                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                  activeTab === 'off-plan'
-                    ? 'bg-hard-gradient text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                }`}
-              >
-                {t.home.searchTabs.offPlan}
-              </button>
             </div>
 
             {/* Filter Form Bar: Location, Property Type, Price Range */}

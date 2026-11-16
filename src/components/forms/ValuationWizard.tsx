@@ -88,7 +88,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
   // Dynamic Valuation Estimation Formula based on input parameters (Calculated directly in SAR)
   const calculatedEstimate = React.useMemo(() => {
     let baseRatePerSqFt = 3500; // SAR
-    if (cityArea.includes('Khobar') || cityArea.includes('الخُبر')) baseRatePerSqFt = 4200;
+    if (cityArea.includes('Khobar') || cityArea.includes('الخبر')) baseRatePerSqFt = 4200;
     else if (cityArea.includes('Dhahran') || cityArea.includes('الظهران')) baseRatePerSqFt = 4500;
     else if (cityArea.includes('Dammam') || cityArea.includes('الدمام')) baseRatePerSqFt = 3600;
     else if (cityArea.includes('Half Moon') || cityArea.includes('نصف القمر')) baseRatePerSqFt = 4800;

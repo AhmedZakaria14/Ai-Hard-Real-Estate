@@ -165,7 +165,7 @@ export const mockFaqs: FaqEntity[] = [
     },
     answer: {
       en: 'HARD Group operates three specialized sector divisions—Real Estate, Master Construction, and Enterprise HVAC—headquartered in Al Khobar with active regional operations in Riyadh and Jeddah.',
-      ar: 'تضم المجموعة ثلاثة قطاعات متخصصة (العقارات، المقاولات العامة، وأنظمة التكييف) بالمقر الرئيسي بالخُبر مع فروع وفروع تشغيلية بالرياض وجدة.',
+      ar: 'تضم المجموعة ثلاثة قطاعات متخصصة (العقارات، المقاولات العامة، وأنظمة التكييف) بالمقر الرئيسي بالخبر مع فروع وفروع تشغيلية بالرياض وجدة.',
     },
     category: { en: 'Group Governance', ar: 'عن المجموعة' },
     sector: 'group',
@@ -177,11 +177,11 @@ export const mockFaqs: FaqEntity[] = [
 export const mockOffices: OfficeLocation[] = [
   {
     id: 'off-1',
-    name: { en: 'HARD Group Headquarters - Al Khobar', ar: 'المقر الرئيسي لمجموعة هارد - الخُبر' },
-    city: { en: 'Al Khobar', ar: 'الخُبر' },
+    name: { en: 'HARD Group Headquarters - Al Khobar', ar: 'المقر الرئيسي لمجموعة هارد - الخبر' },
+    city: { en: 'Al Khobar', ar: 'الخبر' },
     address: {
       en: 'King Salman bin Abdulaziz Road, Corniche District, Al Khobar 34412',
-      ar: 'طريق الملك سلمان بن عبد العزيز، حي الكورنيش، الخُبر 34412',
+      ar: 'طريق الملك سلمان بن عبد العزيز، حي الكورنيش، الخبر 34412',
     },
     phone: '+966 13 800 4273',
     email: 'info@hardgp.com',
@@ -452,7 +452,7 @@ export const mockEnhancedTestimonials: EnhancedTestimonial[] = [
     id: 'test-1',
     name: { en: 'Sheikh Hamad Al-Subaie', ar: 'الشيخ حمد السبيعي' },
     role: { en: 'Private Family Office Trustee', ar: 'رئيس مكتب استثمار عائلي' },
-    location: { en: 'Al Khobar Waterfront', ar: 'كورنيش الخُبر' },
+    location: { en: 'Al Khobar Waterfront', ar: 'كورنيش الخبر' },
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
     rating: 5,
     quote: {

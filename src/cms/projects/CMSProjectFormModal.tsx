@@ -59,9 +59,9 @@ export const CMSProjectFormModal: React.FC<CMSProjectFormModalProps> = ({
   const [unitsAvailable, setUnitsAvailable] = useState<number>(30);
   const [roiProjected, setRoiProjected] = useState('8.5% Projected Yield');
   const [locationEn, setLocationEn] = useState('Al Khobar Waterfront');
-  const [locationAr, setLocationAr] = useState('واجهة الخُبر البحرية');
+  const [locationAr, setLocationAr] = useState('واجهة الخبر البحرية');
   const [cityEn, setCityEn] = useState('Al Khobar');
-  const [cityAr, setCityAr] = useState('الخُبر');
+  const [cityAr, setCityAr] = useState('الخبر');
   const [image, setImage] = useState('');
   const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
   const [newGalleryUrl, setNewGalleryUrl] = useState('');
@@ -94,7 +94,7 @@ export const CMSProjectFormModal: React.FC<CMSProjectFormModalProps> = ({
       setLocationEn(initialData.location?.en || '');
       setLocationAr(initialData.location?.ar || '');
       setCityEn(initialData.city?.en || 'Al Khobar');
-      setCityAr(initialData.city?.ar || 'الخُبر');
+      setCityAr(initialData.city?.ar || 'الخبر');
       setImage(initialData.image || '');
       setGalleryUrls(initialData.gallery || [initialData.image]);
       setHighlightsEn(initialData.highlights?.en || []);
@@ -103,14 +103,14 @@ export const CMSProjectFormModal: React.FC<CMSProjectFormModalProps> = ({
     } else {
       // Defaults for brand-new project
       setTitleEn('Al Khobar Horizon Sky Residences');
-      setTitleAr('أبراج أفق الخُبر السحابية');
+      setTitleAr('أبراج أفق الخبر السحابية');
       setSlug(`project-${Date.now()}`);
       setDeveloperEn('HARD Capital & Developments');
       setDeveloperAr('هارد كابيتال والتطوير العقاري');
       setCategoryEn('Waterfront Masterplan');
       setCategoryAr('مشروع ساحلي متكامل');
       setDescriptionEn('An architectural landmark on Al Khobar waterfront with panoramic marine vistas, luxury concierge, and world-class leisure facilities.');
-      setDescriptionAr('صرح معماري استثنائي على واجهة الخُبر البحرية بإطلالات بحرية مفتوحة ومرافق ترفيهية وخدمية متكاملة.');
+      setDescriptionAr('صرح معماري استثنائي على واجهة الخبر البحرية بإطلالات بحرية مفتوحة ومرافق ترفيهية وخدمية متكاملة.');
       setStatus('off-plan');
       setProgressPercentage(35);
       setStartingPriceSAR('2,750,000 SAR');
@@ -120,9 +120,9 @@ export const CMSProjectFormModal: React.FC<CMSProjectFormModalProps> = ({
       setUnitsAvailable(45);
       setRoiProjected('9.2% Anticipated Rental Yield');
       setLocationEn('Corniche Road, Al Khobar');
-      setLocationAr('طريق الكورنيش، الخُبر');
+      setLocationAr('طريق الكورنيش، الخبر');
       setCityEn('Al Khobar');
-      setCityAr('الخُبر');
+      setCityAr('الخبر');
       setImage('https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80');
       setGalleryUrls([
         'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',
@@ -302,7 +302,7 @@ export const CMSProjectFormModal: React.FC<CMSProjectFormModalProps> = ({
                     value={titleAr}
                     onChange={(e) => setTitleAr(e.target.value)}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-500"
-                    placeholder="مثال: أبراج أفق الخُبر السحابية"
+                    placeholder="مثال: أبراج أفق الخبر السحابية"
                   />
                 </div>
               </div>
@@ -539,7 +539,7 @@ export const CMSProjectFormModal: React.FC<CMSProjectFormModalProps> = ({
                     value={locationAr}
                     onChange={(e) => setLocationAr(e.target.value)}
                     className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
-                    placeholder="مثال: طريق الكورنيش، الخُبر"
+                    placeholder="مثال: طريق الكورنيش، الخبر"
                   />
                 </div>
               </div>
@@ -595,7 +595,7 @@ export const CMSProjectFormModal: React.FC<CMSProjectFormModalProps> = ({
                     value={cityAr}
                     onChange={(e) => setCityAr(e.target.value)}
                     className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
-                    placeholder="الخُبر"
+                    placeholder="الخبر"
                   />
                 </div>
               </div>

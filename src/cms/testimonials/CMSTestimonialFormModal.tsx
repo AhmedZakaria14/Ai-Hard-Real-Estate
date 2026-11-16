@@ -31,7 +31,7 @@ export const CMSTestimonialFormModal: React.FC<CMSTestimonialFormModalProps> = (
   const [formData, setFormData] = useState<Partial<Testimonial>>({
     name: { en: '', ar: '' },
     role: { en: 'Real Estate Investor', ar: 'مستثمر عقاري' },
-    location: { en: 'Al Khobar, Eastern Province', ar: 'الخُبر، المنطقة الشرقية' },
+    location: { en: 'Al Khobar, Eastern Province', ar: 'الخبر، المنطقة الشرقية' },
     avatar: AVATAR_PRESETS[0].url,
     rating: 5,
     dealHighlight: { en: 'Luxury Waterfront Villa Acquisition', ar: 'شراء فيلا فاخرة على الواجهة البحرية' },
@@ -79,7 +79,7 @@ export const CMSTestimonialFormModal: React.FC<CMSTestimonialFormModalProps> = (
         setFormData({
           name: { en: '', ar: '' },
           role: { en: 'Real Estate Investor', ar: 'مستثمر عقاري' },
-          location: { en: 'Al Khobar, Eastern Province', ar: 'الخُبر، المنطقة الشرقية' },
+          location: { en: 'Al Khobar, Eastern Province', ar: 'الخبر، المنطقة الشرقية' },
           avatar: AVATAR_PRESETS[0].url,
           rating: 5,
           dealHighlight: { en: 'Luxury Waterfront Villa Acquisition', ar: 'شراء فيلا فاخرة على الواجهة البحرية' },
@@ -317,7 +317,7 @@ export const CMSTestimonialFormModal: React.FC<CMSTestimonialFormModalProps> = (
                 onChange={(e) =>
                   setFormData({ ...formData, location: { ...(formData.location as any), ar: e.target.value } })
                 }
-                placeholder="مثال: الخُبر، المملكة العربية السعودية"
+                placeholder="مثال: الخبر، المملكة العربية السعودية"
                 className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>

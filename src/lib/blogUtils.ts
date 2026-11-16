@@ -126,7 +126,7 @@ export const INITIAL_BLOG_AUTHORS: BlogAuthor[] = [
     avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80',
     bio: {
       en: 'Directing luxury prime coastal acquisitions across Khobar Corniche, Al Shobaily Bay, and Dammam Marina.',
-      ar: 'إدارة وتطوير الاستثمارات الساحلية الفاخرة على كورنيش الخُبر وخليج الشبيلي وواجهات الدمام.',
+      ar: 'إدارة وتطوير الاستثمارات الساحلية الفاخرة على كورنيش الخبر وخليج الشبيلي وواجهات الدمام.',
     },
     email: 'sultan@hardrealestate.sa',
   },

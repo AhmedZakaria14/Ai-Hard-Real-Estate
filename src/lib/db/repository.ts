@@ -58,7 +58,7 @@ export function propertyToDbRow(prop: Partial<Property>) {
     price_prefix_en: isRent ? 'Annual Rent' : (prop.price?.period === 'month' ? 'Monthly Rent' : 'Guide Price'),
     price_prefix_ar: isRent ? 'إيجار سنوي' : (prop.price?.period === 'month' ? 'إيجار شهري' : 'السعر التقديري'),
     location_en: prop.location?.address?.en || prop.location?.area?.en || prop.location?.city?.en || 'Al Khobar, Eastern Province',
-    location_ar: prop.location?.address?.ar || prop.location?.area?.ar || prop.location?.city?.ar || 'الخُبر، المنطقة الشرقية',
+    location_ar: prop.location?.address?.ar || prop.location?.area?.ar || prop.location?.city?.ar || 'الخبر، المنطقة الشرقية',
     city: cityStr.toLowerCase().replace(/\s+/g, '-'),
     district_en: prop.location?.area?.en || '',
     district_ar: prop.location?.area?.ar || '',
@@ -87,15 +87,15 @@ export function dbRowToProperty(row: any): Property {
     : 'Al Khobar';
 
   const cityArMap: Record<string, string> = {
-    khobar: 'الخُبر',
-    'al-khobar': 'الخُبر',
+    khobar: 'الخبر',
+    'al-khobar': 'الخبر',
     dammam: 'الدمام',
     dhahran: 'الظهران',
     riyadh: 'الرياض',
     jeddah: 'جدة',
   };
 
-  const cityNameAr = cityArMap[row.city?.toLowerCase()] || 'الخُبر';
+  const cityNameAr = cityArMap[row.city?.toLowerCase()] || 'الخبر';
 
   return {
     id: row.id,
@@ -163,7 +163,7 @@ export function projectToDbRow(proj: Partial<Project>) {
     name_en: proj.title?.en || 'Master Development',
     name_ar: proj.title?.ar || 'مشروع تطويري مميز',
     location_en: proj.location?.en || 'Al Khobar, Eastern Province',
-    location_ar: proj.location?.ar || 'الخُبر، المنطقة الشرقية',
+    location_ar: proj.location?.ar || 'الخبر، المنطقة الشرقية',
     type_en: proj.category?.en || 'Luxury Residential',
     type_ar: proj.category?.ar || 'مجمع سكني فاخر',
     status_en: proj.status === 'under-construction' ? `Under Construction (${proj.progressPercentage || 50}%)` : (proj.status || 'Active'),
@@ -289,7 +289,7 @@ export function dbRowToTestimonial(row: any): Testimonial {
     id: row.id,
     name: { en: row.name_en, ar: row.name_ar },
     role: { en: row.role_en || '', ar: row.role_ar || '' },
-    location: { en: 'Al Khobar / Dammam', ar: 'الخُبر / الدمام' },
+    location: { en: 'Al Khobar / Dammam', ar: 'الخبر / الدمام' },
     avatar: row.avatar,
     rating: row.rating || 5,
     quote: { en: row.content_en, ar: row.content_ar },
@@ -349,10 +349,10 @@ export const PropertiesRepository = {
       title: propertyData.title || { en: 'Luxury Residence', ar: 'إقامة فاخرة' },
       description: propertyData.description || { en: 'Exceptional architectural residence.', ar: 'إقامة معمارية استثنائية.' },
       location: propertyData.location || {
-        city: { en: 'Al Khobar', ar: 'الخُبر' },
-        area: { en: 'Corniche Waterfront', ar: 'كورنيش الخُبر' },
+        city: { en: 'Al Khobar', ar: 'الخبر' },
+        area: { en: 'Corniche Waterfront', ar: 'كورنيش الخبر' },
         country: { en: 'Saudi Arabia', ar: 'المملكة العربية السعودية' },
-        address: { en: 'Prince Turki Street, Al Khobar', ar: 'طريق الأمير تركي، الخُبر' },
+        address: { en: 'Prince Turki Street, Al Khobar', ar: 'طريق الأمير تركي، الخبر' },
         coordinates: { lat: 26.2886, lng: 50.2185 },
       },
       price: propertyData.price || {
@@ -637,8 +637,8 @@ export const ProjectsRepository = {
       slug,
       title: projectData.title || { en: 'New Iconic Development', ar: 'مشروع تطويري مميز جديد' },
       developer: projectData.developer || { en: 'HARD Developments', ar: 'هارد للتطوير العقاري' },
-      location: projectData.location || { en: 'Al Khobar Waterfront', ar: 'واجهة الخُبر البحرية' },
-      city: projectData.city || { en: 'Al Khobar', ar: 'الخُبر' },
+      location: projectData.location || { en: 'Al Khobar Waterfront', ar: 'واجهة الخبر البحرية' },
+      city: projectData.city || { en: 'Al Khobar', ar: 'الخبر' },
       startingPriceSAR: projectData.startingPriceSAR || '2,500,000 SAR',
       handoverDate: projectData.handoverDate || { en: 'Q4 2026', ar: 'الربع الرابع 2026' },
       unitsTotal: projectData.unitsTotal || 120,
@@ -908,7 +908,7 @@ export const TestimonialsRepository = {
       id: generatedId,
       name: data.name || { en: 'Client Name', ar: 'اسم العميل' },
       role: data.role || { en: 'Property Investor', ar: 'مستشار ومستثمر عقاري' },
-      location: data.location || { en: 'Al Khobar / Dammam', ar: 'الخُبر / الدمام' },
+      location: data.location || { en: 'Al Khobar / Dammam', ar: 'الخبر / الدمام' },
       avatar: data.avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
       rating: data.rating || 5,
       quote: data.quote || {

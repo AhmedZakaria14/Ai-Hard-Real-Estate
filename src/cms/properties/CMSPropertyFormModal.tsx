@@ -58,11 +58,11 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
 
   // Location
   const [cityEn, setCityEn] = useState('Al Khobar');
-  const [cityAr, setCityAr] = useState('الخُبر');
+  const [cityAr, setCityAr] = useState('الخبر');
   const [areaEn, setAreaEn] = useState('Corniche Waterfront');
-  const [areaAr, setAreaAr] = useState('كورنيش الخُبر');
+  const [areaAr, setAreaAr] = useState('كورنيش الخبر');
   const [addressEn, setAddressEn] = useState('Prince Turki Street, Al Khobar');
-  const [addressAr, setAddressAr] = useState('طريق الأمير تركي، الخُبر');
+  const [addressAr, setAddressAr] = useState('طريق الأمير تركي، الخبر');
   const [lat, setLat] = useState<number>(26.2886);
   const [lng, setLng] = useState<number>(50.2185);
 
@@ -119,7 +119,7 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
       setFeatured(!!initialData.featured);
 
       setCityEn(initialData.location?.city?.en || 'Al Khobar');
-      setCityAr(initialData.location?.city?.ar || 'الخُبر');
+      setCityAr(initialData.location?.city?.ar || 'الخبر');
       setAreaEn(initialData.location?.area?.en || 'Corniche');
       setAreaAr(initialData.location?.area?.ar || 'الكورنيش');
       setAddressEn(initialData.location?.address?.en || '');
@@ -420,7 +420,7 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
                 }}
                 required
                 language={language}
-                placeholderAr="مثال: فيلا شاطئية فائقة الفخامة في كورنيش الخُبر"
+                placeholderAr="مثال: فيلا شاطئية فائقة الفخامة في كورنيش الخبر"
                 placeholderEn="e.g. Ultra-Modern Waterfront Villa in Khobar"
               />
 

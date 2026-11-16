@@ -159,7 +159,7 @@ export const OfficesRepository = {
     const newItem: OfficeLocation = {
       id: item.id || `off-${Date.now()}`,
       name: item.name || { en: 'Office Location', ar: 'مقر الفرع' },
-      city: item.city || { en: 'Al Khobar', ar: 'الخُبر' },
+      city: item.city || { en: 'Al Khobar', ar: 'الخبر' },
       address: item.address || { en: 'Main Street', ar: 'الشارع الرئيسي' },
       phone: item.phone || '+966 13 800 4273',
       email: item.email || 'info@hardgp.com',
@@ -358,7 +358,7 @@ export const EnhancedTestimonialsRepository = {
       id: item.id || `test-${Date.now()}`,
       name: item.name || { en: 'Client Name', ar: 'اسم العميل' },
       role: item.role || { en: 'Investor', ar: 'مستثمر' },
-      location: item.location || { en: 'Al Khobar', ar: 'الخُبر' },
+      location: item.location || { en: 'Al Khobar', ar: 'الخبر' },
       avatar: item.avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
       rating: item.rating || 5,
       quote: item.quote || { en: 'Exceptional service and guidance.', ar: 'خدمة متميزة وتوجيه راقٍ.' },

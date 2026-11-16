@@ -107,7 +107,7 @@ export function PropertyMapView({
     },
     {
       id: 'khobar',
-      label: isAr ? 'الخُبر (الكورنيش والشبيلي)' : 'Al Khobar Waterfront',
+      label: isAr ? 'الخبر (الكورنيش والشبيلي)' : 'Al Khobar Waterfront',
       filterKey: 'Khobar',
     },
     {
@@ -361,7 +361,7 @@ export function PropertyMapView({
           </div>
           <h3 className="text-lg sm:text-xl font-bold font-display-serif text-slate-100">
             {isAr
-              ? 'تصفح خريطة عقارات الخُبر والدمام والظهران'
+              ? 'تصفح خريطة عقارات الخبر والدمام والظهران'
               : 'Explore Properties Across Al Khobar, Dammam & Dhahran'}
           </h3>
         </div>
@@ -440,7 +440,7 @@ export function PropertyMapView({
               {isAr ? 'جارٍ تحميل الخريطة التفاعلية...' : 'Loading Interactive Map...'}
             </p>
             <p className="text-xs text-slate-400 mt-1">
-              {isAr ? 'تهيئة عقارات الخُبر والدمام والظهران' : 'Initializing Eastern Province Listings'}
+              {isAr ? 'تهيئة عقارات الخبر والدمام والظهران' : 'Initializing Eastern Province Listings'}
             </p>
           </div>
         )}
@@ -640,14 +640,14 @@ export function PropertyMapView({
           <Info className="w-4 h-4 text-blue-400 shrink-0" />
           <span>
             {isAr
-              ? 'خريطة تفاعلية تعرض المواقع المعتمدة للعقارات في الخُبر والدمام والظهران.'
+              ? 'خريطة تفاعلية تعرض المواقع المعتمدة للعقارات في الخبر والدمام والظهران.'
               : 'Interactive map displaying verified property locations in Al Khobar, Dammam, and Dhahran.'}
           </span>
         </div>
 
         <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
           <Badge variant="outline" className="text-[10px] text-slate-400 border-slate-700">
-            {isAr ? 'الخُبر • الدمام • الظهران' : 'Al Khobar • Dammam • Dhahran'}
+            {isAr ? 'الخبر • الدمام • الظهران' : 'Al Khobar • Dammam • Dhahran'}
           </Badge>
         </div>
       </div>

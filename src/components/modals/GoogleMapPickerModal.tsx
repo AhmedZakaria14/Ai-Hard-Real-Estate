@@ -41,7 +41,7 @@ interface QuickCity {
 }
 
 const SAUDI_CITIES: QuickCity[] = [
-  { nameAr: 'الخُبر', nameEn: 'Al Khobar', lat: 26.2884, lng: 50.2105, zoom: 14 },
+  { nameAr: 'الخبر', nameEn: 'Al Khobar', lat: 26.2884, lng: 50.2105, zoom: 14 },
   { nameAr: 'الدمام', nameEn: 'Dammam', lat: 26.4344, lng: 50.1033, zoom: 13 },
   { nameAr: 'الظهران', nameEn: 'Dhahran', lat: 26.2714, lng: 50.1504, zoom: 13 },
   { nameAr: 'الرياض', nameEn: 'Riyadh', lat: 24.7136, lng: 46.6753, zoom: 12 },

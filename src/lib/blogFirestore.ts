@@ -130,7 +130,7 @@ export const INITIAL_BLOG_POSTS: BlogPost[] = [
     },
     excerpt: {
       en: 'An in-depth macroeconomic analysis examining institutional liquidity, luxury residential appreciation, and Vision 2030 waterfront milestones across Khobar and Dammam.',
-      ar: 'تحليل معمق يرصد تدفقات الاستثمار المؤسسي ونمو عوائد الأصول الفاخرة وتسارع مشاريع الواجهات البحرية بالخُبر والدمام وفق مستهدفات رؤية 2030.',
+      ar: 'تحليل معمق يرصد تدفقات الاستثمار المؤسسي ونمو عوائد الأصول الفاخرة وتسارع مشاريع الواجهات البحرية بالخبر والدمام وفق مستهدفات رؤية 2030.',
     },
     category: { en: 'Market Intelligence', ar: 'تقارير وتحليلات السوق' },
     categoryId: 'cat-market-intel',
@@ -162,7 +162,7 @@ Investor confidence is underpinned by the strict escrow guarantees mandated by t
       ar: `يشهد القطاع العقاري في المنطقة الشرقية بالمملكة العربية السعودية زخماً استثمارياً متصاعداً مع مطلع عام 2026، مدفوعاً بنمو الاستثمارات النوعية في قطاعات الطاقة والتقنية ومشاريع جودة الحياة.
 
 ### محركات النمو الاقتصادي في المنطقة الشرقية
-تسجل مدن الخُبر والدمام والظهران نمواً ملحوظاً في الطلب على المشاريع السكنية والواجهات البحرية الفاخرة، وذلك بفضل:
+تسجل مدن الخبر والدمام والظهران نمواً ملحوظاً في الطلب على المشاريع السكنية والواجهات البحرية الفاخرة، وذلك بفضل:
 - **مبادرات رؤية المملكة 2030:** تطوير الكورنيشات البحرية والمماشي الترفيهية والمرافق الذكية.
 - **استقرار العوائد الاستثمارية:** تحقيق العقارات الساحلية لعوائد تشغيلية صافية تتراوح بين 8.2% و 9.6%.
 - **البيئة التشريعية المحفزة:** حماية أموال المستثمرين عبر حسابات الضمان البنكية والتوثيق الإلكتروني المعتمد من الهيئة العامة للعقار.
@@ -180,11 +180,11 @@ Investor confidence is underpinned by the strict escrow guarantees mandated by t
       },
       metaDescription: {
         en: 'Read HARD Group strategic report on Saudi Eastern Province real estate capital flows, waterfront yields, and Vision 2030 developments.',
-        ar: 'تقرير شامل من مجموعة هارد العقارية حول مؤشرات السوق بالمنطقة الشرقية وعوائد المشاريع الساحلية بالخُبر والدمام.',
+        ar: 'تقرير شامل من مجموعة هارد العقارية حول مؤشرات السوق بالمنطقة الشرقية وعوائد المشاريع الساحلية بالخبر والدمام.',
       },
       keywords: {
         en: ['Khobar Real Estate', 'Dammam Luxury Villas', 'Saudi Real Estate 2026', 'REGA Compliance'],
-        ar: ['عقارات الخُبر', 'فلل الدمام الفاخرة', 'استثمار عقاري السعودية 2026', 'الهيئة العامة للعقار'],
+        ar: ['عقارات الخبر', 'فلل الدمام الفاخرة', 'استثمار عقاري السعودية 2026', 'الهيئة العامة للعقار'],
       },
       ogImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
     },
@@ -260,7 +260,7 @@ The FAL brokerage law mandates that every market intermediary—whether individu
     },
     title: {
       en: 'Why Luxury Waterfront Living in Al Shobaily & Khobar Corniche Outperforms',
-      ar: 'لماذا تتفوق العقارات الساحلية في الشبيلي وكورنيش الخُبر استثمارياً؟',
+      ar: 'لماذا تتفوق العقارات الساحلية في الشبيلي وكورنيش الخبر استثمارياً؟',
     },
     excerpt: {
       en: 'A strategic review of capital preservation, high occupancy rates, and lifestyle premium in Eastern Province coastal communities.',
@@ -278,13 +278,13 @@ The FAL brokerage law mandates that every market intermediary—whether individu
     image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
     imageAlt: {
       en: 'Luxury waterfront modern villa with private pool overlooking the Arabian Gulf in Al Khobar',
-      ar: 'فيلا حديثة فاخرة مع مسبح خاص مطلة على الخليج العربي في الخُبر',
+      ar: 'فيلا حديثة فاخرة مع مسبح خاص مطلة على الخليج العربي في الخبر',
     },
     content: {
       en: `Coastal properties in Al Khobar consistently command the highest tenant retention and premium pricing across the Eastern Province.
 
 Driven by the demand for open-air waterfront lifestyles, yacht berthing facilities, and direct proximity to King Fahd Causeway leading to Bahrain, developments such as Al Shobaily Bay represent the pinnacle of modern coastal architecture in Saudi Arabia.`,
-      ar: `تسجل العقارات البحرية في مدينة الخُبر أعلى نسب إقبال واستقرار إيجاري بالمنطقة الشرقية، بفضل ما توفره من نمط عيش ساحلي فريد، ومراسي لليخوت، وقرب استراتيجي من جسر الملك فهد المؤدي إلى البحرين.`,
+      ar: `تسجل العقارات البحرية في مدينة الخبر أعلى نسب إقبال واستقرار إيجاري بالمنطقة الشرقية، بفضل ما توفره من نمط عيش ساحلي فريد، ومراسي لليخوت، وقرب استراتيجي من جسر الملك فهد المؤدي إلى البحرين.`,
     },
     status: 'published',
     featured: false,
@@ -292,15 +292,15 @@ Driven by the demand for open-air waterfront lifestyles, yacht berthing faciliti
     seo: {
       metaTitle: {
         en: 'Luxury Waterfront Living in Khobar | HARD Real Estate Insights',
-        ar: 'العقارات الساحلية الفاخرة بالخُبر | هارد للعقارات',
+        ar: 'العقارات الساحلية الفاخرة بالخبر | هارد للعقارات',
       },
       metaDescription: {
         en: 'Discover why coastal assets in Al Shobaily and Khobar Corniche outperform in capital appreciation and rental yield.',
-        ar: 'تحليل أداء العقارات الساحلية بالخُبر وعوائد الفلل البحرية في خليج الشبيلي.',
+        ar: 'تحليل أداء العقارات الساحلية بالخبر وعوائد الفلل البحرية في خليج الشبيلي.',
       },
       keywords: {
         en: ['Khobar Waterfront', 'Shobaily Bay Villas', 'Luxury Real Estate Saudi', 'Corniche Properties'],
-        ar: ['واجهة الخُبر البحرية', 'فلل خليج الشبيلي', 'عقارات فاخرة السعودية', 'شقق كورنيش الخُبر'],
+        ar: ['واجهة الخبر البحرية', 'فلل خليج الشبيلي', 'عقارات فاخرة السعودية', 'شقق كورنيش الخبر'],
       },
       ogImage: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
     },
