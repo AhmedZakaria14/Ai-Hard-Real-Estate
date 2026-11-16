@@ -22,6 +22,7 @@ import {
 import { useData } from "../context/DataContext";
 import { CMSAuth } from "./CMSAuth";
 import { CMSLayout, CMSTab } from "./CMSLayout";
+import { PropertyCatalogStats } from "./properties/PropertyCatalogStats";
 import { CMSPropertiesList } from "./properties/CMSPropertiesList";
 import { CMSPropertyFormModal } from "./properties/CMSPropertyFormModal";
 import { CMSProjectsList } from "./projects/CMSProjectsList";
@@ -88,7 +89,8 @@ export const CMSApp: React.FC<CMSAppProps> = ({
     addProperty,
     updateProperty,
     deleteProperty,
-    resetPropertiesToDefault,
+    propertyLoadStatus,
+    refreshProperties,
     addProject,
     updateProject,
     deleteProject,
@@ -452,7 +454,6 @@ export const CMSApp: React.FC<CMSAppProps> = ({
 
   // Reset all repository data
   const handleResetAllData = async () => {
-    await resetPropertiesToDefault();
     await resetProjectsToDefault();
     await resetBlogPostsToDefault();
     await resetTestimonialsToDefault();
@@ -535,15 +536,25 @@ export const CMSApp: React.FC<CMSAppProps> = ({
           {isAr ? 'إدارة الطلبات والمواعيد والكتالوج على Supabase' : 'Manage requests, appointments and catalog in Supabase'}
         </a>
       </p>
-      {/* 1. Dashboard View */}
+      {(activeTab === 'dashboard' || activeTab === 'properties') && propertyLoadStatus !== 'ready' && (
+        <div role="status" className="mb-4 rounded-lg border bg-white p-4 text-sm">
+          {propertyLoadStatus === 'loading' ? (isAr ? 'جاري تحميل العقارات…' : 'Loading properties…') : <>
+            {isAr ? 'تعذّر تحميل العقارات.' : 'Could not load the property catalog.'}{' '}
+            <button type="button" className="font-semibold underline" onClick={() => void refreshProperties()}>{isAr ? 'إعادة المحاولة' : 'Try again'}</button>
+          </>}
+        </div>
+      )}
       {activeTab === "dashboard" && (
+        <div className="space-y-4">
+          {propertyLoadStatus === 'ready' && <PropertyCatalogStats properties={properties} language={language} />}
         <a className="inline-block rounded-lg border bg-white px-4 py-3 text-sm font-semibold text-blue-700" href="/admin/supabase-inbox?section=reports">
           {isAr ? "فتح تقارير الطلبات في Supabase" : "Open request reports in Supabase"}
         </a>
+        </div>
       )}
 
       {/* 2. Properties Catalog */}
-      {activeTab === "properties" && (
+      {activeTab === "properties" && propertyLoadStatus === 'ready' && (
         <CMSPropertiesList
           properties={properties}
           onAddProperty={handleOpenAddProperty}
@@ -727,7 +738,7 @@ export const CMSApp: React.FC<CMSAppProps> = ({
       )}
 
       {/* MODAL: Add / Edit Property */}
-      <CMSPropertyFormModal
+      {isPropertyModalOpen && <CMSPropertyFormModal
         isOpen={isPropertyModalOpen}
         onClose={() => {
           setIsPropertyModalOpen(false);
@@ -736,7 +747,7 @@ export const CMSApp: React.FC<CMSAppProps> = ({
         onSave={handleSaveProperty}
         initialData={editingProperty}
         language={language}
-      />
+      />}
 
       {/* MODAL: Add / Edit Project */}
       <CMSProjectFormModal

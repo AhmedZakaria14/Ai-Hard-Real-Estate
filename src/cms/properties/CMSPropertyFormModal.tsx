@@ -130,13 +130,13 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
         setLng(initialData.location.coordinates.lng);
       }
 
-      setPriceSAR(initialData.price?.sar || 10000000);
+      setPriceSAR(initialData.price?.sar ?? 10000000);
       setPeriod(initialData.price?.period);
-      setBedrooms(initialData.bedrooms || 4);
-      setBathrooms(initialData.bathrooms || 5);
+      setBedrooms(initialData.bedrooms ?? 4);
+      setBathrooms(initialData.bathrooms ?? 5);
       setAreaSqM(initialData.areaSqM || 500);
       setYearBuilt(initialData.features?.yearBuilt || 2025);
-      setParkingSpaces(initialData.features?.parkingSpaces || 2);
+      setParkingSpaces(initialData.features?.parkingSpaces ?? 2);
       setFurnishingEn(initialData.features?.furnishing?.en || 'Fully Furnished');
       setFurnishingAr(initialData.features?.furnishing?.ar || 'مفروش بالكامل');
       setViewEn(initialData.features?.view?.en || 'Sea View');
@@ -223,9 +223,7 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
           en: titleEn || 'Luxury Estate',
           ar: titleAr || 'عقار فاخر',
         },
-        slug: titleEn
-          ? titleEn.toLowerCase().replace(/[^a-z0-9]+/g, '-')
-          : `property-${Date.now()}`,
+        slug: initialData?.slug || titleEn.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
         description: {
           en: descEn,
           ar: descAr,

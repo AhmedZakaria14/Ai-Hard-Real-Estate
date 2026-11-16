@@ -1,5 +1,7 @@
 import { hardAdminClient } from './hardAdminClient';
-import type { CatalogEntry } from './hardCatalog';
+import type { Property } from '../../types';
+import { canonicalPropertyCity } from '../propertySearch';
+import type { PublicProperty, CatalogEntry } from './hardCatalog';
 
 const editableFields = {
   properties: ['slug', 'title', 'description', 'location', 'price', 'type', 'status', 'bedrooms', 'bathrooms',
@@ -29,8 +31,20 @@ export async function updatePublishedCatalog<T extends { id: string }>(
   if (readError) throw readError;
   if (!entry) throw new Error('السجل غير موجود في كتالوج Supabase المنشور.');
 
+  const content = buildPublicContent(collection, id, updates, entry.content);
+
+  const { data: saved, error } = await hardAdminClient.from('hard_catalog')
+    .update({ content, updated_at: new Date().toISOString() })
+    .eq('collection', collection).eq('id', id).eq('updated_at', entry.updated_at)
+    .select('id,content,updated_at').maybeSingle<CatalogEntry<T>>();
+  if (error) throw error;
+  if (!saved) throw new Error('لم يُحفظ التعديل. أعد تحميل السجل وتأكد من صلاحية حسابك.');
+  return saved.content;
+}
+
+function buildPublicContent(collection: EditableCollection, id: string, updates: object, existing: object = {}) {
   const changes = updates as Record<string, unknown>;
-  const previous = entry.content as Record<string, unknown>;
+  const previous = existing as Record<string, unknown>;
   const content: Record<string, unknown> = { id };
   for (const field of editableFields[collection]) {
     const value = changes[field] ?? previous[field];
@@ -46,11 +60,31 @@ export async function updatePublishedCatalog<T extends { id: string }>(
     }
   }
 
-  const { data: saved, error } = await hardAdminClient.from('hard_catalog')
-    .update({ content, updated_at: new Date().toISOString() })
-    .eq('collection', collection).eq('id', id).eq('updated_at', entry.updated_at)
-    .select('id,content,updated_at').maybeSingle<CatalogEntry<T>>();
+  if (collection === 'properties' && content.location) {
+    const location = content.location as Property['location'];
+    if (typeof location.city?.ar === 'string') {
+      content.location = { ...location, city: { ...location.city, ar: canonicalPropertyCity(location.city.ar) } };
+    }
+  }
+  return content;
+}
+
+export async function createPublishedProperty(property: Partial<Property>): Promise<PublicProperty> {
+  const id = crypto.randomUUID();
+  const slug = (property.slug || 'property') + '-' + id;
+  const content = buildPublicContent('properties', id, { ...property, slug });
+  const { data, error } = await hardAdminClient.from('hard_catalog')
+    .insert({ collection: 'properties', id, content })
+    .select('id,content,updated_at').single<CatalogEntry<PublicProperty>>();
   if (error) throw error;
-  if (!saved) throw new Error('لم يُحفظ التعديل. أعد تحميل السجل وتأكد من صلاحية حسابك.');
-  return saved.content;
+  return data.content;
+}
+
+export async function archivePublishedProperty(id: string): Promise<boolean> {
+  const { data, error } = await hardAdminClient.from('hard_catalog')
+    .update({ archived_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+    .eq('collection', 'properties').eq('id', id).is('archived_at', null)
+    .select('id').maybeSingle();
+  if (error) throw error;
+  return Boolean(data);
 }

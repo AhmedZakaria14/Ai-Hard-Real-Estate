@@ -27,13 +27,21 @@ export async function loadCatalog<T>(collection: CatalogCollection, signal?: Abo
     select: 'id,content,updated_at',
     order: 'id.asc',
   }).toString();
-  const response = await fetch(url, {
-    headers: { apikey: hardPublishableKey },
-    cache: 'no-store',
-    signal,
-  });
-  if (!response.ok) throw new Error('Could not load published catalog');
-  return response.json();
+  const rows: CatalogEntry<T>[] = [];
+  const pageSize = 100;
+  url.searchParams.set('limit', String(pageSize));
+  for (let offset = 0; ; offset += pageSize) {
+    url.searchParams.set('offset', String(offset));
+    const response = await fetch(url, {
+      headers: { apikey: hardPublishableKey },
+      cache: 'no-store',
+      signal,
+    });
+    if (!response.ok) throw new Error('Could not load published catalog');
+    const page: CatalogEntry<T>[] = await response.json();
+    rows.push(...page);
+    if (page.length < pageSize) return rows;
+  }
 }
 
 export async function loadPublishedArticles(signal?: AbortSignal): Promise<CatalogArticle[]> {

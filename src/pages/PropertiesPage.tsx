@@ -55,7 +55,8 @@ import {
   calculatePropertyTypeCounts,
   getPropertyTypeLabel,
 } from '../lib/propertyTaxonomy';
-import { getPropertyAreaSqM } from '../lib/utils';
+import { getPropertyAreaSqM, getLocalizedText } from '../lib/utils';
+import { normalizePropertySearch } from '../lib/propertySearch';
 
 interface PropertiesPageProps {
   onNavigate: (page: PageId, filters?: PropertyFilterParams) => void;
@@ -73,7 +74,7 @@ export function PropertiesPage({
   initialFilters,
 }: PropertiesPageProps) {
   const t = translations[language];
-  const { properties: liveProperties, isLoading } = useData();
+  const { properties: liveProperties, propertyLoadStatus, refreshProperties } = useData();
 
   // Initialize filter state from URL query parameters (falling back to initialFilters or clean defaults)
   const initialParams = useMemo(() => {
@@ -216,64 +217,21 @@ export function PropertiesPage({
   // 1. Compute properties matching all active non-type filters (location, status, price, bedroom, search query)
   const nonTypeFilteredProperties = useMemo(() => {
     return liveProperties.filter((item) => {
-      // Search query
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchesTitle =
-          (item.title?.en || '').toLowerCase().includes(q) ||
-          (item.title?.ar || '').toLowerCase().includes(q);
-        const matchesArea =
-          (item.location?.area?.en || '').toLowerCase().includes(q) ||
-          (item.location?.area?.ar || '').toLowerCase().includes(q);
-        const matchesCity =
-          (item.location?.city?.en || '').toLowerCase().includes(q) ||
-          (item.location?.city?.ar || '').toLowerCase().includes(q);
-        const matchesDesc =
-          (item.description?.en || '').toLowerCase().includes(q) ||
-          (item.description?.ar || '').toLowerCase().includes(q);
-        if (!matchesTitle && !matchesArea && !matchesCity && !matchesDesc) return false;
+      const localizedNames = (value: { ar: string; en: string } | string | undefined) =>
+        (['ar', 'en'] as const).map((language) => normalizePropertySearch(getLocalizedText(value, language)));
+      const locationNames = [...localizedNames(item.location?.city), ...localizedNames(item.location?.area)];
+      const query = normalizePropertySearch(searchQuery);
+      if (query && ![...locationNames, ...localizedNames(item.title), ...localizedNames(item.description)].some((name) => name.includes(query))) {
+        return false;
       }
 
-      // Status
       if (statusFilter !== 'all' && item.status !== statusFilter) return false;
 
-      // Location / City
       if (locationFilter !== 'all') {
-        const locLower = locationFilter.toLowerCase();
-        const cityObj = SAUDI_CITIES.find(
-          (c) => c.ar.toLowerCase() === locLower || c.en.toLowerCase() === locLower
-        );
-        const searchAr = cityObj ? cityObj.ar.toLowerCase() : locLower;
-        const searchEn = cityObj ? cityObj.en.toLowerCase() : locLower;
-
-        const itemAreaEn = (item.location?.area?.en || (typeof item.location?.area === 'string' ? item.location.area : '')).toLowerCase();
-        const itemAreaAr = (item.location?.area?.ar || (typeof item.location?.area === 'string' ? item.location.area : '')).toLowerCase();
-        const itemCityEn = (item.location?.city?.en || (typeof item.location?.city === 'string' ? item.location.city : '')).toLowerCase();
-        const itemCityAr = (item.location?.city?.ar || (typeof item.location?.city === 'string' ? item.location.city : '')).toLowerCase();
-        
-        const matches =
-          itemCityAr === searchAr ||
-          itemCityEn === searchEn ||
-          itemCityAr === locLower ||
-          itemCityEn === locLower ||
-          itemAreaAr === searchAr ||
-          itemAreaEn === searchEn ||
-          itemAreaAr === locLower ||
-          itemAreaEn === locLower ||
-          itemCityAr.includes(searchAr) ||
-          itemCityEn.includes(searchEn) ||
-          itemCityAr.includes(locLower) ||
-          itemCityEn.includes(locLower) ||
-          searchAr.includes(itemCityAr) ||
-          searchEn.includes(itemCityEn) ||
-          locLower.includes(itemCityAr) ||
-          locLower.includes(itemCityEn) ||
-          itemAreaAr.includes(searchAr) ||
-          itemAreaEn.includes(searchEn) ||
-          itemAreaAr.includes(locLower) ||
-          itemAreaEn.includes(locLower);
-
-        if (!matches) return false;
+        const selected = normalizePropertySearch(locationFilter);
+        const city = SAUDI_CITIES.find((entry) => localizedNames(entry).includes(selected));
+        const names = city ? localizedNames(city) : [selected];
+        if (!locationNames.some((name) => names.includes(name))) return false;
       }
 
       // Bedrooms
@@ -1258,6 +1216,13 @@ export function PropertiesPage({
           onSelectProperty={onSelectProperty}
           onOpenBookViewingModal={onOpenBookViewingModal}
         />
+      ) : propertyLoadStatus !== 'ready' && liveProperties.length === 0 ? (
+        <div role="status" className="rounded-2xl border border-slate-200 p-6 text-center">
+          {propertyLoadStatus === 'loading' ? (language === 'ar' ? 'جاري تحميل العقارات…' : 'Loading properties…') : <>
+            <p>{language === 'ar' ? 'تعذّر تحميل العقارات.' : 'Could not load the property catalog.'}</p>
+            <Button onClick={() => void refreshProperties()}>{language === 'ar' ? 'إعادة المحاولة' : 'Try again'}</Button>
+          </>}
+        </div>
       ) : filteredProperties.length === 0 ? (
         <div className="bg-white rounded-3xl p-12 border border-slate-200 text-center space-y-4 max-w-md mx-auto shadow-xs">
           <div className="w-14 h-14 rounded-2xl bg-slate-100 text-slate-500 flex items-center justify-center mx-auto">

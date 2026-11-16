@@ -565,12 +565,12 @@ export const CMSSettings: React.FC<CMSSettingsProps> = ({
         <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-0.5">
             <h4 className="text-xs font-bold text-slate-900">
-              {isAr ? 'إعادة ضبط كتالوج العقارات إلى القيم الأصلية' : 'Restore Default Catalog'}
+              {isAr ? 'إعادة ضبط المحتوى المساند' : 'Reset Supporting Content'}
             </h4>
             <p className="text-[11px] text-slate-500">
               {isAr
-                ? 'استعادة العقارات الفاخرة الافتراضية مع الاحتفاظ بإمكانية التعديل والإضافة'
-                : 'Re-seed properties database to initial verified luxury listings'}
+                ? 'إعادة الإعدادات الافتراضية للمحتوى المساند مثل الأسئلة الشائعة والفريق والمكاتب'
+                : 'Restore defaults for supporting content such as FAQs, team and office entries'}
             </p>
           </div>
 
@@ -585,7 +585,7 @@ export const CMSSettings: React.FC<CMSSettingsProps> = ({
               className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5"
             >
               <RefreshCw className="w-3.5 h-3.5" />
-              <span>{isAr ? 'إعادة الضبط' : 'Reset Catalog'}</span>
+              <span>{isAr ? 'إعادة الضبط' : 'Reset Content'}</span>
             </button>
           </div>
         </div>

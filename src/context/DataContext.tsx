@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { Property, Project, BlogPost, Testimonial, JoinListSubscriber } from '../types';
 import {
   TeamMember,
@@ -10,7 +10,6 @@ import {
   EnhancedTestimonial,
 } from '../types/businessEntities';
 import {
-  PropertiesRepository,
   LeadsRepository,
   ProjectsRepository,
   BlogRepository,
@@ -42,8 +41,8 @@ import {
   getCrmSyncLogs,
 } from '../lib/integrations/crmSync';
 import { isSupabaseConfigured } from '../lib/db/supabaseClient';
-import { loadPublishedArticles, loadPublishedProjects, loadPublishedProperties } from '../lib/db/hardCatalog';
-import { updatePublishedCatalog } from '../lib/db/hardCatalogWrites';
+import { loadPublishedArticles, loadPublishedProjects, loadPublishedProperties, type PublicProperty } from '../lib/db/hardCatalog';
+import { createPublishedProperty, archivePublishedProperty, updatePublishedCatalog } from '../lib/db/hardCatalogWrites';
 import { SECTOR_CONTACT_DETAILS } from '../lib/sectors';
 
 interface DataContextType {
@@ -65,11 +64,11 @@ interface DataContextType {
   isLoading: boolean;
   isSupabaseConnected: boolean;
 
-  // Properties CRUD
   addProperty: (propertyData: Partial<Property>) => Promise<Property>;
-  updateProperty: (id: string, updates: Partial<Property>) => Promise<Property | null>;
+  updateProperty: (id: string, updates: Partial<Property>) => Promise<Property>;
   deleteProperty: (id: string) => Promise<boolean>;
-  resetPropertiesToDefault: () => void;
+  propertyLoadStatus: 'loading' | 'ready' | 'error';
+  refreshProperties: () => Promise<void>;
 
   // Projects CRUD
   addProject: (projectData: Partial<Project>) => Promise<Project>;
@@ -158,6 +157,18 @@ interface DataContextType {
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
+function withPropertyContact(content: PublicProperty): Property {
+  const { phone, whatsapp, email } = SECTOR_CONTACT_DETAILS.realestate;
+  return {
+    ...content,
+    agent: {
+      name: { ar: 'هارد للعقارات', en: 'HARD Real Estate' },
+      title: { ar: 'الاستشارات العقارية', en: 'Real Estate Advisory' },
+      phone, whatsapp, email, avatar: '',
+    },
+  };
+}
+
 export function DataProvider({ children }: { children: React.ReactNode }) {
   const [properties, setProperties] = useState<Property[]>([]);
   const [leads, setLeads] = useState<LeadRecord[]>([]);
@@ -178,22 +189,28 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   const [isLoading, setIsLoading] = useState(true);
 
+  const [propertyLoadStatus, setPropertyLoadStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const propertyReadVersion = useRef(0);
+
+  const refreshProperties = useCallback(async () => {
+    const version = ++propertyReadVersion.current;
+    setPropertyLoadStatus((status) => status === 'ready' ? 'ready' : 'loading');
+    try {
+      const items = await loadPublishedProperties();
+      if (version !== propertyReadVersion.current) return;
+      setProperties(items.map(({ content }) => withPropertyContact(content)));
+      setPropertyLoadStatus('ready');
+    } catch (error) {
+      if (version !== propertyReadVersion.current) return;
+      setPropertyLoadStatus('error');
+      console.error('Could not load published properties:', error);
+    }
+  }, []);
+
   const refreshData = useCallback(async () => {
     setIsLoading(true);
-    const refreshProperties = async () => {
-      const { phone, whatsapp, email } = SECTOR_CONTACT_DETAILS.realestate;
-      const items = await loadPublishedProperties();
-      setProperties(items.map(({ content }) => ({
-        ...content,
-        agent: {
-          name: { ar: 'هارد للعقارات', en: 'HARD Real Estate' },
-          title: { ar: 'الاستشارات العقارية', en: 'Real Estate Advisory' },
-          phone, whatsapp, email, avatar: '',
-        },
-      })));
-    };
+    const propertiesRequest = refreshProperties();
     try {
-      await refreshProperties().catch((error) => console.error('Could not load published properties:', error));
       const [
         lds,
         projs,
@@ -237,9 +254,10 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     } catch (err) {
       console.error('Failed to load data from repositories:', err);
     } finally {
+      await propertiesRequest;
       setIsLoading(false);
     }
-  }, []);
+  }, [refreshProperties]);
 
   useEffect(() => {
     refreshData();
@@ -256,38 +274,26 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   // Properties CRUD
   const addProperty = async (propertyData: Partial<Property>): Promise<Property> => {
-    const created = await PropertiesRepository.create(propertyData);
-    setProperties((prev) => [created, ...prev]);
+    const created = withPropertyContact(await createPublishedProperty(propertyData));
+    setProperties((previous) => [created, ...previous.filter((property) => property.id !== created.id)]);
+    void refreshProperties();
     return created;
   };
 
-  const updateProperty = async (id: string, updates: Partial<Property>): Promise<Property | null> => {
-    const updated = await updatePublishedCatalog<Property>('properties', id, updates);
-    updated.agent = properties.find((property) => property.id === id)?.agent ?? {
-      name: { ar: 'هارد للعقارات', en: 'HARD Real Estate' },
-      title: { ar: 'الاستشارات العقارية', en: 'Real Estate Advisory' },
-      phone: SECTOR_CONTACT_DETAILS.realestate.phone,
-      whatsapp: SECTOR_CONTACT_DETAILS.realestate.whatsapp,
-      email: SECTOR_CONTACT_DETAILS.realestate.email,
-      avatar: '',
-    };
-    if (updated) {
-      setProperties((prev) => prev.map((p) => (p.id === id ? updated : p)));
-    }
+  const updateProperty = async (id: string, updates: Partial<Property>): Promise<Property> => {
+    const updated = withPropertyContact(await updatePublishedCatalog<PublicProperty>('properties', id, updates));
+    setProperties((previous) => previous.map((property) => property.id === id ? updated : property));
+    void refreshProperties();
     return updated;
   };
 
   const deleteProperty = async (id: string): Promise<boolean> => {
-    const success = await PropertiesRepository.delete(id);
-    if (success) {
-      setProperties((prev) => prev.filter((p) => p.id !== id));
+    const archived = await archivePublishedProperty(id);
+    if (archived) {
+      setProperties((previous) => previous.filter((property) => property.id !== id));
+      void refreshProperties();
     }
-    return success;
-  };
-
-  const resetPropertiesToDefault = () => {
-    const defaultData = PropertiesRepository.resetToDefaults();
-    setProperties(defaultData);
+    return archived;
   };
 
   // Projects CRUD
@@ -653,7 +659,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         addProperty,
         updateProperty,
         deleteProperty,
-        resetPropertiesToDefault,
+        propertyLoadStatus,
+        refreshProperties,
         addProject,
         updateProject,
         deleteProject,

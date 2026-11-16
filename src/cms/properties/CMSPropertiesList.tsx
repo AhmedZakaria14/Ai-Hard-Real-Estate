@@ -18,7 +18,6 @@ import {
   LayoutGrid,
   List,
   Sparkles,
-  TrendingUp,
   Tag,
   MapPin,
   RefreshCw,
@@ -26,7 +25,9 @@ import {
 import { Property, PropertyType, ListingStatus, Language } from '../../types';
 import { SAUDI_CITIES } from '../../data/cities';
 import { getPropertyAreaSqM, getLocalizedText } from '../../lib/utils';
-import { PreDeleteReferenceModal } from '../components/PreDeleteReferenceModal';
+import { normalizePropertySearch } from '../../lib/propertySearch';
+import { PropertyCatalogStats } from './PropertyCatalogStats';
+import { propertiesCSV } from './propertyCsv';
 
 interface CMSPropertiesListProps {
   properties: Property[];
@@ -39,13 +40,6 @@ interface CMSPropertiesListProps {
   onViewLive: (property: Property) => void;
   language: Language;
 }
-
-const normalizeSearch = (value: string) => value.normalize('NFKD').replace(/[\u064B-\u065F\u0670\u0640]/g, '').toLowerCase().trim();
-const csvCell = (value: unknown) => {
-  const text = String(value ?? '');
-  const safe = /^[\s]*[=+@\-\t\r]/.test(text) ? `'${text}` : text;
-  return `"${safe.replace(/"/g, '""')}"`;
-};
 
 const safePropTitle = (prop: Property, lang: 'ar' | 'en') => {
   if (!prop || !prop.title) return 'Un-titled Listing';
@@ -94,161 +88,59 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
   const [propertyForDelete, setPropertyForDelete] = useState<Property | null>(null);
 
-  // Filtered properties
+  const [archiving, setArchiving] = useState(false);
+  const [archiveError, setArchiveError] = useState('');
+
   const filteredProperties = useMemo(() => {
+    const query = normalizePropertySearch(searchQuery);
+    const city = normalizePropertySearch(selectedCity);
     return properties.filter((item) => {
-      // Search
-      if (searchQuery.trim()) {
-        const q = normalizeSearch(searchQuery);
-        const titleEn = normalizeSearch(getLocalizedText(item.title, 'en'));
-        const titleAr = normalizeSearch(getLocalizedText(item.title, 'ar'));
-        const cityEn = normalizeSearch(getLocalizedText(item.location?.city, 'en'));
-        const cityAr = normalizeSearch(getLocalizedText(item.location?.city, 'ar'));
-        const matchesTitleEn = titleEn.includes(q);
-        const matchesTitleAr = titleAr.includes(q);
-        const matchesCityEn = cityEn.includes(q);
-        const matchesCityAr = cityAr.includes(q);
-        const matchesId = normalizeSearch(item.id).includes(q);
-        if (!matchesTitleEn && !matchesTitleAr && !matchesCityEn && !matchesCityAr && !matchesId) {
-          return false;
-        }
-      }
-
-      // Type
-      if (selectedType !== 'all' && item.type !== selectedType) return false;
-
-      // Status
-      if (selectedStatus !== 'all' && item.status !== selectedStatus) return false;
-
-      // City
-      if (selectedCity !== 'all') {
-        const selLower = normalizeSearch(selectedCity);
-        const enLower = normalizeSearch(getLocalizedText(item.location?.city, 'en'));
-        const arLower = normalizeSearch(getLocalizedText(item.location?.city, 'ar'));
-        const cityMatch = enLower === selLower || arLower === selLower || arLower.includes(selLower) || enLower.includes(selLower) || (arLower && selLower.includes(arLower)) || (enLower && selLower.includes(enLower));
-        if (!cityMatch) return false;
-      }
-
-      // Featured
-      if (onlyFeatured && !item.featured) return false;
-
-      return true;
+      const cities = ['en', 'ar'].map((lang: Language) => normalizePropertySearch(getLocalizedText(item.location?.city, lang)));
+      const searchFields = [
+        item.id,
+        ...cities,
+        ...(['en', 'ar'] as const).flatMap((lang) => [
+          getLocalizedText(item.title, lang),
+          getLocalizedText(item.location?.area, lang),
+        ]),
+      ];
+      return (!query || searchFields.some((field) => normalizePropertySearch(field).includes(query)))
+        && (selectedType === 'all' || item.type === selectedType)
+        && (selectedStatus === 'all' || item.status === selectedStatus)
+        && (selectedCity === 'all' || cities.includes(city))
+        && (!onlyFeatured || item.featured);
     });
   }, [properties, searchQuery, selectedType, selectedStatus, selectedCity, onlyFeatured]);
 
-  // Statistics calculation
-  const totalValuationSAR = useMemo(() => {
-    return properties.reduce((acc, curr) => acc + (Number(typeof curr.price === 'number' ? curr.price : curr.price?.sar) || 0), 0);
-  }, [properties]);
-
-  const stats = useMemo(() => {
-    const forSale = properties.filter((p) => p.status === 'for-sale').length;
-    const forRent = properties.filter((p) => p.status === 'for-rent').length;
-    const offPlan = properties.filter((p) => p.status === 'off-plan').length;
-    const featuredCount = properties.filter((p) => p.featured).length;
-    return { forSale, forRent, offPlan, featuredCount };
-  }, [properties]);
-
-  const uniqueCities = useMemo(() => {
-    const set = new Set<string>();
-    properties.forEach((p) => {
-      if (p.location?.city?.en) set.add(p.location.city.en);
-    });
-    return Array.from(set);
-  }, [properties]);
-
-  // Export properties data to CSV
   const handleExportCSV = () => {
-    const headers = ['ID', 'Title EN', 'Title AR', 'Type', 'Status', 'Price SAR', 'City', 'Bedrooms', 'Area SqM', 'Featured'];
-    const rows = filteredProperties.map((p) => [
-      p.id,
-      safePropTitle(p, 'en'),
-      safePropTitle(p, 'ar'),
-      p.type || '',
-      p.status || '',
-      typeof p.price === 'number' ? p.price : p.price?.sar ?? '',
-      safePropLocation(p, 'en'),
-      p.bedrooms || 0,
-      p.areaSqM || 0,
-      p.featured ? 'Yes' : 'No',
-    ]);
-
-    const csvContent = '\uFEFF' + [headers.map(csvCell).join(','), ...rows.map((e) => e.map(csvCell).join(','))].join('\n');
-    const encodedUri = URL.createObjectURL(new Blob([csvContent], { type: 'text/csv;charset=utf-8' }));
+    const csv = propertiesCSV(filteredProperties);
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `HARD_Properties_Catalog_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.href = url;
+    link.download = `HARD_Properties_Catalog_${new Date().toISOString().slice(0, 10)}.csv`;
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(encodedUri);
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
+  const archiveProperty = async () => {
+    if (!propertyForDelete || archiving) return;
+    setArchiving(true);
+    setArchiveError('');
+    try {
+      if (!await onDeleteProperty(propertyForDelete.id)) throw new Error('Archive was not confirmed');
+      setPropertyForDelete(null);
+    } catch {
+      setArchiveError(isAr ? 'تعذّرت أرشفة العقار. حاول مرة أخرى.' : 'Could not archive the listing. Try again.');
+    } finally {
+      setArchiving(false);
+    }
   };
 
   return (
     <div className="space-y-6 animate-in fade-in">
-      {/* 1. TOP STATS BAR */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3.5">
-        <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs space-y-1">
-          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-            {isAr ? 'إجمالي العقارات' : 'Total Properties'}
-          </span>
-          <div className="text-2xl font-extrabold text-slate-900 font-display-serif">
-            {properties.length}
-          </div>
-          <span className="text-[11px] text-blue-600 font-semibold flex items-center gap-1">
-            <Building className="w-3 h-3" /> {isAr ? 'مُسجلة في النظام' : 'Active Catalog'}
-          </span>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs space-y-1">
-          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-            {isAr ? 'القيمة الإجمالية للمحفظة' : 'Portfolio Valuation'}
-          </span>
-          <div className="text-xl sm:text-2xl font-extrabold text-blue-700 font-display-serif">
-            {(totalValuationSAR / 1000000).toFixed(1)}M <span className="text-xs font-semibold text-slate-500">SAR</span>
-          </div>
-          <span className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
-            <TrendingUp className="w-3 h-3" /> {isAr ? 'أصول عقارية فاخرة' : 'Verified Luxury Assets'}
-          </span>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs space-y-1">
-          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-            {isAr ? 'عقارات للبيع' : 'For Sale Listings'}
-          </span>
-          <div className="text-2xl font-extrabold text-emerald-700 font-display-serif">
-            {stats.forSale}
-          </div>
-          <span className="text-[11px] text-slate-500 font-medium">
-            {isAr ? 'جاهزة للتملك الفوري' : 'Ready for Acquisition'}
-          </span>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs space-y-1">
-          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-            {isAr ? 'عقارات للإيجار' : 'Rental Properties'}
-          </span>
-          <div className="text-2xl font-extrabold text-sky-700 font-display-serif">
-            {stats.forRent}
-          </div>
-          <span className="text-[11px] text-slate-500 font-medium">
-            {isAr ? 'عقود سنوية مميزة' : 'Annual Leases'}
-          </span>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs space-y-1 col-span-2 lg:col-span-1">
-          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-            {isAr ? 'العقارات المميزة' : 'Featured Properties'}
-          </span>
-          <div className="text-2xl font-extrabold text-amber-600 font-display-serif flex items-center gap-1.5">
-            <Star className="w-5 h-5 fill-amber-500 text-amber-500" />
-            <span>{stats.featuredCount}</span>
-          </div>
-          <span className="text-[11px] text-amber-700 font-medium">
-            {isAr ? 'في واجهة الموقع' : 'Homepage Hero Strip'}
-          </span>
-        </div>
-      </div>
+      <PropertyCatalogStats properties={properties} language={language} />
 
       {/* 2. FILTER & ACTION TOOLBAR */}
       <div className="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200 shadow-xs space-y-4">
@@ -701,27 +593,20 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
         </div>
       )}
 
-      {/* Pre-Deletion Reference Check & Soft Delete Modal */}
       {propertyForDelete && (
-        <PreDeleteReferenceModal
-          isOpen={!!propertyForDelete}
-          onClose={() => setPropertyForDelete(null)}
-          entityType="property"
-          entityId={propertyForDelete.id}
-          entityTitle={propertyForDelete.title}
-          originalCollection="properties"
-          originalData={propertyForDelete}
-          currentUser={{
-            uid: 'admin-1',
-            email: 'admin@hard.sa',
-            role: 'superadmin',
-          }}
-          language={language}
-          onSoftDeleteSuccess={() => {
-            onDeleteProperty(propertyForDelete.id);
-            setPropertyForDelete(null);
-          }}
-        />
+        <div className="fixed inset-0 z-50 grid place-items-center bg-slate-900/50 p-4">
+          <section role="dialog" aria-modal="true" aria-labelledby="archive-property-title" className="w-full max-w-md rounded-2xl bg-white p-5 shadow-lg">
+            <h2 id="archive-property-title" className="font-bold text-slate-900">
+              {isAr ? 'أرشفة العقار' : 'Archive listing'} · {safePropTitle(propertyForDelete, language)}
+            </h2>
+            <p className="mt-2 text-sm text-slate-600">{isAr ? 'سيختفي العقار من الموقع ويمكن استعادته من أرشيف الكتالوج.' : 'The listing will be hidden from visitors and can be restored from the catalog archive.'}</p>
+            {archiveError && <p role="alert" className="mt-2 text-sm text-rose-700">{archiveError}</p>}
+            <div className="mt-4 flex gap-2">
+              <button type="button" disabled={archiving} onClick={() => void archiveProperty()} className="rounded-lg bg-rose-700 px-3 py-2 text-sm text-white">{isAr ? 'أرشفة' : 'Archive'}</button>
+              <button type="button" disabled={archiving} onClick={() => { setPropertyForDelete(null); setArchiveError(''); }} className="rounded-lg border px-3 py-2 text-sm">{isAr ? 'إلغاء' : 'Cancel'}</button>
+            </div>
+          </section>
+        </div>
       )}
     </div>
   );
