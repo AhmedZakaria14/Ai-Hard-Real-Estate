@@ -101,7 +101,6 @@ export const CMSApp: React.FC<CMSAppProps> = ({
     addTestimonial,
     updateTestimonial,
     deleteTestimonial,
-    resetTestimonialsToDefault,
     addSubscriber,
     updateSubscriber,
     deleteSubscriber,
@@ -110,7 +109,6 @@ export const CMSApp: React.FC<CMSAppProps> = ({
     addTeamMember,
     updateTeamMember,
     deleteTeamMember,
-    resetTeamMembersToDefault,
     addFaq,
     updateFaq,
     deleteFaq,
@@ -118,7 +116,6 @@ export const CMSApp: React.FC<CMSAppProps> = ({
     addOffice,
     updateOffice,
     deleteOffice,
-    resetOfficesToDefault,
     addCertification,
     updateCertification,
     deleteCertification,
@@ -126,11 +123,9 @@ export const CMSApp: React.FC<CMSAppProps> = ({
     addStatistic,
     updateStatistic,
     deleteStatistic,
-    resetStatisticsToDefault,
     addPartnerBrand,
     updatePartnerBrand,
     deletePartnerBrand,
-    resetPartnerBrandsToDefault,
   } = useData();
 
   const [adminUser, setAdminUser] = useState(getAdminUser);
@@ -453,14 +448,9 @@ export const CMSApp: React.FC<CMSAppProps> = ({
 
   // Reset all repository data
   const handleResetAllData = async () => {
-    await resetTestimonialsToDefault();
     await resetSubscribersToDefault();
-    resetTeamMembersToDefault();
     resetFaqsToDefault();
-    resetOfficesToDefault();
     resetCertificationsToDefault();
-    resetStatisticsToDefault();
-    resetPartnerBrandsToDefault();
   };
 
   const isAr = language === "ar";
@@ -607,7 +597,6 @@ export const CMSApp: React.FC<CMSAppProps> = ({
           onAddMember={handleOpenAddTeam}
           onEditMember={handleOpenEditTeam}
           onDeleteMember={deleteTeamMember}
-          onResetToDefaults={resetTeamMembersToDefault}
           language={language}
         />
       )}
@@ -631,7 +620,6 @@ export const CMSApp: React.FC<CMSAppProps> = ({
           onAddOffice={handleOpenAddOffice}
           onEditOffice={handleOpenEditOffice}
           onDeleteOffice={deleteOffice}
-          onResetToDefaults={resetOfficesToDefault}
           language={language}
         />
       )}
@@ -655,7 +643,6 @@ export const CMSApp: React.FC<CMSAppProps> = ({
           onAddStatistic={handleOpenAddStat}
           onEditStatistic={handleOpenEditStat}
           onDeleteStatistic={deleteStatistic}
-          onResetToDefaults={resetStatisticsToDefault}
           language={language}
         />
       )}
@@ -667,7 +654,6 @@ export const CMSApp: React.FC<CMSAppProps> = ({
           onAddPartner={handleOpenAddPartner}
           onEditPartner={handleOpenEditPartner}
           onDeletePartner={deletePartnerBrand}
-          onResetToDefaults={resetPartnerBrandsToDefault}
           language={language}
         />
       )}
@@ -694,7 +680,6 @@ export const CMSApp: React.FC<CMSAppProps> = ({
           onAddStory={handleOpenAddTestimonial}
           onEditStory={handleOpenEditTestimonial}
           onDeleteStory={deleteTestimonial}
-          onResetToDefault={resetTestimonialsToDefault}
           language={language}
         />
       )}

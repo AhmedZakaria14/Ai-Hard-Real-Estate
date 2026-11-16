@@ -2,6 +2,12 @@ import React from 'react';
 import { Language } from '../../types';
 import { useSiteSettings } from '../../context/SiteSettingsContext';
 
+export function usePublishedBrandEmblem(sector: 'portal' | 'realestate' | 'construction' | 'hvac', variant: 'light' | 'dark') {
+  const { getEffectiveSettings } = useSiteSettings();
+  const settings = getEffectiveSettings(sector);
+  return (variant === 'light' ? settings.logoUrlLight : settings.logoUrlDark) || '/logo.svg';
+}
+
 interface BrandLogoProps {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   showText?: boolean;
@@ -70,10 +76,10 @@ export function BrandLogo({
         <img
           src={logoSrc}
           alt={brandName}
-          className={`${currentSize.h} w-auto object-contain shrink-0 drop-shadow-xs`}
+          className={`${currentSize.h} w-auto object-contain object-center max-w-[min(10rem,32vw)] shrink-0 py-0.5 drop-shadow-xs`}
           loading="eager"
           decoding="async"
-          onError={(e: any) => { e.target.src = '/logo.svg'; }}
+          onError={({ currentTarget }) => { if (!currentTarget.src.endsWith('/logo.svg')) currentTarget.src = '/logo.svg'; }}
         />
       </div>
 

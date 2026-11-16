@@ -6,7 +6,7 @@ import { CMSImageUpload } from '../components/CMSImageUpload';
 interface CMSTestimonialFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (testimonialData: Partial<Testimonial>) => void;
+  onSave: (testimonialData: Partial<Testimonial>) => Promise<void>;
   initialData?: Testimonial | null;
   language: Language;
 }
@@ -32,7 +32,7 @@ export const CMSTestimonialFormModal: React.FC<CMSTestimonialFormModalProps> = (
     name: { en: '', ar: '' },
     role: { en: 'Real Estate Investor', ar: 'مستثمر عقاري' },
     location: { en: 'Al Khobar, Eastern Province', ar: 'الخبر، المنطقة الشرقية' },
-    avatar: AVATAR_PRESETS[0].url,
+    avatar: '',
     rating: 5,
     dealHighlight: { en: 'Luxury Waterfront Villa Acquisition', ar: 'شراء فيلا فاخرة على الواجهة البحرية' },
     quote: {
@@ -43,6 +43,7 @@ export const CMSTestimonialFormModal: React.FC<CMSTestimonialFormModalProps> = (
     featured: true,
   });
 
+  const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -62,7 +63,7 @@ export const CMSTestimonialFormModal: React.FC<CMSTestimonialFormModalProps> = (
             en: initialData.location?.en || '',
             ar: initialData.location?.ar || '',
           },
-          avatar: initialData.avatar || AVATAR_PRESETS[0].url,
+          avatar: initialData.avatar ?? '',
           rating: initialData.rating || 5,
           dealHighlight: {
             en: initialData.dealHighlight?.en || '',
@@ -80,7 +81,7 @@ export const CMSTestimonialFormModal: React.FC<CMSTestimonialFormModalProps> = (
           name: { en: '', ar: '' },
           role: { en: 'Real Estate Investor', ar: 'مستثمر عقاري' },
           location: { en: 'Al Khobar, Eastern Province', ar: 'الخبر، المنطقة الشرقية' },
-          avatar: AVATAR_PRESETS[0].url,
+          avatar: '',
           rating: 5,
           dealHighlight: { en: 'Luxury Waterfront Villa Acquisition', ar: 'شراء فيلا فاخرة على الواجهة البحرية' },
           quote: {
@@ -97,8 +98,9 @@ export const CMSTestimonialFormModal: React.FC<CMSTestimonialFormModalProps> = (
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (saving || e.currentTarget.querySelector('[data-upload-pending="true"]')) return;
     const newErrors: Record<string, string> = {};
 
     if (!formData.name?.en?.trim()) {
@@ -119,8 +121,15 @@ export const CMSTestimonialFormModal: React.FC<CMSTestimonialFormModalProps> = (
       return;
     }
 
-    onSave(formData);
-    onClose();
+    setSaving(true);
+    try {
+      await onSave(formData);
+      onClose();
+    } catch {
+      setErrors({ save: isAr ? 'تعذّر حفظ القصة في Supabase.' : 'Could not save the story in Supabase.' });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -159,6 +168,7 @@ export const CMSTestimonialFormModal: React.FC<CMSTestimonialFormModalProps> = (
 
         {/* Modal Body */}
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-6 flex-1 text-xs sm:text-sm">
+          {errors.save && <p role="alert" className="text-red-700">{errors.save}</p>}
           {/* Avatar & Rating Row */}
           <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-4">
             <CMSImageUpload

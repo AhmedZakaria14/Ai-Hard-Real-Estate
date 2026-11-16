@@ -1,3 +1,4 @@
+import { usePublishedBrandEmblem } from '../components/ui/BrandLogo';
 import React, { useState } from 'react';
 import {
   Building2,
@@ -28,6 +29,7 @@ export function GroupPortalDashboard({
   onNavigateToConstruction,
   onNavigateToHVAC,
 }: GroupPortalDashboardProps) {
+  const emblem = usePublishedBrandEmblem('portal', 'light');
   const isAr = language === 'ar';
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
 
@@ -123,7 +125,7 @@ export function GroupPortalDashboard({
           <div className="flex items-center gap-3">
             <div className="relative h-12 sm:h-14 w-auto flex items-center justify-center">
               <img
-                src="/logo.svg"
+                src={emblem} onError={({ currentTarget }) => { if (!currentTarget.src.endsWith('/logo.svg')) currentTarget.src = '/logo.svg'; }}
                 alt="HARD Group"
                 className="h-10 sm:h-12 w-auto object-contain drop-shadow-xs"
               />
@@ -217,7 +219,7 @@ export function GroupPortalDashboard({
       <footer className="bg-white border-t border-slate-200/80 py-8 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <div className="flex items-center gap-2.5">
-            <img src="/logo.svg" alt="HARD Group" className="h-5 w-auto object-contain" />
+            <img src={emblem} onError={({ currentTarget }) => { if (!currentTarget.src.endsWith('/logo.svg')) currentTarget.src = '/logo.svg'; }} alt="HARD Group" className="h-5 w-auto object-contain" />
             <span className="font-medium text-slate-700">
               {isAr ? 'مجموعة هارد © ٢٠٢٦' : 'HARD Group © 2026. All rights reserved.'}
             </span>

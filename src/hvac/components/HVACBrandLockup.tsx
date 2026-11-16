@@ -1,3 +1,4 @@
+import { usePublishedBrandEmblem } from '../../components/ui/BrandLogo';
 import React from 'react';
 import { useHVAC } from '../context/HVACContext';
 
@@ -12,6 +13,7 @@ export function HVACBrandLockup({
   size = 'md',
   showLogo = true,
 }: HVACBrandLockupProps) {
+  const emblem = usePublishedBrandEmblem('hvac', 'light');
   const { isAr } = useHVAC();
 
   const logoSizes = {
@@ -41,7 +43,7 @@ export function HVACBrandLockup({
     >
       {showLogo && (
         <img
-          src="/logo.svg"
+          src={emblem} onError={({ currentTarget }) => { if (!currentTarget.src.endsWith('/logo.svg')) currentTarget.src = '/logo.svg'; }}
           alt="HARD HVAC Maintenance"
           className={`${logoSizes[size]} object-contain shrink-0`}
         />

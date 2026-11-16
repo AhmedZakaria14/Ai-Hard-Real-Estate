@@ -22,6 +22,7 @@ export const CMSOfficeFormModal: React.FC<CMSOfficeFormModalProps> = ({
   language,
 }) => {
   const isAr = language === 'ar';
+  const [saveError, setSaveError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [name, setName] = useState({ en: '', ar: '' });
@@ -31,7 +32,7 @@ export const CMSOfficeFormModal: React.FC<CMSOfficeFormModalProps> = ({
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [googleMapUrl, setGoogleMapUrl] = useState('');
-  const [image, setImage] = useState('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80');
+  const [image, setImage] = useState('');
   const [isHeadquarters, setIsHeadquarters] = useState(false);
   const [sector, setSector] = useState<SectorScope>('group');
   const [order, setOrder] = useState<number>(1);
@@ -48,7 +49,7 @@ export const CMSOfficeFormModal: React.FC<CMSOfficeFormModalProps> = ({
       setPhone(initialData.phone || '');
       setEmail(initialData.email || '');
       setGoogleMapUrl(initialData.googleMapUrl || '');
-      setImage(initialData.image || 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80');
+      setImage(initialData.image || '');
       setIsHeadquarters(Boolean(initialData.isHeadquarters));
       setSector(initialData.sector || 'group');
       setOrder(initialData.order || 1);
@@ -65,7 +66,7 @@ export const CMSOfficeFormModal: React.FC<CMSOfficeFormModalProps> = ({
       setPhone('');
       setEmail('');
       setGoogleMapUrl('');
-      setImage('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80');
+      setImage('');
       setIsHeadquarters(false);
       setSector('group');
       setOrder(1);
@@ -77,6 +78,8 @@ export const CMSOfficeFormModal: React.FC<CMSOfficeFormModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (e.currentTarget.querySelector('[data-upload-pending="true"]')) return;
+    setSaveError('');
     setIsSubmitting(true);
     try {
       await onSave({
@@ -97,6 +100,7 @@ export const CMSOfficeFormModal: React.FC<CMSOfficeFormModalProps> = ({
       });
       onClose();
     } catch (err) {
+      setSaveError(isAr ? 'تعذّر الحفظ في Supabase.' : 'Could not save to Supabase.');
       console.error('Failed to save office:', err);
     } finally {
       setIsSubmitting(false);
@@ -115,6 +119,7 @@ export const CMSOfficeFormModal: React.FC<CMSOfficeFormModalProps> = ({
       maxWidth="2xl"
     >
       <form onSubmit={handleSubmit} className="space-y-6">
+        {saveError && <p role="alert" className="text-red-700">{saveError}</p>}
         <div className="space-y-4 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
           <BilingualFormField
             labelEn="Office / Branch Title"

@@ -22,6 +22,7 @@ export const CMSTeamFormModal: React.FC<CMSTeamFormModalProps> = ({
   language,
 }) => {
   const isAr = language === 'ar';
+  const [saveError, setSaveError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [name, setName] = useState({ en: '', ar: '' });
@@ -29,7 +30,7 @@ export const CMSTeamFormModal: React.FC<CMSTeamFormModalProps> = ({
   const [bio, setBio] = useState({ en: '', ar: '' });
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [avatar, setAvatar] = useState('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80');
+  const [avatar, setAvatar] = useState('');
   const [sector, setSector] = useState<SectorScope>('realestate');
   const [order, setOrder] = useState<number>(1);
   const [status, setStatus] = useState<PublicationStatus>('published');
@@ -48,7 +49,7 @@ export const CMSTeamFormModal: React.FC<CMSTeamFormModalProps> = ({
       setBio(initialData.bio || { en: '', ar: '' });
       setEmail(initialData.email || '');
       setPhone(initialData.phone || '');
-      setAvatar(initialData.avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80');
+      setAvatar(initialData.avatar || '');
       setSector(initialData.sector || 'realestate');
       setOrder(initialData.order || 1);
       setStatus(initialData.status || 'published');
@@ -66,7 +67,7 @@ export const CMSTeamFormModal: React.FC<CMSTeamFormModalProps> = ({
       setBio({ en: '', ar: '' });
       setEmail('');
       setPhone('');
-      setAvatar('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80');
+      setAvatar('');
       setSector('realestate');
       setOrder(1);
       setStatus('published');
@@ -80,6 +81,8 @@ export const CMSTeamFormModal: React.FC<CMSTeamFormModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (e.currentTarget.querySelector('[data-upload-pending="true"]')) return;
+    setSaveError('');
     setIsSubmitting(true);
     try {
       await onSave({
@@ -104,6 +107,7 @@ export const CMSTeamFormModal: React.FC<CMSTeamFormModalProps> = ({
       });
       onClose();
     } catch (err) {
+      setSaveError(isAr ? 'تعذّر الحفظ في Supabase.' : 'Could not save to Supabase.');
       console.error('Failed to save team member:', err);
     } finally {
       setIsSubmitting(false);
@@ -122,6 +126,7 @@ export const CMSTeamFormModal: React.FC<CMSTeamFormModalProps> = ({
       maxWidth="2xl"
     >
       <form onSubmit={handleSubmit} className="space-y-6">
+        {saveError && <p role="alert" className="text-red-700">{saveError}</p>}
         {/* Name & Role */}
         <div className="space-y-4 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
           <BilingualFormField

@@ -1,3 +1,4 @@
+import { CMSImageUpload } from '../components/CMSImageUpload';
 import React, { useState, useEffect } from 'react';
 import {
   Globe,
@@ -96,7 +97,14 @@ export const CMSBrandingSettings: React.FC<CMSBrandingSettingsProps> = ({
     return Object.keys(errors).length === 0;
   };
 
+  function imageUploadPending() {
+    if (!document.querySelector('[data-upload-pending="true"]')) return false;
+    setSaveMessage({ type: 'error', text: isAr ? 'انتظر حتى يكتمل رفع الشعار.' : 'Wait for the logo upload to finish.' });
+    return true;
+  }
+
   const handleSaveDraft = async () => {
+    if (imageUploadPending()) return;
     if (!validateForm(formData)) {
       setSaveMessage({
         type: 'error',
@@ -124,6 +132,7 @@ export const CMSBrandingSettings: React.FC<CMSBrandingSettingsProps> = ({
   };
 
   const handlePublish = async () => {
+    if (imageUploadPending()) return;
     if (!validateForm(formData)) {
       setSaveMessage({
         type: 'error',
@@ -253,6 +262,12 @@ export const CMSBrandingSettings: React.FC<CMSBrandingSettingsProps> = ({
         </span>
       </div>
 
+      <details className="rounded-xl border bg-white p-4 text-sm">
+        <summary className="cursor-pointer font-semibold">{isAr ? 'أين تظهر إعدادات الهوية؟' : 'Where do branding settings appear?'}</summary>
+        <p className="mt-2">{isAr
+          ? 'يظهر الشعار واسم العلامة والوصف القصير في رأس موقع العقارات وتذييله. اختر خلفية الشعار المناسبة، ثم انشر الإعدادات للقطاع. تعرض المعاينة بقية الحقول، ويمكن مراجعتها قبل النشر.'
+          : 'The logo, brand name and tagline appear in the real estate header and footer. Choose the matching background and publish the sector settings. The preview shows the remaining fields for review.'}</p>
+      </details>
       {/* Main Settings Grid (Form + Live Preview) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Form Container */}
@@ -302,13 +317,8 @@ export const CMSBrandingSettings: React.FC<CMSBrandingSettingsProps> = ({
                     <label className="block text-xs font-bold text-slate-700 mb-1">
                       {isAr ? 'رابط الشعار المضيء (الخلفية الداكنة)' : 'Light Logo URL (Dark Theme)'}
                     </label>
-                    <input
-                      type="text"
-                      value={formData.logoUrlLight}
-                      onChange={(e) => setFormData({ ...formData, logoUrlLight: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-mono focus:bg-white focus:ring-2 focus:ring-sky-500"
-                      placeholder="/logo.svg or https://..."
-                    />
+                    <CMSImageUpload value={formData.logoUrlLight} language={language}
+                      onChange={(value) => setFormData((previous) => ({ ...previous, logoUrlLight: value }))} />
                     {validationErrors.logoUrlLight && (
                       <p className="text-[11px] text-rose-600 mt-1 flex items-center gap-1">
                         <AlertCircle className="w-3 h-3" />
@@ -321,13 +331,8 @@ export const CMSBrandingSettings: React.FC<CMSBrandingSettingsProps> = ({
                     <label className="block text-xs font-bold text-slate-700 mb-1">
                       {isAr ? 'رابط الشعار الداكن (الخلفية الفاتحة)' : 'Dark Logo URL (Light Theme)'}
                     </label>
-                    <input
-                      type="text"
-                      value={formData.logoUrlDark}
-                      onChange={(e) => setFormData({ ...formData, logoUrlDark: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-mono focus:bg-white focus:ring-2 focus:ring-sky-500"
-                      placeholder="/logo.svg or https://..."
-                    />
+                    <CMSImageUpload value={formData.logoUrlDark} language={language}
+                      onChange={(value) => setFormData((previous) => ({ ...previous, logoUrlDark: value }))} />
                   </div>
                 </div>
 

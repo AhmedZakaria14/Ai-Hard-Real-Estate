@@ -1,3 +1,5 @@
+import { hardAdminClient } from '../lib/db/hardAdminClient';
+import { readAdminCompanyContent, saveCompanyContent, deleteCompanyContent } from '../lib/db/companyContent';
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { Property, Project, BlogPost, Testimonial, JoinListSubscriber } from '../types';
 import {
@@ -11,25 +13,16 @@ import {
 } from '../types/businessEntities';
 import {
   LeadsRepository,
-  TestimonialsRepository,
   JoinListRepository,
 } from '../lib/db/repository';
 import {
-  TeamMembersRepository,
   FaqsRepository,
-  OfficesRepository,
   CertificationsRepository,
-  BusinessStatisticsRepository,
-  PartnerBrandsRepository,
   EnhancedTestimonialsRepository,
 } from '../lib/db/entitiesRepository';
 import {
-  FirestoreTeamMembersRepository,
   FirestoreFaqsRepository,
-  FirestoreOfficesRepository,
   FirestoreCertificationsRepository,
-  FirestoreStatisticsRepository,
-  FirestorePartnersRepository,
   FirestoreEnhancedTestimonialsRepository,
 } from '../lib/db/firestoreEntitiesRepository';
 import {
@@ -82,7 +75,6 @@ interface DataContextType {
   addTestimonial: (data: Partial<Testimonial>) => Promise<Testimonial>;
   updateTestimonial: (id: string, updates: Partial<Testimonial>) => Promise<Testimonial | null>;
   deleteTestimonial: (id: string) => Promise<boolean>;
-  resetTestimonialsToDefault: () => void;
 
   // Join List Subscribers CRUD
   addSubscriber: (email: string, source?: string, notes?: string) => Promise<JoinListSubscriber>;
@@ -96,7 +88,6 @@ interface DataContextType {
   addTeamMember: (data: Partial<TeamMember>) => Promise<TeamMember>;
   updateTeamMember: (id: string, updates: Partial<TeamMember>) => Promise<TeamMember | null>;
   deleteTeamMember: (id: string) => Promise<boolean>;
-  resetTeamMembersToDefault: () => void;
 
   // FAQs
   addFaq: (data: Partial<FaqEntity>) => Promise<FaqEntity>;
@@ -108,7 +99,6 @@ interface DataContextType {
   addOffice: (data: Partial<OfficeLocation>) => Promise<OfficeLocation>;
   updateOffice: (id: string, updates: Partial<OfficeLocation>) => Promise<OfficeLocation | null>;
   deleteOffice: (id: string) => Promise<boolean>;
-  resetOfficesToDefault: () => void;
 
   // Certifications
   addCertification: (data: Partial<Certification>) => Promise<Certification>;
@@ -120,13 +110,11 @@ interface DataContextType {
   addStatistic: (data: Partial<BusinessStatistic>) => Promise<BusinessStatistic>;
   updateStatistic: (id: string, updates: Partial<BusinessStatistic>) => Promise<BusinessStatistic | null>;
   deleteStatistic: (id: string) => Promise<boolean>;
-  resetStatisticsToDefault: () => void;
 
   // Partner Brands
   addPartnerBrand: (data: Partial<PartnerBrand>) => Promise<PartnerBrand>;
   updatePartnerBrand: (id: string, updates: Partial<PartnerBrand>) => Promise<PartnerBrand | null>;
   deletePartnerBrand: (id: string) => Promise<boolean>;
-  resetPartnerBrandsToDefault: () => void;
 
   // Enhanced Testimonials
   addEnhancedTestimonial: (data: Partial<EnhancedTestimonial>) => Promise<EnhancedTestimonial>;
@@ -202,6 +190,32 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    let version = 0;
+    const { data: { subscription } } = hardAdminClient.auth.onAuthStateChange((event, session) => {
+      if (event === 'TOKEN_REFRESHED') return;
+      const current = ++version;
+      clearTimeout(timer);
+      if (session?.user.app_metadata.hard_role !== 'superadmin') {
+        setTeamMembers([]); setOffices([]); setStatistics([]); setPartnerBrands([]); setTestimonials([]);
+        return;
+      }
+      timer = setTimeout(() => {
+        void readAdminCompanyContent().then((rows) => {
+          if (current !== version) return;
+          const list = <T,>(kind: string) => rows.filter((row) => row.kind === kind).map((row) => row.body as T);
+          setTeamMembers(list<TeamMember>('team'));
+          setOffices(list<OfficeLocation>('offices'));
+          setStatistics(list<BusinessStatistic>('statistics'));
+          setPartnerBrands(list<PartnerBrand>('partners'));
+          setTestimonials(list<Testimonial>('stories'));
+        }).catch((error) => console.error('Could not load company content', error));
+      }, 0);
+    });
+    return () => { version++; clearTimeout(timer); subscription.unsubscribe(); };
+  }, []);
+
   const refreshData = useCallback(async () => {
     setIsLoading(true);
     const propertiesRequest = refreshProperties();
@@ -210,41 +224,26 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         lds,
         projs,
         posts,
-        tests,
         subs,
-        tm,
         fq,
-        off,
         certs,
-        stats,
-        partners,
         enhTests,
       ] = await Promise.all([
         LeadsRepository.getAll(),
         loadPublishedProjects().then((rows) => rows.map(({ content }) => content)),
         loadPublishedArticles().then((rows) => rows.map(({ content }) => content)),
-        TestimonialsRepository.getAll(),
         JoinListRepository.getAll(),
-        FirestoreTeamMembersRepository.getAll().catch(() => TeamMembersRepository.getAll()),
         FirestoreFaqsRepository.getAll().catch(() => FaqsRepository.getAll()),
-        FirestoreOfficesRepository.getAll().catch(() => OfficesRepository.getAll()),
         FirestoreCertificationsRepository.getAll().catch(() => CertificationsRepository.getAll()),
-        FirestoreStatisticsRepository.getAll().catch(() => BusinessStatisticsRepository.getAll()),
-        FirestorePartnersRepository.getAll().catch(() => PartnerBrandsRepository.getAll()),
         FirestoreEnhancedTestimonialsRepository.getAll().catch(() => EnhancedTestimonialsRepository.getAll()),
       ]);
 
       setLeads(lds);
       setProjects(projs);
       setBlogPosts(posts);
-      setTestimonials(tests);
       setSubscribers(subs);
-      setTeamMembers(tm);
       setFaqs(fq);
-      setOffices(off);
       setCertifications(certs);
-      setStatistics(stats);
-      setPartnerBrands(partners);
       setEnhancedTestimonials(enhTests);
     } catch (err) {
       console.error('Failed to load data from repositories:', err);
@@ -338,32 +337,22 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   };
 
 
-  // Testimonials / Client Success Stories CRUD
   const addTestimonial = async (data: Partial<Testimonial>): Promise<Testimonial> => {
-    const created = await TestimonialsRepository.create(data);
-    setTestimonials((prev) => [created, ...prev]);
-    return created;
+    const item = await saveCompanyContent('stories', { ...data, id: crypto.randomUUID() } as Testimonial, true);
+    setTestimonials((previous) => [item, ...previous]);
+    return item;
   };
-
   const updateTestimonial = async (id: string, updates: Partial<Testimonial>): Promise<Testimonial | null> => {
-    const updated = await TestimonialsRepository.update(id, updates);
-    if (updated) {
-      setTestimonials((prev) => prev.map((t) => (t.id === id ? updated : t)));
-    }
-    return updated;
+    const current = testimonials.find((item) => item.id === id);
+    if (!current) return null;
+    const saved = await saveCompanyContent('stories', { ...current, ...updates, id });
+    setTestimonials((previous) => previous.map((item) => item.id === id ? saved : item));
+    return saved;
   };
-
   const deleteTestimonial = async (id: string): Promise<boolean> => {
-    const success = await TestimonialsRepository.delete(id);
-    if (success) {
-      setTestimonials((prev) => prev.filter((t) => t.id !== id));
-    }
-    return success;
-  };
-
-  const resetTestimonialsToDefault = () => {
-    const defaultData = TestimonialsRepository.resetToDefaults();
-    setTestimonials(defaultData);
+    const removed = await deleteCompanyContent('stories', id);
+    if (removed) setTestimonials((previous) => previous.filter((item) => item.id !== id));
+    return removed;
   };
 
   // Join List Subscribers CRUD
@@ -409,32 +398,22 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   // --- REUSABLE BUSINESS ENTITIES CRUD METHODS ---
 
-  // 1. Team Members
   const addTeamMember = async (data: Partial<TeamMember>): Promise<TeamMember> => {
-    const item = TeamMembersRepository.create(data);
-    await FirestoreTeamMembersRepository.create(item).catch(() => {});
-    setTeamMembers((prev) => [item, ...prev.filter((t) => t.id !== item.id)].sort((a, b) => a.order - b.order));
+    const item = await saveCompanyContent('team', { ...data, id: crypto.randomUUID() } as TeamMember, true);
+    setTeamMembers((previous) => [item, ...previous]);
     return item;
   };
   const updateTeamMember = async (id: string, updates: Partial<TeamMember>): Promise<TeamMember | null> => {
-    const item = TeamMembersRepository.update(id, updates);
-    if (item) {
-      await FirestoreTeamMembersRepository.update(id, updates).catch(() => {});
-      setTeamMembers((prev) => prev.map((t) => (t.id === id ? item : t)).sort((a, b) => a.order - b.order));
-    }
-    return item;
+    const current = teamMembers.find((item) => item.id === id);
+    if (!current) return null;
+    const saved = await saveCompanyContent('team', { ...current, ...updates, id });
+    setTeamMembers((previous) => previous.map((item) => item.id === id ? saved : item));
+    return saved;
   };
   const deleteTeamMember = async (id: string): Promise<boolean> => {
-    const ok = TeamMembersRepository.delete(id);
-    if (ok) {
-      await FirestoreTeamMembersRepository.delete(id).catch(() => {});
-      setTeamMembers((prev) => prev.filter((t) => t.id !== id));
-    }
-    return ok;
-  };
-  const resetTeamMembersToDefault = () => {
-    const defaults = TeamMembersRepository.resetToDefaults();
-    setTeamMembers(defaults);
+    const removed = await deleteCompanyContent('team', id);
+    if (removed) setTeamMembers((previous) => previous.filter((item) => item.id !== id));
+    return removed;
   };
 
   // 2. FAQs
@@ -465,32 +444,22 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     setFaqs(defaults);
   };
 
-  // 3. Offices
   const addOffice = async (data: Partial<OfficeLocation>): Promise<OfficeLocation> => {
-    const item = OfficesRepository.create(data);
-    await FirestoreOfficesRepository.create(item).catch(() => {});
-    setOffices((prev) => [item, ...prev.filter((o) => o.id !== item.id)].sort((a, b) => a.order - b.order));
+    const item = await saveCompanyContent('offices', { ...data, id: crypto.randomUUID() } as OfficeLocation, true);
+    setOffices((previous) => [item, ...previous]);
     return item;
   };
   const updateOffice = async (id: string, updates: Partial<OfficeLocation>): Promise<OfficeLocation | null> => {
-    const item = OfficesRepository.update(id, updates);
-    if (item) {
-      await FirestoreOfficesRepository.update(id, updates).catch(() => {});
-      setOffices((prev) => prev.map((o) => (o.id === id ? item : o)).sort((a, b) => a.order - b.order));
-    }
-    return item;
+    const current = offices.find((item) => item.id === id);
+    if (!current) return null;
+    const saved = await saveCompanyContent('offices', { ...current, ...updates, id });
+    setOffices((previous) => previous.map((item) => item.id === id ? saved : item));
+    return saved;
   };
   const deleteOffice = async (id: string): Promise<boolean> => {
-    const ok = OfficesRepository.delete(id);
-    if (ok) {
-      await FirestoreOfficesRepository.delete(id).catch(() => {});
-      setOffices((prev) => prev.filter((o) => o.id !== id));
-    }
-    return ok;
-  };
-  const resetOfficesToDefault = () => {
-    const defaults = OfficesRepository.resetToDefaults();
-    setOffices(defaults);
+    const removed = await deleteCompanyContent('offices', id);
+    if (removed) setOffices((previous) => previous.filter((item) => item.id !== id));
+    return removed;
   };
 
   // 4. Certifications
@@ -521,60 +490,40 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     setCertifications(defaults);
   };
 
-  // 5. Business Statistics
   const addStatistic = async (data: Partial<BusinessStatistic>): Promise<BusinessStatistic> => {
-    const item = BusinessStatisticsRepository.create(data);
-    await FirestoreStatisticsRepository.create(item).catch(() => {});
-    setStatistics((prev) => [item, ...prev.filter((s) => s.id !== item.id)].sort((a, b) => a.order - b.order));
+    const item = await saveCompanyContent('statistics', { ...data, id: crypto.randomUUID() } as BusinessStatistic, true);
+    setStatistics((previous) => [item, ...previous]);
     return item;
   };
   const updateStatistic = async (id: string, updates: Partial<BusinessStatistic>): Promise<BusinessStatistic | null> => {
-    const item = BusinessStatisticsRepository.update(id, updates);
-    if (item) {
-      await FirestoreStatisticsRepository.update(id, updates).catch(() => {});
-      setStatistics((prev) => prev.map((s) => (s.id === id ? item : s)).sort((a, b) => a.order - b.order));
-    }
-    return item;
+    const current = statistics.find((item) => item.id === id);
+    if (!current) return null;
+    const saved = await saveCompanyContent('statistics', { ...current, ...updates, id });
+    setStatistics((previous) => previous.map((item) => item.id === id ? saved : item));
+    return saved;
   };
   const deleteStatistic = async (id: string): Promise<boolean> => {
-    const ok = BusinessStatisticsRepository.delete(id);
-    if (ok) {
-      await FirestoreStatisticsRepository.delete(id).catch(() => {});
-      setStatistics((prev) => prev.filter((s) => s.id !== id));
-    }
-    return ok;
-  };
-  const resetStatisticsToDefault = () => {
-    const defaults = BusinessStatisticsRepository.resetToDefaults();
-    setStatistics(defaults);
+    const removed = await deleteCompanyContent('statistics', id);
+    if (removed) setStatistics((previous) => previous.filter((item) => item.id !== id));
+    return removed;
   };
 
-  // 6. Partner Brands
   const addPartnerBrand = async (data: Partial<PartnerBrand>): Promise<PartnerBrand> => {
-    const item = PartnerBrandsRepository.create(data);
-    await FirestorePartnersRepository.create(item).catch(() => {});
-    setPartnerBrands((prev) => [item, ...prev.filter((p) => p.id !== item.id)].sort((a, b) => a.order - b.order));
+    const item = await saveCompanyContent('partners', { ...data, id: crypto.randomUUID() } as PartnerBrand, true);
+    setPartnerBrands((previous) => [item, ...previous]);
     return item;
   };
   const updatePartnerBrand = async (id: string, updates: Partial<PartnerBrand>): Promise<PartnerBrand | null> => {
-    const item = PartnerBrandsRepository.update(id, updates);
-    if (item) {
-      await FirestorePartnersRepository.update(id, updates).catch(() => {});
-      setPartnerBrands((prev) => prev.map((p) => (p.id === id ? item : p)).sort((a, b) => a.order - b.order));
-    }
-    return item;
+    const current = partnerBrands.find((item) => item.id === id);
+    if (!current) return null;
+    const saved = await saveCompanyContent('partners', { ...current, ...updates, id });
+    setPartnerBrands((previous) => previous.map((item) => item.id === id ? saved : item));
+    return saved;
   };
   const deletePartnerBrand = async (id: string): Promise<boolean> => {
-    const ok = PartnerBrandsRepository.delete(id);
-    if (ok) {
-      await FirestorePartnersRepository.delete(id).catch(() => {});
-      setPartnerBrands((prev) => prev.filter((p) => p.id !== id));
-    }
-    return ok;
-  };
-  const resetPartnerBrandsToDefault = () => {
-    const defaults = PartnerBrandsRepository.resetToDefaults();
-    setPartnerBrands(defaults);
+    const removed = await deleteCompanyContent('partners', id);
+    if (removed) setPartnerBrands((previous) => previous.filter((item) => item.id !== id));
+    return removed;
   };
 
   // 7. Enhanced Testimonials
@@ -656,7 +605,6 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         addTestimonial,
         updateTestimonial,
         deleteTestimonial,
-        resetTestimonialsToDefault,
         addSubscriber,
         updateSubscriber,
         deleteSubscriber,
@@ -665,7 +613,6 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         addTeamMember,
         updateTeamMember,
         deleteTeamMember,
-        resetTeamMembersToDefault,
         addFaq,
         updateFaq,
         deleteFaq,
@@ -673,7 +620,6 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         addOffice,
         updateOffice,
         deleteOffice,
-        resetOfficesToDefault,
         addCertification,
         updateCertification,
         deleteCertification,
@@ -681,11 +627,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         addStatistic,
         updateStatistic,
         deleteStatistic,
-        resetStatisticsToDefault,
         addPartnerBrand,
         updatePartnerBrand,
         deletePartnerBrand,
-        resetPartnerBrandsToDefault,
         addEnhancedTestimonial,
         updateEnhancedTestimonial,
         deleteEnhancedTestimonial,

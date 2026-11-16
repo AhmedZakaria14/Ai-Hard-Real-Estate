@@ -1,3 +1,4 @@
+import { usePublishedBrandEmblem } from '../../components/ui/BrandLogo';
 import React from 'react';
 import {
   HardHat,
@@ -22,6 +23,7 @@ interface FooterProps {
 }
 
 export function Footer({ onNavigate, onOpenCMS }: FooterProps) {
+  const emblem = usePublishedBrandEmblem('construction', 'light');
   const { language, toggleLanguage, openCostEstimator, openQuoteModal } = useConstruction();
   const t = constructionTranslations[language];
   const isAr = language === 'ar';
@@ -47,7 +49,7 @@ export function Footer({ onNavigate, onOpenCMS }: FooterProps) {
         <div className="space-y-4 lg:col-span-1">
           <div className="flex items-center gap-3">
             <img
-              src="/logo.svg"
+              src={emblem} onError={({ currentTarget }) => { if (!currentTarget.src.endsWith('/logo.svg')) currentTarget.src = '/logo.svg'; }}
               alt="HARD Group"
               className="h-10 w-auto object-contain"
             />

@@ -229,6 +229,15 @@ export default function SupabaseInbox() {
         }} className="rounded border px-3 py-1">خروج</button>
       </div>
       {view === 'backup' ? <SupabaseDataExport /> : view === 'reports' || view === 'notifications' ? <SupabaseOperations key={view} section={view} refresh={refresh} /> : view === 'sector_sections' ? <SupabaseSectorSections /> : view === 'media' ? <CMSMediaLibrary language="ar" /> : view !== 'requests' && view !== 'appointments' && view !== 'archive' ? <SupabaseArticleEditor key={view} client={client} collection={view === 'articles' ? 'blog_posts' : view} /> : <>
+      {isAppointments && <details className="rounded-lg border p-4 text-sm">
+        <summary className="cursor-pointer font-semibold">طريقة اختبار حجز المعاينة</summary>
+        <ol className="mt-2 list-decimal space-y-2 ps-5">
+          <li>افتح صفحة عقار منشور واختر حجز معاينة.</li>
+          <li>أكمل النموذج ببيانات اختبار، وحدد الموعد وأرسل الطلب. انسخ رقم المتابعة.</li>
+          <li>افتح المواعيد والمعاينات في لوحة الإدارة واضغط تحديث. طابق رقم المتابعة مع الطلب الجديد.</li>
+          <li>أرشف الطلب التجريبي بعد المراجعة.</li>
+        </ol>
+      </details>}
       <button type="button" disabled={busy || exporting} onClick={() => void exportRequests()} className="rounded border px-3 py-1">
         {exporting ? 'جارٍ إعداد ملف الطلبات…' : 'تصدير الطلبات CSV'}
       </button>

@@ -22,11 +22,12 @@ export const CMSPartnerFormModal: React.FC<CMSPartnerFormModalProps> = ({
   language,
 }) => {
   const isAr = language === 'ar';
+  const [saveError, setSaveError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [name, setName] = useState({ en: '', ar: '' });
   const [category, setCategory] = useState({ en: '', ar: '' });
-  const [logoUrl, setLogoUrl] = useState('https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?auto=format&fit=crop&w=300&q=80');
+  const [logoUrl, setLogoUrl] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [sector, setSector] = useState<SectorScope>('group');
   const [order, setOrder] = useState<number>(1);
@@ -36,7 +37,7 @@ export const CMSPartnerFormModal: React.FC<CMSPartnerFormModalProps> = ({
     if (initialData) {
       setName(initialData.name || { en: '', ar: '' });
       setCategory(initialData.category || { en: '', ar: '' });
-      setLogoUrl(initialData.logoUrl || 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?auto=format&fit=crop&w=300&q=80');
+      setLogoUrl(initialData.logoUrl || '');
       setWebsiteUrl(initialData.websiteUrl || '');
       setSector(initialData.sector || 'group');
       setOrder(initialData.order || 1);
@@ -44,7 +45,7 @@ export const CMSPartnerFormModal: React.FC<CMSPartnerFormModalProps> = ({
     } else {
       setName({ en: '', ar: '' });
       setCategory({ en: '', ar: '' });
-      setLogoUrl('https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?auto=format&fit=crop&w=300&q=80');
+      setLogoUrl('');
       setWebsiteUrl('');
       setSector('group');
       setOrder(1);
@@ -54,6 +55,8 @@ export const CMSPartnerFormModal: React.FC<CMSPartnerFormModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (e.currentTarget.querySelector('[data-upload-pending="true"]')) return;
+    setSaveError('');
     setIsSubmitting(true);
     try {
       await onSave({
@@ -68,6 +71,7 @@ export const CMSPartnerFormModal: React.FC<CMSPartnerFormModalProps> = ({
       });
       onClose();
     } catch (err) {
+      setSaveError(isAr ? 'تعذّر الحفظ في Supabase.' : 'Could not save to Supabase.');
       console.error('Failed to save partner brand:', err);
     } finally {
       setIsSubmitting(false);
@@ -86,6 +90,7 @@ export const CMSPartnerFormModal: React.FC<CMSPartnerFormModalProps> = ({
       maxWidth="xl"
     >
       <form onSubmit={handleSubmit} className="space-y-6">
+        {saveError && <p role="alert" className="text-red-700">{saveError}</p>}
         <div className="space-y-4 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
           <BilingualFormField
             labelEn="Partner Name"

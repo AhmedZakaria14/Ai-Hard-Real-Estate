@@ -21,6 +21,7 @@ export const CMSStatisticFormModal: React.FC<CMSStatisticFormModalProps> = ({
   language,
 }) => {
   const isAr = language === 'ar';
+  const [saveError, setSaveError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [value, setValue] = useState('');
@@ -70,6 +71,7 @@ export const CMSStatisticFormModal: React.FC<CMSStatisticFormModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaveError('');
     setIsSubmitting(true);
     try {
       await onSave({
@@ -92,6 +94,7 @@ export const CMSStatisticFormModal: React.FC<CMSStatisticFormModalProps> = ({
       });
       onClose();
     } catch (err) {
+      setSaveError(isAr ? 'تعذّر الحفظ في Supabase.' : 'Could not save to Supabase.');
       console.error('Failed to save statistic:', err);
     } finally {
       setIsSubmitting(false);
@@ -110,6 +113,7 @@ export const CMSStatisticFormModal: React.FC<CMSStatisticFormModalProps> = ({
       maxWidth="2xl"
     >
       <form onSubmit={handleSubmit} className="space-y-6">
+        {saveError && <p role="alert" className="text-red-700">{saveError}</p>}
         <div className="space-y-4 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">

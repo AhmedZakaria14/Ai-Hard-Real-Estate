@@ -1,3 +1,4 @@
+import { PublishedCompanyContent } from './components/ui/PublishedCompanyContent';
 import PublishedPageSections from './components/ui/PublishedPageSections';
 import React, { useState, useEffect } from 'react';
 import { Language, PageId, Property, PropertyFilterParams, Project } from './types';
@@ -567,7 +568,10 @@ function AppContent() {
         )}
 
         {currentPage === 'home' && <PublishedPageSections page="page_realestate" language={language} />}
-        {currentPage === 'about' && <PublishedPageSections page="page_realestate_about" language={language} />}
+        {currentPage === 'about' && <>
+          <PublishedPageSections page="page_realestate_about" language={language} />
+          <PublishedCompanyContent language={language} />
+        </>}
 
         {currentPage === 'blog' && (
           <BlogPage onNavigate={handleNavigate} language={language} />

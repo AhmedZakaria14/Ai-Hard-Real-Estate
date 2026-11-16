@@ -26,7 +26,6 @@ interface CMSTestimonialsListProps {
   onAddStory: () => void;
   onEditStory: (story: Testimonial) => void;
   onDeleteStory: (id: string) => void;
-  onResetToDefault: () => void;
   language: Language;
 }
 
@@ -35,7 +34,6 @@ export const CMSTestimonialsList: React.FC<CMSTestimonialsListProps> = ({
   onAddStory,
   onEditStory,
   onDeleteStory,
-  onResetToDefault,
   language,
 }) => {
   const isAr = language === 'ar';
@@ -145,14 +143,6 @@ export const CMSTestimonialsList: React.FC<CMSTestimonialsListProps> = ({
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
-          <button
-            onClick={onResetToDefault}
-            className="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
-            title={isAr ? 'استعادة البيانات الافتراضية' : 'Reset to defaults'}
-          >
-            <RefreshCw className="w-4 h-4" />
-            <span>{isAr ? 'استعادة الافتراضي' : 'Reset Defaults'}</span>
-          </button>
 
           <button
             onClick={handleExportCSV}

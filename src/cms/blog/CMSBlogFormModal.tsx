@@ -156,6 +156,7 @@ Investors allocating capital towards premium coastal assets are experiencing str
     }
     setIsSubmitting(true);
     try {
+      if (!image.trim()) throw new Error(isAr ? 'اختر صورة الغلاف قبل الحفظ.' : 'Choose a cover image before saving.');
       const payload: Partial<BlogPost> = {
         title: { en: titleEn, ar: titleAr },
         slug: slug || `article-${Date.now()}`,
@@ -167,7 +168,7 @@ Investors allocating capital towards premium coastal assets are experiencing str
         author: { en: authorEn, ar: authorAr },
         authorRole: { en: authorRoleEn, ar: authorRoleAr },
         authorAvatar,
-        image: image || 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
+        image: image.trim(),
         status,
         featured,
         tags,
@@ -562,6 +563,9 @@ Investors allocating capital towards premium coastal assets are experiencing str
                 </div>
               </div>
 
+              <p className="text-xs text-slate-600">{isAr
+                ? 'الخيارات الجاهزة هنا صور مقترحة للكاتب. يمكنك اختيار صورة أو رفع بديل لكل مقال. قائمة الخيارات المشتركة تُعدّل من كود محرر المقالات.'
+                : 'These presets are suggested author photos. Choose one or upload a replacement per article. The shared presets are maintained in the article editor source.'}</p>
               {/* Author Avatar Upload */}
               <div className="pt-3 border-t border-slate-100">
                 <CMSImageUpload

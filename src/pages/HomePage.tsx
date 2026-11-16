@@ -1,3 +1,4 @@
+import { usePublishedCompanyContent } from '../components/ui/PublishedCompanyContent';
 import React, { useState } from 'react';
 import {
   Search,
@@ -53,7 +54,8 @@ export function HomePage({
 }: HomePageProps) {
   const { translations } = useTextOverride();
   const t = translations[language] || defaultTranslations[language];
-  const { properties, testimonials } = useData();
+  const { properties } = useData();
+  const { stories: testimonials } = usePublishedCompanyContent();
   const ArrowIcon = language === 'ar' ? ArrowLeft : ArrowRight;
 
   // Search Filter State in Hero

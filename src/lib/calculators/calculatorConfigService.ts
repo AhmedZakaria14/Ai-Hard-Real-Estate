@@ -167,9 +167,9 @@ export function validateHVACCoefficients(
   if (typeof c.defaultTariffRateSAR !== 'number' || c.defaultTariffRateSAR <= 0 || c.defaultTariffRateSAR > 2.0) {
     return 'Tariff rate must be a valid positive number up to 2.0 SAR/kWh';
   }
-  for (const key of Object.keys(c.tiers) as (keyof typeof c.tiers)[]) {
+  for (const key of Object.keys(DEFAULT_HVAC_COEFFICIENTS.tiers) as (keyof typeof c.tiers)[]) {
     const tier = c.tiers[key];
-    if (typeof tier.seer !== 'number' || tier.seer < 5 || tier.seer > 40) {
+    if (typeof tier?.seer !== 'number' || tier.seer < 5 || tier.seer > 40) {
       return `Tier ${key} SEER rating must be a valid number between 5 and 40`;
     }
   }
@@ -186,7 +186,8 @@ export async function getPublishedCalculatorConfig(
   const docId = `${type}_published`;
   try {
     const config = await readPublicCalculator<AnyCalculatorConfigDoc>(docId);
-    if (config) return config;
+    if (config?.calculatorType === type && config.coefficients &&
+        (config.calculatorType !== 'hvac' || !validateHVACCoefficients(config.coefficients))) return config;
   } catch (err) {
     console.warn(`[CalculatorConfig] Failed to fetch published ${type} config, using default fallback:`, err);
   }
@@ -199,7 +200,8 @@ export async function getDraftCalculatorConfig(
   const docId = `${type}_draft`;
   try {
     const config = await readAdminConfig<AnyCalculatorConfigDoc>('calculator', docId);
-    if (config) return config;
+    if (config?.calculatorType === type && config.coefficients &&
+        (config.calculatorType !== 'hvac' || !validateHVACCoefficients(config.coefficients))) return config;
   } catch (err) {
     console.warn(`[CalculatorConfig] Failed to fetch draft ${type} config, deriving from published:`, err);
   }

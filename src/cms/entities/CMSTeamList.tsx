@@ -20,7 +20,6 @@ interface CMSTeamListProps {
   onAddMember: () => void;
   onEditMember: (member: TeamMember) => void;
   onDeleteMember: (id: string) => void;
-  onResetToDefaults: () => void;
   language: Language;
 }
 
@@ -29,7 +28,6 @@ export const CMSTeamList: React.FC<CMSTeamListProps> = ({
   onAddMember,
   onEditMember,
   onDeleteMember,
-  onResetToDefaults,
   language,
 }) => {
   const isAr = language === 'ar';
@@ -68,12 +66,6 @@ export const CMSTeamList: React.FC<CMSTeamListProps> = ({
         </div>
 
         <div className="flex items-center gap-2.5">
-          <button
-            onClick={onResetToDefaults}
-            className="px-3.5 py-2 text-xs font-semibold rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition-colors"
-          >
-            {isAr ? 'عادة ضبط الافتراضي' : 'Reset Defaults'}
-          </button>
           <button
             onClick={onAddMember}
             className="px-4 py-2 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-md flex items-center gap-2"

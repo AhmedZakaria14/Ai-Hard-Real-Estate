@@ -113,11 +113,11 @@ export const CMSCalculatorConfig: React.FC<CMSCalculatorConfigProps> = ({
     };
   }, [activeType]);
 
-  if (isLoading || !draftConfig || !publishedConfig) {
+  if (isLoading || draftConfig?.calculatorType !== activeType || publishedConfig?.calculatorType !== activeType) {
     return (
       <div className="p-12 text-center text-slate-400">
         <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-3"></div>
-        <span>{isAr ? 'جاري تحميل إعدادات وحاسبات المعايير...' : 'Loading versioned calculator configurations...'}</span>
+        <span role={errorMsg ? 'alert' : 'status'}>{errorMsg || (isAr ? 'جاري تحميل إعدادات الحاسبة…' : 'Loading calculator settings…')}</span>
       </div>
     );
   }

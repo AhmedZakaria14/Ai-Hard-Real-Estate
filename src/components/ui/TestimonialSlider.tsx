@@ -43,7 +43,7 @@ export function TestimonialSlider({ testimonials, language }: TestimonialSliderP
     setCurrentIndex((prev) => (prev + 1) % testimonials.length);
   };
 
-  const current = testimonials[currentIndex];
+  const current = testimonials[currentIndex % testimonials.length];
 
   const categoryBadgeLabel = {
     buyer: language === 'en' ? 'Property Acquisition' : 'استحواذ عقاري',
@@ -104,12 +104,12 @@ export function TestimonialSlider({ testimonials, language }: TestimonialSliderP
         {/* Client Bio & Deal Highlight */}
         <div className="pt-6 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <img
+            {current.avatar && <img
               src={current.avatar}
               alt={current.name[language]}
               referrerPolicy="no-referrer"
               className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-blue-500/40 shrink-0"
-            />
+            />}
             <div className="space-y-1">
               <h4 className="text-base sm:text-lg font-bold text-white font-display-serif">
                 {current.name[language]}
