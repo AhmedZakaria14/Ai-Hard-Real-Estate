@@ -14,8 +14,8 @@ const sectorWordmarks = {
     en: { name: 'HARD Realestate', tagline: 'Luxury Marketing & Brokerage' },
   },
   construction: {
-    ar: { name: 'هارد للمقاولات', tagline: 'مقاولات وتشييد' },
-    en: { name: 'HARD Contracting', tagline: 'Contracting & Construction' },
+    ar: { name: 'هارد للمقاولات', tagline: 'مقاولات عامة وإنشائية' },
+    en: { name: 'HARD Contracting', tagline: 'General Contracting & Construction' },
   },
   hvac: {
     ar: { name: 'هارد لصيانة التكييف', tagline: 'صيانة احترافية' },
