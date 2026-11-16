@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { LocalizedText, SectorId } from '../types/firestore-schema';
-import { db } from '../lib/firebase';
-import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
-import { sanitizePayload, withServerTimestamps } from '../lib/firebase/serializers';
+import { hardAdminClient, toHardAdmin } from '../lib/db/hardAdminClient';
+import { hardPublishableKey, hardSupabaseUrl } from '../lib/db/hardCatalog';
 
 export interface PublicBrandingSettings {
   sector: SectorId;
@@ -64,7 +63,7 @@ export const DEFAULT_PORTAL_SETTINGS: PublicBrandingSettings = {
   sector: 'portal',
   isOverride: false,
   publicationStatus: 'published',
-  updatedAt: new Date().toISOString(),
+  updatedAt: '1970-01-01T00:00:00.000Z',
 
   logoUrlLight: '/logo.svg',
   logoUrlDark: '/logo.svg',
@@ -207,45 +206,74 @@ interface SiteSettingsContextType {
 const SiteSettingsContext = createContext<SiteSettingsContextType | undefined>(undefined);
 
 export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [allSectorSettings, setAllSectorSettings] = useState<Record<SectorId, PublicBrandingSettings>>({
+  const [publishedSettings, setPublishedSettings] = useState<Record<SectorId, PublicBrandingSettings>>({
     portal: DEFAULT_PORTAL_SETTINGS,
     realestate: { ...DEFAULT_PORTAL_SETTINGS, ...DEFAULT_SECTOR_SETTINGS.realestate, sector: 'realestate' },
     construction: { ...DEFAULT_PORTAL_SETTINGS, ...DEFAULT_SECTOR_SETTINGS.construction, sector: 'construction' },
     hvac: { ...DEFAULT_PORTAL_SETTINGS, ...DEFAULT_SECTOR_SETTINGS.hvac, sector: 'hvac' },
   });
+  const [draftSettings, setDraftSettings] = useState<Partial<Record<SectorId, PublicBrandingSettings>>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const allSectorSettings = React.useMemo(() => {
+    const result = { ...publishedSettings };
+    for (const sector of Object.keys(draftSettings) as SectorId[]) {
+      const draft = draftSettings[sector];
+      if (draft && Date.parse(draft.updatedAt) > Date.parse(publishedSettings[sector].updatedAt)) {
+        result[sector] = draft;
+      }
+    }
+    return result;
+  }, [publishedSettings, draftSettings]);
 
-  // Subscribe to Firestore /site_settings for real-time changes
   useEffect(() => {
-    const unsubscribers: (() => void)[] = [];
-    const sectors: SectorId[] = ['portal', 'realestate', 'construction', 'hvac'];
+    const controller = new AbortController();
+    async function loadPublished() {
+      try {
+        const response = await fetch(hardSupabaseUrl + '/rest/v1/hard_site_branding?visibility=eq.published&select=sector,settings', {
+          headers: { apikey: hardPublishableKey },
+          cache: 'no-store',
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error('Could not fetch published branding');
+        const rows: { sector: SectorId; settings: PublicBrandingSettings }[] = await response.json();
+        if (controller.signal.aborted) return;
+        setPublishedSettings((previous) => {
+          const result = { ...previous };
+          for (const { sector, settings } of rows) result[sector] = { ...previous[sector], ...settings, sector };
+          return result;
+        });
+      } catch (error) {
+        if (!controller.signal.aborted) console.warn('Could not load Supabase branding', error);
+      } finally {
+        if (!controller.signal.aborted) setIsLoading(false);
+      }
+    }
+    void loadPublished();
+    return () => controller.abort();
+  }, []);
 
-    sectors.forEach((sec) => {
-      const docRef = doc(db, 'site_settings', sec);
-      const unsub = onSnapshot(
-        docRef,
-        (snap) => {
-          if (snap.exists()) {
-            const data = snap.data() as PublicBrandingSettings;
-            // Public visitors ONLY adopt settings if published or default
-            if (!data.publicationStatus || data.publicationStatus === 'published') {
-              setAllSectorSettings((prev) => ({
-                ...prev,
-                [sec]: { ...prev[sec], ...data, sector: sec },
-              }));
-            }
-          }
-        },
-        (err) => {
-          console.warn(`[SiteSettingsContext] Listener warning for ${sec}:`, err);
+  useEffect(() => {
+    let requestId = 0;
+    const { data: { subscription } } = hardAdminClient.auth.onAuthStateChange((_event, session) => {
+      const id = ++requestId;
+      if (!session || !toHardAdmin(session.user)) {
+        setDraftSettings({});
+        return;
+      }
+      setTimeout(async () => {
+        if (id !== requestId) return;
+        try {
+          const { data, error } = await hardAdminClient.from('hard_site_branding').select('sector,settings').eq('visibility','draft');
+          if (id !== requestId || error) return;
+          setDraftSettings(Object.fromEntries((data ?? []).map(({ sector, settings }) => [sector, settings])));
+        } catch {
+          // Keep the published settings available if drafts cannot be loaded.
         }
-      );
-      unsubscribers.push(unsub);
+      }, 0);
     });
-
-    setIsLoading(false);
     return () => {
-      unsubscribers.forEach((u) => u());
+      requestId++;
+      subscription.unsubscribe();
     };
   }, []);
 
@@ -254,12 +282,12 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
    */
   const getEffectiveSettings = useCallback(
     (sector: SectorId = 'portal'): PublicBrandingSettings => {
-      const portalSettings = allSectorSettings.portal || DEFAULT_PORTAL_SETTINGS;
+      const portalSettings = publishedSettings.portal || DEFAULT_PORTAL_SETTINGS;
       if (sector === 'portal') {
         return portalSettings;
       }
 
-      const sectorSettings = allSectorSettings[sector];
+      const sectorSettings = publishedSettings[sector];
       if (!sectorSettings) {
         return { ...portalSettings, sector };
       }
@@ -289,83 +317,44 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
         },
       };
     },
-    [allSectorSettings]
+    [publishedSettings]
   );
 
-  const saveDraftSettings = async (sector: SectorId, settings: PublicBrandingSettings, authorUid = 'admin') => {
-    const sanitizedPayload: PublicBrandingSettings = {
+  async function persistSettings(sector: SectorId, settings: PublicBrandingSettings, visibility: 'draft' | 'published') {
+    const payload: PublicBrandingSettings = {
       ...settings,
       sector,
-      publicationStatus: 'draft',
+      publicationStatus: visibility,
       logoUrlLight: sanitizeUrl(settings.logoUrlLight),
       logoUrlDark: sanitizeUrl(settings.logoUrlDark),
       faviconUrl: sanitizeUrl(settings.faviconUrl),
       contactEmail: sanitizeText(settings.contactEmail),
       supportPhone: sanitizeText(settings.supportPhone),
       whatsappNumber: sanitizeText(settings.whatsappNumber),
-      office: {
-        ...settings.office,
-        googleMapsUrl: sanitizeUrl(settings.office.googleMapsUrl || ''),
-      },
+      office: { ...settings.office, googleMapsUrl: sanitizeUrl(settings.office.googleMapsUrl || '') },
       updatedAt: new Date().toISOString(),
-      updatedBy: authorUid,
     };
+    delete payload.updatedBy;
+    const { error } = await hardAdminClient.from('hard_site_branding').upsert({
+      sector, visibility, settings: payload, updated_at: payload.updatedAt,
+    }, { onConflict: 'sector,visibility' });
+    if (error) throw error;
+    if (visibility === 'draft') setDraftSettings((previous) => ({ ...previous, [sector]: payload }));
+    else setPublishedSettings((previous) => ({ ...previous, [sector]: payload }));
+  }
 
-    setAllSectorSettings((prev) => ({
-      ...prev,
-      [sector]: sanitizedPayload,
-    }));
+  const saveDraftSettings = (sector: SectorId, settings: PublicBrandingSettings) => persistSettings(sector, settings, 'draft');
 
-    try {
-      const docRef = doc(db, 'site_settings', sector);
-      await setDoc(docRef, withServerTimestamps(sanitizedPayload));
-    } catch (e) {
-      console.error('[SiteSettingsContext] Failed to save draft to Firestore:', e);
-    }
-  };
+  async function publishSettings(sector: SectorId) {
+    const { data, error } = await hardAdminClient.from('hard_site_branding').select('settings')
+      .eq('sector', sector).eq('visibility','draft').maybeSingle();
+    if (error) throw error;
+    await persistSettings(sector, data?.settings ?? getEffectiveSettings(sector), 'published');
+  }
 
-  const publishSettings = async (sector: SectorId, authorUid = 'admin') => {
-    const currentSettings = allSectorSettings[sector] || getEffectiveSettings(sector);
-    const publishedPayload: PublicBrandingSettings = {
-      ...currentSettings,
-      publicationStatus: 'published',
-      updatedAt: new Date().toISOString(),
-      updatedBy: authorUid,
-    };
-
-    setAllSectorSettings((prev) => ({
-      ...prev,
-      [sector]: publishedPayload,
-    }));
-
-    try {
-      const docRef = doc(db, 'site_settings', sector);
-      await setDoc(docRef, withServerTimestamps(publishedPayload));
-    } catch (e) {
-      console.error('[SiteSettingsContext] Failed to publish settings to Firestore:', e);
-    }
-  };
-
-  const resetSectorSettings = async (sector: SectorId) => {
-    let defaultVal: PublicBrandingSettings;
-    if (sector === 'portal') {
-      defaultVal = DEFAULT_PORTAL_SETTINGS;
-    } else {
-      defaultVal = { ...DEFAULT_PORTAL_SETTINGS, ...DEFAULT_SECTOR_SETTINGS[sector], sector };
-    }
-
-    setAllSectorSettings((prev) => ({
-      ...prev,
-      [sector]: defaultVal,
-    }));
-
-    try {
-      const docRef = doc(db, 'site_settings', sector);
-      await setDoc(docRef, sanitizePayload(defaultVal));
-    } catch (e) {
-      console.error('[SiteSettingsContext] Failed to reset sector settings in Firestore:', e);
-    }
-  };
+  const resetSectorSettings = (sector: SectorId) => persistSettings(
+    sector, { ...DEFAULT_PORTAL_SETTINGS, ...DEFAULT_SECTOR_SETTINGS[sector], sector }, 'published',
+  );
 
   return (
     <SiteSettingsContext.Provider
