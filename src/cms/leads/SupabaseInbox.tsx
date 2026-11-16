@@ -1,3 +1,4 @@
+import SupabaseOperations from './SupabaseOperations';
 import SupabaseSectorSections from '../catalog/SupabaseSectorSections';
 import { useEffect, useState, type FormEvent } from 'react';
 import { type Session } from '@supabase/supabase-js';
@@ -24,6 +25,7 @@ type Submission = {
   sector: string;
   form_type: string;
   received_at: string;
+  archived_at: string | null;
   status: keyof typeof statusLabels;
   status_history: { at: string; from: keyof typeof statusLabels; to: keyof typeof statusLabels }[];
   payload: Record<string, unknown>;
@@ -35,11 +37,16 @@ export default function SupabaseInbox() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [rows, setRows] = useState<Submission[]>([]);
-  const [view, setView] = useState<'requests' | 'appointments' | 'articles' | 'projects' | 'properties' | 'construction_projects' | 'hvac_services' | 'media' | 'sector_sections'>('requests');
+  const [view, setView] = useState<'requests' | 'appointments' | 'articles' | 'projects' | 'properties' | 'construction_projects' | 'hvac_services' | 'media' | 'sector_sections' | 'archive' | 'reports' | 'notifications'>(() => {
+    const section = new URLSearchParams(window.location.search).get('section');
+    if (section === 'appointments' || section === 'reports' || section === 'archive' || section === 'notifications') return section;
+    return 'requests';
+  });
   const [page, setPage] = useState(0);
   const [refresh, setRefresh] = useState(0);
   const isAppointments = view === 'appointments';
-  const isIntake = view === 'requests' || isAppointments;
+  const isArchive = view === 'archive';
+  const isIntake = view === 'requests' || isAppointments || isArchive;
   const isAdmin = session?.user.app_metadata.hard_role === 'superadmin';
 
   useEffect(() => {
@@ -62,7 +69,9 @@ export default function SupabaseInbox() {
     const load = async () => {
       try {
         const query = client.from('hard_form_submissions')
-          .select('id,tracking_code,sector,form_type,received_at,payload,status,status_history');
+          .select('id,tracking_code,sector,form_type,received_at,payload,status,status_history,archived_at');
+        if (isArchive) query.not('archived_at', 'is', null);
+        else query.is('archived_at', null);
         if (isAppointments) query.or('form_type.eq.book_viewing,and(form_type.eq.hvac_service,payload->details->>date.not.is.null)');
         const { data, error: queryError } = await query
           .order('received_at', { ascending: false }).order('id')
@@ -79,7 +88,7 @@ export default function SupabaseInbox() {
     };
     void load();
     return () => controller.abort();
-  }, [isAdmin, isAppointments, isIntake, page, refresh]);
+  }, [isAdmin, isAppointments, isArchive, isIntake, page, refresh]);
 
   async function downloadAttachment(attachment: PrivateAttachment) {
     setError('');
@@ -94,6 +103,22 @@ export default function SupabaseInbox() {
     link.href = data.signedUrl;
     link.rel = 'noreferrer';
     link.click();
+  }
+
+  async function archiveRequest(id: string, archive: boolean) {
+    setBusy(true);
+    setError('');
+    try {
+      const { error: archiveError } = await client.from('hard_form_submissions')
+        .update({ archived_at: archive ? new Date().toISOString() : null })
+        .eq('id', id).select('id').single();
+      if (archiveError) throw archiveError;
+      setRefresh((value) => value + 1);
+    } catch {
+      setError('تعذر تغيير حالة الأرشفة.');
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function updateStatus(id: string, status: Submission['status']) {
@@ -153,6 +178,9 @@ export default function SupabaseInbox() {
         <button aria-pressed={view === 'hvac_services'} onClick={() => setView('hvac_services')} className="rounded border px-3 py-1">خدمات التكييف</button>
         <button aria-pressed={view === 'media'} onClick={() => setView('media')} className="rounded border px-3 py-1">مكتبة الوسائط</button>
         <button aria-pressed={view === 'sector_sections'} onClick={() => setView('sector_sections')} className="rounded border px-3 py-1">محتوى القطاعات</button>
+        <button aria-pressed={isArchive} onClick={() => { setPage(0); setView('archive'); }} className="rounded border px-3 py-1">أرشيف الطلبات</button>
+        <button aria-pressed={view === 'reports'} onClick={() => setView('reports')} className="rounded border px-3 py-1">التقارير</button>
+        <button aria-pressed={view === 'notifications'} onClick={() => setView('notifications')} className="rounded border px-3 py-1">الإشعارات</button>
       </nav>
       <div className="flex gap-3">
         <button onClick={() => setRefresh((value) => value + 1)} disabled={busy} className="rounded border px-3 py-1">تحديث</button>
@@ -162,7 +190,7 @@ export default function SupabaseInbox() {
           else setPage(0);
         }} className="rounded border px-3 py-1">خروج</button>
       </div>
-      {view === 'sector_sections' ? <SupabaseSectorSections /> : view === 'media' ? <CMSMediaLibrary language="ar" /> : view !== 'requests' && view !== 'appointments' ? <SupabaseArticleEditor key={view} client={client} collection={view === 'articles' ? 'blog_posts' : view} /> : <>
+      {view === 'reports' || view === 'notifications' ? <SupabaseOperations key={view} section={view} refresh={refresh} /> : view === 'sector_sections' ? <SupabaseSectorSections /> : view === 'media' ? <CMSMediaLibrary language="ar" /> : view !== 'requests' && view !== 'appointments' && view !== 'archive' ? <SupabaseArticleEditor key={view} client={client} collection={view === 'articles' ? 'blog_posts' : view} /> : <>
       {busy ? <p role="status">جارٍ تحميل الطلبات…</p> : !error && rows.length === 0 && <p>لا توجد طلبات في هذه الصفحة.</p>}
       {rows.map((row) => <article key={row.id} className="space-y-2 rounded-lg border p-4">
         <h2 className="font-bold">{String(row.payload.name || row.tracking_code)}</h2>
@@ -178,6 +206,8 @@ export default function SupabaseInbox() {
             {Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
           </select>
         </label>
+        <button type="button" disabled={busy} className="block text-blue-700 underline"
+          onClick={() => void archiveRequest(row.id, !isArchive)}>{isArchive ? 'استعادة إلى الطلبات' : 'نقل إلى الأرشيف'}</button>
         {row.status_history.length > 0 && <details>
           <summary>سجل تغييرات الحالة</summary>
           <ul>{row.status_history.map((change, index) => <li key={index}>{new Date(change.at).toLocaleString('ar-SA')} · {statusLabels[change.from]} ← {statusLabels[change.to]}</li>)}</ul>

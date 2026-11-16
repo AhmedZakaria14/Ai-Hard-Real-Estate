@@ -22,7 +22,6 @@ import {
 import { useData } from "../context/DataContext";
 import { CMSAuth } from "./CMSAuth";
 import { CMSLayout, CMSTab } from "./CMSLayout";
-import { CMSDashboard } from "./CMSDashboard";
 import { CMSPropertiesList } from "./properties/CMSPropertiesList";
 import { CMSPropertyFormModal } from "./properties/CMSPropertyFormModal";
 import { CMSProjectsList } from "./projects/CMSProjectsList";
@@ -34,8 +33,6 @@ import { CMSTestimonialFormModal } from "./testimonials/CMSTestimonialFormModal"
 import { CMSJoinList } from "./subscribers/CMSJoinList";
 import { CMSAddSubscriberModal } from "./subscribers/CMSAddSubscriberModal";
 import { getLocalizedText } from "../lib/utils";
-import { CMSLeadsList } from "./leads/CMSLeadsList";
-import { CMSAppointmentsList } from "./appointments/CMSAppointmentsList";
 import { CMSSiteContentEditor } from "./content/CMSSiteContentEditor";
 import { CMSFormSchemaEditor } from "./forms/CMSFormSchemaEditor";
 import { CMSCalculatorConfig } from "./calculators/CMSCalculatorConfig";
@@ -540,29 +537,9 @@ export const CMSApp: React.FC<CMSAppProps> = ({
       </p>
       {/* 1. Dashboard View */}
       {activeTab === "dashboard" && (
-        <CMSDashboard
-          properties={properties}
-          projects={projects}
-          blogPosts={blogPosts}
-          testimonials={testimonials}
-          subscribers={subscribers}
-          leads={leads}
-          onNavigateToProperties={() => setActiveTab("properties")}
-          onNavigateToProjects={() => setActiveTab("projects")}
-          onNavigateToBlog={() => setActiveTab("blog")}
-          onNavigateToTestimonials={() => setActiveTab("testimonials")}
-          onNavigateToSubscribers={() => setActiveTab("subscribers")}
-          onNavigateToLeads={() => setActiveTab("leads")}
-          onNavigateToAppointments={() => setActiveTab("appointments")}
-          onNavigateToContent={() => setActiveTab("content")}
-          onAddProperty={handleOpenAddProperty}
-          onAddProject={handleOpenAddProject}
-          onAddBlogPost={handleOpenAddBlogPost}
-          onAddTestimonial={handleOpenAddTestimonial}
-          onAddSubscriber={handleOpenAddSubscriber}
-          onSelectProperty={handleOpenEditProperty}
-          language={language}
-        />
+        <a className="inline-block rounded-lg border bg-white px-4 py-3 text-sm font-semibold text-blue-700" href="/admin/supabase-inbox?section=reports">
+          {isAr ? "فتح تقارير الطلبات في Supabase" : "Open request reports in Supabase"}
+        </a>
       )}
 
       {/* 2. Properties Catalog */}
@@ -728,19 +705,16 @@ export const CMSApp: React.FC<CMSAppProps> = ({
 
       {/* 7. Inbound Leads */}
       {activeTab === "leads" && (
-        <CMSLeadsList
-          leads={leads}
-          language={language}
-          currentAdminUser={adminUser || undefined}
-        />
+        <a className="inline-block rounded-lg border bg-white px-4 py-3 text-sm font-semibold text-blue-700" href="/admin/supabase-inbox?section=requests">
+          {isAr ? "فتح صندوق الطلبات في Supabase" : "Open the request inbox in Supabase"}
+        </a>
       )}
 
       {/* 8. Appointments & Field Viewings */}
       {activeTab === "appointments" && (
-        <CMSAppointmentsList
-          language={language}
-          currentAdminUser={adminUser || undefined}
-        />
+        <a className="inline-block rounded-lg border bg-white px-4 py-3 text-sm font-semibold text-blue-700" href="/admin/supabase-inbox?section=appointments">
+          {isAr ? "فتح المواعيد والمعاينات في Supabase" : "Open appointments in Supabase"}
+        </a>
       )}
 
       {/* 9. System Settings */}
