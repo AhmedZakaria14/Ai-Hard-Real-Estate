@@ -29,6 +29,7 @@ export const CMSImageUpload: React.FC<SingleImageUploadProps> = ({
 }) => {
   const isAr = language === 'ar';
   const [activeTab, setActiveTab] = useState<'upload' | 'url'>('upload');
+  const [uploading, setUploading] = useState(false);
   const [urlInput, setUrlInput] = useState(value && value.startsWith('http') ? value : '');
   const [isDragging, setIsDragging] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
@@ -44,6 +45,7 @@ export const CMSImageUpload: React.FC<SingleImageUploadProps> = ({
   };
 
   const processFile = async (file: File) => {
+    if (uploading) return;
     if (!file.type.startsWith('image/')) {
       setError(isAr ? 'يرجى اختيار ملف صورة صالح (PNG, JPG, WebP)' : 'Please select a valid image file (PNG, JPG, WebP)');
       return;
@@ -56,12 +58,15 @@ export const CMSImageUpload: React.FC<SingleImageUploadProps> = ({
 
     setError(null);
     setFileName(file.name);
+    setUploading(true);
 
     try {
       const asset = await uploadMediaAsset({ file });
       onChange(asset.downloadUrl);
     } catch {
       setError(isAr ? 'تعذر رفع الصورة إلى Supabase. حاول مرة أخرى.' : 'Could not upload the image to Supabase. Try again.');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -116,7 +121,7 @@ export const CMSImageUpload: React.FC<SingleImageUploadProps> = ({
   };
 
   return (
-    <div className="space-y-2.5">
+    <div data-upload-pending={uploading} className="space-y-2.5">
       {label && (
         <div className="flex items-center justify-between">
           <label className="text-xs font-bold text-slate-700 text-start flex items-center gap-1.5">
@@ -365,6 +370,7 @@ export const CMSMultiImageGallery: React.FC<MultiImageGalleryProps> = ({
 }) => {
   const isAr = language === 'ar';
   const [activeTab, setActiveTab] = useState<'upload' | 'url'>('upload');
+  const [uploading, setUploading] = useState(false);
   const [newUrl, setNewUrl] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -378,12 +384,14 @@ export const CMSMultiImageGallery: React.FC<MultiImageGalleryProps> = ({
   };
 
   const processFiles = async (files: File[]) => {
+    if (uploading) return;
     const imageFiles = files.filter((file) => file.type.startsWith('image/'));
     if (imageFiles.length === 0) {
       setError(isAr ? 'يرجى اختيار ملفات صور صالحة' : 'Please select valid image files');
       return;
     }
     setError(null);
+    setUploading(true);
     const uploaded: string[] = [];
     for (const file of imageFiles) {
       try {
@@ -393,6 +401,7 @@ export const CMSMultiImageGallery: React.FC<MultiImageGalleryProps> = ({
         setError(isAr ? 'تعذر رفع صورة واحدة أو أكثر.' : 'One or more images could not be uploaded.');
       }
     }
+    setUploading(false);
     if (uploaded.length) onChange([...images, ...uploaded]);
   };
 
@@ -434,7 +443,7 @@ export const CMSMultiImageGallery: React.FC<MultiImageGalleryProps> = ({
   };
 
   return (
-    <div className="space-y-3">
+    <div data-upload-pending={uploading} className="space-y-3">
       {label && (
         <div className="flex items-center justify-between">
           <label className="text-xs font-bold text-slate-700 text-start flex items-center gap-1.5">

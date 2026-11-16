@@ -42,7 +42,8 @@ import {
   getCrmSyncLogs,
 } from '../lib/integrations/crmSync';
 import { isSupabaseConfigured } from '../lib/db/supabaseClient';
-import { loadPublishedProperties } from '../lib/db/hardCatalog';
+import { loadPublishedArticles, loadPublishedProjects, loadPublishedProperties } from '../lib/db/hardCatalog';
+import { updatePublishedCatalog } from '../lib/db/hardCatalogWrites';
 import { SECTOR_CONTACT_DETAILS } from '../lib/sectors';
 
 interface DataContextType {
@@ -208,8 +209,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         enhTests,
       ] = await Promise.all([
         LeadsRepository.getAll(),
-        ProjectsRepository.getAll(),
-        BlogRepository.getAll(),
+        loadPublishedProjects().then((rows) => rows.map(({ content }) => content)),
+        loadPublishedArticles().then((rows) => rows.map(({ content }) => content)),
         TestimonialsRepository.getAll(),
         JoinListRepository.getAll(),
         FirestoreTeamMembersRepository.getAll().catch(() => TeamMembersRepository.getAll()),
@@ -261,7 +262,15 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateProperty = async (id: string, updates: Partial<Property>): Promise<Property | null> => {
-    const updated = await PropertiesRepository.update(id, updates);
+    const updated = await updatePublishedCatalog<Property>('properties', id, updates);
+    updated.agent = properties.find((property) => property.id === id)?.agent ?? {
+      name: { ar: 'هارد للعقارات', en: 'HARD Real Estate' },
+      title: { ar: 'الاستشارات العقارية', en: 'Real Estate Advisory' },
+      phone: SECTOR_CONTACT_DETAILS.realestate.phone,
+      whatsapp: SECTOR_CONTACT_DETAILS.realestate.whatsapp,
+      email: SECTOR_CONTACT_DETAILS.realestate.email,
+      avatar: '',
+    };
     if (updated) {
       setProperties((prev) => prev.map((p) => (p.id === id ? updated : p)));
     }
@@ -289,7 +298,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateProject = async (id: string, updates: Partial<Project>): Promise<Project | null> => {
-    const updated = await ProjectsRepository.update(id, updates);
+    const updated = await updatePublishedCatalog<Project>('projects', id, updates);
     if (updated) {
       setProjects((prev) => prev.map((p) => (p.id === id ? updated : p)));
     }
@@ -317,7 +326,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateBlogPost = async (id: string, updates: Partial<BlogPost>): Promise<BlogPost | null> => {
-    const updated = await BlogRepository.update(id, updates);
+    const updated = await updatePublishedCatalog<BlogPost>('blog_posts', id, updates);
     if (updated) {
       setBlogPosts((prev) => prev.map((p) => (p.id === id ? updated : p)));
     }

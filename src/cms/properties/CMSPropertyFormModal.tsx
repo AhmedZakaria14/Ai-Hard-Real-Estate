@@ -39,6 +39,7 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
 
   const [activeTab, setActiveTab] = useState<'basic' | 'location' | 'pricing' | 'media' | 'amenities' | 'licensing' | 'agent' | 'preview'>('basic');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   // Form State
   const [titleEn, setTitleEn] = useState('');
@@ -190,6 +191,11 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaveError('');
+    if (e.currentTarget.querySelector('[data-upload-pending="true"]')) {
+      setSaveError(isAr ? 'انتظر حتى يكتمل رفع الصورة ثم احفظ.' : 'Wait for the image upload before saving.');
+      return;
+    }
     setIsSubmitting(true);
 
     try {
@@ -267,6 +273,7 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
       await onSave(propertyPayload);
       onClose();
     } catch (err) {
+      setSaveError(err instanceof Error ? err.message : (isAr ? 'تعذر حفظ التعديل في Supabase.' : 'Could not save the change in Supabase.'));
       console.error('Failed to save property:', err);
     } finally {
       setIsSubmitting(false);
@@ -407,6 +414,7 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
 
         {/* Modal Form Body */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+          {saveError && <p role="alert" className="rounded bg-red-50 p-3 text-sm text-red-700">{saveError}</p>}
           {/* TAB 1: BASIC INFO */}
           {activeTab === 'basic' && (
             <div className="space-y-4 animate-in fade-in">

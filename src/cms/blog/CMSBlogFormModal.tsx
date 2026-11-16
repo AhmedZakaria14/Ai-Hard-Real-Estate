@@ -37,6 +37,7 @@ export const CMSBlogFormModal: React.FC<CMSBlogFormModalProps> = ({
   const isAr = language === 'ar';
   const [activeTab, setActiveTab] = useState<TabType>('details');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [saveError, setSaveError] = useState('');
   const [previewContentMode, setPreviewContentMode] = useState(false);
 
   // Form State
@@ -148,6 +149,11 @@ Investors allocating capital towards premium coastal assets are experiencing str
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaveError('');
+    if (e.currentTarget.querySelector('[data-upload-pending="true"]')) {
+      setSaveError(isAr ? 'انتظر حتى يكتمل رفع الصورة ثم احفظ.' : 'Wait for the image upload before saving.');
+      return;
+    }
     setIsSubmitting(true);
     try {
       const payload: Partial<BlogPost> = {
@@ -170,6 +176,7 @@ Investors allocating capital towards premium coastal assets are experiencing str
       await onSave(payload);
       onClose();
     } catch (err) {
+      setSaveError(err instanceof Error ? err.message : (isAr ? 'تعذر حفظ التعديل في Supabase.' : 'Could not save the change in Supabase.'));
       console.error('Error saving blog post:', err);
     } finally {
       setIsSubmitting(false);
@@ -243,6 +250,7 @@ Investors allocating capital towards premium coastal assets are experiencing str
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+          {saveError && <p role="alert" className="rounded bg-red-50 p-3 text-sm text-red-700">{saveError}</p>}
           {/* TAB 1: DETAILS */}
           {activeTab === 'details' && (
             <div className="space-y-4">
