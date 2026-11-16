@@ -40,6 +40,13 @@ interface CMSPropertiesListProps {
   language: Language;
 }
 
+const normalizeSearch = (value: string) => value.normalize('NFKD').replace(/[\u064B-\u065F\u0670\u0640]/g, '').toLowerCase().trim();
+const csvCell = (value: unknown) => {
+  const text = String(value ?? '');
+  const safe = /^[\s]*[=+@\-\t\r]/.test(text) ? `'${text}` : text;
+  return `"${safe.replace(/"/g, '""')}"`;
+};
+
 const safePropTitle = (prop: Property, lang: 'ar' | 'en') => {
   if (!prop || !prop.title) return 'Un-titled Listing';
   if (typeof prop.title === 'string') return prop.title;
@@ -92,16 +99,16 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
     return properties.filter((item) => {
       // Search
       if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const titleEn = getLocalizedText(item.title, 'en').toLowerCase();
-        const titleAr = getLocalizedText(item.title, 'ar').toLowerCase();
-        const cityEn = getLocalizedText(item.location?.city, 'en').toLowerCase();
-        const cityAr = getLocalizedText(item.location?.city, 'ar').toLowerCase();
+        const q = normalizeSearch(searchQuery);
+        const titleEn = normalizeSearch(getLocalizedText(item.title, 'en'));
+        const titleAr = normalizeSearch(getLocalizedText(item.title, 'ar'));
+        const cityEn = normalizeSearch(getLocalizedText(item.location?.city, 'en'));
+        const cityAr = normalizeSearch(getLocalizedText(item.location?.city, 'ar'));
         const matchesTitleEn = titleEn.includes(q);
         const matchesTitleAr = titleAr.includes(q);
         const matchesCityEn = cityEn.includes(q);
         const matchesCityAr = cityAr.includes(q);
-        const matchesId = item.id.toLowerCase().includes(q);
+        const matchesId = normalizeSearch(item.id).includes(q);
         if (!matchesTitleEn && !matchesTitleAr && !matchesCityEn && !matchesCityAr && !matchesId) {
           return false;
         }
@@ -115,10 +122,10 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
 
       // City
       if (selectedCity !== 'all') {
-        const selLower = selectedCity.toLowerCase();
-        const enLower = getLocalizedText(item.location?.city, 'en').toLowerCase();
-        const arLower = getLocalizedText(item.location?.city, 'ar').toLowerCase();
-        const cityMatch = enLower === selLower || arLower === selLower || arLower.includes(selLower) || enLower.includes(selLower) || selLower.includes(arLower) || selLower.includes(enLower);
+        const selLower = normalizeSearch(selectedCity);
+        const enLower = normalizeSearch(getLocalizedText(item.location?.city, 'en'));
+        const arLower = normalizeSearch(getLocalizedText(item.location?.city, 'ar'));
+        const cityMatch = enLower === selLower || arLower === selLower || arLower.includes(selLower) || enLower.includes(selLower) || (arLower && selLower.includes(arLower)) || (enLower && selLower.includes(enLower));
         if (!cityMatch) return false;
       }
 
@@ -131,7 +138,7 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
 
   // Statistics calculation
   const totalValuationSAR = useMemo(() => {
-    return properties.reduce((acc, curr) => acc + (curr.price?.sar || 0), 0);
+    return properties.reduce((acc, curr) => acc + (Number(typeof curr.price === 'number' ? curr.price : curr.price?.sar) || 0), 0);
   }, [properties]);
 
   const stats = useMemo(() => {
@@ -155,25 +162,26 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
     const headers = ['ID', 'Title EN', 'Title AR', 'Type', 'Status', 'Price SAR', 'City', 'Bedrooms', 'Area SqM', 'Featured'];
     const rows = filteredProperties.map((p) => [
       p.id,
-      `"${safePropTitle(p, 'en').replace(/"/g, '""')}"`,
-      `"${safePropTitle(p, 'ar').replace(/"/g, '""')}"`,
+      safePropTitle(p, 'en'),
+      safePropTitle(p, 'ar'),
       p.type || '',
       p.status || '',
-      safePropPrice(p),
-      `"${safePropLocation(p, 'en').replace(/"/g, '""')}"`,
+      typeof p.price === 'number' ? p.price : p.price?.sar ?? '',
+      safePropLocation(p, 'en'),
       p.bedrooms || 0,
       p.areaSqM || 0,
       p.featured ? 'Yes' : 'No',
     ]);
 
-    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
-    const encodedUri = encodeURI(csvContent);
+    const csvContent = '\uFEFF' + [headers.map(csvCell).join(','), ...rows.map((e) => e.map(csvCell).join(','))].join('\n');
+    const encodedUri = URL.createObjectURL(new Blob([csvContent], { type: 'text/csv;charset=utf-8' }));
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
     link.setAttribute('download', `HARD_Properties_Catalog_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(encodedUri);
   };
 
   return (
