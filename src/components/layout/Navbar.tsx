@@ -69,7 +69,7 @@ export function Navbar({
 
   useEffect(() => {
     const unsub = subscribeNavigationDoc('header_realestate', (doc) => {
-      if (doc && doc.items && doc.items.length > 0) {
+      if (doc && Array.isArray(doc.items)) {
         setCmsNavItems(doc.items.filter((i) => i.isVisible).sort((a, b) => a.order - b.order));
       } else {
         setCmsNavItems(null);
@@ -122,7 +122,7 @@ export function Navbar({
 
           {/* Center Navigation Links (Desktop) */}
           <nav className="hidden lg:flex items-center space-x-1 rtl:space-x-reverse" aria-label="Main Navigation">
-            {cmsNavItems && cmsNavItems.length > 0
+            {cmsNavItems !== null
               ? cmsNavItems.map((item) => {
                   const label = item.label[language] || item.label.en || '';
                   const href = item.targetPath;
@@ -133,13 +133,6 @@ export function Navbar({
                       href={href}
                       target={isExternal || item.openInNewTab ? '_blank' : undefined}
                       rel={isExternal || item.openInNewTab ? 'noopener noreferrer' : undefined}
-                      onClick={(e) => {
-                        if (!isExternal) {
-                          const route = href.replace(/^\/realestate\/?/, '').replace(/^\//, '');
-                          const mappedPage: PageId = (route as PageId) || 'home';
-                          handleSemanticClick(e, () => handleNavClick(mappedPage));
-                        }
-                      }}
                       className="px-3.5 py-2 rounded-xl text-sm font-medium transition-colors cursor-pointer select-none text-slate-600 hover:text-slate-900 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
                     >
                       {label}
@@ -330,7 +323,14 @@ export function Navbar({
             <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-1 pt-1">
               {isAr ? 'صفحات العقارات' : 'Real Estate Pages'}
             </div>
-            {navItems.map((item) => {
+            {cmsNavItems !== null ? cmsNavItems.map((item) => (
+              <a key={item.id} href={item.targetPath} className="rounded-xl px-3.5 py-2.5 text-sm text-slate-700"
+                target={item.type === 'external' || item.openInNewTab ? '_blank' : undefined}
+                rel={item.type === 'external' || item.openInNewTab ? 'noopener noreferrer' : undefined}
+                onClick={() => setMobileMenuOpen(false)}>
+                {item.label[language] || item.label.en}
+              </a>
+            )) : navItems.map((item) => {
               const Icon = item.icon || Building2;
               const isActive = currentPage === item.id;
               const href = getPageHref(item.id);

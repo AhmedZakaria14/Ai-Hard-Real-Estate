@@ -1,7 +1,6 @@
-import { doc, getDoc, setDoc, collection, getDocs, onSnapshot, deleteDoc } from 'firebase/firestore';
-import { db } from './firebase';
-import { LocalizedText, SectorId } from '../types/firestore-schema';
-import { sanitizePayload, withServerTimestamps } from './firebase/serializers';
+import type { LocalizedText, SectorId } from '../types/firestore-schema';
+import { hardAdminClient } from './db/hardAdminClient';
+import { hardPublishableKey, hardSupabaseUrl } from './db/hardCatalog';
 
 export interface NavItem {
   id: string;
@@ -64,26 +63,12 @@ export const KNOWN_INTERNAL_DESTINATIONS: { path: string; labelAr: string; label
  * Validates external redirect URLs to prevent open redirect vulnerabilities.
  */
 export function isValidExternalUrl(url: string): boolean {
-  if (!url) return false;
-  const trimmed = url.trim();
-  const lower = trimmed.toLowerCase();
-
-  // Block executable schemes or javascript code
-  if (
-    lower.startsWith('javascript:') ||
-    lower.startsWith('data:') ||
-    lower.startsWith('vbscript:') ||
-    lower.includes('<script')
-  ) {
+  try {
+    const parsed = new URL(url.trim());
+    return ['http:', 'https:'].includes(parsed.protocol) && Boolean(parsed.hostname) && !parsed.username && !parsed.password;
+  } catch {
     return false;
   }
-
-  // Allow standard http/https protocols
-  if (lower.startsWith('http://') || lower.startsWith('https://')) {
-    return true;
-  }
-
-  return false;
 }
 
 /**
@@ -105,103 +90,107 @@ export function isValidSlug(slug: string): boolean {
   return slugRegex.test(slug.trim().toLowerCase());
 }
 
-/**
- * Fetches navigation document for a given menu ID.
- */
+function validItem(item: NavItem) {
+  if (typeof item.targetPath !== 'string') return false;
+  if (item.type === 'external') return isValidExternalUrl(item.targetPath);
+  if (item.type !== 'internal') return false;
+  const target = item.targetPath.trim();
+  return target.startsWith('/') && !target.startsWith('//') && !/[\\\u0000-\u001f]/.test(target);
+}
+
 export async function getNavigationDoc(id: string): Promise<NavigationDoc | null> {
-  try {
-    const docRef = doc(db, 'navigations', id);
-    const snap = await getDoc(docRef);
-    if (snap.exists()) {
-      return snap.data() as NavigationDoc;
-    }
-  } catch (e) {
-    console.warn(`[getNavigationDoc] Failed to fetch ${id}:`, e);
-  }
-  return null;
+  const { data, error } = await hardAdminClient.from('hard_navigation').select('menu,visibility')
+    .eq('id', id).limit(2);
+  if (error) throw error;
+  return (data?.find((row) => row.visibility === 'admin') ?? data?.[0])?.menu ?? null;
 }
 
-/**
- * Subscribes to real-time changes of a navigation document.
- */
+const menuChange = 'hard-navigation-saved';
 export function subscribeNavigationDoc(id: string, callback: (nav: NavigationDoc | null) => void) {
-  const docRef = doc(db, 'navigations', id);
-  return onSnapshot(
-    docRef,
-    (snap) => {
-      if (snap.exists()) {
-        callback(snap.data() as NavigationDoc);
-      } else {
-        callback(null);
-      }
-    },
-    (err) => {
-      console.warn(`[subscribeNavigationDoc] Error listening to ${id}:`, err);
-      callback(null);
+  const controller = new AbortController();
+  let generation = 0;
+  async function refresh() {
+    const request = ++generation;
+    try {
+      const params = new URLSearchParams({ id: 'eq.' + id, visibility: 'eq.published', select: 'menu', limit: '1' });
+      const response = await fetch(hardSupabaseUrl + '/rest/v1/hard_navigation?' + params, {
+        headers: { apikey: hardPublishableKey }, signal: controller.signal, cache: 'no-store',
+      });
+      if (!response.ok) throw new Error('Could not load navigation');
+      const rows: { menu: NavigationDoc }[] = await response.json();
+      if (controller.signal.aborted || request !== generation) return;
+      const menu = rows[0]?.menu;
+      callback(menu ? { ...menu, items: (menu.items ?? []).filter(validItem) } : null);
+    } catch (error) {
+      if (!controller.signal.aborted) console.warn('Could not read Supabase navigation', error);
     }
-  );
-}
-
-/**
- * Saves or updates a navigation menu document.
- */
-export async function saveNavigationDoc(navDoc: NavigationDoc, authorUid = 'admin'): Promise<void> {
-  const docRef = doc(db, 'navigations', navDoc.id);
-  const payload = {
-    ...navDoc,
-    updatedAt: new Date().toISOString(),
-    updatedBy: authorUid,
+  }
+  window.addEventListener(menuChange, refresh);
+  window.addEventListener('focus', refresh);
+  void refresh();
+  return () => {
+    controller.abort();
+    window.removeEventListener(menuChange, refresh);
+    window.removeEventListener('focus', refresh);
   };
-  await setDoc(docRef, withServerTimestamps(payload));
 }
 
-/**
- * Creates an automatic 301/302 URL redirect when a published slug changes.
- */
+export async function saveNavigationDoc(navDoc: NavigationDoc): Promise<void> {
+  if (navDoc.id !== navDoc.menuType + '_' + navDoc.sector || navDoc.items.length > 100
+    || navDoc.items.some((item) => !validItem(item) || !item.label?.ar?.trim() || !item.label?.en?.trim())) {
+    throw new Error('راجع تسميات القائمة وروابطها قبل الحفظ.');
+  }
+  const menu: NavigationDoc = {
+    id: navDoc.id, sector: navDoc.sector, menuType: navDoc.menuType,
+    items: navDoc.items.map((item, index) => ({ ...item, targetPath: item.targetPath.trim(), order: index + 1 })),
+    updatedAt: new Date().toISOString(),
+  };
+  const published = { ...menu, items: menu.items.filter((item) => item.isVisible) };
+  const { error } = await hardAdminClient.from('hard_navigation').upsert([
+    { id: menu.id, visibility: 'admin', menu },
+    { id: menu.id, visibility: 'published', menu: published },
+  ], { onConflict: 'id,visibility' });
+  if (error) throw error;
+  window.dispatchEvent(new Event(menuChange));
+}
+
+function redirectPath(path: string): string {
+  const normalized = '/' + path.trim().toLowerCase().replace(/^\//, '').replace(/\/+$/, '');
+  if (!/^\/[a-z0-9][a-z0-9/-]*$/.test(normalized) || normalized.includes('//')
+    || isProtectedInfrastructureRoute(normalized) || /^\/(realestate|construction|hvac)\/(admin|cms)(\/|$)/.test(normalized)) {
+    throw new Error('اختر مسارًا داخليًا صالحًا خارج مسارات الإدارة والنظام.');
+  }
+  return normalized;
+}
+
 export async function createUrlRedirect(
   oldSlug: string,
   newSlug: string,
-  sector: SectorId = 'realestate',
-  authorUid = 'admin'
+  sector: SectorId = 'realestate'
 ): Promise<RedirectDoc> {
-  if (isProtectedInfrastructureRoute(oldSlug)) {
-    throw new Error(`Cannot redirect infrastructure route '${oldSlug}'`);
-  }
-
-  const redirectId = `redir-${Date.now()}`;
-  const redirectData: RedirectDoc = {
-    id: redirectId,
-    sourceSlug: oldSlug.startsWith('/') ? oldSlug : `/${oldSlug}`,
-    targetSlug: newSlug.startsWith('/') ? newSlug : `/${newSlug}`,
-    sector,
-    statusCode: 301,
-    createdAt: new Date().toISOString(),
-    createdBy: authorUid,
-  };
-
-  const docRef = doc(db, 'redirects', redirectId);
-  await setDoc(docRef, sanitizePayload(redirectData));
-  return redirectData;
+  const sourceSlug = redirectPath(oldSlug);
+  const targetSlug = redirectPath(newSlug);
+  if (sourceSlug === targetSlug) throw new Error('المسار القديم والجديد يجب أن يكونا مختلفين.');
+  const id = crypto.randomUUID();
+  const createdAt = new Date().toISOString();
+  const { error } = await hardAdminClient.from('hard_redirect_rules').insert({
+    id, source_path: sourceSlug, target_path: targetSlug, sector, status_code: 301, created_at: createdAt,
+  });
+  if (error) throw error;
+  return { id, sourceSlug, targetSlug, sector, statusCode: 301, createdAt };
 }
 
-/**
- * Fetches all registered active redirects.
- */
 export async function getAllRedirects(): Promise<RedirectDoc[]> {
-  try {
-    const colRef = collection(db, 'redirects');
-    const snap = await getDocs(colRef);
-    return snap.docs.map((d) => d.data() as RedirectDoc);
-  } catch (e) {
-    console.warn('[getAllRedirects] Error loading redirects:', e);
-    return [];
-  }
+  const { data, error } = await hardAdminClient.from('hard_redirect_rules')
+    .select('id,source_path,target_path,sector,status_code,created_at').order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map((row) => ({
+    id: row.id, sourceSlug: row.source_path, targetSlug: row.target_path,
+    sector: row.sector, statusCode: row.status_code, createdAt: row.created_at,
+  }));
 }
 
-/**
- * Deletes a redirect entry.
- */
-export async function deleteRedirect(redirectId: string): Promise<void> {
-  const docRef = doc(db, 'redirects', redirectId);
-  await deleteDoc(docRef);
+export async function deleteRedirect(id: string): Promise<void> {
+  const { error } = await hardAdminClient.from('hard_redirect_rules').delete().eq('id', id);
+  if (error) throw error;
 }

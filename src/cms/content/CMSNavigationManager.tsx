@@ -89,13 +89,14 @@ export const CMSNavigationManager: React.FC<CMSNavigationManagerProps> = ({ lang
   useEffect(() => {
     async function loadMenu() {
       setIsLoading(true);
-      const navDoc = await getNavigationDoc(docId);
-      if (navDoc && navDoc.items && navDoc.items.length > 0) {
-        setItems(navDoc.items.sort((a, b) => a.order - b.order));
-      } else {
-        setItems(DEFAULT_HEADER_ITEMS);
+      try {
+        const navDoc = await getNavigationDoc(docId);
+        setItems(navDoc?.items ? [...navDoc.items].sort((a, b) => a.order - b.order) : DEFAULT_HEADER_ITEMS);
+      } catch {
+        setStatusMessage({ type: 'error', text: isAr ? 'تعذر تحميل القائمة.' : 'Could not load the menu.' });
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     }
     loadMenu();
   }, [docId]);
@@ -103,8 +104,11 @@ export const CMSNavigationManager: React.FC<CMSNavigationManagerProps> = ({ lang
   // Load redirects
   useEffect(() => {
     async function loadRedirs() {
-      const list = await getAllRedirects();
-      setRedirects(list);
+      try {
+        setRedirects(await getAllRedirects());
+      } catch {
+        setRedirectError(isAr ? 'تعذر تحميل قواعد التحويل.' : 'Could not load redirect rules.');
+      }
     }
     loadRedirs();
   }, []);
@@ -172,7 +176,7 @@ export const CMSNavigationManager: React.FC<CMSNavigationManagerProps> = ({ lang
         updatedAt: new Date().toISOString(),
       };
       await saveNavigationDoc(navDoc);
-      setStatusMessage({ type: 'success', text: isAr ? 'تم حفظ الترتيب والقوائم بنجاح في Firestore!' : 'Navigation menu saved to Firestore!' });
+      setStatusMessage({ type: 'success', text: isAr ? 'تم حفظ الترتيب والقوائم بنجاح في Supabase!' : 'Navigation menu saved to Supabase!' });
     } catch (e: any) {
       setStatusMessage({ type: 'error', text: e?.message || (isAr ? 'فشل حفظ القائمة' : 'Failed to save menu') });
     }
@@ -195,15 +199,19 @@ export const CMSNavigationManager: React.FC<CMSNavigationManagerProps> = ({ lang
       setRedirects([created, ...redirects]);
       setRedirectSource('');
       setRedirectTarget('');
-      setStatusMessage({ type: 'success', text: isAr ? 'تم إنشاء التوجيه بنجاح (301 Redirect)' : 'Redirect created successfully' });
+      setStatusMessage({ type: 'success', text: isAr ? 'تم حفظ قاعدة التحويل في Supabase' : 'Redirect rule saved in Supabase' });
     } catch (e: any) {
       setRedirectError(e?.message || (isAr ? 'فشل إنشاء التوجيه' : 'Failed to create redirect'));
     }
   };
 
   const handleDeleteRedirect = async (id: string) => {
-    await deleteRedirect(id);
-    setRedirects(redirects.filter((r) => r.id !== id));
+    try {
+      await deleteRedirect(id);
+      setRedirects(redirects.filter((r) => r.id !== id));
+    } catch {
+      setRedirectError(isAr ? 'تعذر حذف قاعدة التحويل.' : 'Could not delete the redirect rule.');
+    }
   };
 
   // Diagnostic check for broken references
@@ -475,7 +483,7 @@ export const CMSNavigationManager: React.FC<CMSNavigationManagerProps> = ({ lang
                 className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-2 shadow-xs ml-auto"
               >
                 <Save className="w-4 h-4" />
-                <span>{isAr ? 'حفظ التغييرات في Firestore' : 'Save Navigation to Firestore'}</span>
+                <span>{isAr ? 'حفظ التغييرات في Supabase' : 'Save Navigation to Supabase'}</span>
               </button>
             </div>
           </div>
