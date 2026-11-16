@@ -27,6 +27,9 @@ const labels: Record<string, string> = {
   stats: 'الأرقام المعروضة فوق الصورة', value: 'القيمة',
   bgImageUrl: 'رابط صورة الغلاف', googleMapsUrl: 'رابط الخريطة',
   officeEmail: 'البريد الإلكتروني للمكتب', emergencyPhone: 'هاتف الطوارئ',
+  cityNameAr: 'اسم المدينة بالعربية', cityNameEn: 'اسم المدينة بالإنجليزية',
+  regionAr: 'المنطقة بالعربية', regionEn: 'المنطقة بالإنجليزية',
+  responseTimeMin: 'مدة الاستجابة بالدقائق', isPrimaryArea: 'منطقة رئيسية',
   whatsappNumber: 'رقم واتساب', active: 'مفعّل',
 };
 const inputStyle = 'block w-full rounded border px-2 py-1';
@@ -49,6 +52,7 @@ export default function SupabaseSectorSections() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const section = sections[active];
+  const editingCities = section.target.sector === 'hvac' && section.target.key === 'service_areas';
 
   useEffect(() => {
     const controller = new AbortController();
@@ -107,7 +111,7 @@ export default function SupabaseSectorSections() {
         {label}{' '}
         {typeof value === 'boolean' ? <input type="checkbox" checked={value} onChange={(event) => edit(path, event.target.checked)} />
           : typeof value === 'number' ? <input type="number" step="any" required className={inputStyle} value={value} onChange={(event) => edit(path, Number(event.target.value))} />
-          : <textarea className={inputStyle} rows={value.length > 80 ? 3 : 1} dir="auto" value={value} onChange={(event) => edit(path, event.target.value)} />}
+          : <textarea className={inputStyle} rows={value.length > 80 ? 3 : 1} dir="auto" required={editingCities && (key === 'cityNameAr' || key === 'cityNameEn')} value={value} onChange={(event) => edit(path, event.target.value)} />}
       </label>
       {key === 'bgImageUrl' && <label className="text-sm">رفع صورة الغلاف <input type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif" onChange={(event) => {
         const file = event.target.files?.[0];
@@ -119,6 +123,14 @@ export default function SupabaseSectorSections() {
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!form || typeof form !== 'object' || busy) return;
+    if (editingCities && (!Array.isArray(form) || form.some((city) =>
+      !city || typeof city !== 'object' || Array.isArray(city) ||
+      typeof city.cityNameAr !== 'string' || !city.cityNameAr.trim() ||
+      typeof city.cityNameEn !== 'string' || !city.cityNameEn.trim()
+    ))) {
+      setMessage('أدخل اسم كل مدينة بالعربية والإنجليزية.');
+      return;
+    }
     if (invalidLink(form)) {
       setMessage('استخدم روابط عامة ثابتة عبر HTTPS أو روابط نسبية من الموقع.');
       return;
@@ -144,7 +156,20 @@ export default function SupabaseSectorSections() {
     {loading && <p role="status">جارٍ تحميل القسم…</p>}
     {form !== undefined && <form key={active} onSubmit={save}>
       <fieldset disabled={busy} className="grid gap-4">
-        {renderField(form)}
+        {editingCities && Array.isArray(form) ? <>
+          {form.map((city, index) => (
+            <div key={city && typeof city === 'object' && !Array.isArray(city) ? String(city.id ?? index) : index} className="space-y-2">
+              {renderField(city, [index])}
+              <button type="button" className="rounded border px-3 py-1 text-rose-700" onClick={() =>
+                setForm((current) => Array.isArray(current) ? current.filter((_, i) => i !== index) : current)
+              }>حذف المدينة من القائمة</button>
+            </div>
+          ))}
+          <button type="button" className="w-fit rounded border px-3 py-1" onClick={() => {
+            const city = { id: 'city-' + crypto.randomUUID(), cityNameAr: '', cityNameEn: '', regionAr: '', regionEn: '', responseTimeMin: 0, isPrimaryArea: false, active: true };
+            setForm((current) => Array.isArray(current) ? [...current, city] : current);
+          }}>إضافة مدينة</button>
+        </> : renderField(form)}
         <button type="submit" className="w-fit rounded bg-slate-900 px-4 py-2 text-white">حفظ ونشر</button>
       </fieldset>
     </form>}
