@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
-  ShieldCheck,
   HardHat,
   Layers,
   Award,
   CheckCircle2,
-  Cpu,
   Target,
   Sparkles,
   ArrowRight,
@@ -24,11 +22,10 @@ export function AboutSection() {
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
 
   const aboutTitle = isAr ? companyContent.aboutTitleAr : companyContent.aboutTitleEn;
-  const aboutText = isAr ? companyContent.aboutTextAr : companyContent.aboutTextEn;
+  const aboutText = isAr ? companyContent.aboutTextAr.replace('تأسست شركة هارد للمقاولات', 'تأسست مؤسسة عبد المحسن الدوسري (هارد) للمقاولات').replace('قطاع المقاولات والإنشاءات بالمملكة', 'قطاع المقاولات والإنشاءات بالمنطقة الشرقية') : companyContent.aboutTextEn.replace(/^.*?(?= was established)/i, 'Abdul Mohsen Al-Dosari Establishment (HARD) for Contracting');
   const visionText = isAr ? companyContent.visionAr : companyContent.visionEn;
   const missionText = isAr ? companyContent.missionAr : companyContent.missionEn;
 
-  const [activeTab, setActiveTab] = useState<'quality' | 'safety' | 'management'>('quality');
 
   return (
     <section id="about" className="py-16 sm:py-24 bg-white text-slate-900 border-b border-slate-200/80">
@@ -92,53 +89,8 @@ export function AboutSection() {
           </div>
         </div>
 
-        {/* Interactive Tabbed Pillars (Quality, Safety, Management) */}
-        <div className="bg-[#f8fafc] border border-sky-100/80 rounded-3xl p-6 sm:p-8 space-y-8 shadow-sm">
-          {/* Tab Buttons */}
-          <div className="flex flex-wrap gap-2 sm:gap-3 border-b border-slate-200 pb-4">
-            <button
-              type="button"
-              onClick={() => setActiveTab('quality')}
-              className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 ${
-                activeTab === 'quality'
-                  ? 'bg-[#009ee2] text-white shadow-md shadow-[#009ee2]/20'
-                  : 'bg-white text-slate-700 hover:text-[#009ee2] hover:bg-sky-50 border border-slate-200'
-              }`}
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              <span>{t.about.tabs.quality}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('safety')}
-              className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 ${
-                activeTab === 'safety'
-                  ? 'bg-[#009ee2] text-white shadow-md shadow-[#009ee2]/20'
-                  : 'bg-white text-slate-700 hover:text-[#009ee2] hover:bg-sky-50 border border-slate-200'
-              }`}
-            >
-              <ShieldCheck className="w-4 h-4" />
-              <span>{t.about.tabs.safety}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('management')}
-              className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 ${
-                activeTab === 'management'
-                  ? 'bg-[#009ee2] text-white shadow-md shadow-[#009ee2]/20'
-                  : 'bg-white text-slate-700 hover:text-[#009ee2] hover:bg-sky-50 border border-slate-200'
-              }`}
-            >
-              <Cpu className="w-4 h-4" />
-              <span>{t.about.tabs.management}</span>
-            </button>
-          </div>
-
-          {/* Tab Content Panels */}
+        <div className="bg-[#f8fafc] border border-sky-100 rounded-3xl p-6 sm:p-8">
           <div className="text-start">
-            {activeTab === 'quality' && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center animate-in fade-in-50 duration-300">
                 <div className="space-y-4">
                   <h3 className="text-xl font-bold text-[#0f243e] font-display-serif">
@@ -174,83 +126,6 @@ export function AboutSection() {
                   </div>
                 </div>
               </div>
-            )}
-
-            {activeTab === 'safety' && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center animate-in fade-in-50 duration-300">
-                <div className="space-y-4">
-                  <h3 className="text-xl font-bold text-[#0f243e] font-display-serif">
-                    {t.about.tabs.safety}
-                  </h3>
-                  <p className="text-sm text-slate-600 leading-relaxed">
-                    {t.about.safetyDesc}
-                  </p>
-                  <ul className="space-y-2.5 pt-2 text-xs sm:text-sm text-slate-700">
-                    <li className="flex items-center gap-2.5">
-                      <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>{isAr ? 'صفر حوادث مهنية مع تدريب مستمر لمشرفي المواقع' : 'Zero-accident safety record with weekly certified site safety toolboxes'}</span>
-                    </li>
-                    <li className="flex items-center gap-2.5">
-                      <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>{isAr ? 'أنظمة حماية وسقالات معتمدة ومطابقة لاشتراطات الدفاع المدني' : 'Engineered safety scaffolding inspected and compliant with Civil Defense'}</span>
-                    </li>
-                    <li className="flex items-center gap-2.5">
-                      <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>{isAr ? 'التأمين الشامل على كافة العاملين ومواقع العمل (CAR Insurance)' : 'Comprehensive Contractors All Risks (CAR) insurance on all active sites'}</span>
-                    </li>
-                  </ul>
-                </div>
-                <div className="relative rounded-2xl overflow-hidden aspect-16/10 border border-sky-100 bg-slate-100 shadow-sm">
-                  <img
-                    src="https://images.unsplash.com/photo-1541888946425-d0fbb186156a?auto=format&fit=crop&w=800&q=80"
-                    alt="Safety Standards"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0f243e]/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-3 start-3 px-3 py-1.5 rounded-lg bg-white/95 backdrop-blur-xs text-xs font-bold text-emerald-600 shadow-sm">
-                    {isAr ? 'شهادات السلامة المعتمدة' : 'Safety Compliant Certification'}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'management' && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center animate-in fade-in-50 duration-300">
-                <div className="space-y-4">
-                  <h3 className="text-xl font-bold text-[#0f243e] font-display-serif">
-                    {t.about.tabs.management}
-                  </h3>
-                  <p className="text-sm text-slate-600 leading-relaxed">
-                    {t.about.managementDesc}
-                  </p>
-                  <ul className="space-y-2.5 pt-2 text-xs sm:text-sm text-slate-700">
-                    <li className="flex items-center gap-2.5">
-                      <Cpu className="w-4 h-4 text-[#009ee2] shrink-0" />
-                      <span>{isAr ? 'تقارير إلكترونية أسبوعية مع تتبع نسب الإنجاز بالصور والفيديو' : 'Weekly digital progress reports with HD photo/drone milestone tracking'}</span>
-                    </li>
-                    <li className="flex items-center gap-2.5">
-                      <Cpu className="w-4 h-4 text-[#009ee2] shrink-0" />
-                      <span>{isAr ? 'نمذجة معلومات البناء 4D BIM لتفادي أي أخطاء أو تأخير زمني' : '4D BIM digital modeling eliminating costly clashes prior to site execution'}</span>
-                    </li>
-                    <li className="flex items-center gap-2.5">
-                      <Cpu className="w-4 h-4 text-[#009ee2] shrink-0" />
-                      <span>{isAr ? 'إدارة مالية دقيقة تضمن عدم تجاوز ميزانية العقد المعتمدة' : 'Strict cost control and transparent milestone billing without hidden charges'}</span>
-                    </li>
-                  </ul>
-                </div>
-                <div className="relative rounded-2xl overflow-hidden aspect-16/10 border border-sky-100 bg-slate-100 shadow-sm">
-                  <img
-                    src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=800&q=80"
-                    alt="BIM Engineering"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0f243e]/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-3 start-3 px-3 py-1.5 rounded-lg bg-white/95 backdrop-blur-xs text-xs font-bold text-[#009ee2] shadow-sm">
-                    {isAr ? 'إدارة مشاريع بنظام BIM المتطور' : '4D BIM Integrated Governance'}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 

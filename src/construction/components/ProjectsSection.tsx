@@ -117,7 +117,7 @@ export function ProjectsSection() {
               onClick={() => setActiveCategory(tab.id)}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                 activeCategory === tab.id
-                  ? 'bg-[#0f243e] text-white shadow-md shadow-[#0f243e]/20'
+                  ? 'bg-[#0076bb] text-white shadow-md shadow-[#0076bb]/20'
                   : 'bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200 border border-slate-200'
               }`}
             >
@@ -231,7 +231,7 @@ export function ProjectsSection() {
                       </div>
                       <div className="flex items-center gap-1.5 min-w-0">
                         <Calendar className="w-3.5 h-3.5 text-[#0072b8] shrink-0" />
-                        <span className="truncate">{proj.year}</span>
+                        <span className="truncate">{String(proj.year ?? '').replace(/[0-9٠-٩]/g, (digit) => { const index = '٠١٢٣٤٥٦٧٨٩'.indexOf(digit); return isAr ? '٠١٢٣٤٥٦٧٨٩'[index < 0 ? Number(digit) : index] : (index < 0 ? digit : String(index)); })}</span>
                       </div>
                     </div>
 

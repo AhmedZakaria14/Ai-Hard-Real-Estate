@@ -8,20 +8,16 @@ import {
   Calculator,
   ShieldCheck,
   CheckCircle2,
-  ArrowRight,
-  ArrowLeft,
   FileText,
 } from 'lucide-react';
 import { useConstruction } from '../context/ConstructionContext';
 import { INITIAL_SERVICES } from '../data/seedData';
 import { constructionTranslations } from '../utils/translations';
-import { ConstructionService } from '../types';
 
 export function ServicesSection() {
-  const { language, openQuoteModal } = useConstruction();
+  const { language } = useConstruction();
   const t = constructionTranslations[language];
   const isAr = language === 'ar';
-  const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
 
   const getIcon = (name: string) => {
     switch (name) {
@@ -40,13 +36,6 @@ export function ServicesSection() {
       default:
         return Building2;
     }
-  };
-
-  const handleOrderService = (service: ConstructionService) => {
-    openQuoteModal({
-      source: 'quote_form',
-      notes: `Service Requested: ${isAr ? service.titleAr : service.titleEn}`,
-    });
   };
 
   return (
@@ -123,8 +112,8 @@ export function ServicesSection() {
                   </div>
                 </div>
 
-                {/* Bottom Card Footer with Warranty & Order CTA */}
-                <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+                {/* Warranty */}
+                <div className="pt-4 border-t border-slate-100 flex items-center gap-3">
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
                     <ShieldCheck className="w-4 h-4" />
                     <span>
@@ -132,14 +121,6 @@ export function ServicesSection() {
                     </span>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => handleOrderService(srv)}
-                    className="px-4 py-2 rounded-xl bg-[#009ee2] hover:bg-[#008bc7] text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
-                  >
-                    <span>{t.services.orderService}</span>
-                    <ArrowIcon className="w-3.5 h-3.5" />
-                  </button>
                 </div>
               </div>
             );

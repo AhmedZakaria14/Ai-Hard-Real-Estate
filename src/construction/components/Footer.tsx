@@ -55,22 +55,18 @@ export function Footer({ onNavigate, onOpenCMS }: FooterProps) {
             />
             <div>
               <div className="font-display-serif font-black text-base text-white">
-                {isAr ? 'هارد للمقاولات العامة' : 'HARD Contracting Co.'}
+                {isAr ? 'هارد للمقاولات' : 'HARD Contracting Co.'}
               </div>
               <div className="text-[10px] text-[#009ee2] font-bold">
-                {isAr ? 'قطاع الهندسة والإنشاءات' : 'Engineering & Construction'}
+                {isAr ? 'مقاولات عامة وإنشائية' : 'General Contracting & Construction'}
               </div>
             </div>
           </div>
 
           <p className="text-xs text-slate-300 leading-relaxed">
-            {t.brand.tagline}. {t.brand.slogan}.
+            {t.brand.tagline.replace('في المملكة', 'في المنطقة الشرقية')}. {t.brand.slogan.replace('في المملكة', 'في المنطقة الشرقية')}.
           </p>
 
-          <div className="space-y-1 text-[11px] text-slate-400">
-            <div>{t.credentials.cr}</div>
-            <div>{isAr ? 'الرقم الضريبي: ' : 'Tax ID: '} {COMPANY_CREDENTIALS.taxId}</div>
-          </div>
         </div>
 
         {/* Col 2: Quick Links & Group Sectors */}
@@ -304,7 +300,7 @@ export function Footer({ onNavigate, onOpenCMS }: FooterProps) {
               {isAr ? 'هارد لصيانة التكييف' : 'HARD HVAC Maintenance'}
             </a>
             <span className="text-slate-700">•</span>
-            <span className="text-emerald-400 font-semibold">{isAr ? 'معتمد رسمياً في المملكة' : 'Certified in KSA'}</span>
+            <span className="text-emerald-400 font-semibold">{isAr ? 'معتمد رسمياً في المنطقة الشرقية' : 'Certified in the Eastern Province'}</span>
           </div>
         </div>
       </div>
