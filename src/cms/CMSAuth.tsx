@@ -1,23 +1,21 @@
 import React, { useState } from 'react';
 import { ShieldCheck, Lock, Mail, ArrowRight, Eye, EyeOff, Building2, Sparkles, KeyRound, CheckCircle2, AlertTriangle, RefreshCw } from 'lucide-react';
 import { Language } from '../types';
-import { loginAdmin, sendAdminPasswordReset, bootstrapAdminAccount } from '../lib/firebaseService';
+import { hardAdminClient, toHardAdmin } from '../lib/db/hardAdminClient';
 
 interface CMSAuthProps {
-  onLoginSuccess: (user: { name: string; email: string; role: string }) => void;
   onCancel: () => void;
   language: Language;
   onLanguageChange: (lang: Language) => void;
 }
 
 export const CMSAuth: React.FC<CMSAuthProps> = ({
-  onLoginSuccess,
   onCancel,
   language,
   onLanguageChange,
 }) => {
-  const [email, setEmail] = useState('admin@hard.sa');
-  const [password, setPassword] = useState('HardGroup2026!');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -31,66 +29,19 @@ export const CMSAuth: React.FC<CMSAuthProps> = ({
 
   const isAr = language === 'ar';
 
-  const mapAuthError = (code: string): string => {
-    switch (code) {
-      case 'auth/invalid-credential':
-      case 'auth/wrong-password':
-      case 'auth/user-not-found':
-        return isAr
-          ? 'اسم المستخدم أو كلمة المرور غير صحيحة. يرجى التحقق وإعادة المحاولة.'
-          : 'Invalid email address or password. Please verify and try again.';
-      case 'auth/invalid-email':
-        return isAr
-          ? 'صيغة البريد الإلكتروني غير صحيحة.'
-          : 'The email address format is invalid.';
-      case 'auth/too-many-requests':
-        return isAr
-          ? 'تم تعليق المحاولات مؤقتاً لكثرة الطلبات. يرجى الانتظار دقيقة وتكرار المحاولة.'
-          : 'Access temporarily blocked due to repeated failed attempts. Please try again later.';
-      case 'auth/network-request-failed':
-        return isAr
-          ? 'تعذر الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت.'
-          : 'Network error. Please check your internet connection.';
-      default:
-        return isAr
-          ? 'حدث خطأ غير متوقع أثناء المصادقة. يرجى المحاولة لاحقاً.'
-          : 'An unexpected authentication error occurred. Please try again.';
-    }
-  };
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
-
     try {
-      // Bootstrap initial superadmin if first run
-      try {
-        await bootstrapAdminAccount();
-      } catch (bErr) {
-        console.warn('Bootstrap admin catch:', bErr);
+      const { data, error } = await hardAdminClient.auth.signInWithPassword({ email: email.trim(), password });
+      if (error) throw error;
+      if (!toHardAdmin(data.user)) {
+        await hardAdminClient.auth.signOut({ scope: 'local' });
+        setError(isAr ? 'الحساب لا يملك صلاحية الإدارة.' : 'This account does not have administrator access.');
       }
-      const profile = await loginAdmin(email.trim(), password);
-      
-      onLoginSuccess({
-        name: profile.displayName || (isAr ? 'مدير النظام' : 'Executive Admin'),
-        email: profile.email,
-        role: profile.role || 'superadmin',
-      });
-    } catch (err: any) {
-      const errCode = err?.code || '';
-      console.warn('Firebase Auth Login code:', errCode);
-
-      // Secure Fallback if demo default credentials are used
-      if (email.trim().toLowerCase() === 'admin@hard.sa' && password === 'HardGroup2026!') {
-        onLoginSuccess({
-          name: isAr ? 'مدير النظام التنفيذي' : 'Executive Admin',
-          email: 'admin@hard.sa',
-          role: 'superadmin',
-        });
-      } else {
-        setError(mapAuthError(errCode));
-      }
+    } catch {
+      setError(isAr ? 'تعذر تسجيل الدخول. تحقق من البريد وكلمة المرور.' : 'Sign-in failed. Check your email and password.');
     } finally {
       setIsLoading(false);
     }
@@ -107,7 +58,10 @@ export const CMSAuth: React.FC<CMSAuthProps> = ({
         throw new Error(isAr ? 'يرجى إدخال بريد إلكتروني صحيح' : 'Please enter a valid email address');
       }
 
-      await sendAdminPasswordReset(resetEmail.trim());
+      const { error } = await hardAdminClient.auth.resetPasswordForEmail(resetEmail.trim(), {
+        redirectTo: window.location.origin + '/admin/password-reset',
+      });
+      if (error) throw error;
       setResetSuccess(
         isAr
           ? `تم إرسال رابط إعادة تعيين كلمة المرور بنجاح إلى ${resetEmail}. يرجى فحص صندوق الوارد.`
@@ -123,12 +77,6 @@ export const CMSAuth: React.FC<CMSAuthProps> = ({
     } finally {
       setIsResetting(false);
     }
-  };
-
-  const handleFillDemo = () => {
-    setEmail('admin@hard.sa');
-    setPassword('HardGroup2026!');
-    setError(null);
   };
 
   return (
@@ -211,7 +159,7 @@ export const CMSAuth: React.FC<CMSAuthProps> = ({
                     aria-required="true"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="admin@hard.sa"
+                    placeholder="info@hardgp.com"
                     className="w-full ps-10 pe-4 py-2.5 bg-slate-800/90 border border-slate-700 hover:border-slate-600 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-start"
                   />
                 </div>
@@ -257,21 +205,6 @@ export const CMSAuth: React.FC<CMSAuthProps> = ({
                 </div>
               </div>
 
-              {/* Demo Fill Helper */}
-              <div className="p-3 rounded-xl bg-blue-950/60 border border-blue-800/50 flex items-center justify-between text-xs">
-                <div className="space-y-0.5 text-start">
-                  <span className="text-slate-300 block text-xs font-medium">{isAr ? 'بيانات التجربة المعتمدة:' : 'Demo Admin Credentials:'}</span>
-                  <span className="font-mono text-blue-300 text-xs font-bold">admin@hard.sa / HardGroup2026!</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleFillDemo}
-                  className="text-xs font-semibold text-blue-400 hover:text-blue-300 underline underline-offset-2 cursor-pointer"
-                >
-                  {isAr ? 'تعبئة تلقائية' : 'Auto Fill'}
-                </button>
-              </div>
-
               {/* Submit Button */}
               <button
                 type="submit"
@@ -281,7 +214,7 @@ export const CMSAuth: React.FC<CMSAuthProps> = ({
                 {isLoading ? (
                   <span className="inline-flex items-center gap-2">
                     <RefreshCw className="w-4 h-4 animate-spin text-white" />
-                    <span>{isAr ? 'جاري التحقق من Firebase...' : 'Authenticating...'}</span>
+                    <span>{isAr ? 'جاري التحقق من الحساب...' : 'Authenticating...'}</span>
                   </span>
                 ) : (
                   <>
@@ -323,7 +256,7 @@ export const CMSAuth: React.FC<CMSAuthProps> = ({
                     aria-required="true"
                     value={resetEmail}
                     onChange={(e) => setResetEmail(e.target.value)}
-                    placeholder="admin@hard.sa"
+                    placeholder="info@hardgp.com"
                     className="w-full ps-10 pe-4 py-2.5 bg-slate-800/90 border border-slate-700 hover:border-slate-600 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-start"
                   />
                 </div>
@@ -361,7 +294,7 @@ export const CMSAuth: React.FC<CMSAuthProps> = ({
 
         {/* Security Notice */}
         <div className="text-center pt-3 text-[11px] text-slate-500 border-t border-slate-800/80 space-y-1">
-          <p>{isAr ? '🔒 منطقة محمية بمصادقة مشفرة عبر Firebase Authentication' : '🔒 Environment protected by Firebase Authentication'}</p>
+          <p>{isAr ? '🔒 منطقة محمية بمصادقة مشفرة عبر Supabase Auth' : '🔒 Environment protected by Supabase Auth'}</p>
           <p className="text-[10px] text-slate-600">{isAr ? 'مقتصرة على المسؤوليين المعتمدين - يمنع تسجيل الزوار' : 'Restricted to pre-authorized administrative identities'}</p>
         </div>
       </div>

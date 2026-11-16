@@ -5,7 +5,9 @@ import { ErrorBoundary } from './components/ui/ErrorBoundary.tsx';
 
 const Page = /^\/admin\/supabase-inbox\/?$/.test(window.location.pathname)
   ? lazy(() => import('./cms/leads/SupabaseInbox'))
-  : lazy(() => import('./App'));
+  : /^\/admin\/password-reset\/?$/.test(window.location.pathname)
+    ? lazy(() => import('./cms/CMSPasswordReset'))
+    : lazy(() => import('./App'));
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -55,8 +55,8 @@ import { CMSStatisticFormModal } from "./entities/CMSStatisticFormModal";
 import { CMSPartnersList } from "./entities/CMSPartnersList";
 import { CMSPartnerFormModal } from "./entities/CMSPartnerFormModal";
 
-import { notifyAdminAuthChange } from "../lib/adminAuth";
-import { subscribeAuth, logoutAdmin } from "../lib/firebaseService";
+import { getAdminUser, hasResolvedAdmin } from "../lib/adminAuth";
+import { hardAdminClient } from "../lib/db/hardAdminClient";
 
 interface CMSAppProps {
   onReturnToSite: () => void;
@@ -135,71 +135,22 @@ export const CMSApp: React.FC<CMSAppProps> = ({
     resetPartnerBrandsToDefault,
   } = useData();
 
-  const [adminUser, setAdminUser] = useState<{
-    name: string;
-    email: string;
-    role: string;
-  } | null>(() => {
-    try {
-      const stored = sessionStorage.getItem("hard_cms_admin_session");
-      if (stored) return JSON.parse(stored);
-    } catch {
-      // Fall through
-    }
-    return null;
-  });
-
-  const [isResolvingAuth, setIsResolvingAuth] = useState(() => {
-    try {
-      const stored = sessionStorage.getItem("hard_cms_admin_session");
-      return !stored;
-    } catch {
-      return true;
-    }
-  });
+  const [adminUser, setAdminUser] = useState(getAdminUser);
+  const [isResolvingAuth, setIsResolvingAuth] = useState(true);
 
   useEffect(() => {
-    // 500ms safety boundary to ensure resolves cleanly without getting stuck
-    const safetyTimer = setTimeout(() => {
+    const syncAdmin = () => {
+      setAdminUser(getAdminUser());
       setIsResolvingAuth(false);
-    }, 500);
-
-    const unsubscribe = subscribeAuth((fbAdmin) => {
-      clearTimeout(safetyTimer);
-      if (fbAdmin) {
-        const userObj = {
-          name: fbAdmin.displayName || "Executive Admin",
-          email: fbAdmin.email,
-          role: fbAdmin.role || "superadmin",
-        };
-        setAdminUser(userObj);
-        try {
-          sessionStorage.setItem(
-            "hard_cms_admin_session",
-            JSON.stringify(userObj),
-          );
-          notifyAdminAuthChange();
-        } catch {
-          // Ignore
-        }
-      } else {
-        // If no firebase user, check if we have a valid fallback session in sessionStorage
-        try {
-          const stored = sessionStorage.getItem("hard_cms_admin_session");
-          if (!stored) {
-            setAdminUser(null);
-            notifyAdminAuthChange();
-          }
-        } catch {
-          setAdminUser(null);
-        }
-      }
-      setIsResolvingAuth(false);
+    };
+    window.addEventListener('cms-auth-change', syncAdmin);
+    if (hasResolvedAdmin()) syncAdmin();
+    const { data: { subscription } } = hardAdminClient.auth.onAuthStateChange((_event, session) => {
+      if (!session) syncAdmin();
     });
-
     return () => {
-      clearTimeout(safetyTimer);
-      unsubscribe();
+      window.removeEventListener('cms-auth-change', syncAdmin);
+      subscription.unsubscribe();
     };
   }, []);
 
@@ -248,33 +199,9 @@ export const CMSApp: React.FC<CMSAppProps> = ({
     null,
   );
 
-  const handleLoginSuccess = (user: {
-    name: string;
-    email: string;
-    role: string;
-  }) => {
-    setAdminUser(user);
-    try {
-      sessionStorage.setItem("hard_cms_admin_session", JSON.stringify(user));
-      notifyAdminAuthChange();
-    } catch (e) {
-      console.warn("Session storage write failed:", e);
-    }
-  };
-
   const handleLogout = async () => {
-    try {
-      await logoutAdmin();
-    } catch {
-      // Ignore
-    }
-    setAdminUser(null);
-    try {
-      sessionStorage.removeItem("hard_cms_admin_session");
-      notifyAdminAuthChange();
-    } catch (e) {
-      console.warn("Session storage remove failed:", e);
-    }
+    const { error } = await hardAdminClient.auth.signOut({ scope: 'local' });
+    if (error) console.error('Supabase sign out failed', error.message);
   };
 
   // --- PROPERTIES HANDLERS ---
@@ -578,8 +505,8 @@ export const CMSApp: React.FC<CMSAppProps> = ({
           </h3>
           <p className="text-xs text-slate-500">
             {isAr
-              ? "التحقق الآمن عبر Firebase Authentication"
-              : "Verifying encrypted identity via Firebase Authentication"}
+              ? "التحقق الآمن عبر Supabase Auth"
+              : "Verifying encrypted identity via Supabase Auth"}
           </p>
         </div>
       </div>
@@ -589,7 +516,6 @@ export const CMSApp: React.FC<CMSAppProps> = ({
   if (!adminUser) {
     return (
       <CMSAuth
-        onLoginSuccess={handleLoginSuccess}
         onCancel={onReturnToSite}
         language={language}
         onLanguageChange={onLanguageChange}
@@ -607,6 +533,11 @@ export const CMSApp: React.FC<CMSAppProps> = ({
       language={language}
       onLanguageChange={onLanguageChange}
     >
+      <p className="mb-4 rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-700">
+        <a className="font-semibold text-blue-700 underline" href="/admin/supabase-inbox">
+          {isAr ? 'إدارة الطلبات والمواعيد والكتالوج على Supabase' : 'Manage requests, appointments and catalog in Supabase'}
+        </a>
+      </p>
       {/* 1. Dashboard View */}
       {activeTab === "dashboard" && (
         <CMSDashboard

@@ -1,14 +1,9 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { createClient, type Session } from '@supabase/supabase-js';
+import { type Session } from '@supabase/supabase-js';
 
 import SupabaseArticleEditor from '../catalog/SupabaseArticleEditor';
-import { hardSupabaseUrl, hardPublishableKey } from '../../lib/db/hardCatalog';
+import { hardAdminClient as client } from '../../lib/db/hardAdminClient';
 
-const client = createClient(
-  hardSupabaseUrl,
-  hardPublishableKey,
-  { auth: { storageKey: 'hard-admin-supabase-session' } },
-);
 const pageSize = 25;
 const statusLabels = { new: 'جديد', contacted: 'تم التواصل', closed: 'مغلق' };
 

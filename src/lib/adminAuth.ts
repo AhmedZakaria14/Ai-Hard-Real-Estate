@@ -1,9 +1,4 @@
-/**
- * HARD REAL ESTATE - ADMIN AUTHENTICATION & AUTHORIZATION UTILITY
- * 
- * Centralized authorization guard to restrict inline page editing, CMS access,
- * and persistent write actions to authenticated administrators.
- */
+import { hardAdminClient, toHardAdmin } from './db/hardAdminClient';
 
 export interface AdminUser {
   name: string;
@@ -11,46 +6,41 @@ export interface AdminUser {
   role: string;
 }
 
-export const ADMIN_SESSION_KEY = 'hard_cms_admin_session';
+let verifiedAdmin: AdminUser | null = null;
+let generation = 0;
+let resolved = false;
 
-/**
- * Retrieves the currently active admin session from sessionStorage or localStorage.
- */
+export function hasResolvedAdmin() { return resolved; }
+
 export function getAdminUser(): AdminUser | null {
-  try {
-    const stored = sessionStorage.getItem(ADMIN_SESSION_KEY) || localStorage.getItem(ADMIN_SESSION_KEY);
-    if (!stored) return null;
-    const user = JSON.parse(stored);
-    if (user && typeof user === 'object' && user.email) {
-      return user;
-    }
-  } catch (e) {
-    // Return null if invalid JSON
-  }
-  return null;
+  return verifiedAdmin;
 }
 
-/**
- * Validates whether the current visitor has an active, authorized admin session.
- */
 export function isAuthorizedAdmin(): boolean {
-  const user = getAdminUser();
-  if (!user || !user.email) return false;
-  
-  // Require valid admin email format or explicit administrator role
-  const isEmailAdmin = user.email.toLowerCase().includes('admin') || user.email.toLowerCase().endsWith('@hard.sa');
-  const isRoleAdmin = Boolean(user.role);
-  
-  return isEmailAdmin || isRoleAdmin;
+  return verifiedAdmin?.role === 'superadmin';
 }
 
-/**
- * Triggers a global auth state change event across components.
- */
 export function notifyAdminAuthChange(): void {
-  try {
-    window.dispatchEvent(new Event('cms-auth-change'));
-  } catch {
-    // Ignore in non-browser environments
-  }
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('cms-auth-change'));
 }
+
+hardAdminClient.auth.onAuthStateChange((event, session) => {
+  const current = ++generation;
+  if (!session || event === 'PASSWORD_RECOVERY') {
+    verifiedAdmin = null;
+    resolved = true;
+    notifyAdminAuthChange();
+    return;
+  }
+  void hardAdminClient.auth.getUser(session.access_token).then(({ data, error }) => {
+    if (current !== generation) return;
+    verifiedAdmin = error ? null : toHardAdmin(data.user);
+    resolved = true;
+    notifyAdminAuthChange();
+  }).catch(() => {
+    if (current !== generation) return;
+    verifiedAdmin = null;
+    resolved = true;
+    notifyAdminAuthChange();
+  });
+});
