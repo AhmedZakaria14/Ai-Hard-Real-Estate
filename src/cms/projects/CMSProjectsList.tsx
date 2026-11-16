@@ -108,24 +108,30 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
     const headers = ['ID', 'Title_EN', 'Title_AR', 'Developer', 'Location', 'StartingPrice', 'UnitsTotal', 'UnitsAvailable', 'Progress%', 'Status'];
     const rows = filteredProjects.map((p) => [
       p.id,
-      `"${getLocalizedText(p.title, 'en').replace(/"/g, '""')}"`,
-      `"${getLocalizedText(p.title, 'ar').replace(/"/g, '""')}"`,
-      `"${getLocalizedText(p.developer, 'en').replace(/"/g, '""')}"`,
-      `"${getLocalizedText(p.location, 'en').replace(/"/g, '""')}"`,
-      `"${p.startingPriceSAR}"`,
+      getLocalizedText(p.title, 'en'),
+      getLocalizedText(p.title, 'ar'),
+      getLocalizedText(p.developer, 'en'),
+      getLocalizedText(p.location, 'en'),
+      p.startingPriceSAR,
       p.unitsTotal,
       p.unitsAvailable,
-      `${p.progressPercentage || 0}%`,
-      p.status || 'under-construction',
+      p.progressPercentage == null ? '' : `${p.progressPercentage}%`,
+      p.status,
     ]);
-    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
-    const encodedUri = encodeURI(csvContent);
+    const escapeCell = (value: unknown) => {
+      const text = String(value ?? '');
+      const safe = typeof value === 'string' && /^[\s]*[=+@-]|^[\t\r\n]/.test(text) ? "'" + text : text;
+      return '"' + safe.replace(/"/g, '""') + '"';
+    };
+    const csvContent = '\uFEFF' + [headers, ...rows].map((row) => row.map(escapeCell).join(',')).join('\r\n');
+    const encodedUri = URL.createObjectURL(new Blob([csvContent], { type: 'text/csv;charset=utf-8' }));
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
     link.setAttribute('download', `HARD_Projects_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(encodedUri);
   };
 
   return (
