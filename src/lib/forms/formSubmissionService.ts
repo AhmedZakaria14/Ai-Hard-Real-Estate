@@ -100,7 +100,7 @@ export function generateIdempotencyKey(payload: FormSubmissionPayload): string {
 }
 
 /**
- * Validates payload on server/backend logic layer before Firestore write
+ * Validates the form payload before submitting it to Supabase
  */
 export function validateFormPayload(
   payload: FormSubmissionPayload,
@@ -111,10 +111,12 @@ export function validateFormPayload(
 
   const emailTrimmed = payload.email ? payload.email.trim() : '';
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const emailOptional = payload.formType === 'hvac_service' && payload.sector === 'hvac';
+  const isPropertyContact = payload.sector === 'realestate'
+    && (payload.formType === 'property_inquiry' || payload.formType === 'book_viewing');
+  const emailOptional = isPropertyContact || (payload.formType === 'hvac_service' && payload.sector === 'hvac');
   if (!emailTrimmed && !emailOptional) {
     errors.email = isAr ? 'يرجى إدخال البريد الإلكتروني.' : 'Email address is required.';
-  } else if (emailTrimmed && !emailRegex.test(emailTrimmed)) {
+  } else if (emailTrimmed && (!emailRegex.test(emailTrimmed) || emailTrimmed.length > 254)) {
     errors.email = isAr
       ? 'يرجى إدخال عنوان بريد إلكتروني صحيح (مثال: name@domain.com).'
       : 'Please enter a valid email address.';
@@ -139,6 +141,8 @@ export function validateFormPayload(
     errors.phone = isAr
       ? 'رقم الهاتف يجب أن يحتوي على 7 أرقام على الأقل.'
       : 'Phone number must contain at least 7 digits.';
+  } else if (isPropertyContact && (phoneDigits.length > 20 || /[^\d()+.-]/.test(phoneTrimmed))) {
+    errors.phone = isAr ? 'يرجى إدخال رقم هاتف صحيح.' : 'Please enter a valid phone number.';
   }
 
   return errors;
