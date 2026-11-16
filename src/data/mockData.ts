@@ -890,8 +890,8 @@ export const mockServices: ServiceDetail[] = [
       ar: 'الوساطة العقارية المعتمدة وإدارة المحافظ السكنية',
     },
     subtitle: {
-      en: 'Discreet acquisition and disposition of exceptional waterfront villas, penthouses, and private estates.',
-      ar: 'خدمات وساطة واستشارات تملك متخصصة للقصور والفلل البحرية والشقق الفاخرة بالمنطقة الشرقية.',
+      en: 'Discreet acquisition and disposition of exceptional villas, penthouses, and private estates.',
+      ar: 'خدمات وساطة واستشارات تملك متخصصة للقصور والفلل والشقق الفاخرة بالمنطقة الشرقية.',
     },
     description: {
       en: 'Our certified real estate advisors represent high-net-worth individuals, family offices, and discerning investors across Khobar, Dhahran, and Dammam with unmatched market intelligence and REGA compliance.',

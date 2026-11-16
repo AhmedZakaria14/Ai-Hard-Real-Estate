@@ -1,4 +1,5 @@
-import { usePublishedCompanyContent } from '../components/ui/PublishedCompanyContent';
+import { subscribeSectorSection } from '../lib/db/hardSectorSections';
+import { defaultRealEstateHero, publicRealEstateImage, realEstateHeroSection } from '../lib/realEstateHomeContent';
 import React, { useState } from 'react';
 import {
   Search,
@@ -16,13 +17,11 @@ import {
 } from 'lucide-react';
 import { Language, PageId, Property, PropertyFilterParams, Project } from '../types';
 import { translations as defaultTranslations } from '../lib/translations';
-import { mockTestimonials } from '../data/mockData';
 import { getHeroPropertyFilters } from '../lib/heroPropertySearch';
 import { CitySearchDropdown } from '../components/ui/CitySearchDropdown';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { PropertyCard } from '../components/ui/PropertyCard';
-import { TestimonialSlider } from '../components/ui/TestimonialSlider';
 import { ServicesSection } from '../components/home/ServicesSection';
 import { loadPublishedProjects } from '../lib/db/hardCatalog';
 import { useData } from '../context/DataContext';
@@ -52,7 +51,8 @@ export function HomePage({
   const { translations } = useTextOverride();
   const t = translations[language] || defaultTranslations[language];
   const { properties } = useData();
-  const { stories: testimonials } = usePublishedCompanyContent();
+  const [hero, setHero] = useState(defaultRealEstateHero);
+  React.useEffect(() => subscribeSectorSection(realEstateHeroSection, defaultRealEstateHero, setHero), []);
   const ArrowIcon = language === 'ar' ? ArrowLeft : ArrowRight;
 
   // Search Filter State in Hero
@@ -97,7 +97,7 @@ export function HomePage({
         {/* High-End Architectural Background Image with Gradient Overlay */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img
-            src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=2200&q=90"
+            src={publicRealEstateImage(hero?.bgImageUrl, defaultRealEstateHero.bgImageUrl)}
             alt="Luxury Modern Architecture"
             loading="eager"
             fetchPriority="high"
@@ -308,23 +308,7 @@ export function HomePage({
         />
       </section>
 
-      {/* 4. TESTIMONIALS SLIDER COMPONENT */}
-      <section id="testimonials-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="text-center max-w-3xl mx-auto space-y-3">
-          <Badge variant="primary" className="mx-auto">
-            {t.home.testimonialsTag}
-          </Badge>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 font-display-serif tracking-tight">
-            {t.home.testimonialsSectionTitle}
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-            {t.home.testimonialsSectionSubtitle}
-          </p>
-        </div>
 
-        {/* The Testimonial Slider Component */}
-        <TestimonialSlider testimonials={testimonials.length > 0 ? testimonials : mockTestimonials} language={language} />
-      </section>
 
       {/* MASTER PROJECT SPOTLIGHT */}
       {spotlightProject && (

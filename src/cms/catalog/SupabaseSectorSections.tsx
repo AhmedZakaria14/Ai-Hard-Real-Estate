@@ -1,3 +1,4 @@
+import { defaultRealEstateHero, defaultRealEstateServiceMedia, realEstateHeroSection, realEstateServiceMediaSection } from '../../lib/realEstateHomeContent';
 import { useEffect, useState, type FormEvent } from 'react';
 import { DEFAULT_HERO_CONTENT, DEFAULT_COMPANY_CONTENT, DEFAULT_WORK_STAGES, DEFAULT_OFFICES } from '../../construction/services/sectionDefaults';
 import { DEFAULT_HVAC_HERO, DEFAULT_HVAC_HOURS_CONTACT, DEFAULT_HVAC_BOOKING_COPY, DEFAULT_HVAC_CITIES } from '../../hvac/services/sectionDefaults';
@@ -7,6 +8,8 @@ import { uploadMediaAsset } from '../../lib/cmsMediaLibrary';
 type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
 type FieldPath = (string | number)[];
 const sections: { target: SectorSection; title: string; fallback: object }[] = [
+  { target: realEstateHeroSection, title: 'العقارات — صورة الهيرو', fallback: defaultRealEstateHero },
+  { target: realEstateServiceMediaSection, title: 'العقارات — صور وأرقام الخدمات', fallback: defaultRealEstateServiceMedia },
   { target: { sector: 'construction', key: 'hero' }, title: 'الإنشاءات — الصفحة الرئيسية', fallback: DEFAULT_HERO_CONTENT },
   { target: { sector: 'construction', key: 'company' }, title: 'الإنشاءات — عن الشركة', fallback: DEFAULT_COMPANY_CONTENT },
   { target: { sector: 'construction', key: 'stages' }, title: 'الإنشاءات — مراحل العمل', fallback: DEFAULT_WORK_STAGES },
@@ -20,6 +23,8 @@ const labels: Record<string, string> = {
   badgeAr: 'العبارة العلوية بالعربية', badgeEn: 'العبارة العلوية بالإنجليزية',
   headlineAr: 'العنوان بالعربية', headlineEn: 'العنوان بالإنجليزية',
   subtitleAr: 'الوصف بالعربية', subtitleEn: 'الوصف بالإنجليزية',
+  'serv-1': 'الوساطة العقارية', 'serv-2': 'التسويق العقاري', 'serv-3': 'الاستشارات الاستثمارية',
+  stats: 'الأرقام المعروضة فوق الصورة', value: 'القيمة',
   bgImageUrl: 'رابط صورة الغلاف', googleMapsUrl: 'رابط الخريطة',
   officeEmail: 'البريد الإلكتروني للمكتب', emergencyPhone: 'هاتف الطوارئ',
   whatsappNumber: 'رقم واتساب', active: 'مفعّل',

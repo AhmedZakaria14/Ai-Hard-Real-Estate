@@ -42,7 +42,7 @@ export default function SupabaseInbox() {
   const [rows, setRows] = useState<Submission[]>([]);
   const [view, setView] = useState<'requests' | 'appointments' | 'articles' | 'projects' | 'properties' | 'construction_projects' | 'hvac_services' | 'media' | 'sector_sections' | 'archive' | 'reports' | 'notifications' | 'backup'>(() => {
     const section = new URLSearchParams(window.location.search).get('section');
-    if (section === 'appointments' || section === 'reports' || section === 'archive' || section === 'notifications' || section === 'backup' || section === 'properties') return section;
+    if (section === 'sector_sections' || section === 'appointments' || section === 'reports' || section === 'archive' || section === 'notifications' || section === 'backup' || section === 'properties') return section;
     return 'requests';
   });
   const [page, setPage] = useState(0);

@@ -1,0 +1,9 @@
+alter table public.hard_sector_sections
+  drop constraint hard_sector_sections_sector_check,
+  drop constraint hard_sector_sections_check,
+  add constraint hard_sector_sections_sector_check check (sector in ('construction','hvac','realestate')),
+  add constraint hard_sector_sections_check check (
+    (sector='construction' and section_key in ('hero','company','stages','offices'))
+    or (sector='hvac' and section_key in ('hero','hours_contact','booking_copy','service_areas'))
+    or (sector='realestate' and section_key in ('hero','service_media'))
+  );

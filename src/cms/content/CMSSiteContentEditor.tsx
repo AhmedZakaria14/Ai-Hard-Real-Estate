@@ -175,6 +175,9 @@ export const CMSSiteContentEditor: React.FC<CMSSiteContentEditorProps> = ({ lang
               <li>{isAr ? 'من سجل الإصدارات يمكنك استرجاع نسخة كمسودة، ثم مراجعتها ونشرها.' : 'Restore a revision as a draft from version history, then review and publish it.'}</li>
             </ol>
           </details>
+          <a href="/admin/supabase-inbox?section=sector_sections" className="inline-flex rounded-lg border bg-white px-4 py-3 text-sm font-semibold text-blue-700">
+            {isAr ? 'تعديل صورة الهيرو وصور وأرقام خدمات العقارات' : 'Edit real estate hero image and service media and figures'}
+          </a>
           <CMSPageSectionEditor language={language} />
         </>
       )}

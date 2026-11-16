@@ -3,18 +3,14 @@ import {
   CheckCircle2,
   ArrowRight,
   ArrowLeft,
-  Building,
-  TrendingUp,
-  ShieldCheck,
-  Camera,
-  LineChart,
 } from 'lucide-react';
 import { Language, PageId } from '../../types';
 import { translations as defaultTranslations } from '../../lib/translations';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import { mockServices } from '../../data/mockData';
 import { Button } from '../ui/Button';
-import { Badge } from '../ui/Badge';
+import { subscribeSectorSection } from '../../lib/db/hardSectorSections';
+import { defaultRealEstateServiceMedia, publicRealEstateImage, realEstateServiceMediaSection } from '../../lib/realEstateHomeContent';
 import { getPageHref, handleSemanticClick } from '../../lib/navigation';
 
 interface ServicesSectionProps {
@@ -46,19 +42,13 @@ export function ServicesSection({
     }
   };
 
-  const getServiceIcon = (index: number) => {
-    if (index === 0) return Building;
-    if (index === 1) return Camera;
-    return LineChart;
-  };
+  const [media, setMedia] = React.useState(defaultRealEstateServiceMedia);
+  React.useEffect(() => subscribeSectorSection(realEstateServiceMediaSection, defaultRealEstateServiceMedia, setMedia), []);
 
   return (
     <section id="services-section" className="space-y-16 sm:space-y-24">
       {/* Section Header */}
       <div className="text-center max-w-3xl mx-auto space-y-4 px-4">
-        <Badge variant="primary" className="mx-auto">
-          {t.home.servicesTag}
-        </Badge>
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 font-display-serif tracking-tight leading-tight">
           {t.home.servicesSectionTitle}
         </h2>
@@ -71,7 +61,7 @@ export function ServicesSection({
       <div className="space-y-16 sm:space-y-24">
         {mockServices.map((service, index) => {
           const isEven = index % 2 === 1; // Alternating layout
-          const ServiceIcon = getServiceIcon(index);
+          const serviceMedia = media?.[service.id];
 
           return (
             <div
@@ -88,20 +78,12 @@ export function ServicesSection({
               >
                 <div className="relative rounded-3xl overflow-hidden shadow-xl aspect-16/11 bg-slate-950 group">
                   <img
-                    src={service.image || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'}
+                    src={publicRealEstateImage(serviceMedia?.bgImageUrl, service.image)}
                     alt={service.title[language]}
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent opacity-60" />
-
-                  {/* Corner Badge */}
-                  <div className="absolute top-4 start-4">
-                    <Badge variant="dark" className="backdrop-blur-md bg-slate-950/80 text-white border-white/20">
-                      <ServiceIcon className="w-3.5 h-3.5 text-blue-400 me-1.5" />
-                      <span>{service.tag[language]}</span>
-                    </Badge>
-                  </div>
 
                   {/* Bottom Stats Card floating over image */}
                   <div className="absolute bottom-4 start-4 end-4 bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/40 text-slate-900">
@@ -109,7 +91,7 @@ export function ServicesSection({
                       {service.stats.map((stat, sIdx) => (
                         <div key={sIdx} className="px-1">
                           <div dir="ltr" className="text-base sm:text-xl font-extrabold text-blue-600 font-display-serif inline-block">
-                            {stat.value}
+                            {typeof serviceMedia?.stats?.[sIdx]?.value === 'string' ? serviceMedia.stats[sIdx].value : stat.value}
                           </div>
                           <div className="text-[10px] sm:text-xs text-slate-500 font-medium leading-tight mt-0.5">
                             {stat.label[language]}
@@ -128,9 +110,6 @@ export function ServicesSection({
                 }`}
               >
                 <div className="space-y-3">
-                  <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
-                    {service.tag[language]}
-                  </span>
                   <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 font-display-serif leading-tight">
                     {service.title[language]}
                   </h3>
