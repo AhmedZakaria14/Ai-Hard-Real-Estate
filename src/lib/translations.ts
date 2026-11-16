@@ -499,7 +499,7 @@ export const translations = {
           icon: 'trending-up',
         },
       ],
-      featuredSectionTitle: 'عقارات مميزة مختارة بعناية',
+      featuredSectionTitle: 'عقارات مميزة',
       featuredSectionSubtitle: 'قوائم عقارية موثقة ومتاحة ببيانات السعر والمواصفات الكاملة للتملك الفوري.',
       propertyBadgeFeatured: 'مميز',
       propertyBadgeNew: 'إطلاق جديد',
