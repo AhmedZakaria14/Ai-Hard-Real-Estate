@@ -48,7 +48,7 @@ interface CMSPageSectionEditorProps {
 }
 
 const PAGES_CATALOG: { id: string; slug: string; nameAr: string; nameEn: string; sector: 'portal' | 'realestate' | 'construction' | 'hvac' }[] = [
-  { id: 'page_portal', slug: '/', nameAr: 'بوابة المجموعة القابضة (الرئيسية)', nameEn: 'Group Portal Main Page', sector: 'portal' },
+  { id: 'page_portal', slug: '/', nameAr: 'بوابة المجموعة (الرئيسية)', nameEn: 'Group Portal Main Page', sector: 'portal' },
   { id: 'page_realestate', slug: '/realestate', nameAr: 'صفحة قطاع العقارات', nameEn: 'Real Estate Landing Page', sector: 'realestate' },
   { id: 'page_realestate_about', slug: '/realestate/about', nameAr: 'صفحة عن هارد والقصة', nameEn: 'About Us & Legacy Page', sector: 'realestate' },
   { id: 'page_construction', slug: '/construction', nameAr: 'صفحة قطاع المقاولات', nameEn: 'Construction Landing Page', sector: 'construction' },

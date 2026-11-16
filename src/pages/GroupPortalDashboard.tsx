@@ -62,9 +62,9 @@ export function GroupPortalDashboard({
       nameEn: 'HARD Real Estate',
       nameAr: 'هارد للعقارات',
       descriptionEn:
-        'A premier Saudi real estate advisory delivering certified residential sales, commercial leasing, off-plan master developments, and REGA-verified portfolio management across the Kingdom.',
+        'A leading HARD division in the Eastern Province, specializing in real estate marketing, brokerage licensed by the Real Estate General Authority (FAL), and management of major regional investment portfolios.',
       descriptionAr:
-        'الذراع العقاري الرائد في المملكة العربية السعودية، متخصص في التسويق والوساطة المعتمدة من الهيئة العامة للعقار (فال)، وإدارة المحافظ الاستثمارية الكبرى في المنطقة الشرقية والرياض.',
+        'أحد قطاعات هارد الرائدة في المنطقة الشرقية، متخصص في التسويق العقاري والوساطة المعتمدة برخصة (فال) من الهيئة العامة للعقار، وإدارة المحافظ الاستثمارية الكبرى في المنطقة الشرقية.',
       image:
         'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80',
       linkTextEn: 'Enter Real Estate Portal',
@@ -74,12 +74,12 @@ export function GroupPortalDashboard({
     },
     {
       id: 'construction',
-      nameEn: 'HARD Construction',
-      nameAr: 'هارد للإنشاءات',
+      nameEn: 'HARD Construction Contracting',
+      nameAr: 'هارد للمقاولات الإنشائية',
       descriptionEn:
-        'Class-A general contracting division building high-specification commercial structures, modern residential complexes, luxury fit-outs, and turnkey infrastructure projects with rigorous SBC compliance.',
+        'HARD Group’s main division delivers classified construction services for villas, apartments, residential and commercial complexes, and smart buildings in accordance with the Saudi Building Code.',
       descriptionAr:
-        'الذراع الإنشائي والهندسي لمجموعة هارد، يقدم خدمات المقاولات العامة المصنفة فئة أولى لتنفيذ الأبراج التجارية، المجمعات السكنية، والمنشآت الذكية بأعلى كفاءة ومعايير كود البناء السعودي.',
+        'القطاع الرئيسي في مجموعة هارد، يقدم خدمات المقاولات الإنشائية المصنفة للفلل والشقق السكنية والمجمعات السكنية والتجارية والمنشآت الذكية، وفق معايير كود البناء السعودي.',
       image:
         'https://images.unsplash.com/photo-1517581177682-a085bb7ffb15?auto=format&fit=crop&w=1200&q=80',
       linkTextEn: 'Explore Construction Division',
@@ -92,9 +92,9 @@ export function GroupPortalDashboard({
       nameEn: 'HARD HVAC Maintenance',
       nameAr: 'هارد لصيانة التكييف',
       descriptionEn:
-        'Specialized electro-mechanical engineering services providing comprehensive chiller overhaul, central VRF installations, smart climate automation, and 24/7 rapid emergency dispatch across Eastern Province & Riyadh.',
+        'A specialized HVAC and refrigeration maintenance division offering maintenance contracts, modern maintenance systems, air duct cleaning, and rapid emergency response.',
       descriptionAr:
-        'الذراع التخصصي للخدمات الكهروميكانيكية والتبريد، يقدم عقود الصيانة الوقائية (AMC) للشيلرات، أنظمة VRF الحديثة، وتنقية مجاري الهواء مع طوارئ واستجابة فورية على مدار الساعة.',
+        'قطاع تخصصي لخدمات صيانة التكييف والتبريد، يقدم عقود الصيانة وأنظمة صيانة حديثة وتنقية مجاري الهواء مع خدمات طوارئ واستجابة سريعة.',
       image:
         'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1200&q=80',
       linkTextEn: 'Explore HVAC Maintenance',
@@ -135,7 +135,7 @@ export function GroupPortalDashboard({
                 {isAr ? 'مجموعة هارد' : 'HARD Group'}
               </span>
               <span className="text-xs sm:text-sm font-semibold text-slate-700 leading-tight">
-                {isAr ? 'بوابة المجموعة القابضة' : 'Corporate Group Portal'}
+                {isAr ? 'بوابة المجموعة' : 'Group Portal'}
               </span>
             </div>
           </div>
@@ -165,8 +165,8 @@ export function GroupPortalDashboard({
           </h1>
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
             {isAr
-              ? 'بوابة موحدة تجمع قطاعات مجموعة هارد في التطوير والوساطة العقارية، المقاولات والإنشاءات، وصيانة أنظمة التكييف والتبريد.'
-              : 'Unified corporate gateway connecting HARD Group’s specialized divisions in Real Estate, Construction, and HVAC Maintenance.'}
+              ? 'بوابة موحدة تجمع قطاعات مجموعة هارد في الوساطة والتسويق العقاري، المقاولات الإنشائية، وصيانة أنظمة التكييف والتبريد.'
+              : 'A unified portal for HARD Group’s real estate brokerage and marketing, construction contracting, and HVAC and refrigeration maintenance divisions.'}
           </p>
         </div>
 
@@ -246,7 +246,7 @@ export function GroupPortalDashboard({
               onClick={(e) => handleSemanticClick(e, handleConstructionClick)}
               className="text-slate-600 hover:text-sky-600 transition-colors"
             >
-              {isAr ? 'هارد للإنشاءات' : 'HARD Construction'}
+              {isAr ? 'هارد للمقاولات الإنشائية' : 'HARD Construction'}
             </a>
             <span className="text-slate-300">•</span>
             <a

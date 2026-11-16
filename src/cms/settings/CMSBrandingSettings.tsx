@@ -39,7 +39,7 @@ interface CMSBrandingSettingsProps {
 }
 
 const SECTORS: { id: SectorId; nameAr: string; nameEn: string; icon: any }[] = [
-  { id: 'portal', nameAr: 'المجموعة القابضة (عام)', nameEn: 'HARD Group (Shared)', icon: Building2 },
+  { id: 'portal', nameAr: 'المجموعة (عام)', nameEn: 'HARD Group (Shared)', icon: Building2 },
   { id: 'realestate', nameAr: 'قطاع العقارات', nameEn: 'Real Estate Sector', icon: Home },
   { id: 'construction', nameAr: 'قطاع المقاولات', nameEn: 'Construction Sector', icon: HardHat },
   { id: 'hvac', nameAr: 'قطاع التكييف HVAC', nameEn: 'HVAC Engineering', icon: ThermometerSnowflake },
@@ -252,7 +252,7 @@ export const CMSBrandingSettings: React.FC<CMSBrandingSettingsProps> = ({
           <Sliders className="w-4 h-4 text-sky-600 shrink-0" />
           <span>
             {isSharedPortal
-              ? (isAr ? 'أنت تعدل الإعدادات العامة الأساسية للمجموعة القابضة (تطبق كأصل لكافة القطاعات).' : 'Editing base group settings (inherits to all sectors unless overridden).')
+              ? (isAr ? 'أنت تعدل الإعدادات العامة الأساسية للمجموعة (تطبق كأصل لكافة القطاعات).' : 'Editing base group settings (inherits to all sectors unless overridden).')
               : (isAr ? `أنت تعدل تخصيصات قطاع: ${SECTORS.find(s => s.id === activeSector)?.nameAr}` : `Editing overrides for: ${SECTORS.find(s => s.id === activeSector)?.nameEn}`)}
           </span>
         </div>

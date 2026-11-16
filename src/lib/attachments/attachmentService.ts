@@ -36,11 +36,17 @@ export async function uploadFormAttachment(
   const isAr = options.isAr ?? true;
   const validationError = validateAttachmentFile(file, options.config, isAr);
   if (validationError) throw new Error(validationError);
+  const timeout = AbortSignal.timeout(45000);
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: { apikey: hardPublishableKey, 'Content-Type': file.type, 'x-file-name': encodeURIComponent(file.name) },
     body: file,
-    signal: AbortSignal.timeout(60000),
+    signal: timeout,
+  }).catch((error) => {
+    if (timeout.aborted) {
+      throw new Error(isAr ? 'انتهت مهلة رفع المرفق. حاول مرة أخرى.' : 'The attachment upload timed out. Try again.');
+    }
+    throw error;
   });
   if (!response.ok) {
     throw new Error(response.status === 429

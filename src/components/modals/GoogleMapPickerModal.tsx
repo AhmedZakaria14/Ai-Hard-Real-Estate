@@ -87,14 +87,20 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
   const [searchResults, setSearchResults] = useState<Array<{ display_name: string; lat: string; lon: string }>>([]);
 
   // Fetch human-readable address from Nominatim reverse geocode
+  const reverseLookup = useRef<AbortController | null>(null);
   const reverseGeocode = async (lat: number, lng: number) => {
+    reverseLookup.current?.abort();
+    const request = new AbortController();
+    reverseLookup.current = request;
+    setAddressText('');
     try {
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=${isAr ? 'ar' : 'en'}`
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=${isAr ? 'ar' : 'en'}`,
+        { signal: request.signal },
       );
       if (res.ok) {
         const data = await res.json();
-        if (data && data.display_name) {
+        if (!request.signal.aborted && data?.display_name) {
           // Format a clean, brief address
           const addr = data.address || {};
           const district = addr.suburb || addr.neighbourhood || addr.quarter || addr.city_district || '';
@@ -110,14 +116,14 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
         }
       }
     } catch {
-      // Fallback to coordinates
-      setAddressText('');
+      if (!request.signal.aborted) setAddressText('');
     }
   };
 
   // Initialize Map when modal opens
   useEffect(() => {
     if (!isOpen) {
+      reverseLookup.current?.abort();
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;

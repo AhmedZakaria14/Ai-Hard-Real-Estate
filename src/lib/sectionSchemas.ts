@@ -178,7 +178,7 @@ export const REGISTERED_SECTION_TYPES: {
     descriptionAr: 'عنوان كاسح، خلفية صورية مكثفة، وأزرار توجيه رئيسية',
     descriptionEn: 'Prominent headline, immersive background image, and call-to-action buttons',
     defaultContent: {
-      title: { ar: 'مجموعة هارد القابضة', en: 'HARD Group Holding' },
+      title: { ar: 'مجموعة هارد', en: 'HARD Group' },
       subtitle: { ar: 'الريادة والتميز في العقارات والإنشاءات وأنظمة التكييف بالمملكة', en: 'Pioneering Excellence Across Real Estate, Construction & HVAC' },
       bgImageUrl: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1600&q=80',
       primaryCtaText: { ar: 'استكشف عقاراتنا', en: 'Explore Properties' },
@@ -197,8 +197,8 @@ export const REGISTERED_SECTION_TYPES: {
       heading: { ar: 'عن المجموعة ورؤيتنا المستقبلية', en: 'About The Group & Future Vision' },
       subheading: { ar: 'التزام راسخ بالجودة والتطوير المستدام', en: 'Unwavering commitment to quality & sustainable development' },
       bodyParagraphs: {
-        ar: 'تعد مجموعة هارد القابضة واحدة من أبرز المجموعات الاستثمارية والتطويرية في المملكة العربية السعودية، حيث تقدم محفظة متكاملة تشمل التطوير العقاري الفاخر، المقاولات الكبرى، وهندسة أنظمة التكييف والتبريد.',
-        en: 'HARD Group Holding is a premier investment and development entity in the Kingdom of Saudi Arabia, delivering a comprehensive portfolio across luxury real estate, master contracting, and enterprise HVAC engineering.',
+        ar: 'تعد مجموعة هارد واحدة من أبرز المجموعات الاستثمارية والتطويرية في المملكة العربية السعودية، حيث تقدم محفظة متكاملة تشمل التطوير العقاري الفاخر، المقاولات الكبرى، وهندسة أنظمة التكييف والتبريد.',
+        en: 'HARD Group is a premier investment and development entity in the Kingdom of Saudi Arabia, delivering a comprehensive portfolio across luxury real estate, master contracting, and enterprise HVAC engineering.',
       },
       alignment: 'start',
     } as TextBlockContent,

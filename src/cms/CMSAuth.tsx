@@ -159,7 +159,7 @@ export const CMSAuth: React.FC<CMSAuthProps> = ({
                     aria-required="true"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="info@hardgp.com"
+                    placeholder="name@example.com"
                     className="w-full ps-10 pe-4 py-2.5 bg-slate-800/90 border border-slate-700 hover:border-slate-600 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-start"
                   />
                 </div>
@@ -191,7 +191,6 @@ export const CMSAuth: React.FC<CMSAuthProps> = ({
                     aria-required="true"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
                     className="w-full ps-10 pe-11 py-2.5 bg-slate-800/90 border border-slate-700 hover:border-slate-600 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-start"
                   />
                   <button
@@ -256,7 +255,7 @@ export const CMSAuth: React.FC<CMSAuthProps> = ({
                     aria-required="true"
                     value={resetEmail}
                     onChange={(e) => setResetEmail(e.target.value)}
-                    placeholder="info@hardgp.com"
+                    placeholder="name@example.com"
                     className="w-full ps-10 pe-4 py-2.5 bg-slate-800/90 border border-slate-700 hover:border-slate-600 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-start"
                   />
                 </div>

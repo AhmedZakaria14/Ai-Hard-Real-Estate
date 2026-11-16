@@ -69,8 +69,8 @@ export const DEFAULT_PORTAL_SETTINGS: PublicBrandingSettings = {
   logoUrlDark: '/logo.svg',
   faviconUrl: '/favicon.ico',
   siteName: {
-    ar: 'مجموعة هارد القابضة',
-    en: 'HARD Group Holding',
+    ar: 'مجموعة هارد',
+    en: 'HARD Group',
   },
   tagline: {
     ar: 'الرائدة في العقارات، الإنشاءات، وحلول التكييف بالمملكة',
@@ -111,8 +111,8 @@ export const DEFAULT_PORTAL_SETTINGS: PublicBrandingSettings = {
 
   footerContent: {
     copyrightText: {
-      ar: '© 2026 مجموعة هارد القابضة. جميع الحقوق محفوظة.',
-      en: '© 2026 HARD Group Holding. All rights reserved.',
+      ar: '© 2026 مجموعة هارد. جميع الحقوق محفوظة.',
+      en: '© 2026 HARD Group. All rights reserved.',
     },
     crNumber: '1010892341',
     taxNumber: '310982341200003',

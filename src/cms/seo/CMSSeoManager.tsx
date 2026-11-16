@@ -96,7 +96,7 @@ export const CMSSeoManager: React.FC<CMSSeoManagerProps> = ({ language }) => {
   };
 
   const pagesList: { key: string; labelEn: string; labelAr: string; path: string }[] = [
-    { key: 'portal', labelEn: 'Corporate Group Portal', labelAr: 'بوابة المجموعة القابضة', path: '/' },
+    { key: 'portal', labelEn: 'Corporate Group Portal', labelAr: 'بوابة المجموعة', path: '/' },
     { key: 'home', labelEn: 'Real Estate Home', labelAr: 'الرئيسية - العقارات', path: '/realestate' },
     { key: 'properties', labelEn: 'Properties Search Index', labelAr: 'فهرس البحث عن العقارات', path: '/realestate/properties' },
     { key: 'projects', labelEn: 'Major Off-Plan Projects', labelAr: 'المشاريع التطويرية الكبرى', path: '/realestate/projects' },

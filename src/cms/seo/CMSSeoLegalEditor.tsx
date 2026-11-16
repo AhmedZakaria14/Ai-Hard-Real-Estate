@@ -206,7 +206,7 @@ export const CMSSeoLegalEditor: React.FC<CMSSeoLegalEditorProps> = ({ language }
   };
 
   const pageRouteLabels: Record<string, { en: string; ar: string }> = {
-    portal: { en: 'Corporate Portal (/)', ar: 'البوابة الرئيسية القابضة (/)' },
+    portal: { en: 'Corporate Portal (/)', ar: 'البوابة الرئيسية (/)' },
     home: { en: 'Real Estate Home (/realestate)', ar: 'الرئيسية للعقارات (/realestate)' },
     properties: { en: 'Properties Index (/realestate/properties)', ar: 'فهرس العقارات (/realestate/properties)' },
     projects: { en: 'Off-Plan Projects (/realestate/projects)', ar: 'المشاريع التطويرية (/realestate/projects)' },

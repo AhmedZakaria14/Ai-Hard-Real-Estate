@@ -640,7 +640,7 @@ export const T = {
     },
     corporatePortal: {
       en: 'Corporate Group Portal',
-      ar: 'بوابة المجموعة القابضة',
+      ar: 'بوابة المجموعة',
     },
     constructionDiv: {
       en: 'HARD Construction & Contracting',

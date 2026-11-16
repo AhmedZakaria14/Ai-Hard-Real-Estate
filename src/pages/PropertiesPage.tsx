@@ -63,6 +63,10 @@ interface PropertiesPageProps {
   initialFilters?: PropertyFilterParams | null;
 }
 
+function normalizeStatus(status: string): PropertyStatusFilter {
+  return status === 'for-sale' || status === 'for-rent' ? status : 'all';
+}
+
 export function PropertiesPage({
   onNavigate,
   onSelectProperty,
@@ -81,7 +85,7 @@ export function PropertiesPage({
 
     return {
       searchQuery: initialFilters?.searchQuery ?? fromUrl.searchQuery,
-      status: (initialFilters?.status as PropertyStatusFilter) ?? fromUrl.status,
+      status: normalizeStatus(initialFilters?.status ?? fromUrl.status),
       type: (initialFilters?.type as PropertyTypeFilter) ?? fromUrl.type,
       city: initialFilters?.city ?? fromUrl.city,
       bedroom: (initialFilters?.bedroom as PropertyBedroomFilter) ?? fromUrl.bedroom,
@@ -102,12 +106,8 @@ export function PropertiesPage({
   const [rentalPeriod, setRentalPeriod] = useState<RentalPeriod>(initialParams.rentalPeriod);
   const [maxPrice, setMaxPrice] = useState<number>(initialParams.maxPrice);
   const [minPrice, setMinPrice] = useState<number>(initialParams.minPrice);
-  const [minInputVal, setMinInputVal] = useState<string>(initialParams.minPrice ? String(initialParams.minPrice) : '');
-  const [maxInputVal, setMaxInputVal] = useState<string>('');
-  const [priceError, setPriceError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<PropertySortOption>(initialParams.sortBy);
   const [viewMode, setViewMode] = useState<Exclude<PropertyViewMode, 'map'>>(initialParams.viewMode);
-  const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false);
 
   // References to distinguish history navigation, continuous slider/typing updates, and discrete filter clicks
   const isPopstateRef = React.useRef(false);
@@ -121,7 +121,7 @@ export function PropertiesPage({
       isPopstateRef.current = true;
       const parsed = parsePropertyQueryParams(window.location.search);
       setSearchQuery(parsed.searchQuery);
-      setStatusFilter(parsed.status);
+      setStatusFilter(normalizeStatus(parsed.status));
       setTypeFilter(parsed.type);
       setLocationFilter(parsed.city);
       setBedroomFilter(parsed.bedroom);
@@ -140,7 +140,7 @@ export function PropertiesPage({
   useEffect(() => {
     if (initialFilters) {
       if (initialFilters.searchQuery !== undefined) setSearchQuery(initialFilters.searchQuery);
-      if (initialFilters.status !== undefined) setStatusFilter(initialFilters.status as PropertyStatusFilter);
+      if (initialFilters.status !== undefined) setStatusFilter(normalizeStatus(initialFilters.status));
       if (initialFilters.type !== undefined) setTypeFilter(initialFilters.type as PropertyTypeFilter);
       if (initialFilters.city !== undefined) setLocationFilter(initialFilters.city);
       if (initialFilters.rentalPeriod !== undefined) setRentalPeriod(initialFilters.rentalPeriod as RentalPeriod);
@@ -295,181 +295,21 @@ export function PropertiesPage({
     return count;
   }, [searchQuery, statusFilter, typeFilter, locationFilter, bedroomFilter, minPrice, maxPrice, currentMaxCap]);
 
-  // Sync minInputVal & maxInputVal when numeric states minPrice / maxPrice update from non-input interactions
-  useEffect(() => {
-    const isMinFocused = typeof document !== 'undefined' && document.activeElement?.id === 'min-price-input';
-    if (!isMinFocused) {
-      setMinInputVal(minPrice > 0 ? String(minPrice) : '');
-    }
-  }, [minPrice]);
-
-  useEffect(() => {
-    const isMaxFocused = typeof document !== 'undefined' && document.activeElement?.id === 'max-price-input';
-    if (!isMaxFocused) {
-      setMaxInputVal(maxPrice < currentMaxCap ? String(maxPrice) : '');
-    }
-  }, [maxPrice, currentMaxCap]);
-
-  // Accessible Min Price Input Handlers
-  const handleMinInputChange = (val: string) => {
-    setMinInputVal(val);
-    isTypingSearchRef.current = true;
-
-    if (val.trim() === '') {
-      setMinPrice(0);
-      setPriceError(null);
-      return;
-    }
-
-    const num = Number(val);
-    if (Number.isNaN(num) || num < 0) {
-      setPriceError(
-        language === 'en'
-          ? 'Minimum price must be a non-negative number'
-          : 'الحد الأدنى للسعر يجب أن يكون رقماً غير سالب'
-      );
-      setMinPrice(0);
-    } else {
-      setMinPrice(num);
-      if (maxPrice > 0 && num > maxPrice) {
-        setPriceError(
-          language === 'en'
-            ? 'Minimum price exceeds maximum price'
-            : 'الحد الأدنى للسعر يتجاوز الحد الأقصى'
-        );
-      } else {
-        setPriceError(null);
-      }
-    }
-  };
-
-  const handleMinInputBlur = () => {
-    isTypingSearchRef.current = false;
-    if (minInputVal.trim() === '') {
-      setMinPrice(0);
-      setPriceError(null);
-    } else {
-      const num = Number(minInputVal);
-      if (Number.isNaN(num) || num < 0) {
-        setMinPrice(0);
-        setMinInputVal('');
-        setPriceError(null);
-      } else if (maxPrice > 0 && num > maxPrice) {
-        // Enforce min <= max without silently discarding user's input: raise max to match min
-        setMaxPrice(num);
-        setMaxInputVal(String(num));
-        setPriceError(null);
-      } else {
-        setPriceError(null);
-      }
-    }
-    syncPropertyUrl(
-      {
-        searchQuery,
-        city: locationFilter,
-        type: typeFilter,
-        status: statusFilter,
-        rentalPeriod,
-        minPrice,
-        maxPrice,
-        bedroom: bedroomFilter,
-        sortBy,
-        viewMode,
-      },
-      { replace: false }
-    );
-  };
-
-  // Accessible Max Price Input Handlers
-  const handleMaxInputChange = (val: string) => {
-    setMaxInputVal(val);
-    isTypingSearchRef.current = true;
-
-    if (val.trim() === '') {
-      setMaxPrice(currentMaxCap);
-      setPriceError(null);
-      return;
-    }
-
-    const num = Number(val);
-    if (Number.isNaN(num) || num < 0) {
-      setPriceError(
-        language === 'en'
-          ? 'Maximum price must be a non-negative number'
-          : 'الحد الأقصى للسعر يجب أن يكون رقماً غير سالب'
-      );
-      setMaxPrice(currentMaxCap);
-    } else {
-      setMaxPrice(num);
-      if (minPrice > 0 && num < minPrice) {
-        setPriceError(
-          language === 'en'
-            ? 'Maximum price is less than minimum price'
-            : 'الحد الأقصى للسعر أقل من الحد الأدنى'
-        );
-      } else {
-        setPriceError(null);
-      }
-    }
-  };
-
-  const handleMaxInputBlur = () => {
-    isTypingSearchRef.current = false;
-    if (maxInputVal.trim() === '') {
-      setMaxPrice(currentMaxCap);
-      setPriceError(null);
-    } else {
-      const num = Number(maxInputVal);
-      if (Number.isNaN(num) || num < 0) {
-        setMaxPrice(currentMaxCap);
-        setMaxInputVal('');
-        setPriceError(null);
-      } else if (minPrice > 0 && num < minPrice) {
-        // Enforce min <= max without silently discarding user's input: lower min to match max
-        setMinPrice(num);
-        setMinInputVal(String(num));
-        setPriceError(null);
-      } else {
-        setPriceError(null);
-      }
-    }
-    syncPropertyUrl(
-      {
-        searchQuery,
-        city: locationFilter,
-        type: typeFilter,
-        status: statusFilter,
-        rentalPeriod,
-        minPrice,
-        maxPrice,
-        bedroom: bedroomFilter,
-        sortBy,
-        viewMode,
-      },
-      { replace: false }
-    );
-  };
-
   // Helper to handle status filter changes & automatically reset incompatible price limits
   const handleStatusFilterChange = (newStatus: PropertyStatusFilter) => {
     isTypingSearchRef.current = false;
     isDraggingSliderRef.current = false;
     setStatusFilter(newStatus);
-    setPriceError(null);
 
     if (newStatus === 'for-rent') {
       if (maxPrice > DEFAULT_RENTAL_YEAR_MAX || minPrice > DEFAULT_RENTAL_YEAR_MAX) {
         setMinPrice(0);
         setMaxPrice(rentalPeriod === 'month' ? DEFAULT_RENTAL_MONTH_MAX : DEFAULT_RENTAL_YEAR_MAX);
-        setMinInputVal('');
-        setMaxInputVal('');
       }
     } else {
       if (maxPrice <= DEFAULT_RENTAL_YEAR_MAX) {
         setMinPrice(0);
         setMaxPrice(DEFAULT_PURCHASE_MAX);
-        setMinInputVal('');
-        setMaxInputVal('');
       }
     }
   };
@@ -480,35 +320,26 @@ export function PropertiesPage({
     isDraggingSliderRef.current = false;
     isTypingSearchRef.current = false;
     setRentalPeriod(newPeriod);
-    setPriceError(null);
 
     if (newPeriod === 'month') {
       if (maxPrice >= DEFAULT_RENTAL_YEAR_MAX) {
         setMinPrice(0);
         setMaxPrice(DEFAULT_RENTAL_MONTH_MAX);
-        setMinInputVal('');
-        setMaxInputVal('');
       } else {
         const newMin = Math.round(minPrice / 12);
         const newMax = Math.round(maxPrice / 12);
         setMinPrice(newMin);
         setMaxPrice(newMax);
-        setMinInputVal(newMin > 0 ? String(newMin) : '');
-        setMaxInputVal(String(newMax));
       }
     } else {
       if (maxPrice >= DEFAULT_RENTAL_MONTH_MAX) {
         setMinPrice(0);
         setMaxPrice(DEFAULT_RENTAL_YEAR_MAX);
-        setMinInputVal('');
-        setMaxInputVal('');
       } else {
         const newMin = Math.round(minPrice * 12);
         const newMax = Math.round(maxPrice * 12);
         setMinPrice(newMin);
         setMaxPrice(newMax);
-        setMinInputVal(newMin > 0 ? String(newMin) : '');
-        setMaxInputVal(String(newMax));
       }
     }
   };
@@ -524,9 +355,6 @@ export function PropertiesPage({
     setRentalPeriod('year');
     setMinPrice(0);
     setMaxPrice(DEFAULT_PURCHASE_MAX);
-    setMinInputVal('');
-    setMaxInputVal('');
-    setPriceError(null);
     setSortBy('featured');
     syncPropertyUrl(
       {
@@ -546,13 +374,6 @@ export function PropertiesPage({
     })),
   ], [language, t]);
 
-  const pricePresets = [
-    { label: language === 'en' ? 'Any Price' : 'أي سعر', max: 50000000 },
-    { label: language === 'en' ? 'Under 5M SAR' : 'أقل من 5 مليون ر.س', max: 5000000 },
-    { label: language === 'en' ? 'Under 10M SAR' : 'أقل من 10 مليون ر.س', max: 10000000 },
-    { label: language === 'en' ? 'Under 25M SAR' : 'أقل من 25 مليون ر.س', max: 25000000 },
-    { label: language === 'en' ? '25M+ SAR' : 'أكثر من 25 مليون ر.س', min: 25000000, max: 50000000 },
-  ];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -578,44 +399,8 @@ export function PropertiesPage({
         </div>
       </div>
 
-      {/* Property Type Visual Pill Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-        {propertyTypeTabs.map((tab) => {
-          const Icon = tab.icon;
-          const isSelected = typeFilter === tab.id;
-          const count = typeCounts[tab.id] ?? 0;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => {
-                isDraggingSliderRef.current = false;
-                isTypingSearchRef.current = false;
-                setTypeFilter(tab.id as PropertyTypeFilter);
-              }}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                isSelected
-                  ? 'bg-slate-900 text-white shadow-md'
-                  : 'bg-white border border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50'
-              }`}
-            >
-              <Icon className={`w-4 h-4 ${isSelected ? 'text-blue-400' : 'text-slate-400'}`} />
-              <span>{tab.label}</span>
-              <span
-                className={`text-[11px] px-2 py-0.5 rounded-full ${
-                  isSelected ? 'bg-slate-800 text-slate-200' : 'bg-slate-100 text-slate-600'
-                }`}
-              >
-                {count}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Main Search & Interactive Filter Control Panel */}
-      <div className="relative z-30 bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-6 overflow-visible">
-        {/* Primary Row: Search, Status, Location, and Sort */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 relative z-30 overflow-visible">
+      <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="grid gap-6 lg:grid-cols-[17rem_minmax(0,1fr)] items-start">
+        <aside aria-label={language === 'ar' ? 'تصفية العقارات' : 'Property filters'} className="relative z-30 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
           {/* Keyword Search (4 cols) */}
           <div className="lg:col-span-4 relative">
             <label htmlFor="properties-search-query" className="sr-only">
@@ -685,6 +470,20 @@ export function PropertiesPage({
             )}
           </div>
 
+          <select
+            aria-label={t.properties.filters.allTypes}
+            value={typeFilter}
+            onChange={(event) => {
+              isTypingSearchRef.current = false;
+              setTypeFilter(event.target.value as PropertyTypeFilter);
+            }}
+            className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm"
+          >
+            {propertyTypeTabs.map(({ id, label }) => (
+              <option key={id} value={id}>{label} ({(typeCounts[id] ?? 0).toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')})</option>
+            ))}
+          </select>
+
           {/* Location / City Dropdown (3 cols) */}
           <div className="lg:col-span-3">
             <CitySearchDropdown
@@ -718,7 +517,6 @@ export function PropertiesPage({
               <option value="all">{t.properties.filters.allStatus}</option>
               <option value="for-sale">{t.properties.filters.forSale}</option>
               <option value="for-rent">{t.properties.filters.forRent}</option>
-              <option value="off-plan">{t.properties.filters.offPlan}</option>
             </select>
           </div>
 
@@ -745,12 +543,8 @@ export function PropertiesPage({
               <option value="beds-desc">{language === 'en' ? 'Bedrooms: Most First' : 'غرف النوم: الأكثر أولاً'}</option>
             </select>
           </div>
-        </div>
 
-        {/* Interactive Price Range & Bedroom Controls */}
-        <div className="pt-4 border-t border-slate-100 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Price Range Slider Section (7 cols) */}
-          <div className="lg:col-span-7 space-y-3">
+          <div className="space-y-3 border-t border-slate-100 pt-3">
             {/* Header with Active Budget Display */}
             <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
               <span className="font-semibold text-slate-700 flex items-center gap-1.5">
@@ -786,110 +580,22 @@ export function PropertiesPage({
                 </div>
               )}
 
-              {/* Active Budget Display Badge */}
-              <span className="font-bold text-blue-700 font-display-serif text-xs sm:text-sm px-2.5 py-0.5 bg-blue-50 border border-blue-200 rounded-xl">
-                {statusFilter === 'for-rent' ? (
-                  rentalPeriod === 'month' ? (
-                    maxPrice >= DEFAULT_RENTAL_MONTH_MAX && minPrice === 0 ? (
-                      language === 'en' ? 'Any Monthly Budget' : 'جميع ميزانيات الإيجار الشهري'
-                    ) : minPrice > 0 ? (
-                      `${(minPrice || 0).toLocaleString()} - ${(maxPrice || 0).toLocaleString()} ${language === 'ar' ? 'ر.س / شهرياً' : 'SAR / mo'}`
-                    ) : (
-                      `${language === 'en' ? 'Up to' : 'حتى'} ${(maxPrice || 0).toLocaleString()} ${language === 'ar' ? 'ر.س / شهرياً' : 'SAR / mo'}`
-                    )
-                  ) : (
-                    maxPrice >= DEFAULT_RENTAL_YEAR_MAX && minPrice === 0 ? (
-                      language === 'en' ? 'Any Annual Budget' : 'جميع ميزانيات الإيجار السنوي'
-                    ) : minPrice > 0 ? (
-                      `${(minPrice || 0).toLocaleString()} - ${(maxPrice || 0).toLocaleString()} ${language === 'ar' ? 'ر.س / سنوياً' : 'SAR / yr'}`
-                    ) : (
-                      `${language === 'en' ? 'Up to' : 'حتى'} ${(maxPrice || 0).toLocaleString()} ${language === 'ar' ? 'ر.س / سنوياً' : 'SAR / yr'}`
-                    )
-                  )
-                ) : (
-                  maxPrice >= DEFAULT_PURCHASE_MAX && minPrice === 0 ? (
-                    t.properties.filters.anyPrice
-                  ) : minPrice > 0 ? (
-                    `${(minPrice / 1000000).toFixed(1)}M - ${(maxPrice / 1000000).toFixed(1)}M ${language === 'ar' ? 'ر.س' : 'SAR'}`
-                  ) : (
-                    `${language === 'en' ? 'Up to' : 'حتى'} ${(maxPrice / 1000000).toFixed(1)}M ${language === 'ar' ? 'ر.س' : 'SAR'}`
-                  )
-                )}
-              </span>
             </div>
+            <p className="text-xs font-semibold text-blue-700">
+              {maxPrice >= currentMaxCap && minPrice === 0
+                ? t.properties.filters.anyPrice
+                : <>
+                    {minPrice > 0 ? <>{minPrice.toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')} – </> : (language === 'ar' ? 'حتى ' : 'Up to ')}
+                    {maxPrice.toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')} {language === 'ar' ? 'ر.س' : 'SAR'}
+                  </>}
+            </p>
 
-            {/* Interactive Slider & Accessible Min/Max Price Inputs */}
-            <div className="space-y-3 pt-1">
-              {/* Accessible Min & Max Numeric Inputs */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label htmlFor="min-price-input" className="block text-[11px] font-semibold text-slate-600 mb-1 text-start">
-                    {t.properties.filters.minPrice || (language === 'en' ? 'Min Price' : 'الحد الأدنى')}
-                  </label>
-                  <div className="relative">
-                    <input
-                      id="min-price-input"
-                      type="number"
-                      min={0}
-                      max={currentMaxCap}
-                      step={statusFilter === 'for-rent' ? (rentalPeriod === 'month' ? 1000 : 10000) : 100000}
-                      placeholder={language === 'en' ? '0' : '٠'}
-                      value={minInputVal}
-                      onChange={(e) => handleMinInputChange(e.target.value)}
-                      onBlur={handleMinInputBlur}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleMinInputBlur();
-                      }}
-                      aria-label={language === 'en' ? 'Minimum property price' : 'الحد الأدنى لسعر العقار'}
-                      className="w-full ps-3 pe-12 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-start"
-                    />
-                    <span className="absolute top-2 end-2.5 text-[11px] font-bold text-slate-400 pointer-events-none">
-                      {language === 'ar' ? 'ر.س' : 'SAR'}
-                    </span>
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="max-price-input" className="block text-[11px] font-semibold text-slate-600 mb-1 text-start">
-                    {t.properties.filters.maxPrice || (language === 'en' ? 'Max Price' : 'الحد الأقصى')}
-                  </label>
-                  <div className="relative">
-                    <input
-                      id="max-price-input"
-                      type="number"
-                      min={0}
-                      max={currentMaxCap}
-                      step={statusFilter === 'for-rent' ? (rentalPeriod === 'month' ? 1000 : 10000) : 100000}
-                      placeholder={statusFilter === 'for-rent' ? (rentalPeriod === 'month' ? '50,000' : '500,000') : '50,000,000'}
-                      value={maxInputVal}
-                      onChange={(e) => handleMaxInputChange(e.target.value)}
-                      onBlur={handleMaxInputBlur}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleMaxInputBlur();
-                      }}
-                      aria-label={language === 'en' ? 'Maximum property price' : 'الحد الأقصى لسعر العقار'}
-                      className="w-full ps-3 pe-12 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-start"
-                    />
-                    <span className="absolute top-2 end-2.5 text-[11px] font-bold text-slate-400 pointer-events-none">
-                      {language === 'ar' ? 'ر.س' : 'SAR'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Validation Warning Alert */}
-              {priceError && (
-                <div className="text-[11px] font-semibold text-amber-800 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-xl flex items-center gap-1.5 animate-in fade-in">
-                  <AlertCircle className="w-3.5 h-3.5 shrink-0 text-amber-600" />
-                  <span>{priceError}</span>
-                </div>
-              )}
-
+            <div className="space-y-2">
               {/* Range Slider */}
               <input
                 type="range"
                 aria-label={t.properties.filters.priceSlider || (language === 'en' ? 'Price range filter' : 'تصفية نطاق السعر')}
-                min={statusFilter === 'for-rent' ? 0 : 500000}
+                min={0}
                 max={
                   statusFilter === 'for-rent'
                     ? (rentalPeriod === 'month' ? DEFAULT_RENTAL_MONTH_MAX : DEFAULT_RENTAL_YEAR_MAX)
@@ -942,115 +648,26 @@ export function PropertiesPage({
                 }}
                 className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-600"
               />
-              <div className="flex justify-between text-[11px] text-slate-400 font-medium">
-                {statusFilter === 'for-rent' ? (
-                  rentalPeriod === 'month' ? (
-                    <>
-                      <span>0 SAR</span>
-                      <span>15k</span>
-                      <span>30k</span>
-                      <span>50k+ SAR / mo</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>0 SAR</span>
-                      <span>150k</span>
-                      <span>300k</span>
-                      <span>500k+ SAR / yr</span>
-                    </>
-                  )
-                ) : (
-                  <>
-                    <span>500k</span>
-                    <span>10M</span>
-                    <span>25M</span>
-                    <span>40M</span>
-                    <span>50M+ SAR</span>
-                  </>
-                )}
-              </div>
             </div>
+          </div>
 
-            {/* Price Presets */}
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {(statusFilter === 'for-rent'
-                ? rentalPeriod === 'month'
-                  ? [
-                      { label: language === 'en' ? 'Any Rent' : 'أية ميزانية', max: DEFAULT_RENTAL_MONTH_MAX },
-                      { label: language === 'en' ? '< 10k SAR/mo' : 'أقل من 10,000 ر.س/شهرياً', max: 10000 },
-                      { label: language === 'en' ? '< 20k SAR/mo' : 'أقل من 20,000 ر.س/شهرياً', max: 20000 },
-                      { label: language === 'en' ? '< 35k SAR/mo' : 'أقل من 35,000 ر.س/شهرياً', max: 35000 },
-                      { label: language === 'en' ? '35k+ SAR/mo' : 'أكثر من 35,000 ر.س/شهرياً', min: 35000, max: DEFAULT_RENTAL_MONTH_MAX },
-                    ]
-                  : [
-                      { label: language === 'en' ? 'Any Rent' : 'أية ميزانية', max: DEFAULT_RENTAL_YEAR_MAX },
-                      { label: language === 'en' ? '< 100k SAR/yr' : 'أقل من 100,000 ر.س/سنوياً', max: 100000 },
-                      { label: language === 'en' ? '< 200k SAR/yr' : 'أقل من 200,000 ر.س/سنوياً', max: 200000 },
-                      { label: language === 'en' ? '< 350k SAR/yr' : 'أقل من 350,000 ر.س/سنوياً', max: 350000 },
-                      { label: language === 'en' ? '350k+ SAR/yr' : 'أكثر من 350,000 ر.س/سنوياً', min: 350000, max: DEFAULT_RENTAL_YEAR_MAX },
-                    ]
-                : [
-                    { label: language === 'en' ? 'Any Price' : 'أي سعر', max: DEFAULT_PURCHASE_MAX },
-                    { label: language === 'en' ? 'Under 5M SAR' : 'أقل من 5 مليون ر.س', max: 5000000 },
-                    { label: language === 'en' ? 'Under 10M SAR' : 'أقل من 10 مليون ر.س', max: 10000000 },
-                    { label: language === 'en' ? 'Under 25M SAR' : 'أقل من 25 مليون ر.س', max: 25000000 },
-                    { label: language === 'en' ? '25M+ SAR' : 'أكثر من 25 مليون ر.س', min: 25000000, max: DEFAULT_PURCHASE_MAX },
-                  ]
-              ).map((preset, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => {
-                    isDraggingSliderRef.current = false;
-                    isTypingSearchRef.current = false;
-                    if (preset.min) {
-                      setMinPrice(preset.min);
-                      setMaxPrice(preset.max);
-                    } else {
-                      setMinPrice(0);
-                      setMaxPrice(preset.max);
-                    }
-                  }}
-                  className={`text-[11px] px-2.5 py-1 rounded-xl transition-all cursor-pointer ${
-                    maxPrice === preset.max && (preset.min ? minPrice === preset.min : minPrice === 0)
-                      ? 'bg-blue-600 text-white font-semibold shadow-xs'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
-                >
-                  {preset.label}
-                </button>
+          <label className="block space-y-1 text-xs font-semibold">
+            <span>{t.properties.filters.bedrooms}</span>
+            <select
+              value={bedroomFilter}
+              onChange={(event) => {
+                isDraggingSliderRef.current = false;
+                isTypingSearchRef.current = false;
+                setBedroomFilter(event.target.value as PropertyBedroomFilter);
+              }}
+              className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm"
+            >
+              <option value="all">{language === 'ar' ? 'الكل' : 'All'}</option>
+              {['1', '2', '3', '4', '5+'].map((count) => (
+                <option key={count} value={count}>{Number.parseInt(count).toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')}{count.endsWith('+') ? '+' : ''}</option>
               ))}
-            </div>
-          </div>
-
-          {/* Bedroom Filter Chips (5 cols) */}
-          <div className="lg:col-span-5 space-y-2">
-            <label className="block text-xs font-semibold text-slate-700">
-              {t.properties.filters.bedrooms}
-            </label>
-            <div className="grid grid-cols-6 gap-1.5">
-              {['all', '1', '2', '3', '4', '5+'].map((beds) => {
-                const isSelected = bedroomFilter === beds;
-                return (
-                  <button
-                    key={beds}
-                    onClick={() => {
-                      isDraggingSliderRef.current = false;
-                      isTypingSearchRef.current = false;
-                      setBedroomFilter(beds as PropertyBedroomFilter);
-                    }}
-                    className={`py-2 px-1 rounded-xl text-xs font-semibold text-center transition-all cursor-pointer ${
-                      isSelected
-                        ? 'bg-blue-600 text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    {beds === 'all' ? (language === 'en' ? 'All' : 'الكل') : beds}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
+            </select>
+          </label>
 
         {/* Active Filter Chips & Reset All Bar */}
         {activeFiltersCount > 0 && (
@@ -1151,8 +768,8 @@ export function PropertiesPage({
             </button>
           </div>
         )}
-      </div>
-
+        </aside>
+        <section className="min-w-0 space-y-6">
       {/* Results Controls Bar: Results Count & View Mode Switcher */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <p className="text-xs sm:text-sm font-medium text-slate-600">
@@ -1220,7 +837,7 @@ export function PropertiesPage({
         <div
           className={
             viewMode === 'grid'
-              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+              ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'
               : 'space-y-6'
           }
         >
@@ -1237,6 +854,8 @@ export function PropertiesPage({
           ))}
         </div>
       )}
+        </section>
+      </div>
     </div>
   );
 }

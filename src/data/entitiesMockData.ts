@@ -160,8 +160,8 @@ export const mockFaqs: FaqEntity[] = [
   {
     id: 'faq-4',
     question: {
-      en: 'What is the corporate structure and regional reach of HARD Group Holding?',
-      ar: 'ما هي الهيكلية النطاق الجغرافي لمجموعة هارد القابضة؟',
+      en: 'What is the corporate structure and regional reach of HARD Group?',
+      ar: 'ما هي الهيكلية النطاق الجغرافي لمجموعة هارد؟',
     },
     answer: {
       en: 'HARD Group operates three specialized sector divisions—Real Estate, Master Construction, and Enterprise HVAC—headquartered in Al Khobar with active regional operations in Riyadh and Jeddah.',

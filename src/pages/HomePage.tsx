@@ -59,7 +59,7 @@ export function HomePage({
   const ArrowIcon = language === 'ar' ? ArrowLeft : ArrowRight;
 
   // Search Filter State in Hero
-  const [activeTab, setActiveTab] = useState<'buy' | 'rent'>('buy');
+  const [activeTab, setActiveTab] = useState<'all' | 'buy' | 'rent'>('all');
   const [searchLocation, setSearchLocation] = useState('');
   const [searchType, setSearchType] = useState('all');
   const [searchBudget, setSearchBudget] = useState('all');
@@ -138,30 +138,23 @@ export function HomePage({
 
           {/* Prominent, Simplified Search Bar (Location, Property Type, Price Range) - 25% wider container with full dropdown visibility */}
           <div className="relative z-30 bg-white/95 backdrop-blur-md rounded-3xl p-5 sm:p-7 shadow-2xl border border-white/20 text-slate-900 max-w-5xl lg:max-w-6xl w-full overflow-visible">
-            {/* Search Tab Switcher: Buy and Rent */}
             <div className="flex items-center gap-2 mb-4 border-b border-slate-200/80 pb-3">
-              <button
-                type="button"
-                onClick={() => { if (activeTab !== 'buy') setSearchBudget('all'); setActiveTab('buy'); }}
-                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                  activeTab === 'buy'
-                    ? 'bg-hard-gradient text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                }`}
-              >
-                {t.home.searchTabs.buy}
-              </button>
-              <button
-                type="button"
-                onClick={() => { if (activeTab !== 'rent') setSearchBudget('all'); setActiveTab('rent'); }}
-                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                  activeTab === 'rent'
-                    ? 'bg-hard-gradient text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                }`}
-              >
-                {t.home.searchTabs.rent}
-              </button>
+              {(['all', 'buy', 'rent'] as const).map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  aria-pressed={activeTab === mode}
+                  onClick={() => {
+                    if (activeTab !== mode) setSearchBudget('all');
+                    setActiveTab(mode);
+                  }}
+                  className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                    activeTab === mode ? 'bg-hard-gradient text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  {mode === 'all' ? (language === 'ar' ? 'الكل' : 'All') : t.home.searchTabs[mode]}
+                </button>
+              ))}
             </div>
 
             {/* Filter Form Bar: Location, Property Type, Price Range */}

@@ -40,7 +40,7 @@ interface CMSMediaLibraryProps {
 }
 
 const SECTORS: { id: SectorId; nameAr: string; nameEn: string; icon: any }[] = [
-  { id: 'portal', nameAr: 'المجموعة القابضة', nameEn: 'Group Main Portal', icon: Building2 },
+  { id: 'portal', nameAr: 'المجموعة', nameEn: 'Group Main Portal', icon: Building2 },
   { id: 'realestate', nameAr: 'قطاع العقارات', nameEn: 'Real Estate', icon: Home },
   { id: 'construction', nameAr: 'قطاع المقاولات', nameEn: 'Construction', icon: HardHat },
   { id: 'hvac', nameAr: 'قطاع التكييف', nameEn: 'HVAC Engineering', icon: ThermometerSnowflake },

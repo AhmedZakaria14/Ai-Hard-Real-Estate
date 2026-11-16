@@ -50,6 +50,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
   const isAr = language === 'ar';
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const uploadInProgress = useRef(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
@@ -59,7 +60,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
 
   const processFiles = async (files: FileList | File[]) => {
     setUploadError(null);
-    if (disabled || isMaxReached) return;
+    if (disabled || isMaxReached || uploadInProgress.current) return;
 
     const fileList = Array.from(files);
     if (fileList.length === 0) return;
@@ -73,18 +74,19 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
       return;
     }
 
+    const validationError = fileList.map((file) => validateAttachmentFile(file, mergedConfig, isAr)).find(Boolean);
+    if (validationError) {
+      setUploadError(validationError);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    uploadInProgress.current = true;
     setIsUploading(true);
     const newAttachments: FormAttachmentMeta[] = [...attachments];
 
     try {
       for (const file of fileList) {
-        const error = validateAttachmentFile(file, mergedConfig, isAr);
-        if (error) {
-          setUploadError(error);
-          setIsUploading(false);
-          return;
-        }
-
         const uploadedMeta = await uploadFormAttachment(file, {
           uploadSessionId,
           config: mergedConfig,
@@ -99,6 +101,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
       setUploadError(err?.message || (isAr ? 'حدث خطأ أثناء رفع الملف.' : 'Error uploading file.'));
     } finally {
       onChange(newAttachments);
+      uploadInProgress.current = false;
       setIsUploading(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';

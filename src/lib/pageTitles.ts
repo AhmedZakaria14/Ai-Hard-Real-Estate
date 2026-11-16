@@ -31,7 +31,7 @@ export function getPageTitle(options: PageTitleOptions): string {
   switch (page) {
     case 'portal':
       return isAr
-        ? 'مجموعة هارد | بوابة المجموعة القابضة'
+        ? 'مجموعة هارد | بوابة المجموعة'
         : 'HARD Group | Corporate Group Portal';
 
     case 'home':
@@ -136,7 +136,7 @@ export function getPageTitle(options: PageTitleOptions): string {
 
     default:
       return isAr
-        ? 'مجموعة هارد | بوابة المجموعة القابضة'
+        ? 'مجموعة هارد | بوابة المجموعة'
         : 'HARD Group | Corporate Group Portal';
   }
 }
@@ -151,7 +151,7 @@ export function getPageDescription(options: PageTitleOptions): string {
   switch (page) {
     case 'portal':
       return isAr
-        ? 'مجموعة هارد القابضة - البوابة الموحدة لقطاعات العقارات والإنشاءات والمقاولات العامة وصيانة وتكييف الهواء في المملكة العربية السعودية.'
+        ? 'مجموعة هارد - البوابة الموحدة لقطاعات العقارات والإنشاءات والمقاولات العامة وصيانة وتكييف الهواء في المملكة العربية السعودية.'
         : 'HARD Group Corporate Portal - Unified multi-sector platform for Real Estate Advisory, General Contracting & Construction, and HVAC Maintenance across Saudi Arabia.';
 
     case 'home':

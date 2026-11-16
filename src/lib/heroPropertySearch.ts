@@ -17,7 +17,7 @@ const rentalBudgets: Readonly<Record<string, readonly [number, number]>> = {
 };
 
 export function getHeroPropertyFilters(
-  mode: 'buy' | 'rent',
+  mode: 'all' | 'buy' | 'rent',
   city: string,
   type: string,
   budget: string,
@@ -31,7 +31,7 @@ export function getHeroPropertyFilters(
   return {
     city: city.trim() || 'all',
     type,
-    status: rental ? 'for-rent' : 'for-sale',
+    status: mode === 'all' ? 'all' : rental ? 'for-rent' : 'for-sale',
     rentalPeriod: 'year',
     minPrice,
     maxPrice,

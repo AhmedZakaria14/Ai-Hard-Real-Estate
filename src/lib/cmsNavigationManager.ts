@@ -47,7 +47,7 @@ export const INFRASTRUCTURE_ROUTES = [
 
 // Available Internal Destinations Catalog
 export const KNOWN_INTERNAL_DESTINATIONS: { path: string; labelAr: string; labelEn: string; sector: SectorId }[] = [
-  { path: '/', labelAr: 'البوابة الرئيسية القابضة', labelEn: 'Group Main Portal', sector: 'portal' },
+  { path: '/', labelAr: 'البوابة الرئيسية', labelEn: 'Group Main Portal', sector: 'portal' },
   { path: '/realestate', labelAr: 'الرئيسية - العقارات', labelEn: 'Real Estate Home', sector: 'realestate' },
   { path: '/realestate/properties', labelAr: 'كتالوج العقارات والأصول', labelEn: 'Properties & Assets Catalog', sector: 'realestate' },
   { path: '/realestate/projects', labelAr: 'المشاريع التطويرية الكبرى', labelEn: 'Master Development Projects', sector: 'realestate' },

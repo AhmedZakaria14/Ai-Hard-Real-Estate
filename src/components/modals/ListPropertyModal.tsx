@@ -101,6 +101,8 @@ export function ListPropertyModal({
         { id: 'warehouse', label: 'Warehouse / Industrial' },
       ];
 
+  propertyTypes.push({ id: 'other', label: isAr ? 'نوع آخر' : 'Other' });
+
   const getPropTypeLabel = (id: string) => {
     const found = propertyTypes.find((p) => p.id === id);
     return found ? found.label : id || (isAr ? 'غير محدد' : 'Unspecified');
@@ -110,14 +112,9 @@ export function ListPropertyModal({
     e.preventDefault();
     setContactError('');
 
-    // Contact validation: Full name required, and either phone OR email
     if (!fullName.trim()) return;
-    if (!phone.trim() && !email.trim()) {
-      setContactError(
-        isAr
-          ? 'يرجى تقديم وسيلة تواصل واحدة على الأقل (رقم الهاتف أو البريد الإلكتروني).'
-          : 'Please provide at least one contact method (phone or email).'
-      );
+    if (!phone.trim()) {
+      setContactError(isAr ? 'رقم الهاتف مطلوب' : 'Phone number is required');
       return;
     }
 
@@ -205,7 +202,7 @@ export function ListPropertyModal({
         title={isAr ? 'منصة خدمات العقار' : 'Property Services Portal'}
         subtitle={
           isAr
-            ? 'اختر نوع الخدمة: عرض عقارك للمبيعات والإيجار، أو تسجيل طلب بحث بمواصفات خاصة'
+            ? 'اختر نوع الخدمة: عرض عقارك للبيع أو الإيجار، أو تسجيل طلب لعقار بمواصفات خاصة'
             : 'Select your journey: List your property or request a custom property search.'
         }
         maxWidth="lg"
@@ -230,8 +227,8 @@ export function ListPropertyModal({
               </div>
               <p className="text-xs sm:text-sm text-emerald-900 leading-relaxed">
                 {isAr
-                  ? 'تم حفظ طلبك وتوجيهه مباشرة لقسم الوساطة والتسويق العقاري في هارد للعقارات. سيتواصل معك مستشار متخصص خلال 15 دقيقة.'
-                  : 'Your request has been registered and routed directly to the HARD Group brokerage team. A certified manager will contact you within 15 minutes.'}
+                  ? 'تم حفظ طلبك وتوجيهه مباشرة لقسم الوساطة والتسويق العقاري في هارد للعقارات. سيتواصل معك مستشار متخصص خلال يوم عمل واحد.'
+                  : 'Your request has been registered and routed directly to the HARD Group brokerage team. A certified manager will contact you within one business day.'}
               </p>
             </div>
 
@@ -314,7 +311,7 @@ export function ListPropertyModal({
             {/* ========================================================================= */}
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider text-start">
-                {isAr ? '١. حدد هدفك ونوع الخدمة المطلوب:' : '1. Select Your Service Objective:'}
+                {isAr ? '١. اختر نوع الخدمة المطلوبة:' : '1. Choose the service you need:'}
               </label>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -351,7 +348,7 @@ export function ListPropertyModal({
 
                   <div>
                     <h4 className="text-sm font-bold font-display-serif">
-                      {isAr ? 'عرض وإدراج عقاري' : 'List My Property'}
+                      {isAr ? 'عرض/إدراج عقار' : 'List My Property'}
                     </h4>
                     <p
                       className={`text-xs mt-1 leading-relaxed ${
@@ -359,7 +356,7 @@ export function ListPropertyModal({
                       }`}
                     >
                       {isAr
-                        ? 'أنا مالك وأبحث عن بيع أو تأجير عقار مباشر'
+                        ? 'أنا مالك وأبحث عن بيع أو تأجير عقاري'
                         : 'I own a property and want to sell or rent it out'}
                     </p>
                   </div>
@@ -392,13 +389,13 @@ export function ListPropertyModal({
                           : 'bg-slate-200/80 text-slate-600'
                       }`}
                     >
-                      {isAr ? 'للباحثين' : 'For Seekers'}
+                      {isAr ? 'للمشترين/للمستأجرين' : 'For Buyers / Tenants'}
                     </span>
                   </div>
 
                   <div>
                     <h4 className="text-sm font-bold font-display-serif">
-                      {isAr ? 'طلب وبحث عن عقار' : 'Request Property Search'}
+                      {isAr ? 'طلب عقار' : 'Request a Property'}
                     </h4>
                     <p
                       className={`text-xs mt-1 leading-relaxed ${
@@ -477,7 +474,7 @@ export function ListPropertyModal({
                           setAddressMethod('map');
                           setIsMapModalOpen(true);
                         }}
-                        className="w-full px-3 py-2 bg-slate-100/90 border border-slate-300 rounded-xl text-xs font-mono text-slate-800 placeholder-slate-400 cursor-pointer select-none focus:outline-none transition-all text-start"
+                        className="w-full px-3 py-2 bg-slate-100/90 border border-slate-300 rounded-xl text-xs text-slate-800 placeholder-slate-400 cursor-pointer select-none focus:outline-none transition-all text-start"
                       />
                     </div>
                   </div>
@@ -517,7 +514,7 @@ export function ListPropertyModal({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label htmlFor="list-property-type-owner" className="block text-xs font-bold text-slate-800 mb-1 text-start">
-                      {isAr ? 'نوع العقار' : 'Property Type'} *
+                      {isAr ? 'نوع العقار' : 'Property Type'} <span aria-hidden="true" className="text-rose-600">*</span>
                     </label>
                     <select
                       id="list-property-type-owner"
@@ -540,7 +537,7 @@ export function ListPropertyModal({
 
                   <div>
                     <label className="block text-xs font-bold text-slate-800 mb-1 text-start">
-                      {isAr ? 'طبيعة العرض المطلوب' : 'Listing Purpose'}
+                      {isAr ? 'نوع العرض' : 'Listing Purpose'}
                     </label>
                     <div className="flex items-center gap-4 py-1.5">
                       <label className="inline-flex items-center gap-2 cursor-pointer select-none">
@@ -553,7 +550,7 @@ export function ListPropertyModal({
                           className="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
                         />
                         <span className="text-xs font-bold text-slate-800">
-                          {isAr ? 'للبيع (تمليك)' : 'For Sale'}
+                          {isAr ? 'بيع' : 'For Sale'}
                         </span>
                       </label>
                       <label className="inline-flex items-center gap-2 cursor-pointer select-none">
@@ -566,7 +563,7 @@ export function ListPropertyModal({
                           className="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
                         />
                         <span className="text-xs font-bold text-slate-800">
-                          {isAr ? 'للتأجير' : 'For Rent'}
+                          {isAr ? 'تأجير' : 'For Rent'}
                         </span>
                       </label>
                     </div>
@@ -593,7 +590,7 @@ export function ListPropertyModal({
                 {/* 1. Property Description / Specifications */}
                 <div>
                   <label htmlFor="list-property-desc" className="block text-xs font-bold text-slate-800 mb-1.5 text-start">
-                    {isAr ? 'وصف العقار والمواصفات المطلوبة' : 'Desired Property Specifications'} *
+                    {isAr ? 'وصف العقار والمواصفات المطلوبة' : 'Desired Property Specifications'} <span aria-hidden="true" className="text-rose-600">*</span>
                   </label>
                   <textarea
                     id="list-property-desc"
@@ -604,7 +601,7 @@ export function ListPropertyModal({
                     onChange={(e) => setPropertyDescription(e.target.value)}
                     placeholder={
                       isAr
-                        ? 'مثال: أبحث عن فيلا 4 غرف في حي الشاطئ بالخبر بميزانية حتي 2.5 مليون ريال، مع حديقة وموقف سيارتين...'
+                        ? 'مثال: أبحث عن فيلا 4 غرف في حي الشاطئ بالخبر بميزانية حتى 2.5 مليون ريال، مع حديقة وموقف سيارتين...'
                         : 'e.g. Looking for a 4-bedroom villa in Al Khobar with private garden, budget around 2.5M SAR...'
                     }
                     className="w-full px-3.5 py-2 bg-white border border-slate-300 hover:border-slate-400 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all resize-none text-start"
@@ -615,7 +612,7 @@ export function ListPropertyModal({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label htmlFor="list-property-type-seeker" className="block text-xs font-bold text-slate-800 mb-1 text-start">
-                      {isAr ? 'نوع العقار المطلوب' : 'Property Type'} *
+                      {isAr ? 'نوع العقار المطلوب' : 'Property Type'} <span aria-hidden="true" className="text-rose-600">*</span>
                     </label>
                     <select
                       id="list-property-type-seeker"
@@ -651,7 +648,7 @@ export function ListPropertyModal({
                           className="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
                         />
                         <span className="text-xs font-bold text-slate-800">
-                          {isAr ? 'رغبة بالشراء' : 'To Buy'}
+                          {isAr ? 'شراء' : 'To Buy'}
                         </span>
                       </label>
                       <label className="inline-flex items-center gap-2 cursor-pointer select-none">
@@ -664,7 +661,7 @@ export function ListPropertyModal({
                           className="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
                         />
                         <span className="text-xs font-bold text-slate-800">
-                          {isAr ? 'رغبة بالاستئجار' : 'To Rent'}
+                          {isAr ? 'استئجار' : 'To Rent'}
                         </span>
                       </label>
                     </div>
@@ -703,7 +700,7 @@ export function ListPropertyModal({
 
               <div>
                 <label htmlFor="list-property-fullname" className="block text-xs font-bold text-slate-800 mb-1.5 text-start">
-                  {isAr ? 'الاسم الكامل' : 'Full Name'} *
+                  {isAr ? 'الاسم الكامل' : 'Full Name'} <span aria-hidden="true" className="text-rose-600">*</span>
                 </label>
                 <input
                   id="list-property-fullname"
@@ -720,11 +717,13 @@ export function ListPropertyModal({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label htmlFor="list-property-phone" className="block text-xs font-bold text-slate-800 mb-1.5 text-start">
-                    {isAr ? 'رقم الهاتف' : 'Phone Number'} <span className="text-slate-600 font-normal">({isAr ? 'أو البريد' : 'or Email'})</span>
+                    {isAr ? 'رقم الهاتف' : 'Phone Number'} <span aria-hidden="true" className="text-rose-600">*</span>
                   </label>
                   <input
                     id="list-property-phone"
                     type="tel"
+                    required
+                    onInvalid={() => setContactError(isAr ? 'رقم الهاتف مطلوب' : 'Phone number is required')}
                     placeholder="+966 50 000 0000"
                     value={phone}
                     onChange={(e) => {
@@ -737,11 +736,12 @@ export function ListPropertyModal({
 
                 <div>
                   <label htmlFor="list-property-email" className="block text-xs font-bold text-slate-800 mb-1.5 text-start">
-                    {isAr ? 'البريد الإلكتروني' : 'Email Address'} <span className="text-slate-600 font-normal">({isAr ? 'أو الهاتف' : 'or Phone'})</span>
+                    {isAr ? 'البريد الإلكتروني' : 'Email Address'} {userRole === 'owner' && <span aria-hidden="true" className="text-rose-600">*</span>}
                   </label>
                   <input
                     id="list-property-email"
                     type="email"
+                    required={userRole === 'owner'}
                     placeholder="name@domain.com"
                     value={email}
                     onChange={(e) => {
@@ -754,7 +754,7 @@ export function ListPropertyModal({
               </div>
 
               {contactError && (
-                <p className="text-xs text-rose-700 font-semibold">{contactError}</p>
+                <p role="alert" className="text-xs text-rose-700 font-semibold">{contactError}</p>
               )}
             </div>
 
@@ -766,13 +766,7 @@ export function ListPropertyModal({
                 className="w-full py-3 font-bold justify-center text-sm shadow-md"
               >
                 <span>
-                  {userRole === 'owner'
-                    ? isAr
-                      ? 'إرسال طلب إدراج وعرض العقار'
-                      : 'Submit Property Listing'
-                    : isAr
-                    ? 'إرسال طلب البحث عن عقار'
-                    : 'Submit Property Search Request'}
+                  {isAr ? 'إرسال الطلب' : 'Submit Request'}
                 </span>
               </Button>
             </div>

@@ -36,7 +36,7 @@ export const HARD_GROUP_SECTORS: SectorDefinition[] = [
     },
     tagline: {
       en: 'Corporate Holdings & Gateway',
-      ar: 'البوابة القابضة للمجموعة',
+      ar: 'بوابة المجموعة',
     },
     iconName: 'Building2',
   },

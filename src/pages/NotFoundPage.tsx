@@ -84,7 +84,7 @@ export function NotFoundPage({
             />
             <div className="flex flex-col text-start">
               <span className="text-sm font-bold text-slate-900 tracking-tight leading-none font-display-serif">
-                {isAr ? 'مجموعة هارد القابضة' : 'HARD Group Holding'}
+                {isAr ? 'مجموعة هارد' : 'HARD Group'}
               </span>
               <span className="text-[10px] text-slate-500 font-semibold leading-tight">
                 {isAr ? 'البوابة الرسمية الموحدة' : 'Official Corporate Portal'}

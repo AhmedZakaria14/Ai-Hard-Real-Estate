@@ -92,11 +92,11 @@ const DEFAULT_SEO_CONFIGS: Record<string, PageSeoConfig> = {
     pageId: 'portal',
     title: {
       en: 'HARD Group | Corporate Holding Division',
-      ar: 'مجموعة هارد القابضة | البوابة الرئيسية للقطاعات',
+      ar: 'مجموعة هارد | البوابة الرئيسية للقطاعات',
     },
     description: {
-      en: 'HARD Group Holding - Unified multi-sector platform for Real Estate Brokerage, General Contracting, and Enterprise HVAC Solutions in Saudi Arabia.',
-      ar: 'مجموعة هارد القابضة - البوابة الموحدة لقطاعات التطوير والوساطة العقارية، المقاولات العامة، وأنظمة التكييف بالمملكة العربية السعودية.',
+      en: 'HARD Group - Unified multi-sector platform for Real Estate Brokerage, General Contracting, and Enterprise HVAC Solutions in Saudi Arabia.',
+      ar: 'مجموعة هارد - البوابة الموحدة لقطاعات التطوير والوساطة العقارية، المقاولات العامة، وأنظمة التكييف بالمملكة العربية السعودية.',
     },
     ogImage: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80',
     indexable: true,
@@ -166,7 +166,7 @@ const DEFAULT_SEO_CONFIGS: Record<string, PageSeoConfig> = {
     },
     description: {
       en: 'Pioneering Saudi real estate development, general contracting, and engineering excellence.',
-      ar: 'تعرف على رؤية وقيم مجموعة هارد القابضة وإنجازاتها التنموية في قطاعات العقار والبناء والتكييف بالمملكة.',
+      ar: 'تعرف على رؤية وقيم مجموعة هارد وإنجازاتها التنموية في قطاعات العقار والبناء والتكييف بالمملكة.',
     },
     ogImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
     indexable: true,

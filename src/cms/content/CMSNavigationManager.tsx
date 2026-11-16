@@ -46,7 +46,7 @@ interface CMSNavigationManagerProps {
 }
 
 const SECTORS: { id: SectorId; nameAr: string; nameEn: string; icon: any }[] = [
-  { id: 'portal', nameAr: 'المجموعة القابضة', nameEn: 'HARD Group Portal', icon: Building2 },
+  { id: 'portal', nameAr: 'المجموعة', nameEn: 'HARD Group Portal', icon: Building2 },
   { id: 'realestate', nameAr: 'قطاع العقارات', nameEn: 'Real Estate Sector', icon: Home },
   { id: 'construction', nameAr: 'قطاع المقاولات', nameEn: 'Construction Sector', icon: HardHat },
   { id: 'hvac', nameAr: 'قطاع التكييف', nameEn: 'HVAC Engineering', icon: ThermometerSnowflake },
