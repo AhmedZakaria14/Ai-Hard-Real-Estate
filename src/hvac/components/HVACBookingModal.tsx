@@ -46,6 +46,7 @@ export function HVACBookingModal() {
     clientName: string;
   } | null>(null);
 
+  const [bookingError, setBookingError] = useState('');
   const modalRef = useRef<HTMLDivElement>(null);
   const triggerElementRef = useRef<HTMLElement | null>(null);
   const titleId = useId();
@@ -123,6 +124,7 @@ export function HVACBookingModal() {
   useEffect(() => {
     if (isBookingModalOpen) {
       setConfirmedLead(null);
+      setBookingError('');
       setService(bookingInitialService || '');
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
@@ -138,8 +140,6 @@ export function HVACBookingModal() {
       : T.citiesList.find((c) => c.id === city)
       ? pick(T.citiesList.find((c) => c.id === city), language)
       : city;
-
-  const [bookingError, setBookingError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

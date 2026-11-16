@@ -19,10 +19,10 @@ export const COMPANY_CREDENTIALS = {
     ar: 'ضمان إنشائي معتمد لمدة ١٠ سنوات',
     en: '10-Year Certified Structural Warranty',
   },
-  phone: '+966 13 800 4272',
+  phone: '+966 55 612 5711',
   mobile: '+966 50 123 4567',
-  whatsapp: '+966501234567',
-  email: 'info@hard-sa.com',
+  whatsapp: '+966556125711',
+  email: 'info@hardgp.com',
   address: {
     ar: 'طريق الملك فهد، حي الصحافة، الرياض 13321، المملكة العربية السعودية',
     en: 'King Fahd Road, Al-Sahafa District, Riyadh 13321, Saudi Arabia',

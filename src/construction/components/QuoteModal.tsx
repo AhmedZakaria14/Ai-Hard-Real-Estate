@@ -25,9 +25,13 @@ import { COMPANY_CREDENTIALS } from '../data/seedData';
 import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSubmissionService';
 
 export function QuoteModal() {
+  const { isQuoteModalOpen } = useConstruction();
+  return isQuoteModalOpen ? <QuoteModalContent /> : null;
+}
+
+function QuoteModalContent() {
   const {
     language,
-    isQuoteModalOpen,
     closeQuoteModal,
     quoteModalInitialData,
   } = useConstruction();
@@ -72,8 +76,6 @@ export function QuoteModal() {
       }
     }
   }, [quoteModalInitialData]);
-
-  if (!isQuoteModalOpen) return null;
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

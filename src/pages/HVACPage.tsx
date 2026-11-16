@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { HVACProvider, useHVAC } from '../hvac/context/HVACContext';
-import { EmergencyTopBar } from '../hvac/components/EmergencyTopBar';
 import { HVACNavbar } from '../hvac/components/HVACNavbar';
 import { HVACHero } from '../hvac/components/HVACHero';
 import { HVACServicesSection } from '../hvac/components/HVACServicesSection';
@@ -18,7 +17,6 @@ import { HVACQuoteDialog } from '../hvac/components/HVACQuoteDialog';
 import { HVACBookingModal } from '../hvac/components/HVACBookingModal';
 import { Language, PageId } from '../types';
 import { getPageTitle, updateDocumentTitle } from '../lib/pageTitles';
-import { SectorNav } from '../components/layout/SectorNav';
 
 interface HVACPageProps {
   onNavigatePage?: (page: PageId) => void;
@@ -77,14 +75,7 @@ function HVACPageContent({ onNavigatePage }: HVACPageProps) {
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col font-ui-sans selection:bg-[#0EA5E9] selection:text-white">
       {/* 0. Global Sector Utility Navigation Bar */}
-      <SectorNav
-        currentPage="hvac"
-        language={language}
-        onNavigate={onNavigatePage || (() => {})}
-      />
 
-      {/* 1. Emergency Top Bar (Sticky dark navy strip) */}
-      <EmergencyTopBar />
 
       {/* 2. Main HVAC Navbar (Sticky header with brand lockup & links) */}
       <HVACNavbar

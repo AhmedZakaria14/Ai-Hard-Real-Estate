@@ -1,11 +1,8 @@
 import { usePublishedBrandEmblem } from '../../components/ui/BrandLogo';
 import React from 'react';
 import {
-  HardHat,
   ShieldCheck,
   Award,
-  Lock,
-  Globe,
   Phone,
   Mail,
   MapPin,
@@ -15,31 +12,17 @@ import { useConstruction } from '../context/ConstructionContext';
 import { constructionTranslations } from '../utils/translations';
 import { COMPANY_CREDENTIALS } from '../data/seedData';
 import { handleSemanticClick } from '../../lib/navigation';
-import { isAuthorizedAdmin } from '../../lib/adminAuth';
 
 interface FooterProps {
   onNavigate?: (page: any) => void;
   onOpenCMS?: () => void;
 }
 
-export function Footer({ onNavigate, onOpenCMS }: FooterProps) {
+export function Footer({ onNavigate }: FooterProps) {
   const emblem = usePublishedBrandEmblem('construction', 'light');
-  const { language, toggleLanguage, openCostEstimator, openQuoteModal } = useConstruction();
+  const { language, openCostEstimator, openQuoteModal } = useConstruction();
   const t = constructionTranslations[language];
   const isAr = language === 'ar';
-
-  const [isAdmin, setIsAdmin] = React.useState<boolean>(() => isAuthorizedAdmin());
-
-  React.useEffect(() => {
-    const checkAuth = () => setIsAdmin(isAuthorizedAdmin());
-    checkAuth();
-    window.addEventListener('cms-auth-change', checkAuth);
-    window.addEventListener('storage', checkAuth);
-    return () => {
-      window.removeEventListener('cms-auth-change', checkAuth);
-      window.removeEventListener('storage', checkAuth);
-    };
-  }, []);
 
   return (
     <footer className="bg-[#0b1b2d] text-slate-400 border-t border-slate-800 text-xs">
@@ -182,7 +165,7 @@ export function Footer({ onNavigate, onOpenCMS }: FooterProps) {
           <ul className="space-y-2 text-xs">
             <li className="flex items-center gap-2 text-slate-300">
               <Award className="w-4 h-4 text-[#009ee2] shrink-0" />
-              <span>{t.credentials.classA}</span>
+              <span>{isAr ? 'تصنيف معتمد' : 'Certified classification'}</span>
             </li>
             <li className="flex items-center gap-2 text-slate-300">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -191,10 +174,6 @@ export function Footer({ onNavigate, onOpenCMS }: FooterProps) {
             <li className="flex items-center gap-2 text-slate-300">
               <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
               <span>{t.credentials.warranty}</span>
-            </li>
-            <li className="flex items-center gap-2 text-slate-300">
-              <HardHat className="w-4 h-4 text-[#009ee2] shrink-0" />
-              <span>{t.credentials.sce}</span>
             </li>
           </ul>
         </div>
@@ -222,85 +201,18 @@ export function Footer({ onNavigate, onOpenCMS }: FooterProps) {
             </div>
             <div className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-[#009ee2] shrink-0" />
-              <span>{isAr ? 'الرياض - حي الصحافة' : 'Riyadh - Al Sahafa'}</span>
+              <span>{isAr ? 'طريق الأمير متعب بن عبد العزيز، حي هجر، الدمام، المملكة العربية السعودية' : 'Prince Mutaib bin Abdulaziz Road, Hajar District, Dammam, Saudi Arabia'}</span>
             </div>
           </div>
 
-          <div className="pt-2 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={toggleLanguage}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-bold text-slate-200 border border-slate-700 cursor-pointer"
-            >
-              <Globe className="w-3.5 h-3.5 text-[#009ee2]" />
-              <span>{language === 'en' ? 'العربية (RTL)' : 'English (LTR)'}</span>
-            </button>
-
-            {isAdmin && onOpenCMS && (
-              <button
-                type="button"
-                onClick={onOpenCMS}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-bold text-amber-300 border border-slate-700 cursor-pointer"
-              >
-                <Lock className="w-3.5 h-3.5 text-amber-400" />
-                <span>{t.nav.cms}</span>
-              </button>
-            )}
-          </div>
         </div>
       </div>
 
       {/* Sub-Footer Copyright */}
       <div className="border-t border-slate-900 py-6 bg-[#071320]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-[11px] text-slate-400">
           <div>
             {isAr ? 'جميع الحقوق محفوظة. هارد للمقاولات@2026' : 'Copyright. HARD Contracting@2026'}
-          </div>
-          <div className="flex flex-wrap items-center gap-3 sm:gap-4 font-medium">
-            <span className="text-slate-500 uppercase tracking-wider text-[10px]">
-              {isAr ? 'قطاعات هارد:' : 'Sectors:'}
-            </span>
-            <a
-              href="/"
-              onClick={(e) => {
-                handleSemanticClick(e, () => {
-                  if (onNavigate) onNavigate('portal');
-                });
-              }}
-              className="hover:text-[#009ee2] transition-colors"
-            >
-              {isAr ? 'بوابة مجموعة هارد' : 'HARD Group Portal'}
-            </a>
-            <span className="text-slate-700">•</span>
-            <a
-              href="/realestate"
-              onClick={(e) => {
-                handleSemanticClick(e, () => {
-                  if (onNavigate) onNavigate('home');
-                });
-              }}
-              className="hover:text-[#009ee2] transition-colors"
-            >
-              {isAr ? 'هارد للعقارات' : 'HARD Real Estate'}
-            </a>
-            <span className="text-slate-700">•</span>
-            <span className="text-[#009ee2] font-bold">
-              {isAr ? 'هارد للإنشاءات (القطاع الحالي)' : 'HARD Construction (Current)'}
-            </span>
-            <span className="text-slate-700">•</span>
-            <a
-              href="/hvac"
-              onClick={(e) => {
-                handleSemanticClick(e, () => {
-                  if (onNavigate) onNavigate('hvac');
-                });
-              }}
-              className="hover:text-[#009ee2] transition-colors"
-            >
-              {isAr ? 'هارد لصيانة التكييف' : 'HARD HVAC Maintenance'}
-            </a>
-            <span className="text-slate-700">•</span>
-            <span className="text-emerald-400 font-semibold">{isAr ? 'معتمد رسمياً في المنطقة الشرقية' : 'Certified in the Eastern Province'}</span>
           </div>
         </div>
       </div>

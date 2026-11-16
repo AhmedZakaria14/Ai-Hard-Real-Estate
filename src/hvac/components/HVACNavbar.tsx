@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  Phone,
   Globe,
   Calendar,
   Menu,
@@ -11,28 +10,16 @@ import {
   Star,
   HelpCircle,
   Mail,
-  Calculator,
   ListChecks,
   Lock,
-  ChevronDown,
-  Building2,
-  Home,
-  HardHat,
   ThermometerSnowflake,
 } from 'lucide-react';
 
-const SECTOR_ICONS = {
-  Building2,
-  Home,
-  HardHat,
-  ThermometerSnowflake,
-};
 import { useHVAC } from '../context/HVACContext';
 import { BrandLogo } from '../../components/ui/BrandLogo';
 import { T, pick } from '../translations';
 import { PageId } from '../../types';
 import { handleSemanticClick } from '../../lib/navigation';
-import { HARD_GROUP_SECTORS, SectorId } from '../../lib/sectors';
 import { isAuthorizedAdmin } from '../../lib/adminAuth';
 
 interface HVACNavbarProps {
@@ -56,8 +43,6 @@ export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
       window.removeEventListener('storage', checkAuth);
     };
   }, []);
-  const [sectorDropdownOpen, setSectorDropdownOpen] = useState(false);
-  const sectorDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -67,26 +52,10 @@ export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        sectorDropdownRef.current &&
-        !sectorDropdownRef.current.contains(event.target as Node)
-      ) {
-        setSectorDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const currentSectorId: SectorId = 'hvac';
-
   const navLinks = [
     { href: '#services', label: pick(T.nav.services, language), icon: Wrench },
     { href: '#why-us', label: pick(T.nav.whyUs, language), icon: ShieldCheck },
     { href: '#work', label: pick(T.nav.work, language), icon: Layers },
-    { href: '#calculator', label: pick(T.nav.calculator, language), icon: Calculator },
     { href: '#checklist', label: pick(T.nav.checklist, language), icon: ListChecks },
     { href: '#reviews', label: pick(T.nav.reviews, language), icon: Star },
     { href: '#faq', label: pick(T.nav.faq, language), icon: HelpCircle },
@@ -95,7 +64,7 @@ export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
 
   return (
     <header
-      className={`sticky top-[37px] z-40 transition-all duration-300 ${
+      className={`sticky top-0 z-40 transition-all duration-300 ${
         scrolled
           ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200/80'
           : 'bg-white/90 backdrop-blur-md border-b border-slate-200/60'
@@ -143,15 +112,6 @@ export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
 
         {/* Right CTA Actions */}
         <div className="hidden sm:flex items-center gap-3">
-          {/* Orange outlined "Call 24/7" pill */}
-          <a
-            href="tel:+966550641000"
-            className="px-3.5 py-2 rounded-full border-2 border-[#F97316] text-[#F97316] hover:bg-[#F97316] hover:text-white transition-all text-xs sm:text-sm font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"
-          >
-            <Phone className="w-3.5 h-3.5 animate-bounce" />
-            <span>{pick(T.nav.callPill, language)}</span>
-          </a>
-
           {/* Language toggle: globe icon showing the other language */}
           <button
             type="button"
@@ -170,67 +130,8 @@ export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
             className="px-4 py-2.5 rounded-xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white font-semibold text-xs sm:text-sm transition-all flex items-center gap-2 shadow-xs cursor-pointer"
           >
             <Calendar className="w-4 h-4" />
-            <span>{pick(T.nav.bookServiceBtn, language)}</span>
+            <span className="whitespace-nowrap">{pick(T.nav.bookServiceBtn, language)}</span>
           </button>
-
-          {/* Sector Switcher Dropdown */}
-          <div className="relative" ref={sectorDropdownRef}>
-            <button
-              type="button"
-              onClick={() => setSectorDropdownOpen(!sectorDropdownOpen)}
-              className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer"
-            >
-              <Layers className="w-4 h-4 text-[#0EA5E9]" />
-              <span>{isAr ? 'قطاعات هارد' : 'HARD Sectors'}</span>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
-            </button>
-
-            {sectorDropdownOpen && (
-              <div
-                className={`absolute top-full mt-2 w-56 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl py-2 z-50 text-slate-200 text-xs animate-in fade-in slide-in-from-top-2 duration-150 ${
-                  isAr ? 'left-0' : 'right-0'
-                }`}
-              >
-                <div className="px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 border-b border-slate-800">
-                  {isAr ? 'قطاعات مجموعة هارد' : 'HARD Group Sectors'}
-                </div>
-                {HARD_GROUP_SECTORS.map((sector) => {
-                  const isCurrent = sector.id === currentSectorId;
-                  const SectorIcon = SECTOR_ICONS[sector.iconName] || ThermometerSnowflake;
-                  return (
-                    <a
-                      key={sector.id}
-                      href={sector.href}
-                      onClick={(e) =>
-                        handleSemanticClick(e, () => {
-                          setSectorDropdownOpen(false);
-                          if (!isCurrent && onNavigatePage) {
-                            onNavigatePage(sector.pageId);
-                          }
-                        })
-                      }
-                      aria-current={isCurrent ? 'page' : undefined}
-                      className={`flex items-center justify-between px-3 py-2 text-xs transition-colors cursor-pointer ${
-                        isCurrent
-                          ? 'bg-[#0EA5E9] text-white font-bold'
-                          : 'hover:bg-slate-800 text-slate-300'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <SectorIcon className="w-4 h-4" />
-                        <span>{sector.name[language]}</span>
-                      </div>
-                      {isCurrent && (
-                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-black/30 text-sky-200 font-extrabold">
-                          {isAr ? 'القطاع الحالي' : 'Active'}
-                        </span>
-                      )}
-                    </a>
-                  );
-                })}
-              </div>
-            )}
-          </div>
 
           {isAdmin && onOpenCMS && (
             <button
@@ -269,49 +170,6 @@ export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
         <div className="sm:hidden bg-white border-b border-slate-200 p-4 space-y-4 shadow-lg animate-in slide-in-from-top-4 duration-200">
-          {/* HARD Group Sector Navigation */}
-          <div className="bg-slate-900 rounded-2xl p-3 text-white space-y-2">
-            <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-              {isAr ? 'قطاعات مجموعة هارد' : 'HARD Group Sectors'}
-            </div>
-            <div className="grid grid-cols-1 gap-1">
-              {HARD_GROUP_SECTORS.map((sector) => {
-                const isCurrent = sector.id === currentSectorId;
-                const SectorIcon = SECTOR_ICONS[sector.iconName] || ThermometerSnowflake;
-                return (
-                  <a
-                    key={sector.id}
-                    href={sector.href}
-                    onClick={(e) =>
-                      handleSemanticClick(e, () => {
-                        setMobileMenuOpen(false);
-                        if (!isCurrent && onNavigatePage) {
-                          onNavigatePage(sector.pageId);
-                        }
-                      })
-                    }
-                    aria-current={isCurrent ? 'page' : undefined}
-                    className={`flex items-center justify-between p-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
-                      isCurrent
-                        ? 'bg-[#0EA5E9] text-white font-bold'
-                        : 'text-slate-300 hover:bg-slate-800'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <SectorIcon className="w-4 h-4 text-sky-400" />
-                      <span>{sector.name[language]}</span>
-                    </div>
-                    {isCurrent && (
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-black/30 text-sky-200 font-extrabold">
-                        {isAr ? 'القطاع الحالي' : 'Active'}
-                      </span>
-                    )}
-                  </a>
-                );
-              })}
-            </div>
-          </div>
-
           <nav className="flex flex-col space-y-2 text-start">
             {navLinks.map((link) => {
               const Icon = link.icon || ThermometerSnowflake;
@@ -330,14 +188,6 @@ export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
           </nav>
 
           <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
-            <a
-              href="tel:+966550641000"
-              className="w-full py-2.5 rounded-xl border-2 border-[#F97316] text-[#F97316] font-semibold text-sm flex items-center justify-center gap-2"
-            >
-              <Phone className="w-4 h-4" />
-              <span>{pick(T.nav.callPill, language)}</span>
-              <bdi dir="ltr">+966 55 064 1000</bdi>
-            </a>
 
             <button
               type="button"
@@ -348,7 +198,7 @@ export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
               className="w-full py-2.5 rounded-xl bg-[#0EA5E9] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-xs"
             >
               <Calendar className="w-4 h-4" />
-              <span>{pick(T.nav.bookServiceBtn, language)}</span>
+              <span className="whitespace-nowrap">{pick(T.nav.bookServiceBtn, language)}</span>
             </button>
 
             {onNavigatePage && (
