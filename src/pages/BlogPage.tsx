@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { Language, PageId, BlogPost } from '../types';
 import { translations } from '../lib/translations';
-import { useData } from '../context/DataContext';
+import { loadPublishedArticles } from '../lib/db/hardCatalog';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Modal } from '../components/ui/Modal';
@@ -24,7 +24,19 @@ interface BlogPageProps {
 
 export function BlogPage({ onNavigate, language }: BlogPageProps) {
   const t = translations[language];
-  const { blogPosts } = useData();
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [loadStatus, setLoadStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  React.useEffect(() => {
+    const controller = new AbortController();
+    loadPublishedArticles(controller.signal).then((articles) => {
+      if (controller.signal.aborted) return;
+      setBlogPosts(articles.map(({ content }) => content));
+      setLoadStatus('ready');
+    }).catch(() => {
+      if (!controller.signal.aborted) setLoadStatus('error');
+    });
+    return () => controller.abort();
+  }, []);
   const ArrowIcon = language === 'ar' ? ArrowLeft : ArrowRight;
   const [activeCategory, setActiveCategory] = useState('All');
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
@@ -75,6 +87,9 @@ export function BlogPage({ onNavigate, language }: BlogPageProps) {
           {t.blog.pageSubtitle}
         </p>
       </div>
+
+      {loadStatus === 'loading' && <p role="status">{language === 'ar' ? 'جارٍ تحميل المقالات…' : 'Loading articles…'}</p>}
+      {loadStatus === 'error' && <p role="alert">{language === 'ar' ? 'تعذر تحميل المقالات. أعد تحميل الصفحة للمحاولة مرة أخرى.' : 'Could not load articles. Reload the page to try again.'}</p>}
 
       {/* Category Pills */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2">

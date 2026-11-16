@@ -1,9 +1,12 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { createClient, type Session } from '@supabase/supabase-js';
 
+import SupabaseArticleEditor from '../catalog/SupabaseArticleEditor';
+import { hardSupabaseUrl, hardPublishableKey } from '../../lib/db/hardCatalog';
+
 const client = createClient(
-  'https://vlpdiyicmupghfcualoe.supabase.co',
-  'sb_publishable_jam6dG2vyvPi65DHUEgqXQ_4YZfJGxF',
+  hardSupabaseUrl,
+  hardPublishableKey,
   { auth: { storageKey: 'hard-admin-supabase-session' } },
 );
 const pageSize = 25;
@@ -26,6 +29,7 @@ export default function SupabaseInbox() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [rows, setRows] = useState<Submission[]>([]);
+  const [view, setView] = useState<'requests' | 'articles'>('requests');
   const [page, setPage] = useState(0);
   const [refresh, setRefresh] = useState(0);
   const isAdmin = session?.user.app_metadata.hard_role === 'superadmin';
@@ -105,7 +109,7 @@ export default function SupabaseInbox() {
   }
 
   return <main dir="rtl" className="mx-auto min-h-screen max-w-5xl space-y-6 p-6 text-slate-900">
-    <h1 className="text-3xl font-bold">طلبات هارد الجديدة</h1>
+    <h1 className="text-3xl font-bold">إدارة هارد</h1>
     {error && <p role="alert" className="text-red-700">{error}</p>}
     {!ready ? <p role="status">جارٍ التحقق من الجلسة…</p> : !isAdmin ? (
       <form onSubmit={signIn} className="grid max-w-md gap-4">
@@ -114,6 +118,10 @@ export default function SupabaseInbox() {
         <button disabled={busy} className="rounded bg-slate-900 px-4 py-2 text-white">دخول المسؤول</button>
       </form>
     ) : <>
+      <nav aria-label="أقسام الإدارة" className="flex gap-3">
+        <button aria-pressed={view === 'requests'} onClick={() => setView('requests')} className="rounded border px-3 py-1">الطلبات</button>
+        <button aria-pressed={view === 'articles'} onClick={() => setView('articles')} className="rounded border px-3 py-1">المقالات المنشورة</button>
+      </nav>
       <div className="flex gap-3">
         <button onClick={() => setRefresh((value) => value + 1)} disabled={busy} className="rounded border px-3 py-1">تحديث</button>
         <button onClick={async () => {
@@ -122,6 +130,7 @@ export default function SupabaseInbox() {
           else setPage(0);
         }} className="rounded border px-3 py-1">خروج</button>
       </div>
+      {view === 'articles' ? <SupabaseArticleEditor client={client} /> : <>
       {busy ? <p role="status">جارٍ تحميل الطلبات…</p> : !error && rows.length === 0 && <p>لا توجد طلبات في هذه الصفحة.</p>}
       {rows.map((row) => <article key={row.id} className="space-y-2 rounded-lg border p-4">
         <h2 className="font-bold">{String(row.payload.name || row.tracking_code)}</h2>
@@ -142,6 +151,7 @@ export default function SupabaseInbox() {
         <button disabled={busy || page === 0} onClick={() => setPage((value) => value - 1)} className="rounded border px-3 py-1 disabled:opacity-40">السابق</button>
         <button disabled={busy || rows.length < pageSize} onClick={() => setPage((value) => value + 1)} className="rounded border px-3 py-1 disabled:opacity-40">التالي</button>
       </nav>
+      </>}
     </>}
   </main>;
 }
