@@ -180,9 +180,9 @@ export const translations = {
       overview: 'Property Overview',
       amenities: 'Features & Luxury Amenities',
       agentCardTitle: 'Direct Listing Agent',
-      bookViewingSubtitle: 'Schedule an on-site private walk-through or a live virtual guided tour.',
+      bookViewingSubtitle: 'Schedule an in-person viewing of the property.',
       inquiryFormTitle: 'Inquire About This Property',
-      inquiryFormSubtitle: 'Connect directly with the designated property specialist for questions, floorplans, or private appointments.',
+      inquiryFormSubtitle: 'Contact the assigned property advisor with any questions or requests about this property.',
       fullName: 'Full Name',
       fullNamePlaceholder: 'e.g. Faisal Al-Otaibi',
       email: 'Email Address',
@@ -360,7 +360,7 @@ export const translations = {
     // Live Chat & Modals
     modals: {
       bookViewingTitle: 'Schedule a Private Property Viewing',
-      bookViewingSubtitle: 'Select your preferred date, time, and tour format for this property.',
+      bookViewingSubtitle: 'Select your preferred date and time to visit this property.',
       tourType: 'Tour Format',
       inPerson: 'In-Person Private Walkthrough',
       virtual: 'Live 1-on-1 Virtual Tour',
@@ -583,9 +583,9 @@ export const translations = {
       overview: 'نبذة عن العقار',
       amenities: 'المزايا والمرافق الراقية',
       agentCardTitle: 'الوسيط المسؤول عن العقار',
-      bookViewingSubtitle: 'حدد موعداً لزيارة العقار شخصياً أو عبر جولة افتراضية تفاعلية.',
+      bookViewingSubtitle: 'حدد موعداً لزيارة العقار شخصياً.',
       inquiryFormTitle: 'استفسار عن هذا العقار',
-      inquiryFormSubtitle: 'تواصل مباشرة مع المستشار العقاري المسؤول لطرح أي أسئلة أو طلب المخططات المعمارية.',
+      inquiryFormSubtitle: 'تواصل مباشرة مع المستشار العقاري المسؤول لطرح أي أسئلة أو طلب يتعلق بهذا العقار.',
       fullName: 'الاسم الكامل',
       fullNamePlaceholder: 'مثال: فيصل العتيبي',
       email: 'البريد الإلكتروني',
@@ -763,7 +763,7 @@ export const translations = {
     // Live Chat & Modals
     modals: {
       bookViewingTitle: 'حجز موعد لمعاينة العقار',
-      bookViewingSubtitle: 'اختر الموعد والوقت المناسب وطريقة المعاينة المفضلة.',
+      bookViewingSubtitle: 'اختر التاريخ والوقت المناسبين لزيارة العقار.',
       tourType: 'طريقة المعاينة',
       inPerson: 'معاينة ميدانية حضورية',
       virtual: 'جولة افتراضية حية 1-على-1',

@@ -14,9 +14,10 @@ import {
   Sliders,
   UserCheck,
 } from 'lucide-react';
-import { Property, PropertyType, ListingStatus, Language } from '../../types';
+import { Property, PropertyType, ListingStatus, Language, PropertySpecification } from '../../types';
 import { SAUDI_CITIES } from '../../data/cities';
 import { CMSImageUpload, CMSMultiImageGallery } from '../components/CMSImageUpload';
+import { propertySpecificationIcons } from '../../components/properties/propertySpecificationIcons';
 import { BilingualFormField } from '../components/BilingualFormField';
 
 interface CMSPropertyFormModalProps {
@@ -73,7 +74,7 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
   const [bedrooms, setBedrooms] = useState<number>(5);
   const [bathrooms, setBathrooms] = useState<number>(6);
   const [areaSqM, setAreaSqM] = useState<number>(650);
-  const [yearBuilt, setYearBuilt] = useState<number>(2025);
+  const [yearBuilt, setYearBuilt] = useState<number | ''>('');
   const [parkingSpaces, setParkingSpaces] = useState<number>(3);
   const [furnishingEn, setFurnishingEn] = useState('Fully Furnished');
   const [furnishingAr, setFurnishingAr] = useState('مفروش بالكامل');
@@ -88,15 +89,8 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
   const [newImageUrl, setNewImageUrl] = useState('');
 
   // Amenities
-  const [amenitiesEn, setAmenitiesEn] = useState<string[]>([
-    'Private Swimming Pool',
-    'Smart Home Automation',
-    'Landscaped Garden',
-    'Private Elevator',
-    'Maid and Driver Quarters',
-  ]);
-  const [newAmenityEn, setNewAmenityEn] = useState('');
-  const [newAmenityAr, setNewAmenityAr] = useState('');
+  const [amenities, setAmenities] = useState<{ ar: string; en: string }[]>([]);
+  const [additionalSpecs, setAdditionalSpecs] = useState<PropertySpecification[]>([]);
 
   // Agent
   const [agentNameEn, setAgentNameEn] = useState('Faisal Al-Otaibi');
@@ -138,7 +132,8 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
       setBedrooms(initialData.bedrooms ?? 4);
       setBathrooms(initialData.bathrooms ?? 5);
       setAreaSqM(initialData.areaSqM || 500);
-      setYearBuilt(initialData.features?.yearBuilt || 2025);
+      setYearBuilt(initialData.features?.yearBuilt || '');
+      setAdditionalSpecs(initialData.features?.additionalSpecs ?? []);
       setParkingSpaces(initialData.features?.parkingSpaces ?? 2);
       setFurnishingEn(initialData.features?.furnishing?.en ?? '');
       setFurnishingAr(initialData.features?.furnishing?.ar ?? '');
@@ -146,7 +141,11 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
       setViewAr(initialData.features?.view?.ar || 'إطلالة بحرية');
 
       setImages(initialData.images?.length ? initialData.images : ['https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1600&q=85']);
-      setAmenitiesEn(initialData.amenities?.en || ['Private Pool', 'Smart Home']);
+      const { ar = [], en = [] } = initialData.amenities ?? {};
+      setAmenities(Array.from({ length: Math.max(ar.length, en.length) }, (_, index) => ({
+        ar: ar[index] ?? '',
+        en: en[index] ?? '',
+      })));
 
       if (initialData.agent) {
         setAgentNameEn(initialData.agent.name?.en || 'Faisal Al-Otaibi');
@@ -159,7 +158,9 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
         setAgentAvatar(initialData.agent.avatar || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80');
       }
     } else {
-      // Default reset
+      setYearBuilt('');
+      setAmenities([]);
+      setAdditionalSpecs([]);
       setTitleEn('');
       setTitleAr('');
       setDescEn('');
@@ -178,18 +179,6 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
 
   const handleRemoveImage = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
-  };
-
-  const handleAddAmenity = () => {
-    if (newAmenityEn.trim()) {
-      setAmenitiesEn([...amenitiesEn, newAmenityEn.trim()]);
-      setNewAmenityEn('');
-      setNewAmenityAr('');
-    }
-  };
-
-  const handleRemoveAmenity = (index: number) => {
-    setAmenitiesEn(amenitiesEn.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -255,14 +244,12 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
         },
         images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1600&q=85'],
         amenities: {
-          en: amenitiesEn,
-          ar: amenitiesEn.map((item) => {
-            const index = initialData?.amenities?.en?.indexOf(item) ?? -1;
-            return (index >= 0 ? initialData?.amenities?.ar?.[index] : undefined) ?? item;
-          }),
+          ar: amenities.map((item) => item.ar.trim() || item.en.trim()).filter(Boolean),
+          en: amenities.map((item) => item.en.trim() || item.ar.trim()).filter(Boolean),
         },
         features: {
-          yearBuilt: Number(yearBuilt),
+          yearBuilt: yearBuilt === '' ? null : yearBuilt,
+          additionalSpecs: additionalSpecs.filter((spec) => (spec.label.ar.trim() || spec.label.en.trim()) && (spec.value.ar.trim() || spec.value.en.trim())),
           parkingSpaces: Number(parkingSpaces),
           furnishing: { en: furnishingEn.trim(), ar: furnishingAr.trim() },
           view: { en: viewEn, ar: viewAr },
@@ -762,6 +749,60 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
                 </div>
               </div>
 
+              <label className="block max-w-xs text-xs font-bold text-slate-700">
+                {isAr ? 'سنة البناء' : 'Year built'}
+                <input
+                  type="number"
+                  min={1000}
+                  max={9999}
+                  value={yearBuilt}
+                  onChange={(event) => setYearBuilt(event.target.value === '' ? '' : event.target.valueAsNumber)}
+                  className="mt-1 block w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm"
+                />
+              </label>
+
+              <fieldset className="space-y-3">
+                <legend className="text-xs font-bold text-slate-700">{isAr ? 'مواصفات إضافية' : 'Additional specifications'}</legend>
+                {additionalSpecs.map((spec, index) => (
+                  <div key={index} className="grid gap-2 rounded-xl border border-slate-200 p-3 sm:grid-cols-2">
+                    {(['label', 'value'] as const).map((field) => (
+                      <BilingualFormField
+                        key={field}
+                        label={field === 'label' ? (isAr ? 'اسم المواصفة' : 'Specification name') : (isAr ? 'القيمة' : 'Value')}
+                        language={language}
+                        value={spec[field]}
+                        onChange={(value) => setAdditionalSpecs((items) => items.map((item, i) => i === index
+                          ? { ...item, [field]: value }
+                          : item))}
+                      />
+                    ))}
+                    <label className="text-xs">
+                      {isAr ? 'الأيقونة' : 'Icon'}
+                      <select
+                        className="mt-1 block w-full rounded-xl border border-slate-300 px-3 py-2"
+                        value={spec.icon}
+                        onChange={(event) => {
+                          const icon = event.target.value as PropertySpecification['icon'];
+                          setAdditionalSpecs((items) => items.map((item, i) => i === index ? { ...item, icon } : item));
+                        }}
+                      >
+                        {Object.entries(propertySpecificationIcons).map(([key, option]) => (
+                          <option key={key} value={key}>{option[language]}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <button type="button" className="self-end justify-self-start rounded-lg px-3 py-2 text-xs text-red-700"
+                      onClick={() => setAdditionalSpecs((items) => items.filter((_, i) => i !== index))}>
+                      {isAr ? 'حذف المواصفة' : 'Remove specification'}
+                    </button>
+                  </div>
+                ))}
+                <button type="button" className="rounded-xl bg-blue-700 px-4 py-2.5 text-xs font-bold text-white"
+                  onClick={() => setAdditionalSpecs((items) => [...items, { label: { ar: '', en: '' }, value: { ar: '', en: '' }, icon: 'check' }])}>
+                  {isAr ? 'إضافة مواصفة' : 'Add specification'}
+                </button>
+              </fieldset>
+
               {/* View & Furnishing */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                 <div>
@@ -815,41 +856,32 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
           {/* TAB 5: AMENITIES */}
           {activeTab === 'amenities' && (
             <div className="space-y-4 animate-in fade-in">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder={isAr ? 'أدخل ميزة جديدة (مثال: سينما خاصة)' : 'Enter amenity (e.g. Private Cinema)'}
-                  value={newAmenityEn}
-                  onChange={(e) => setNewAmenityEn(e.target.value)}
-                  className="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={handleAddAmenity}
-                  className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>{isAr ? 'إضافة' : 'Add'}</span>
-                </button>
-              </div>
-
-              <div className="flex flex-wrap gap-2 pt-2">
-                {amenitiesEn.map((item, idx) => (
-                  <span
-                    key={idx}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-800 rounded-xl text-xs font-medium border border-slate-200"
-                  >
-                    <span>{item}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveAmenity(idx)}
-                      className="text-slate-400 hover:text-red-600 cursor-pointer"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </span>
-                ))}
-              </div>
+              {amenities.map((item, index) => (
+                <div key={index} className="grid items-end gap-2 rounded-xl border border-slate-200 p-3 sm:grid-cols-[1fr_1fr_auto]">
+                  {([language, isAr ? 'en' : 'ar'] as const).map((locale) => (
+                    <label key={locale} className="text-xs font-semibold">
+                      {locale === 'ar' ? (isAr ? 'الميزة بالعربية' : 'Amenity in Arabic') : (isAr ? 'الميزة بالإنجليزية' : 'Amenity in English')}
+                      <input
+                        dir={locale === 'ar' ? 'rtl' : 'ltr'}
+                        className="mt-1 block w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
+                        value={item[locale]}
+                        onChange={(event) => {
+                          const value = event.target.value;
+                          setAmenities((items) => items.map((entry, i) => i === index ? { ...entry, [locale]: value } : entry));
+                        }}
+                      />
+                    </label>
+                  ))}
+                  <button type="button" className="rounded-lg px-3 py-2 text-xs text-red-700"
+                    onClick={() => setAmenities((items) => items.filter((_, i) => i !== index))}>
+                    {isAr ? 'حذف الميزة' : 'Remove amenity'}
+                  </button>
+                </div>
+              ))}
+              <button type="button" className="rounded-xl bg-blue-700 px-4 py-2.5 text-xs font-bold text-white"
+                onClick={() => setAmenities((items) => [...items, { ar: '', en: '' }])}>
+                {isAr ? 'إضافة ميزة' : 'Add amenity'}
+              </button>
             </div>
           )}
 

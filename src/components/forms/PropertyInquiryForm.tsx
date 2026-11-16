@@ -16,7 +16,6 @@ import { Language, Property } from '../../types';
 import { FormAttachmentMeta } from '../../types/firestore-schema';
 import { translations } from '../../lib/translations';
 import { Button } from '../ui/Button';
-import { Badge } from '../ui/Badge';
 import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSubmissionService';
 import { FileUploadZone } from './FileUploadZone';
 
@@ -38,11 +37,7 @@ export function PropertyInquiryForm({
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [inquiryTopic, setInquiryTopic] = useState('scheduleTour');
-  const [message, setMessage] = useState(
-    isAr
-      ? `مرحباً، أود الاستفسار عن العقار "${property?.title?.ar || ''}" (المعرف: ${property?.id || ''}). يرجى تزويدي بمزيد من المعلومات حول التوفر وخيارات الدفع.`
-      : `Hello, I am interested in inquiring about "${property?.title?.en || ''}" (ID: ${property?.id || ''}). Please send me full floorplans and available viewing windows.`
-  );
+  const [message, setMessage] = useState('');
   const [attachments, setAttachments] = useState<FormAttachmentMeta[]>([]);
 
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -65,26 +60,13 @@ export function PropertyInquiryForm({
       newErrors.fullName = t.propertyDetails.validation.nameMinLength;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const hasEmail = Boolean(email.trim());
-    const hasPhone = Boolean(phone.trim());
-
-    if (!hasEmail && !hasPhone) {
-      const msg = isAr
-        ? 'يرجى تقديم وسيلة تواصل واحدة على الأقل (البريد أو الهاتف)'
-        : 'Please provide at least one contact method (email or phone).';
-      newErrors.email = msg;
-      newErrors.phone = msg;
-    } else {
-      if (hasEmail && !emailRegex.test(email.trim())) {
-        newErrors.email = t.propertyDetails.validation.emailInvalid;
-      }
-      if (hasPhone) {
-        const phoneDigits = phone.replace(/\D/g, '');
-        if (phoneDigits.length < 7) {
-          newErrors.phone = t.propertyDetails.validation.phoneInvalid;
-        }
-      }
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      newErrors.email = t.propertyDetails.validation.emailInvalid;
+    }
+    if (!phone.trim()) {
+      newErrors.phone = t.propertyDetails.validation.phoneRequired;
+    } else if (phone.replace(/\D/g, '').length < 7 || /[^\d\s()+.-]/.test(phone)) {
+      newErrors.phone = t.propertyDetails.validation.phoneInvalid;
     }
 
     setErrors(newErrors);
@@ -107,8 +89,8 @@ export function PropertyInquiryForm({
     const finalMessage = message.trim()
       ? message.trim()
       : isAr
-      ? `مرحباً، أود الاستفسار عن العقار "${property?.title?.ar || ''}" (المعرف: ${property?.id || ''}).`
-      : `Hello, I am interested in inquiring about "${property?.title?.en || ''}" (ID: ${property?.id || ''}).`;
+      ? `مرحباً، أود الاستفسار عن العقار "${property?.title?.ar || ''}".`
+      : `Hello, I am interested in inquiring about "${property?.title?.en || ''}".`;
 
     setIsSubmitting(true);
     setSubmitError('');
@@ -122,7 +104,7 @@ export function PropertyInquiryForm({
         entityId: property.id,
         entityTitle: property?.title?.[language] || property?.title?.en || '',
         language,
-        message: `Topic: ${inquiryTopic}\n\n${finalMessage}`,
+        message: `Topic: ${inquiryTopic}\n${isAr ? 'معرّف العقار' : 'Property ID'}: ${property.id}\n\n${finalMessage}`,
         attachments,
         details: {
           inquiryTopic,
@@ -162,18 +144,13 @@ export function PropertyInquiryForm({
     setFullName('');
     setEmail('');
     setPhone('');
+    setMessage('');
   };
 
   return (
     <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
       {/* Header */}
       <div className="space-y-1">
-        <div className="flex items-center gap-2">
-          <Badge variant="primary">
-            {isAr ? 'طلب استفسار مباشر' : 'Direct Property Inquiry'}
-          </Badge>
-          <span className="text-xs text-slate-400">ID: {property.id}</span>
-        </div>
         <h3 className="text-xl sm:text-2xl font-bold text-slate-900 font-display-serif">
           {t.propertyDetails.inquiryFormTitle}
         </h3>
@@ -260,7 +237,7 @@ export function PropertyInquiryForm({
           </div>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form noValidate onSubmit={handleSubmit} className="space-y-4">
           {submitError && (
             <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-xs space-y-2 text-rose-900 animate-in fade-in">
               <div className="flex items-center gap-2 font-bold text-rose-700">
@@ -338,7 +315,7 @@ export function PropertyInquiryForm({
             {/* Email Field */}
             <div>
               <label htmlFor="prop-inquiry-email" className="block text-xs font-bold text-slate-700 mb-1">
-                {t.propertyDetails.email} <span className="text-slate-400 font-normal">({isAr ? 'أو الهاتف' : 'or Phone'})</span>
+                {t.propertyDetails.email} <span className="text-slate-400 font-normal">({isAr ? 'اختياري' : 'Optional'})</span>
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5" />
@@ -369,13 +346,14 @@ export function PropertyInquiryForm({
             {/* Phone Field */}
             <div>
               <label htmlFor="prop-inquiry-phone" className="block text-xs font-bold text-slate-700 mb-1">
-                {t.propertyDetails.phone} <span className="text-slate-400 font-normal">({isAr ? 'أو البريد' : 'or Email'})</span>
+                {t.propertyDetails.phone} <span className="text-rose-500" aria-hidden="true">*</span>
               </label>
               <div className="relative">
                 <Phone className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5" />
                 <input
                   id="prop-inquiry-phone"
                   type="tel"
+                  required
                   aria-invalid={Boolean(touched.phone && errors.phone)}
                   aria-describedby={touched.phone && errors.phone ? "prop-inquiry-phone-error" : undefined}
                   placeholder={t.propertyDetails.phonePlaceholder}

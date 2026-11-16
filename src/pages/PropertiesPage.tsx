@@ -2,7 +2,6 @@ import React, { useState, useMemo, useEffect } from 'react';
 import {
   Search,
   SlidersHorizontal,
-  MapPin,
   Bed,
   Bath,
   Maximize,
@@ -12,7 +11,6 @@ import {
   RotateCcw,
   LayoutGrid,
   List,
-  Compass,
   DollarSign,
   Check,
   X,
@@ -29,7 +27,6 @@ import { translations } from '../lib/translations';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { PropertyCard } from '../components/ui/PropertyCard';
-import { PropertyMapView } from '../components/properties/PropertyMapView';
 import { useData } from '../context/DataContext';
 import { SAUDI_CITIES } from '../data/cities';
 import { CitySearchDropdown } from '../components/ui/CitySearchDropdown';
@@ -92,7 +89,7 @@ export function PropertiesPage({
       minPrice: initialFilters?.minPrice ?? fromUrl.minPrice,
       maxPrice: initialFilters?.maxPrice ?? fromUrl.maxPrice,
       sortBy: (initialFilters?.sortBy as PropertySortOption) ?? fromUrl.sortBy,
-      viewMode: (initialFilters?.viewMode as PropertyViewMode) ?? fromUrl.viewMode,
+      viewMode: (initialFilters?.viewMode ?? fromUrl.viewMode) === 'list' ? 'list' as const : 'grid' as const,
     };
   }, []);
 
@@ -109,7 +106,7 @@ export function PropertiesPage({
   const [maxInputVal, setMaxInputVal] = useState<string>('');
   const [priceError, setPriceError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<PropertySortOption>(initialParams.sortBy);
-  const [viewMode, setViewMode] = useState<PropertyViewMode>(initialParams.viewMode);
+  const [viewMode, setViewMode] = useState<Exclude<PropertyViewMode, 'map'>>(initialParams.viewMode);
   const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false);
 
   // References to distinguish history navigation, continuous slider/typing updates, and discrete filter clicks
@@ -132,7 +129,7 @@ export function PropertiesPage({
       setMinPrice(parsed.minPrice);
       setMaxPrice(parsed.maxPrice);
       setSortBy(parsed.sortBy);
-      setViewMode(parsed.viewMode);
+      setViewMode(parsed.viewMode === 'list' ? 'list' : 'grid');
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -151,7 +148,7 @@ export function PropertiesPage({
       if (initialFilters.maxPrice !== undefined) setMaxPrice(initialFilters.maxPrice);
       if (initialFilters.bedroom !== undefined) setBedroomFilter(initialFilters.bedroom as PropertyBedroomFilter);
       if (initialFilters.sortBy !== undefined) setSortBy(initialFilters.sortBy as PropertySortOption);
-      if (initialFilters.viewMode !== undefined) setViewMode(initialFilters.viewMode as PropertyViewMode);
+      if (initialFilters.viewMode !== undefined) setViewMode(initialFilters.viewMode === 'list' ? 'list' : 'grid');
     }
   }, [initialFilters]);
 
@@ -1190,30 +1187,11 @@ export function PropertiesPage({
             <List className="w-3.5 h-3.5" />
             <span>{language === 'ar' ? 'قائمة' : 'List'}</span>
           </button>
-          <button
-            onClick={() => setViewMode('map')}
-            className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold ${
-              viewMode === 'map'
-                ? 'bg-blue-600 text-white shadow-xs'
-                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
-            }`}
-            title={language === 'ar' ? 'عرض الخريطة التفاعلية' : 'Interactive Map View'}
-          >
-            <Compass className="w-3.5 h-3.5 text-sky-400" />
-            <span>{language === 'ar' ? 'الخريطة' : 'Map View'}</span>
-          </button>
         </div>
       </div>
 
-      {/* Properties Output View (Map / Grid / List) */}
-      {viewMode === 'map' ? (
-        <PropertyMapView
-          properties={filteredProperties}
-          language={language}
-          onSelectProperty={onSelectProperty}
-          onOpenBookViewingModal={onOpenBookViewingModal}
-        />
-      ) : propertyLoadStatus !== 'ready' && liveProperties.length === 0 ? (
+      {/* Property results */}
+      {propertyLoadStatus !== 'ready' && liveProperties.length === 0 ? (
         <div role="status" className="rounded-2xl border border-slate-200 p-6 text-center">
           {propertyLoadStatus === 'loading' ? (language === 'ar' ? 'جاري تحميل العقارات…' : 'Loading properties…') : <>
             <p>{language === 'ar' ? 'تعذّر تحميل العقارات.' : 'Could not load the property catalog.'}</p>

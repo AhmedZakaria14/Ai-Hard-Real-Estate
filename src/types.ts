@@ -20,6 +20,12 @@ export type PageId =
 export type PropertyType = 'villa' | 'apartment' | 'penthouse' | 'townhouse' | 'commercial' | 'mansion';
 export type ListingStatus = 'for-sale' | 'for-rent' | 'off-plan' | 'exclusive' | 'new-launch';
 
+export interface PropertySpecification {
+  label: { en: string; ar: string };
+  value: { en: string; ar: string };
+  icon: 'check' | 'pool' | 'gym' | 'bed' | 'bath' | 'area' | 'parking';
+}
+
 export interface Property {
   id: string;
   slug: string;
@@ -59,7 +65,8 @@ export interface Property {
     ar: string[];
   };
   features: {
-    yearBuilt: number;
+    yearBuilt?: number | null;
+    additionalSpecs?: PropertySpecification[];
     parkingSpaces: number;
     furnishing: { en: string; ar: string };
     view: { en: string; ar: string };

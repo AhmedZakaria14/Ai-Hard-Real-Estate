@@ -2,11 +2,9 @@ import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Property, Language } from '../../types';
-import { FormAttachmentMeta } from '../../types/firestore-schema';
 import { translations } from '../../lib/translations';
-import { Calendar, Clock, User, Mail, Phone, Video, CheckCircle2, MessageSquare, Sparkles } from 'lucide-react';
+import { Calendar, Clock, User, Mail, Phone, CheckCircle2, MessageSquare, Sparkles } from 'lucide-react';
 import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSubmissionService';
-import { FileUploadZone } from '../forms/FileUploadZone';
 
 interface BookViewingModalProps {
   isOpen: boolean;
@@ -23,14 +21,13 @@ export function BookViewingModal({
 }: BookViewingModalProps) {
   const t = translations[language];
 
-  const [tourType, setTourType] = useState<'in-person' | 'virtual'>('in-person');
+  const tourType = 'in-person';
   const [preferredDate, setPreferredDate] = useState('');
   const [preferredTime, setPreferredTime] = useState('morning');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [notes, setNotes] = useState('');
-  const [attachments, setAttachments] = useState<FormAttachmentMeta[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [leadRef, setLeadRef] = useState('');
   const [crmRef, setCrmRef] = useState('');
@@ -43,12 +40,12 @@ export function BookViewingModal({
     setContactError('');
 
     if (!fullName.trim()) return;
-    if (!email.trim() && !phone.trim()) {
-      setContactError(
-        language === 'en'
-          ? 'Please provide at least one contact method (email or phone).'
-          : 'يرجى تقديم وسيلة تواصل واحدة على الأقل (البريد الإلكتروني أو رقم الهاتف).'
-      );
+    if (!phone.trim()) {
+      setContactError(t.propertyDetails.validation.phoneRequired);
+      return;
+    }
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setContactError(t.propertyDetails.validation.emailInvalid);
       return;
     }
 
@@ -64,7 +61,6 @@ export function BookViewingModal({
         entityTitle: property?.title?.[language] || property?.title?.en || '',
         language,
         message: `Format: ${tourType}\nPreferred Date: ${preferredDate}\nPreferred Time: ${preferredTime}\nNotes: ${notes}`,
-        attachments,
         details: {
           tourType,
           preferredDate,
@@ -120,7 +116,7 @@ export function BookViewingModal({
           <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 text-start text-xs space-y-1.5 text-slate-600">
             <p><strong>{language === 'en' ? 'Reference Code:' : 'رقم المرجع:'}</strong> <span className="font-mono font-bold text-slate-900">{leadRef}</span></p>
             <p><strong>{language === 'en' ? 'Property:' : 'العقار:'}</strong> {property?.title?.[language] || ''}</p>
-            <p><strong>{language === 'en' ? 'Format:' : 'النوع:'}</strong> {tourType === 'in-person' ? t.modals.inPerson : t.modals.virtual}</p>
+            <p><strong>{language === 'en' ? 'Format:' : 'النوع:'}</strong> {t.modals.inPerson}</p>
             <p className="flex items-center gap-1.5 text-blue-600 font-semibold pt-1 border-t border-slate-200">
               <Sparkles className="w-3.5 h-3.5" />
               <span>CRM Hook: {crmRef || 'Synced to Real Estate CRM'}</span>
@@ -148,39 +144,6 @@ export function BookViewingModal({
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Tour Format selection */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
-              {t.modals.tourType}
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setTourType('in-person')}
-                className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs sm:text-sm font-medium transition-all ${
-                  tourType === 'in-person'
-                    ? 'border-blue-600 bg-blue-50/60 text-blue-700 ring-2 ring-blue-500/20'
-                    : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-                }`}
-              >
-                <User className="w-4 h-4" />
-                {t.modals.inPerson}
-              </button>
-              <button
-                type="button"
-                onClick={() => setTourType('virtual')}
-                className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs sm:text-sm font-medium transition-all ${
-                  tourType === 'virtual'
-                    ? 'border-blue-600 bg-blue-50/60 text-blue-700 ring-2 ring-blue-500/20'
-                    : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-                }`}
-              >
-                <Video className="w-4 h-4" />
-                {t.modals.virtual}
-              </button>
-            </div>
-          </div>
-
           {/* Date & Time */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
@@ -263,11 +226,12 @@ export function BookViewingModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label htmlFor="book-viewing-email" className="block text-xs font-semibold text-slate-700 mb-1">
-                {t.contact.email} <span className="text-slate-400 font-normal">({language === 'en' ? 'or Phone' : 'أو الهاتف'})</span>
+                {t.contact.email} <span className="text-slate-400 font-normal">({language === 'en' ? 'Optional' : 'اختياري'})</span>
               </label>
               <input
                 id="book-viewing-email"
                 type="email"
+                onInvalid={() => setContactError(t.propertyDetails.validation.emailInvalid)}
                 placeholder="name@domain.com"
                 value={email}
                 onChange={(e) => {
@@ -279,11 +243,13 @@ export function BookViewingModal({
             </div>
             <div>
               <label htmlFor="book-viewing-phone" className="block text-xs font-semibold text-slate-700 mb-1">
-                {t.contact.phone} <span className="text-slate-400 font-normal">({language === 'en' ? 'or Email' : 'أو البريد'})</span>
+                {t.contact.phone} <span className="text-rose-500" aria-hidden="true">*</span>
               </label>
               <input
                 id="book-viewing-phone"
                 type="tel"
+                required
+                onInvalid={() => setContactError(t.propertyDetails.validation.phoneRequired)}
                 placeholder="+966 50 000 0000"
                 value={phone}
                 onChange={(e) => {
@@ -296,7 +262,7 @@ export function BookViewingModal({
           </div>
 
           {contactError && (
-            <p className="text-xs text-rose-500 font-medium">{contactError}</p>
+            <p role="alert" className="text-xs text-rose-500 font-medium">{contactError}</p>
           )}
 
           <div>
@@ -306,19 +272,12 @@ export function BookViewingModal({
             <textarea
               id="book-viewing-notes"
               rows={2}
-              placeholder={language === 'en' ? 'Any specific questions or gate access requirements...' : 'أي استفسارات أو متطلبات خاصة بالدخول...'}
+              placeholder={language === 'en' ? 'Any questions or special requirements...' : 'أي استفسارات أو متطلبات خاصة...'}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               className="w-full px-3 py-2 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
             />
           </div>
-
-          <FileUploadZone
-            uploadSessionId="book-viewing-modal"
-            attachments={attachments}
-            onChange={setAttachments}
-            language={language}
-          />
 
           <div className="pt-2">
             <Button type="submit" isLoading={isLoading} className="w-full">

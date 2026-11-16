@@ -20,7 +20,7 @@ import { getPageHref, handleSemanticClick } from '../../lib/navigation';
 import { getNormalizedPropertyPrice, RentalPeriod } from '../../lib/priceNormalization';
 import { formatCurrency, formatPropertyArea } from '../../lib/utils';
 
-function WhatsAppIcon() {
+export function WhatsAppIcon() {
   return <svg viewBox="0 0 24 24" fill="currentColor" className="size-4 shrink-0" aria-hidden="true">
     <path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.49s1.07 2.89 1.22 3.09c.15.2 2.1 3.2 5.09 4.49.71.31 1.27.49 1.7.63.71.23 1.36.2 1.87.12.57-.08 1.76-.72 2-1.42.25-.7.25-1.3.17-1.42-.07-.13-.27-.2-.57-.35zM12.05 2a9.95 9.95 0 0 0-8.63 14.9L2 22l5.25-1.38A9.95 9.95 0 1 0 12.05 2zm0 18.23a8.25 8.25 0 0 1-4.2-1.15l-.3-.18-3.11.82.83-3.03-.2-.31a8.26 8.26 0 1 1 6.98 3.85z"/>
   </svg>;
@@ -126,16 +126,6 @@ export function PropertyCard({
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
           </button>
 
-          {/* Price overlay on image for mobile */}
-          <div className="absolute bottom-3 start-3 text-white font-bold text-lg font-display-serif drop-shadow-md pointer-events-none">
-            {formatCurrency(property.price.sar, 'SAR', language)}
-            {property.price.period && (
-              <span className="text-xs font-normal opacity-90">
-                {' '}
-                {property.price.period === 'year' ? t.propertyDetails.perYear : t.propertyDetails.perMonth}
-              </span>
-            )}
-          </div>
         </div>
 
         {/* Content Container */}
@@ -188,7 +178,7 @@ export function PropertyCard({
 
           {/* Action Row */}
           <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-            <div className="text-slate-900 font-extrabold text-xl font-display-serif hidden md:block">
+            <div className="text-blue-700 font-extrabold text-xl font-display-serif">
               {formatCurrency(property.price.sar, 'SAR', language)}
               {property.price.period && (
                 <span className="text-xs font-normal text-slate-500">

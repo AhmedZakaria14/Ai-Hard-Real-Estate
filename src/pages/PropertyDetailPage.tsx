@@ -7,16 +7,15 @@ import {
   Bath,
   Maximize,
   Calendar,
-  MessageSquare,
-  ShieldCheck,
   CheckCircle2,
-  Building,
   Car,
   RefreshCw,
 } from 'lucide-react';
 import { Language, PageId, Property } from '../types';
 import { translations } from '../lib/translations';
 import { useData } from '../context/DataContext';
+import { WhatsAppIcon } from '../components/ui/PropertyCard';
+import { propertySpecificationIcons } from '../components/properties/propertySpecificationIcons';
 import { Button } from '../components/ui/Button';
 import { getLocalizedText } from '../lib/utils';
 import { Badge } from '../components/ui/Badge';
@@ -59,6 +58,13 @@ export function PropertyDetailPage({
       </div>
     );
   }
+
+  const specificationRows = [
+    { label: t.propertyDetails.quickFacts.propertyType, value: getPropertyTypeLabel(property.type, language) },
+    { label: t.propertyDetails.quickFacts.yearBuilt, value: property.features?.yearBuilt || '' },
+    { label: t.propertyDetails.quickFacts.furnishing, value: getLocalizedText(property.features?.furnishing, language) },
+    { label: t.propertyDetails.quickFacts.view, value: getLocalizedText(property.features?.view, language) },
+  ];
 
   const similarProperties = properties.filter((p) => p.id !== property.id).slice(0, 2);
 
@@ -221,6 +227,18 @@ export function PropertyDetailPage({
                   : (property.features.parkingSpaces === 1 ? 'Space' : 'Spaces')}
               </p>
             </div>
+            {(property.features?.additionalSpecs ?? []).map((spec, index) => {
+              const { Icon } = propertySpecificationIcons[spec.icon] ?? propertySpecificationIcons.check;
+              return (
+                <div key={index} className="space-y-1">
+                  <span className="text-xs text-slate-500 flex items-center gap-1.5">
+                    <Icon aria-hidden="true" className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                    {getLocalizedText(spec.label, language)}
+                  </span>
+                  <p className="text-base font-bold text-slate-900"><bdi>{getLocalizedText(spec.value, language)}</bdi></p>
+                </div>
+              );
+            })}
           </div>
 
           {/* Description / Overview */}
@@ -238,24 +256,14 @@ export function PropertyDetailPage({
             <h2 className="text-xl font-bold text-slate-900 font-display-serif">
               {t.propertyDetails.specifications}
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
-              <div className="flex justify-between py-2 border-b border-slate-100">
-                <span className="text-slate-500">{t.propertyDetails.quickFacts.propertyType}:</span>
-                <span className="font-semibold text-slate-900">{getPropertyTypeLabel(property.type, language)}</span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-slate-100">
-                <span className="text-slate-500">{t.propertyDetails.quickFacts.yearBuilt}:</span>
-                <span className="font-semibold text-slate-900">{property.features?.yearBuilt}</span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-slate-100">
-                <span className="text-slate-500">{t.propertyDetails.quickFacts.furnishing}:</span>
-                <span className="font-semibold text-slate-900">{getLocalizedText(property.features?.furnishing, language)}</span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-slate-100">
-                <span className="text-slate-500">{t.propertyDetails.quickFacts.view}:</span>
-                <span className="font-semibold text-slate-900">{getLocalizedText(property.features?.view, language)}</span>
-              </div>
-            </div>
+            <dl dir={language === 'ar' ? 'rtl' : 'ltr'} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
+              {specificationRows.filter(({ value }) => Boolean(value)).map(({ label, value }) => (
+                <div key={label} className="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-2 py-2 border-b border-slate-100 text-start">
+                  <dt className="text-slate-500">{label}:</dt>
+                  <dd className="font-semibold text-slate-900 break-words"><bdi>{value}</bdi></dd>
+                </div>
+              ))}
+            </dl>
           </div>
 
           {/* Luxury Amenities */}
@@ -312,16 +320,10 @@ export function PropertyDetailPage({
               size="lg"
               className="w-full justify-center"
             >
-              <MessageSquare className="w-4 h-4" />
+              <WhatsAppIcon />
               <span>{t.cta.chatOnWhatsApp}</span>
             </Button>
 
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-[11px] text-slate-500 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>
-                {language === 'en' ? 'Verified Title Deed & Escrow Protected' : 'صك ملكية موثق ومعتمد وضمان بنكي'}
-              </span>
-            </div>
           </div>
         </div>
       </div>
