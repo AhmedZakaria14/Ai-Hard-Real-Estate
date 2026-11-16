@@ -1,6 +1,8 @@
 import React from 'react';
 import { PageId } from '../types';
 
+export const realEstateNavigationPages = ['home', 'about', 'properties', 'projects', 'marketing', 'blog', 'contact'] as const;
+
 /**
  * Returns the authoritative real URL destination for any PageId
  */

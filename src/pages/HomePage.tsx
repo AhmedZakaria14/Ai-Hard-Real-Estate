@@ -1,8 +1,13 @@
+import { getLocalizedText } from '../lib/utils';
+import { SECTOR_CONTACT_DETAILS } from '../lib/sectors';
 import { subscribeSectorSection } from '../lib/db/hardSectorSections';
 import { defaultRealEstateHero, publicRealEstateImage, realEstateHeroSection } from '../lib/realEstateHomeContent';
 import React, { useState } from 'react';
 import {
   Search,
+  ChevronLeft,
+  ChevronRight,
+  MessageCircle,
   MapPin,
   ArrowRight,
   ArrowLeft,
@@ -36,7 +41,6 @@ interface HomePageProps {
   onOpenBookViewingModal: (property: Property) => void;
   onOpenListPropertyModal: () => void;
   onOpenInquiryModal: () => void;
-  onOpenProjectInquiryModal?: (project: Project) => void;
 }
 
 export function HomePage({
@@ -46,7 +50,6 @@ export function HomePage({
   onOpenBookViewingModal,
   onOpenListPropertyModal,
   onOpenInquiryModal,
-  onOpenProjectInquiryModal,
 }: HomePageProps) {
   const { translations } = useTextOverride();
   const t = translations[language] || defaultTranslations[language];
@@ -65,11 +68,16 @@ export function HomePage({
   const featuredProperties = properties.filter((p) => p.featured).slice(0, 3).length > 0
     ? properties.filter((p) => p.featured).slice(0, 3)
     : properties.slice(0, 3);
-  const [spotlightProject, setSpotlightProject] = React.useState<Project | undefined>();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [projectIndex, setProjectIndex] = useState(0);
+  const spotlightProject = projects[projectIndex];
+  const PreviousProjectIcon = language === 'ar' ? ChevronRight : ChevronLeft;
+  const NextProjectIcon = language === 'ar' ? ChevronLeft : ChevronRight;
+  const projectWhatsapp = SECTOR_CONTACT_DETAILS.realestate.whatsapp.replace(/\D/g, '');
   React.useEffect(() => {
     const controller = new AbortController();
     loadPublishedProjects(controller.signal).then((items) => {
-      if (!controller.signal.aborted) setSpotlightProject(items[0]?.content);
+      if (!controller.signal.aborted) setProjects(items.map(({ content }) => content));
     }).catch(() => {});
     return () => controller.abort();
   }, []);
@@ -89,6 +97,7 @@ export function HomePage({
 
   return (
     <div className="space-y-16 sm:space-y-24 lg:space-y-32 pb-20">
+      <div className="space-y-8 sm:space-y-12">
       {/* 1. HERO SECTION */}
       <section
         id="home-hero-section"
@@ -241,6 +250,40 @@ export function HomePage({
         </div>
       </section>
 
+      {/* GLOBAL LISTING CTA BANNER */}
+      <section id="property-listing-banner" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-hard-gradient text-white rounded-3xl p-8 sm:p-12 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="space-y-3 max-w-xl">
+            <div className="flex items-center gap-3">
+              <div className="shrink-0 rounded-xl border border-white/75 bg-white p-2 shadow-sm">
+                <BrandLogo size="xs" language={language} variant="dark" isIconOnly />
+              </div>
+              <span className="text-xs font-bold tracking-wider uppercase text-blue-100">
+                {language === 'en' ? 'Sell or Lease with HARD' : 'اعرض عقارك للبيع أو الإيجار'}
+              </span>
+            </div>
+            <h3 className="text-2xl sm:text-3xl font-extrabold font-display-serif">
+              {t.home.marketingBannerTitle}
+            </h3>
+            <p className="text-xs sm:text-sm text-blue-50 leading-relaxed">
+              {t.home.marketingBannerSubtitle}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <Button
+              variant="white"
+              size="lg"
+              onClick={onOpenListPropertyModal}
+              className="font-bold text-blue-900 shadow-xl"
+            >
+              <span>{t.cta.listProperty}</span>
+              <ArrowIcon className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* TRUST STATS BANNER */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-3">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 p-6 sm:p-8 bg-white rounded-3xl border border-slate-200/90 shadow-xs divide-y sm:divide-y-0 sm:divide-x sm:divide-x-reverse sm:divide-slate-100">
@@ -260,6 +303,8 @@ export function HomePage({
         </div>
 
       </section>
+
+      </div>
 
       {/* 2. FEATURED LISTINGS GRID (3-Column Card Layout) */}
       <section id="featured-listings-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
@@ -312,14 +357,15 @@ export function HomePage({
 
       {/* MASTER PROJECT SPOTLIGHT */}
       {spotlightProject && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-slate-900 text-white rounded-3xl overflow-hidden border border-slate-800 shadow-2xl grid grid-cols-1 lg:grid-cols-12">
+        <section id="project-spotlight" className="max-w-7xl mx-auto space-y-4 px-4 sm:px-6 lg:px-8">
+          <div id="project-spotlight-slide" aria-live="polite" className="bg-slate-900 text-white rounded-3xl overflow-hidden border border-slate-800 shadow-2xl grid grid-cols-1 lg:grid-cols-12">
             <div className="lg:col-span-6 relative aspect-16/10 lg:aspect-auto overflow-hidden bg-slate-950">
               <img
-                src={spotlightProject.image}
-                alt={spotlightProject.title[language]}
+                key={spotlightProject.id}
+                src={spotlightProject.image || spotlightProject.gallery?.[0]}
+                alt={getLocalizedText(spotlightProject.title, language)}
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500"
               />
               {spotlightProject.financialMetric?.isVerified ? (
                 <div className="absolute top-4 start-4 bg-emerald-600 text-white text-xs px-3 py-1 rounded-full font-bold shadow-md flex items-center gap-1.5">
@@ -341,15 +387,15 @@ export function HomePage({
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <Badge variant="primary">{language === 'en' ? 'Exclusive Master Project' : 'مشروع تطويري حصري'}</Badge>
-                  <span className="text-xs text-blue-300 font-medium">{spotlightProject.developer[language]}</span>
+                  <span className="text-xs text-blue-300 font-medium">{getLocalizedText(spotlightProject.developer, language)}</span>
                 </div>
 
                 <h3 className="text-2xl sm:text-3xl font-extrabold font-display-serif">
-                  {spotlightProject.title[language]}
+                  {getLocalizedText(spotlightProject.title, language)}
                 </h3>
 
                 <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  {spotlightProject.description[language]}
+                  {getLocalizedText(spotlightProject.description, language)}
                 </p>
 
                 {spotlightProject.financialMetric && !spotlightProject.financialMetric.isVerified && spotlightProject.financialMetric.statusNote && (
@@ -374,7 +420,7 @@ export function HomePage({
                       </span>
                     </div>
                     <strong className="text-base sm:text-lg text-slate-200 font-medium block">
-                      {spotlightProject.handoverDate[language]}
+                      {getLocalizedText(spotlightProject.handoverDate, language)}
                     </strong>
                     <div className="mt-1 flex items-center justify-between text-[10px] text-slate-400">
                       <span>{t.projects.progress}: {spotlightProject.progressPercentage ?? 0}%</span>
@@ -394,57 +440,36 @@ export function HomePage({
                   <ArrowIcon className="w-4 h-4" />
                 </a>
                 <Button
-                  variant="secondary"
-                  onClick={() => {
-                    if (onOpenProjectInquiryModal && spotlightProject) {
-                      onOpenProjectInquiryModal(spotlightProject);
-                    } else {
-                      onOpenInquiryModal();
-                    }
-                  }}
+                  href={`https://wa.me/${projectWhatsapp}?text=${encodeURIComponent(language === 'ar'
+                    ? 'مرحبًا، أود الاستفسار عن مشروع ' + getLocalizedText(spotlightProject.title, language)
+                    : 'Hello, I would like to ask about ' + getLocalizedText(spotlightProject.title, language))}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  variant="whatsapp"
                   className="justify-center"
                 >
-                  <span>{t.projects.inquireProject}</span>
+                  <MessageCircle className="size-4" aria-hidden="true" />
+                  <span>{language === 'ar' ? 'واتساب' : 'WhatsApp'}</span>
                 </Button>
               </div>
             </div>
           </div>
+          {projects.length > 1 && <nav className="flex items-center justify-center gap-3" aria-label={language === 'ar' ? 'تصفح المشاريع' : 'Browse projects'}>
+            <Button type="button" size="icon" variant="outline" aria-controls="project-spotlight-slide"
+              aria-label={language === 'ar' ? 'المشروع السابق' : 'Previous project'}
+              onClick={() => setProjectIndex((index) => (index + projects.length - 1) % projects.length)}>
+              <PreviousProjectIcon className="size-5" aria-hidden="true" />
+            </Button>
+            <bdi dir="ltr" className="text-sm text-slate-600">{projectIndex + 1} / {projects.length}</bdi>
+            <Button type="button" size="icon" variant="outline" aria-controls="project-spotlight-slide"
+              aria-label={language === 'ar' ? 'المشروع التالي' : 'Next project'}
+              onClick={() => setProjectIndex((index) => (index + 1) % projects.length)}>
+              <NextProjectIcon className="size-5" aria-hidden="true" />
+            </Button>
+          </nav>}
         </section>
       )}
 
-      {/* GLOBAL LISTING CTA BANNER */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-hard-gradient text-white rounded-3xl p-8 sm:p-12 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="space-y-3 max-w-xl">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-white/10 rounded-2xl border border-white/20 backdrop-blur-xs">
-                <BrandLogo size="xs" isIconOnly={true} />
-              </div>
-              <span className="text-xs font-bold tracking-wider uppercase text-blue-100">
-                {language === 'en' ? 'Sell or Lease with HARD' : 'اعرض عقارك للبيع أو الإيجار'}
-              </span>
-            </div>
-            <h3 className="text-2xl sm:text-3xl font-extrabold font-display-serif">
-              {t.home.marketingBannerTitle}
-            </h3>
-            <p className="text-xs sm:text-sm text-blue-50 leading-relaxed">
-              {t.home.marketingBannerSubtitle}
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3 shrink-0">
-            <Button
-              variant="white"
-              size="lg"
-              onClick={onOpenListPropertyModal}
-              className="font-bold text-blue-900 shadow-xl"
-            >
-              <span>{t.cta.listProperty}</span>
-              <ArrowIcon className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </section>
 
     </div>
   );

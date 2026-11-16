@@ -1,3 +1,4 @@
+import { getLocalizedText } from '../lib/utils';
 import React, { useState } from 'react';
 import {
   Layers,
@@ -91,7 +92,7 @@ export function ProjectsPage({
             <div className="lg:col-span-5 relative aspect-16/10 lg:aspect-auto bg-slate-950 overflow-hidden">
               <img
                 src={project.image || project.gallery?.[0] || 'https://images.unsplash.com/photo-1541888946425-d0fbb186156a?auto=format&fit=crop&w=800&q=80'}
-                alt={project.title[language]}
+                alt={getLocalizedText(project.title, language)}
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover"
               />
@@ -116,7 +117,7 @@ export function ProjectsPage({
               <div className="space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-xs font-bold text-blue-700 uppercase tracking-wider">
-                    {project.developer[language]}
+                    {getLocalizedText(project.developer, language)}
                   </span>
                   <div className="flex items-center gap-2">
                     {project.isOverdue && (
@@ -125,16 +126,16 @@ export function ProjectsPage({
                         <span>{t.projects.overdueFlag}</span>
                       </span>
                     )}
-                    <Badge variant="secondary">{project.category[language]}</Badge>
+                    <Badge variant="secondary">{getLocalizedText(project.category, language)}</Badge>
                   </div>
                 </div>
 
                 <h2 className="text-xl sm:text-2xl font-bold text-slate-900 font-display-serif">
-                  {project.title[language]}
+                  {getLocalizedText(project.title, language)}
                 </h2>
 
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  {project.description[language]}
+                  {getLocalizedText(project.description, language)}
                 </p>
 
                 {/* Construction Progress & Schedule Status */}
@@ -165,7 +166,7 @@ export function ProjectsPage({
                       <span>{t.projects.lastUpdated}: {project.lastUpdated || project.deliveryAudit?.lastUpdated || '2026-10-09'}</span>
                     </span>
                     <span>
-                      {t.projects.handover}: <strong className="text-slate-800 font-semibold">{project.handoverDate[language]}</strong>
+                      {t.projects.handover}: <strong className="text-slate-800 font-semibold">{getLocalizedText(project.handoverDate, language)}</strong>
                     </span>
                   </div>
                 </div>
@@ -194,7 +195,7 @@ export function ProjectsPage({
 
                 {/* Highlights */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                  {project.highlights[language].map((hl, idx) => (
+                  {(project.highlights?.[language] ?? []).map((hl, idx) => (
                     <div key={idx} className="flex items-center gap-2 text-xs text-slate-700 font-medium">
                       <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                       <span>{hl}</span>
@@ -211,7 +212,7 @@ export function ProjectsPage({
                     {project.startingPriceSAR}
                   </div>
                   <span className="text-[11px] text-slate-500 block">
-                    {t.projects.handover}: {project.handoverDate[language]}
+                    {t.projects.handover}: {getLocalizedText(project.handoverDate, language)}
                   </span>
                 </div>
 
@@ -242,7 +243,7 @@ export function ProjectsPage({
                       if (onOpenProjectInquiryModal) {
                         onOpenProjectInquiryModal(project);
                       } else {
-                        onOpenInquiryModal(`Project Allocation: ${project.title[language]}`);
+                        onOpenInquiryModal(`Project Allocation: ${getLocalizedText(project.title, language)}`);
                       }
                     }}
                     className="flex-1 sm:flex-initial text-xs font-semibold"

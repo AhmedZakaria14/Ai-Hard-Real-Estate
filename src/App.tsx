@@ -514,7 +514,6 @@ function AppContent() {
             onOpenBookViewingModal={handleOpenBookViewing}
             onOpenListPropertyModal={() => setIsListPropertyModalOpen(true)}
             onOpenInquiryModal={() => handleOpenInquiryModal('General Inquiry')}
-            onOpenProjectInquiryModal={handleOpenProjectInquiryModal}
           />
         )}
 

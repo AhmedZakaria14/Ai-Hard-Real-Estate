@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import {
   Phone,
   Mail,
@@ -9,10 +9,6 @@ import {
   ArrowLeft,
   ShieldCheck,
   Instagram,
-  Building2,
-  Home,
-  HardHat,
-  ThermometerSnowflake,
 } from 'lucide-react';
 import { Language, PageId } from '../../types';
 import { translations as defaultTranslations } from '../../lib/translations';
@@ -21,24 +17,12 @@ import { useData } from '../../context/DataContext';
 import { submitCustomerForm } from '../../lib/forms/formSubmissionService';
 import { Button } from '../ui/Button';
 import { BrandLogo } from '../ui/BrandLogo';
-import { getPageHref, handleSemanticClick } from '../../lib/navigation';
-import { HARD_GROUP_SECTORS } from '../../lib/sectors';
-import { isAuthorizedAdmin } from '../../lib/adminAuth';
-import { ComplianceVerificationModal } from '../modals/ComplianceVerificationModal';
-import { PrivacyTermsModal } from '../modals/PrivacyTermsModal';
-import { SitemapModal } from '../modals/SitemapModal';
+import { getPageHref, handleSemanticClick, realEstateNavigationPages } from '../../lib/navigation';
 
 interface FooterProps {
   onNavigate: (page: PageId) => void;
   language: Language;
 }
-
-const SECTOR_ICONS = {
-  Building2,
-  Home,
-  HardHat,
-  ThermometerSnowflake,
-};
 
 export function Footer({ onNavigate, language }: FooterProps) {
   const { translations } = useTextOverride();
@@ -49,25 +33,7 @@ export function Footer({ onNavigate, language }: FooterProps) {
   const [subscribed, setSubscribed] = useState(false);
   const [subError, setSubError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isComplianceModalOpen, setIsComplianceModalOpen] = useState(false);
-  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
-  const [privacyInitialTab, setPrivacyInitialTab] = useState<'privacy' | 'terms'>('privacy');
-  const [isSitemapModalOpen, setIsSitemapModalOpen] = useState(false);
-
-  const [isAdmin, setIsAdmin] = useState<boolean>(() => isAuthorizedAdmin());
-
-  React.useEffect(() => {
-    const checkAuth = () => setIsAdmin(isAuthorizedAdmin());
-    checkAuth();
-    window.addEventListener('cms-auth-change', checkAuth);
-    window.addEventListener('storage', checkAuth);
-    return () => {
-      window.removeEventListener('cms-auth-change', checkAuth);
-      window.removeEventListener('storage', checkAuth);
-    };
-  }, []);
-
-  const handleSubscribe = async (e: React.FormEvent) => {
+  const handleSubscribe = async (e: FormEvent) => {
     e.preventDefault();
     if (!newsletterEmail.trim()) return;
     setLoading(true);
@@ -123,175 +89,63 @@ export function Footer({ onNavigate, language }: FooterProps) {
             </a>
 
             <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-              {t.brandBio}
+              {isAr
+                ? 'نحن في مؤسسة هارد للعقارات نرسم ملامح جديدة للتميز العقاري؛ لنكون منصتكم الأولى للوساطة والتسويق العقاري الفاخر. نلبي تطلعات كافة شرائح العملاء بأعلى معايير الاحترافية.'
+                : 'At HARD Real Estate, we are shaping a new standard of excellence as your first choice for luxury real estate brokerage and marketing. We serve clients of every kind with the highest standards of professionalism.'}
             </p>
 
-            <button
-              type="button"
-              onClick={() => setIsComplianceModalOpen(true)}
-              className="pt-2 flex items-center gap-2 text-xs text-blue-400 hover:text-blue-300 font-medium transition-colors cursor-pointer group text-start focus-visible:outline-none focus-visible:underline"
-            >
-              <ShieldCheck className="w-4 h-4 shrink-0 text-blue-400 group-hover:scale-110 transition-transform" />
-              <span>
-                {language === 'en'
-                  ? 'Officially Licensed REGA Brokerage • View Audit'
-                  : 'مؤسسة وساطة عقارية مرخصة رسمياً (عرض السجل)'}
+            <p className="flex items-start gap-2 pt-2 text-xs font-medium text-blue-400">
+              <ShieldCheck className="size-4 shrink-0" aria-hidden="true" />
+              <span>{isAr ? 'مؤسسة وساطة وتسويق عقاري مرخصة رسمياً' : 'Officially licensed real estate brokerage and marketing firm'}
+                <br />{isAr ? '(رخصة فال)' : '(FAL License)'}
               </span>
-            </button>
-
-            {/* Social handles */}
-            <div className="pt-2 flex items-center gap-2.5">
-              <a
-                href="https://www.instagram.com/hardgrp"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-pink-400 hover:bg-slate-800/90 hover:border-pink-500/40 transition-all group shadow-xs"
-                aria-label="Instagram"
-                title="Instagram (@hardgrp)"
-              >
-                <Instagram className="w-4 h-4 group-hover:scale-110 transition-transform" />
-              </a>
-              <a
-                href="https://x.com/HARDGRP"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800/90 hover:border-slate-600 transition-all group shadow-xs"
-                aria-label="X / Twitter"
-                title="X / Twitter (@HARDGRP)"
-              >
-                <svg
-                  className="w-3.5 h-3.5 fill-current group-hover:scale-110 transition-transform"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
+            </p>
+            <div className="space-y-2 pt-2">
+              <p className="text-xs font-semibold text-slate-300">{isAr ? 'تابعنا على:' : 'Follow us on:'}</p>
+              <div className="flex items-center gap-2.5">
+                <a
+                  href="https://www.instagram.com/hardgrp"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-pink-400 hover:bg-slate-800/90 hover:border-pink-500/40 transition-all group shadow-xs"
+                  aria-label="Instagram"
+                  title="Instagram (@hardgrp)"
                 >
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                </svg>
-              </a>
+                  <Instagram className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                </a>
+                <a
+                  href="https://x.com/HARDGRP"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800/90 hover:border-slate-600 transition-all group shadow-xs"
+                  aria-label="X / Twitter"
+                  title="X / Twitter (@HARDGRP)"
+                >
+                  <svg
+                    className="w-3.5 h-3.5 fill-current group-hover:scale-110 transition-transform"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                </a>
+              </div>
             </div>
           </div>
 
-          {/* Column 2: HARD Group Sectors (Standardized Sector Navigation) */}
-          <div className="space-y-4">
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider font-ui-sans flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-blue-500" />
-              <span>{isAr ? 'قطاعات مجموعة هارد' : 'HARD Group Sectors'}</span>
-            </h4>
+          <nav aria-label={t.footer.sitemap}>
+            <h4 className="mb-4 text-sm font-bold text-white">{t.footer.sitemap}</h4>
             <ul className="space-y-2 text-xs sm:text-sm">
-              {HARD_GROUP_SECTORS.map((sector) => {
-                const Icon = SECTOR_ICONS[sector.iconName] || Building2;
-                const isCurrent = sector.id === 'realestate';
-                return (
-                  <li key={sector.id}>
-                    <a
-                      href={sector.href}
-                      onClick={(e) =>
-                        handleSemanticClick(e, () => {
-                          if (!isCurrent) handleLinkClick(sector.pageId);
-                        })
-                      }
-                      aria-current={isCurrent ? 'page' : undefined}
-                      className={`flex items-center justify-between p-2 rounded-xl border transition-all cursor-pointer ${
-                        isCurrent
-                          ? 'bg-blue-950/70 border-blue-800 text-blue-200 font-semibold'
-                          : 'bg-slate-900/60 border-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-900 hover:border-slate-700'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <Icon
-                          className={`w-4 h-4 shrink-0 ${
-                            isCurrent ? 'text-blue-400' : 'text-slate-400'
-                          }`}
-                        />
-                        <span>{sector.name[language]}</span>
-                      </div>
-                      {isCurrent ? (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-300 border border-blue-500/40">
-                          {isAr ? 'القطاع الحالي' : 'Current'}
-                        </span>
-                      ) : (
-                        <span className="text-slate-500 text-xs">›</span>
-                      )}
-                    </a>
-                  </li>
-                );
-              })}
+              {realEstateNavigationPages.map((page) => <li key={page}>
+                <a href={getPageHref(page)} onClick={(event) => handleSemanticClick(event, () => handleLinkClick(page))}
+                  className="inline-block py-0.5 text-slate-300 hover:text-blue-400 focus-visible:underline">
+                  {t.nav[page]}
+                </a>
+              </li>)}
             </ul>
-          </div>
+          </nav>
 
-          {/* Column 3: Real Estate Sitemap */}
-          <div>
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4 font-ui-sans">
-              {isAr ? 'صفحات العقارات' : 'Real Estate Navigation'}
-            </h4>
-            <ul className="space-y-2 text-xs sm:text-sm">
-              {[
-                { id: 'home', label: t.nav.home },
-                { id: 'properties', label: t.nav.properties },
-                { id: 'projects', label: t.nav.projects },
-                { id: 'marketing', label: t.nav.marketing },
-                { id: 'about', label: t.nav.about },
-                { id: 'blog', label: t.nav.blog },
-                { id: 'contact', label: t.nav.contact },
-              ].map((link) => {
-                const href = getPageHref(link.id as PageId);
-                return (
-                  <li key={link.id}>
-                    <a
-                      href={href}
-                      onClick={(e) => handleSemanticClick(e, () => handleLinkClick(link.id as PageId))}
-                      className="hover:text-blue-400 transition-colors flex items-center gap-1.5 cursor-pointer text-slate-300 focus-visible:outline-none focus-visible:underline py-0.5"
-                    >
-                      <span className="text-blue-500 opacity-60">›</span>
-                      <span>{link.label}</span>
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-
-            {/* Legal & Sitemap Controls */}
-            <div className="pt-3 border-t border-slate-900/80 space-y-1.5 text-xs">
-              <a
-                href="/realestate/privacy"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setPrivacyInitialTab('privacy');
-                  setIsPrivacyModalOpen(true);
-                }}
-                className="hover:text-blue-400 text-slate-400 transition-colors flex items-center gap-1.5 cursor-pointer py-0.5"
-              >
-                <span className="text-slate-600">•</span>
-                <span>{t.footer.privacy}</span>
-              </a>
-
-              <a
-                href="/realestate/terms"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setPrivacyInitialTab('terms');
-                  setIsPrivacyModalOpen(true);
-                }}
-                className="hover:text-blue-400 text-slate-400 transition-colors flex items-center gap-1.5 cursor-pointer py-0.5"
-              >
-                <span className="text-slate-600">•</span>
-                <span>{t.footer.terms}</span>
-              </a>
-
-              <a
-                href="/realestate/sitemap"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsSitemapModalOpen(true);
-                }}
-                className="hover:text-blue-400 text-slate-300 font-semibold transition-colors flex items-center gap-1.5 cursor-pointer py-0.5"
-              >
-                <span className="text-blue-400">•</span>
-                <span>{t.footer.sitemap} (HTML)</span>
-              </a>
-            </div>
-          </div>
-
-          {/* Column 4: Contact & Newsletter Subscription */}
+          {/* Contact information */}
           <div className="space-y-4">
             <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-2 font-ui-sans">
               {t.footer.contactInfo}
@@ -343,7 +197,9 @@ export function Footer({ onNavigate, language }: FooterProps) {
               </div>
             </div>
 
-            <div className="pt-2 border-t border-slate-900">
+          </div>
+
+          <div className="space-y-2">
               <h5 className="text-xs font-bold text-white uppercase tracking-wider mb-1 font-ui-sans">
                 {t.footer.newsletterTitle}
               </h5>
@@ -388,124 +244,11 @@ export function Footer({ onNavigate, language }: FooterProps) {
                   </Button>
                 </form>
               )}
-            </div>
           </div>
         </div>
 
-        {/* Bottom bar with Direct Legal & Cross-Sector Links */}
-        <div className="mt-12 pt-8 border-t border-slate-900 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-start">
-            <p>{t.footer.copyright}</p>
-            <span className="hidden sm:inline text-slate-800">•</span>
-            {/* Legal Links */}
-            <div className="flex items-center gap-3 text-slate-400 font-medium">
-              <a
-                href="/realestate/privacy"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setPrivacyInitialTab('privacy');
-                  setIsPrivacyModalOpen(true);
-                }}
-                className="hover:text-blue-400 transition-colors cursor-pointer"
-              >
-                {t.footer.privacy}
-              </a>
-              <span className="text-slate-700">•</span>
-              <a
-                href="/realestate/terms"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setPrivacyInitialTab('terms');
-                  setIsPrivacyModalOpen(true);
-                }}
-                className="hover:text-blue-400 transition-colors cursor-pointer"
-              >
-                {t.footer.terms}
-              </a>
-              <span className="text-slate-700">•</span>
-              <a
-                href="/realestate/sitemap"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsSitemapModalOpen(true);
-                }}
-                className="hover:text-blue-400 font-semibold text-slate-300 transition-colors cursor-pointer"
-              >
-                {t.footer.sitemap}
-              </a>
-            </div>
-          </div>
-
-          {/* Standardized Direct Sector Destination Links */}
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 font-medium text-slate-400">
-            <span className="text-slate-600 font-semibold uppercase text-[10px] tracking-wider">
-              {isAr ? 'قطاعات هارد:' : 'Sectors:'}
-            </span>
-            <a
-              href="/"
-              onClick={(e) => handleSemanticClick(e, () => handleLinkClick('portal'))}
-              className="hover:text-blue-400 transition-colors"
-            >
-              {isAr ? 'بوابة مجموعة هارد' : 'HARD Group Portal'}
-            </a>
-            <span className="text-slate-700">•</span>
-            <span className="text-blue-400 font-bold">
-              {isAr ? 'هارد للعقارات (القطاع الحالي)' : 'HARD Real Estate (Current)'}
-            </span>
-            <span className="text-slate-700">•</span>
-            <a
-              href="/construction"
-              onClick={(e) => handleSemanticClick(e, () => handleLinkClick('construction'))}
-              className="hover:text-blue-400 transition-colors"
-            >
-              {isAr ? 'هارد للإنشاءات' : 'HARD Construction'}
-            </a>
-            <span className="text-slate-700">•</span>
-            <a
-              href="/hvac"
-              onClick={(e) => handleSemanticClick(e, () => handleLinkClick('hvac'))}
-              className="hover:text-blue-400 transition-colors font-medium text-slate-300"
-            >
-              {isAr ? 'هارد لصيانة التكييف' : 'HARD HVAC Maintenance'}
-            </a>
-            {isAdmin && (
-              <>
-                <span className="text-slate-700">•</span>
-                <a
-                  href="/realestate/admin"
-                  onClick={(e) => handleSemanticClick(e, () => handleLinkClick('admin'))}
-                  className="hover:text-blue-400 font-semibold inline-flex items-center gap-1 text-slate-400 transition-colors"
-                  title="Admin CMS Portal"
-                >
-                  <ShieldCheck className="w-3 h-3 text-blue-400" />
-                  <span>{language === 'en' ? 'Admin CMS' : 'بوابة الإدارة (CMS)'}</span>
-                </a>
-              </>
-            )}
-          </div>
-        </div>
+        <p className="mt-12 border-t border-slate-800 pt-6 text-center text-xs text-slate-400">{t.footer.copyright}</p>
       </div>
-
-      <ComplianceVerificationModal
-        isOpen={isComplianceModalOpen}
-        onClose={() => setIsComplianceModalOpen(false)}
-        language={language}
-        initialTab="licensing"
-      />
-
-      <PrivacyTermsModal
-        isOpen={isPrivacyModalOpen}
-        onClose={() => setIsPrivacyModalOpen(false)}
-        language={language}
-        initialTab={privacyInitialTab}
-      />
-
-      <SitemapModal
-        isOpen={isSitemapModalOpen}
-        onClose={() => setIsSitemapModalOpen(false)}
-        language={language}
-        onNavigate={onNavigate}
-      />
     </footer>
   );
 }

@@ -4,7 +4,7 @@ import type { Language, PageId } from '../../types';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import { Button } from '../ui/Button';
 import { BrandLogo } from '../ui/BrandLogo';
-import { getPageHref, handleSemanticClick } from '../../lib/navigation';
+import { getPageHref, handleSemanticClick, realEstateNavigationPages } from '../../lib/navigation';
 import { subscribeNavigationDoc, type NavItem } from '../../lib/cmsNavigationManager';
 
 interface NavbarProps {
@@ -14,8 +14,6 @@ interface NavbarProps {
   onLanguageChange: (lang: Language) => void;
   onOpenListPropertyModal: () => void;
 }
-
-const headerPages = ['home', 'about', 'properties', 'projects', 'marketing', 'blog', 'contact'] as const;
 
 function pathOnly(href: string) {
   return href.split(/[?#]/, 1)[0].replace(/\/+$/, '');
@@ -40,7 +38,7 @@ export function Navbar({ currentPage, onNavigate, language, onLanguageChange, on
     onOpenListPropertyModal();
   }
 
-  const links = headerPages.map((page) => {
+  const links = realEstateNavigationPages.map((page) => {
     const href = getPageHref(page);
     const item = cmsItems.find((row) => row.isVisible && row.type !== 'external' && pathOnly(row.targetPath) === pathOnly(href));
     const active = currentPage === page || (page === 'properties' && currentPage === 'property-details');
