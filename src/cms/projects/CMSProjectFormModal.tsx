@@ -85,7 +85,7 @@ export const CMSProjectFormModal: React.FC<CMSProjectFormModalProps> = ({
       setDescriptionEn(initialData.description?.en || '');
       setDescriptionAr(initialData.description?.ar || '');
       setStatus(initialData.status || 'under-construction');
-      setProgressPercentage(initialData.progressPercentage ?? 50);
+      setProgressPercentage(initialData.progressPercentage ?? 0);
       setStartingPriceSAR(initialData.startingPriceSAR || '');
       setHandoverDateEn(initialData.handoverDate?.en || '');
       setHandoverDateAr(initialData.handoverDate?.ar || '');

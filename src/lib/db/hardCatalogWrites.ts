@@ -1,5 +1,5 @@
 import { hardAdminClient } from './hardAdminClient';
-import type { Property } from '../../types';
+import type { BlogPost, Project, Property } from '../../types';
 import { canonicalPropertyCity } from '../propertySearch';
 import type { PublicProperty, CatalogEntry } from './hardCatalog';
 
@@ -9,7 +9,7 @@ const editableFields = {
   projects: ['slug', 'title', 'developer', 'location', 'city', 'startingPriceSAR', 'handoverDate', 'unitsTotal',
     'unitsAvailable', 'roiProjected', 'image', 'gallery', 'category', 'status', 'progressPercentage',
     'lastUpdated', 'description', 'highlights', 'featured', 'brochureUrl'],
-  blog_posts: ['slug', 'title', 'excerpt', 'category', 'date', 'publishedAt', 'readTime', 'author', 'authorRole',
+  blog_posts: ['slug', 'title', 'excerpt', 'category', 'date', 'publishedAt', 'updatedAt', 'readTime', 'author', 'authorRole',
     'authorAvatar', 'image', 'imageAlt', 'content', 'featured', 'tags'],
 } as const;
 
@@ -31,7 +31,10 @@ export async function updatePublishedCatalog<T extends { id: string }>(
   if (readError) throw readError;
   if (!entry) throw new Error('السجل غير موجود في كتالوج Supabase المنشور.');
 
-  const content = buildPublicContent(collection, id, updates, entry.content);
+  const changes = collection === 'blog_posts'
+    ? { ...updates, date: (entry.content as { date?: string }).date, publishedAt: (entry.content as { publishedAt?: string }).publishedAt, updatedAt: new Date().toISOString() }
+    : updates;
+  const content = buildPublicContent(collection, id, changes, entry.content);
 
   const { data: saved, error } = await hardAdminClient.from('hard_catalog')
     .update({ content, updated_at: new Date().toISOString() })
@@ -80,10 +83,40 @@ export async function createPublishedProperty(property: Partial<Property>): Prom
   return data.content;
 }
 
-export async function archivePublishedProperty(id: string): Promise<boolean> {
+export async function createPublishedProject(project: Partial<Project>): Promise<Project> {
+  const id = crypto.randomUUID();
+  const slug = (project.slug || 'project') + '-' + id;
+  const content = buildPublicContent('projects', id, { ...project, slug });
+  const { data, error } = await hardAdminClient.from('hard_catalog')
+    .insert({ collection: 'projects', id, content })
+    .select('id,content,updated_at').single<CatalogEntry<Project>>();
+  if (error) throw error;
+  return data.content;
+}
+
+export async function createPublishedArticle(article: Partial<BlogPost>): Promise<BlogPost> {
+  if (article.status && article.status !== 'published') {
+    throw new Error('يدعم كتالوج المقالات نشر المقالات. احفظ نص المسودة خارج محرر الكتالوج إلى أن يصبح جاهزًا للنشر.');
+  }
+  const id = crypto.randomUUID();
+  const publishedAt = new Date(article.date || Date.now());
+  if (Number.isNaN(publishedAt.valueOf())) throw new Error('أدخل تاريخ نشر صالحًا.');
+  const date = article.date || publishedAt.toISOString().slice(0, 10);
+  const content = {
+    ...buildPublicContent('blog_posts', id, { ...article, slug: article.slug || id, date, publishedAt: publishedAt.toISOString() }),
+    status: 'published',
+  };
+  const { data, error } = await hardAdminClient.from('hard_catalog')
+    .insert({ collection: 'blog_posts', id, content })
+    .select('id,content,updated_at').single<CatalogEntry<BlogPost>>();
+  if (error) throw error;
+  return data.content;
+}
+
+export async function archivePublishedCatalog(collection: 'properties' | 'projects' | 'blog_posts', id: string): Promise<boolean> {
   const { data, error } = await hardAdminClient.from('hard_catalog')
     .update({ archived_at: new Date().toISOString(), updated_at: new Date().toISOString() })
-    .eq('collection', 'properties').eq('id', id).is('archived_at', null)
+    .eq('collection', collection).eq('id', id).is('archived_at', null)
     .select('id').maybeSingle();
   if (error) throw error;
   return Boolean(data);

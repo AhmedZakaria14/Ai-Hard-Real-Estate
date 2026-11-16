@@ -165,7 +165,18 @@ export const CMSSiteContentEditor: React.FC<CMSSiteContentEditorProps> = ({ lang
       ) : editorView === 'seo_legal' ? (
         <CMSSeoLegalEditor language={language} />
       ) : (
-        <CMSPageSectionEditor language={language} />
+        <>
+          <details className="rounded-xl border bg-white p-4 text-sm">
+            <summary className="cursor-pointer font-semibold">{isAr ? 'كيف أعدّل محتوى الصفحات وأنشره؟' : 'How do I edit and publish a page?'}</summary>
+            <ol className="mt-3 list-decimal space-y-2 ps-5">
+              <li>{isAr ? 'اختر الصفحة، ثم أضف قسمًا أو عدّل نصه باللغتين ورتّبه في القائمة.' : 'Choose a page, then add, edit and reorder its sections. Enter both language versions.'}</li>
+              <li>{isAr ? 'احفظ مسودة لمتابعة العمل لاحقًا، واستخدم المعاينة لمراجعة النص والترتيب.' : 'Save a draft to continue later and use the preview to check the wording and order.'}</li>
+              <li>{isAr ? 'انشر الإصدار بعد المراجعة. يعرض الموقع أقسام الواجهة الرئيسية والكتل النصية المرئية في الصفحات المدعومة.' : 'Publish after review. The supported pages show visible hero and text sections.'}</li>
+              <li>{isAr ? 'من سجل الإصدارات يمكنك استرجاع نسخة كمسودة، ثم مراجعتها ونشرها.' : 'Restore a revision as a draft from version history, then review and publish it.'}</li>
+            </ol>
+          </details>
+          <CMSPageSectionEditor language={language} />
+        </>
       )}
     </div>
   );

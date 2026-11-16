@@ -330,6 +330,7 @@ Investors allocating capital towards premium coastal assets are experiencing str
                   <input
                     type="text"
                     value={date}
+                    readOnly={Boolean(initialData)}
                     onChange={(e) => setDate(e.target.value)}
                     className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
                     placeholder="e.g. October 14, 2026"

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Language, PageId, BlogPost } from '../types';
 import { translations } from '../lib/translations';
+import { blogCategories, blogCategoryKey } from '../lib/blogCategories';
 import { loadPublishedArticles } from '../lib/db/hardCatalog';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
@@ -38,7 +39,7 @@ export function BlogPage({ onNavigate, language }: BlogPageProps) {
     return () => controller.abort();
   }, []);
   const ArrowIcon = language === 'ar' ? ArrowLeft : ArrowRight;
-  const [activeCategory, setActiveCategory] = useState('All');
+  const [activeCategory, setActiveCategory] = useState('all');
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
   // Synchronize document title for articles page and active article modal
@@ -63,17 +64,8 @@ export function BlogPage({ onNavigate, language }: BlogPageProps) {
   // Show published posts only on public site
   const livePosts = blogPosts.filter((p) => (p.status || 'published') === 'published');
 
-  const filteredPosts = livePosts.filter((post) => {
-    if (activeCategory === 'All' || activeCategory === 'الكل') return true;
-    if (!post.category) return false;
-    const catVal = post.category as any;
-    if (typeof catVal === 'string') {
-      return catVal.includes(activeCategory);
-    }
-    const catEn = catVal?.en || '';
-    const catAr = catVal?.ar || '';
-    return catEn.includes(activeCategory) || catAr.includes(activeCategory);
-  });
+  const categories = [{ key: 'all', label: { ar: 'الكل', en: 'All' } }, ...blogCategories(livePosts)];
+  const filteredPosts = livePosts.filter((post) => activeCategory === 'all' || blogCategoryKey(post) === activeCategory);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
@@ -93,17 +85,17 @@ export function BlogPage({ onNavigate, language }: BlogPageProps) {
 
       {/* Category Pills */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2">
-        {t.blog.categories.map((cat, idx) => (
+        {categories.map((cat) => (
           <button
-            key={idx}
-            onClick={() => setActiveCategory(cat)}
+            key={cat.key}
+            onClick={() => setActiveCategory(cat.key)}
             className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
-              activeCategory === cat
+              activeCategory === cat.key
                 ? 'bg-hard-gradient text-white shadow-xs'
                 : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
             }`}
           >
-            {cat}
+            {cat.label[language]}
           </button>
         ))}
       </div>

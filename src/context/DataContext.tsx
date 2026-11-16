@@ -11,8 +11,6 @@ import {
 } from '../types/businessEntities';
 import {
   LeadsRepository,
-  ProjectsRepository,
-  BlogRepository,
   TestimonialsRepository,
   JoinListRepository,
 } from '../lib/db/repository';
@@ -42,7 +40,7 @@ import {
 } from '../lib/integrations/crmSync';
 import { isSupabaseConfigured } from '../lib/db/supabaseClient';
 import { loadPublishedArticles, loadPublishedProjects, loadPublishedProperties, type PublicProperty } from '../lib/db/hardCatalog';
-import { createPublishedProperty, archivePublishedProperty, updatePublishedCatalog } from '../lib/db/hardCatalogWrites';
+import { createPublishedProperty, archivePublishedCatalog, createPublishedProject, createPublishedArticle, updatePublishedCatalog } from '../lib/db/hardCatalogWrites';
 import { SECTOR_CONTACT_DETAILS } from '../lib/sectors';
 
 interface DataContextType {
@@ -74,14 +72,11 @@ interface DataContextType {
   addProject: (projectData: Partial<Project>) => Promise<Project>;
   updateProject: (id: string, updates: Partial<Project>) => Promise<Project | null>;
   deleteProject: (id: string) => Promise<boolean>;
-  resetProjectsToDefault: () => void;
 
   // Blog Posts CRUD
   addBlogPost: (postData: Partial<BlogPost>) => Promise<BlogPost>;
   updateBlogPost: (id: string, updates: Partial<BlogPost>) => Promise<BlogPost | null>;
   deleteBlogPost: (id: string) => Promise<boolean>;
-  resetBlogToDefault: () => void;
-  resetBlogPostsToDefault: () => void;
 
   // Testimonials / Client Success Stories CRUD
   addTestimonial: (data: Partial<Testimonial>) => Promise<Testimonial>;
@@ -288,7 +283,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteProperty = async (id: string): Promise<boolean> => {
-    const archived = await archivePublishedProperty(id);
+    const archived = await archivePublishedCatalog('properties', id);
     if (archived) {
       setProperties((previous) => previous.filter((property) => property.id !== id));
       void refreshProperties();
@@ -298,7 +293,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   // Projects CRUD
   const addProject = async (projectData: Partial<Project>): Promise<Project> => {
-    const created = await ProjectsRepository.create(projectData);
+    const created = await createPublishedProject(projectData);
     setProjects((prev) => [created, ...prev]);
     return created;
   };
@@ -312,21 +307,16 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteProject = async (id: string): Promise<boolean> => {
-    const success = await ProjectsRepository.delete(id);
+    const success = await archivePublishedCatalog('projects', id);
     if (success) {
       setProjects((prev) => prev.filter((p) => p.id !== id));
     }
     return success;
   };
 
-  const resetProjectsToDefault = () => {
-    const defaultData = ProjectsRepository.resetToDefaults();
-    setProjects(defaultData);
-  };
-
   // Blog Posts CRUD
   const addBlogPost = async (postData: Partial<BlogPost>): Promise<BlogPost> => {
-    const created = await BlogRepository.create(postData);
+    const created = await createPublishedArticle(postData);
     setBlogPosts((prev) => [created, ...prev]);
     return created;
   };
@@ -340,17 +330,13 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteBlogPost = async (id: string): Promise<boolean> => {
-    const success = await BlogRepository.delete(id);
+    const success = await archivePublishedCatalog('blog_posts', id);
     if (success) {
       setBlogPosts((prev) => prev.filter((p) => p.id !== id));
     }
     return success;
   };
 
-  const resetBlogToDefault = () => {
-    const defaultData = BlogRepository.resetToDefaults();
-    setBlogPosts(defaultData);
-  };
 
   // Testimonials / Client Success Stories CRUD
   const addTestimonial = async (data: Partial<Testimonial>): Promise<Testimonial> => {
@@ -664,12 +650,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         addProject,
         updateProject,
         deleteProject,
-        resetProjectsToDefault,
         addBlogPost,
         updateBlogPost,
         deleteBlogPost,
-        resetBlogToDefault,
-        resetBlogPostsToDefault: resetBlogToDefault,
         addTestimonial,
         updateTestimonial,
         deleteTestimonial,

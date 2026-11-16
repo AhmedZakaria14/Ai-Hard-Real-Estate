@@ -1,3 +1,4 @@
+import { downloadCsv } from '../../lib/csv';
 import SupabaseDataExport from '../catalog/SupabaseDataExport';
 import SupabaseOperations from './SupabaseOperations';
 import SupabaseSectorSections from '../catalog/SupabaseSectorSections';
@@ -36,6 +37,7 @@ export default function SupabaseInbox() {
   const [session, setSession] = useState<Session | null>(null);
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [error, setError] = useState('');
   const [rows, setRows] = useState<Submission[]>([]);
   const [view, setView] = useState<'requests' | 'appointments' | 'articles' | 'projects' | 'properties' | 'construction_projects' | 'hvac_services' | 'media' | 'sector_sections' | 'archive' | 'reports' | 'notifications' | 'backup'>(() => {
@@ -58,6 +60,16 @@ export default function SupabaseInbox() {
     return () => subscription.unsubscribe();
   }, []);
 
+  function intakeQuery() {
+    const query = client.from('hard_form_submissions')
+      .select('id,tracking_code,sector,form_type,received_at,payload,status,status_history,archived_at')
+      .neq('form_type', 'newsletter_signup');
+    if (isArchive) query.not('archived_at', 'is', null);
+    else query.is('archived_at', null);
+    if (isAppointments) query.or('form_type.eq.book_viewing,and(form_type.eq.hvac_service,payload->details->>date.not.is.null)');
+    return query.order('received_at', { ascending: false }).order('id');
+  }
+
   useEffect(() => {
     if (!isAdmin || !isIntake) {
       setRows([]);
@@ -69,13 +81,7 @@ export default function SupabaseInbox() {
     setRows([]);
     const load = async () => {
       try {
-        const query = client.from('hard_form_submissions')
-          .select('id,tracking_code,sector,form_type,received_at,payload,status,status_history,archived_at');
-        if (isArchive) query.not('archived_at', 'is', null);
-        else query.is('archived_at', null);
-        if (isAppointments) query.or('form_type.eq.book_viewing,and(form_type.eq.hvac_service,payload->details->>date.not.is.null)');
-        const { data, error: queryError } = await query
-          .order('received_at', { ascending: false }).order('id')
+        const { data, error: queryError } = await intakeQuery()
           .range(page * pageSize, (page + 1) * pageSize - 1)
           .abortSignal(controller.signal);
         if (controller.signal.aborted) return;
@@ -90,6 +96,36 @@ export default function SupabaseInbox() {
     void load();
     return () => controller.abort();
   }, [isAdmin, isAppointments, isArchive, isIntake, page, refresh]);
+
+  async function exportRequests() {
+    if (exporting || !isAdmin || !isIntake) return;
+    setError('');
+    setExporting(true);
+    try {
+      const { data: identity, error: authError } = await client.auth.getUser();
+      if (authError || identity.user?.app_metadata.hard_role !== 'superadmin') throw new Error('Administrator required');
+      const entries: Submission[] = [];
+      const limit = 100;
+      for (let offset = 0; ; offset += limit) {
+        const { data, error: readError } = await intakeQuery().range(offset, offset + limit - 1);
+        if (readError) throw readError;
+        entries.push(...(data ?? []));
+        if ((data?.length ?? 0) < limit) break;
+      }
+      if (!entries.length) {
+        setError('لا توجد طلبات في هذا القسم للتصدير.');
+        return;
+      }
+      const headers = ['Tracking Code', 'Sector', 'Form', 'Received At', 'Status', 'Name', 'Email', 'Phone', 'Message'];
+      downloadCsv('HARD_Requests_' + new Date().toISOString().slice(0, 10) + '.csv', [headers,
+        ...entries.map((row) => [row.tracking_code, row.sector, row.form_type, row.received_at, row.status,
+          row.payload.name ?? '', row.payload.email ?? '', row.payload.phone ?? '', row.payload.message ?? ''])]);
+    } catch {
+      setError('تعذّر تصدير الطلبات. حاول مرة أخرى.');
+    } finally {
+      setExporting(false);
+    }
+  }
 
   async function downloadAttachment(attachment: PrivateAttachment) {
     setError('');
@@ -193,6 +229,9 @@ export default function SupabaseInbox() {
         }} className="rounded border px-3 py-1">خروج</button>
       </div>
       {view === 'backup' ? <SupabaseDataExport /> : view === 'reports' || view === 'notifications' ? <SupabaseOperations key={view} section={view} refresh={refresh} /> : view === 'sector_sections' ? <SupabaseSectorSections /> : view === 'media' ? <CMSMediaLibrary language="ar" /> : view !== 'requests' && view !== 'appointments' && view !== 'archive' ? <SupabaseArticleEditor key={view} client={client} collection={view === 'articles' ? 'blog_posts' : view} /> : <>
+      <button type="button" disabled={busy || exporting} onClick={() => void exportRequests()} className="rounded border px-3 py-1">
+        {exporting ? 'جارٍ إعداد ملف الطلبات…' : 'تصدير الطلبات CSV'}
+      </button>
       {busy ? <p role="status">جارٍ تحميل الطلبات…</p> : !error && rows.length === 0 && <p>لا توجد طلبات في هذه الصفحة.</p>}
       {rows.map((row) => <article key={row.id} className="space-y-2 rounded-lg border p-4">
         <h2 className="font-bold">{String(row.payload.name || row.tracking_code)}</h2>

@@ -22,6 +22,7 @@ import {
 import { useData } from "../context/DataContext";
 import { CMSAuth } from "./CMSAuth";
 import { CMSLayout, CMSTab } from "./CMSLayout";
+import { RequestDashboardCounts } from "./leads/RequestDashboardCounts";
 import { PropertyCatalogStats } from "./properties/PropertyCatalogStats";
 import { CMSPropertiesList } from "./properties/CMSPropertiesList";
 import { CMSPropertyFormModal } from "./properties/CMSPropertyFormModal";
@@ -94,11 +95,9 @@ export const CMSApp: React.FC<CMSAppProps> = ({
     addProject,
     updateProject,
     deleteProject,
-    resetProjectsToDefault,
     addBlogPost,
     updateBlogPost,
     deleteBlogPost,
-    resetBlogPostsToDefault,
     addTestimonial,
     updateTestimonial,
     deleteTestimonial,
@@ -454,8 +453,6 @@ export const CMSApp: React.FC<CMSAppProps> = ({
 
   // Reset all repository data
   const handleResetAllData = async () => {
-    await resetProjectsToDefault();
-    await resetBlogPostsToDefault();
     await resetTestimonialsToDefault();
     await resetSubscribersToDefault();
     resetTeamMembersToDefault();
@@ -547,6 +544,7 @@ export const CMSApp: React.FC<CMSAppProps> = ({
       {activeTab === "dashboard" && (
         <div className="space-y-4">
           {propertyLoadStatus === 'ready' && <PropertyCatalogStats properties={properties} language={language} />}
+          <RequestDashboardCounts language={language} />
         <a className="inline-block rounded-lg border bg-white px-4 py-3 text-sm font-semibold text-blue-700" href="/admin/supabase-inbox?section=reports">
           {isAr ? "فتح تقارير الطلبات في Supabase" : "Open request reports in Supabase"}
         </a>

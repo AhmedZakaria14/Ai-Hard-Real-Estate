@@ -1,3 +1,4 @@
+import { blogCategories, blogCategoryKey } from '../../lib/blogCategories';
 import React, { useState, useMemo } from 'react';
 import {
   BookOpen,
@@ -58,14 +59,7 @@ export const CMSBlogList: React.FC<CMSBlogListProps> = ({
     { value: 'archived', labelEn: 'Archived', labelAr: 'مؤرشف', color: 'bg-slate-100 text-slate-700 border-slate-200' },
   ];
 
-  // Extract unique categories
-  const categories = useMemo(() => {
-    const set = new Set<string>();
-    blogPosts.forEach((p) => {
-      if (p.category?.en) set.add(p.category.en);
-    });
-    return Array.from(set);
-  }, [blogPosts]);
+  const categories = useMemo(() => blogCategories(blogPosts), [blogPosts]);
 
   // Filtering
   const filteredPosts = useMemo(() => {
@@ -80,11 +74,11 @@ export const CMSBlogList: React.FC<CMSBlogListProps> = ({
         post.excerpt.en.toLowerCase().includes(q) ||
         post.excerpt.ar.toLowerCase().includes(q);
 
-      const matchesCat = categoryFilter === 'all' || post.category?.en === categoryFilter;
+      const matchesCat = categoryFilter === 'all' || blogCategoryKey(post) === categoryFilter;
       const matchesStatus = statusFilter === 'all' || (post.status || 'published') === statusFilter;
 
       return matchesSearch && matchesCat && matchesStatus;
-    });
+    }).sort((a, b) => (Date.parse(b.publishedAt || b.date) || 0) - (Date.parse(a.publishedAt || a.date) || 0));
   }, [blogPosts, searchQuery, categoryFilter, statusFilter]);
 
   // Export to CSV
@@ -184,7 +178,7 @@ export const CMSBlogList: React.FC<CMSBlogListProps> = ({
             <Tag className="w-4 h-4 text-purple-600" />
           </div>
           <p className="text-xl sm:text-2xl font-black text-slate-900 font-display-serif">
-            {categories.length || 3}
+            {categories.length}
           </p>
           <p className="text-[10px] text-slate-500">
             {isAr ? 'محاور تحليلية متنوعة' : 'Diverse market pillars'}
@@ -230,7 +224,7 @@ export const CMSBlogList: React.FC<CMSBlogListProps> = ({
           >
             <option value="all">{isAr ? 'كافة التصنيفات' : 'All Categories'}</option>
             {categories.map((c) => (
-              <option key={c} value={c}>{c}</option>
+              <option key={c.key} value={c.key}>{c.label[language]}</option>
             ))}
           </select>
 

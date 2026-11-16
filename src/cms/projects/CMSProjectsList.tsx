@@ -22,14 +22,14 @@ import {
   Percent,
 } from 'lucide-react';
 import { Language, Project, ProjectStatus } from '../../types';
-import { PreDeleteReferenceModal } from '../components/PreDeleteReferenceModal';
+import { downloadCsv } from '../../lib/csv';
 import { getLocalizedText } from '../../lib/utils';
 
 interface CMSProjectsListProps {
   projects: Project[];
   onAddProject: () => void;
   onEditProject: (project: Project) => void;
-  onDeleteProject: (id: string) => void;
+  onDeleteProject: (id: string) => Promise<boolean>;
   onDuplicateProject: (project: Project) => void;
   onToggleFeatured: (project: Project) => void;
   onQuickStatusChange: (project: Project, newStatus: ProjectStatus) => void;
@@ -52,7 +52,7 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
-  const [projectForDelete, setProjectForDelete] = useState<Project | null>(null);
+  const [archiveError, setArchiveError] = useState('');
 
   const statusOptions: { value: ProjectStatus; labelEn: string; labelAr: string; color: string }[] = [
     { value: 'planning', labelEn: 'Planning & Design', labelAr: 'مرحلة التخطيط والتصميم', color: 'bg-amber-100 text-amber-800 border-amber-200' },
@@ -99,43 +99,45 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
   );
   const avgProgress = useMemo(() => {
     if (projects.length === 0) return 0;
-    const sum = projects.reduce((acc, p) => acc + (p.progressPercentage || 50), 0);
+    const sum = projects.reduce((acc, p) => acc + (p.progressPercentage ?? 0), 0);
     return Math.round(sum / projects.length);
   }, [projects]);
 
   // Export to CSV
+  async function archiveProject(project: Project) {
+    if (!window.confirm(isAr ? 'هل تريد أرشفة هذا المشروع؟' : 'Archive this project?')) return;
+    setArchiveError('');
+    try {
+      if (!await onDeleteProject(project.id)) throw new Error('Archive was not confirmed');
+    } catch {
+      setArchiveError(isAr ? 'تعذّرت أرشفة المشروع.' : 'Could not archive the project.');
+    }
+  }
+
   const handleExportCSV = () => {
-    const headers = ['ID', 'Title_EN', 'Title_AR', 'Developer', 'Location', 'StartingPrice', 'UnitsTotal', 'UnitsAvailable', 'Progress%', 'Status'];
+    const headers = ['ID', 'Title_EN', 'Title_AR', 'Developer EN', 'Developer AR', 'Location EN', 'Location AR', 'Starting Price SAR', 'UnitsTotal', 'UnitsAvailable', 'Progress%', 'Status'];
     const rows = filteredProjects.map((p) => [
       p.id,
       getLocalizedText(p.title, 'en'),
       getLocalizedText(p.title, 'ar'),
       getLocalizedText(p.developer, 'en'),
+      getLocalizedText(p.developer, 'ar'),
       getLocalizedText(p.location, 'en'),
-      p.startingPriceSAR,
+      getLocalizedText(p.location, 'ar'),
+      /^\s*[\d,.]+\s*(?:SAR)?\s*$/i.test(p.startingPriceSAR)
+        ? Number(p.startingPriceSAR.replace(/[,\s]|SAR/gi, ''))
+        : p.startingPriceSAR,
       p.unitsTotal,
       p.unitsAvailable,
-      p.progressPercentage == null ? '' : `${p.progressPercentage}%`,
+      p.progressPercentage ?? 0,
       p.status,
     ]);
-    const escapeCell = (value: unknown) => {
-      const text = String(value ?? '');
-      const safe = typeof value === 'string' && /^[\s]*[=+@-]|^[\t\r\n]/.test(text) ? "'" + text : text;
-      return '"' + safe.replace(/"/g, '""') + '"';
-    };
-    const csvContent = '\uFEFF' + [headers, ...rows].map((row) => row.map(escapeCell).join(',')).join('\r\n');
-    const encodedUri = URL.createObjectURL(new Blob([csvContent], { type: 'text/csv;charset=utf-8' }));
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `HARD_Projects_${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(encodedUri);
+    downloadCsv(`HARD_Projects_${new Date().toISOString().slice(0, 10)}.csv`, [headers, ...rows]);
   };
 
   return (
     <div className="space-y-6">
+      {archiveError && <p role="alert" className="text-red-700">{archiveError}</p>}
       {/* Top Header & Quick Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -327,7 +329,7 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
                 {filteredProjects.map((project) => {
                   const currentStatus = project.status || 'under-construction';
                   const statusInfo = statusOptions.find((s) => s.value === currentStatus) || statusOptions[2];
-                  const progress = project.progressPercentage || 50;
+                  const progress = project.progressPercentage ?? 0;
 
                   return (
                     <tr key={project.id} className="hover:bg-slate-50/70 transition-colors group">
@@ -335,7 +337,7 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-3">
                           <img
-                            src={project.image}
+                            src={project.image || project.gallery?.[0]}
                             alt={getLocalizedText(project.title, language)}
                             className="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0"
                           />
@@ -442,7 +444,7 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
                           </button>
 
                           <button
-                            onClick={() => setProjectForDelete(project)}
+                            onClick={() => void archiveProject(project)}
                             className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
                             title={isAr ? 'أرشفة ونقل لسلة المهملات' : 'Move to Trash'}
                           >
@@ -463,7 +465,7 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
           {filteredProjects.map((project) => {
             const currentStatus = project.status || 'under-construction';
             const statusInfo = statusOptions.find((s) => s.value === currentStatus) || statusOptions[2];
-            const progress = project.progressPercentage || 50;
+            const progress = project.progressPercentage ?? 0;
 
             return (
               <div
@@ -474,7 +476,7 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
                   {/* Image cover */}
                   <div className="relative aspect-16/10 bg-slate-900 overflow-hidden">
                     <img
-                      src={project.image}
+                      src={project.image || project.gallery?.[0]}
                       alt={getLocalizedText(project.title, language)}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
@@ -562,7 +564,7 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
                     </button>
 
                     <button
-                      onClick={() => setProjectForDelete(project)}
+                      onClick={() => void archiveProject(project)}
                       className="p-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold transition-colors cursor-pointer"
                       title={isAr ? 'أرشفة ونقل لسلة المهملات' : 'Move to Trash'}
                     >
@@ -577,27 +579,7 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
       )}
 
       {/* Pre-Deletion Reference Check & Soft Delete Modal */}
-      {projectForDelete && (
-        <PreDeleteReferenceModal
-          isOpen={!!projectForDelete}
-          onClose={() => setProjectForDelete(null)}
-          entityType="project"
-          entityId={projectForDelete.id}
-          entityTitle={projectForDelete.title}
-          originalCollection="construction_projects"
-          originalData={projectForDelete}
-          currentUser={{
-            uid: 'admin-1',
-            email: 'admin@hard.sa',
-            role: 'superadmin',
-          }}
-          language={language}
-          onSoftDeleteSuccess={() => {
-            onDeleteProject(projectForDelete.id);
-            setProjectForDelete(null);
-          }}
-        />
-      )}
+
     </div>
   );
 };

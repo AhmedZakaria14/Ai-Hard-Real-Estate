@@ -225,6 +225,15 @@ export const CMSFormSchemaEditor: React.FC<CMSFormSchemaEditorProps> = ({
 
   return (
     <div className="space-y-8 text-start font-ui-sans">
+      <details className="rounded-xl border bg-white p-4 text-sm">
+        <summary className="cursor-pointer font-semibold">{isAr ? 'كيف أجهّز نموذج خدمة؟' : 'How do I configure a service form?'}</summary>
+        <ol className="mt-3 list-decimal space-y-2 ps-5">
+          <li>{isAr ? 'اختر النموذج المطلوب، ثم راجع نوع الحقل واسمه وخياراته وما إذا كان إلزاميًا.' : 'Select a form and review each field’s type, label, options, and required setting.'}</li>
+          <li>{isAr ? 'أدخل تسميات الحقول ونصوص المساعدة بالعربية والإنجليزية. احفظ المسودة وراجعها في المعاينة.' : 'Enter Arabic and English labels and help text. Save and preview the draft.'}</li>
+          <li>{isAr ? 'استخدم التحقق قبل النشر واتبع رسائل التحقق. يحفظ النشر إصدارًا من تعريف النموذج في Supabase.' : 'Run the publishing checks and address any validation messages. Publishing stores a version of the form definition in Supabase.'}</li>
+          <li>{isAr ? 'راجع النموذج العام المعني بعد النشر. تظهر الطلبات التي يرسلها الزوار في صندوق طلبات Supabase.' : 'Review the corresponding public form after publishing. Visitor submissions go to the Supabase request inbox.'}</li>
+        </ol>
+      </details>
       {/* Header Banner */}
       <div className="bg-slate-950 text-white rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2 max-w-2xl">
