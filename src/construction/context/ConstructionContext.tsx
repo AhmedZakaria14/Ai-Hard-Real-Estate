@@ -214,24 +214,24 @@ export const ConstructionProvider: React.FC<{
 
   const updateHeroContent = async (data: Partial<ConstructionHeroContent>) => {
     const updated = { ...heroContent, ...data };
-    setHeroContent(updated);
     await saveConstructionSectionContent('hero', updated);
+    setHeroContent(updated);
   };
 
   const updateCompanyContent = async (data: Partial<ConstructionCompanyContent>) => {
     const updated = { ...companyContent, ...data };
-    setCompanyContent(updated);
     await saveConstructionSectionContent('company', updated);
+    setCompanyContent(updated);
   };
 
   const updateWorkStages = async (stages: ConstructionWorkStage[]) => {
-    setWorkStages(stages);
     await saveConstructionSectionContent('stages', stages);
+    setWorkStages(stages);
   };
 
   const updateOfficeLocations = async (offices: ConstructionOfficeLocation[]) => {
-    setOfficeLocations(offices);
     await saveConstructionSectionContent('offices', offices);
+    setOfficeLocations(offices);
   };
 
   // Leads State with Firestore sync

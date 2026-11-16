@@ -200,8 +200,8 @@ export function HVACProvider({
   }, []);
 
   const updateServiceAreas = async (areas: HVACCityArea[]) => {
-    setServiceAreas(areas);
     await saveHVACSectionContent('service_areas', areas);
+    setServiceAreas(areas);
   };
 
   // Hero, Operating Hours & Booking Copy
@@ -235,20 +235,20 @@ export function HVACProvider({
 
   const updateHeroContent = async (data: Partial<HVACHeroContent>) => {
     const merged = { ...heroContent, ...data };
-    setHeroContent(merged);
     await saveHVACSectionContent('hero', merged);
+    setHeroContent(merged);
   };
 
   const updateOperatingHours = async (data: Partial<HVACOperatingHoursContact>) => {
     const merged = { ...operatingHours, ...data };
-    setOperatingHours(merged);
     await saveHVACSectionContent('hours_contact', merged);
+    setOperatingHours(merged);
   };
 
   const updateBookingCopy = async (data: Partial<HVACBookingCopy>) => {
     const merged = { ...bookingCopy, ...data };
-    setBookingCopy(merged);
     await saveHVACSectionContent('booking_copy', merged);
+    setBookingCopy(merged);
   };
 
   // Gallery Items
