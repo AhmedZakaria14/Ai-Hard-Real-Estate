@@ -24,7 +24,6 @@ export function HVACQuoteDialog() {
     isQuoteDialogOpen,
     closeQuoteDialog,
     quoteInitialData,
-    addLead,
   } = useHVAC();
 
   const [fullName, setFullName] = useState('');
@@ -159,19 +158,8 @@ export function HVACQuoteDialog() {
         },
       });
 
-      const lead = addLead({
-        clientName: fullName.trim(),
-        phoneNumber: phone.trim(),
-        email: email.trim() || undefined,
-        city: cityName,
-        customCity: quoteInitialData?.customCity,
-        service: serviceName,
-        notes: notes.trim() || undefined,
-        isUrgent,
-      });
-
       setSubmittedLead({
-        referenceNumber: result.trackingCode || lead.referenceNumber,
+        referenceNumber: result.trackingCode,
         clientName: fullName.trim(),
       });
     } catch (err: any) {

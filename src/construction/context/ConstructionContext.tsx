@@ -1,3 +1,4 @@
+import { loadPublishedConstructionProjects } from '../../lib/db/hardCatalog';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   ConstructionLanguage,
@@ -18,7 +19,6 @@ import {
   syncConstructionUrl,
 } from '../utils/constructionUrlParams';
 import {
-  subscribeConstructionProjects,
   saveConstructionProject,
   deleteConstructionProject as deleteConstructionProjectFromDb,
   subscribeConstructionSectionContent,
@@ -116,14 +116,22 @@ export const ConstructionProvider: React.FC<{
     setLanguage(nextLang);
   };
 
-  // Projects State with Firestore real-time sync
-  const [projects, setProjects] = useState<ConstructionProject[]>(INITIAL_PROJECTS);
-
+  const [projects, setProjects] = useState<ConstructionProject[]>([]);
   useEffect(() => {
-    const unsub = subscribeConstructionProjects((list) => {
-      setProjects(list);
+    const controller = new AbortController();
+    loadPublishedConstructionProjects(controller.signal).then((entries) => {
+      if (controller.signal.aborted) return;
+      setProjects(entries.map(({ content }) => ({
+        ...content,
+        category: 'residential',
+        year: '', durationMonths: 0, valueSAR: '', clientAr: '', clientEn: '',
+        scopeAr: [], scopeEn: [], structuralSystemAr: '', structuralSystemEn: '',
+        finishingLevelAr: '', finishingLevelEn: '', highlightsAr: [], highlightsEn: [],
+      })));
+    }).catch((error) => {
+      if (!controller.signal.aborted) console.error('Unable to load construction projects', error);
     });
-    return () => unsub();
+    return () => controller.abort();
   }, []);
 
   const addProject = async (proj: Omit<ConstructionProject, 'id'>) => {

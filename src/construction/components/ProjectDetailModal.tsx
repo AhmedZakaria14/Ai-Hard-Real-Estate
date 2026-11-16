@@ -222,7 +222,7 @@ export function ProjectDetailModal() {
               {getLocalizedCategoryLabel(proj.category, language)}
             </span>
             <span className="text-xs text-slate-500">
-              {isAr ? proj.cityAr : proj.cityEn} • {proj.year}
+              {isAr ? proj.cityAr : proj.cityEn}{proj.year && ' • ' + proj.year}
             </span>
           </div>
           <h2 id="project-modal-title" className="text-xl sm:text-2xl font-bold font-display-serif text-[#0f243e]">
@@ -288,6 +288,7 @@ export function ProjectDetailModal() {
               </div>
             </div>
 
+            {proj.durationMonths > 0 && (
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
               <div className="text-[10px] text-slate-500">{t.projects.durationLabel}</div>
               <div className="text-sm sm:text-base font-bold text-[#0f243e] flex items-center gap-1.5">
@@ -295,7 +296,9 @@ export function ProjectDetailModal() {
                 <span>{proj.durationMonths} {isAr ? 'أشهر' : 'Months'}</span>
               </div>
             </div>
+            )}
 
+            {proj.valueSAR && (
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
               <div className="text-[10px] text-slate-500">{t.projects.valueLabel}</div>
               <div className="text-sm sm:text-base font-bold text-emerald-600 flex items-center gap-1.5">
@@ -303,6 +306,7 @@ export function ProjectDetailModal() {
                 <span>{proj.valueSAR}</span>
               </div>
             </div>
+            )}
 
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
               <div className="text-[10px] text-slate-500">{isAr ? 'الموقع الجغرافي:' : 'Location:'}</div>

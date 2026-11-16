@@ -1,9 +1,16 @@
+import type { HVACService } from '../../hvac/types';
+import type { ConstructionProject } from '../../construction/types';
 import type { BlogPost, Project, Property } from '../../types';
 
 export const hardSupabaseUrl = 'https://vlpdiyicmupghfcualoe.supabase.co';
 export const hardPublishableKey = 'sb_publishable_jam6dG2vyvPi65DHUEgqXQ_4YZfJGxF';
 
-export type CatalogCollection = 'blog_posts' | 'projects' | 'properties';
+export type CatalogCollection = 'blog_posts' | 'projects' | 'properties' | 'construction_projects' | 'hvac_services';
+
+export function catalogTable(collection: CatalogCollection) {
+  return collection === 'construction_projects' || collection === 'hvac_services'
+    ? 'hard_sector_catalog' : 'hard_catalog';
+}
 
 export interface CatalogEntry<T> {
   id: string;
@@ -14,7 +21,7 @@ export interface CatalogEntry<T> {
 export type CatalogArticle = CatalogEntry<BlogPost>;
 
 export async function loadCatalog<T>(collection: CatalogCollection, signal?: AbortSignal): Promise<CatalogEntry<T>[]> {
-  const url = new URL('/rest/v1/hard_catalog', hardSupabaseUrl);
+  const url = new URL('/rest/v1/' + catalogTable(collection), hardSupabaseUrl);
   url.search = new URLSearchParams({
     collection: 'eq.' + collection,
     select: 'id,content,updated_at',
@@ -45,4 +52,17 @@ export type PublicProperty = Omit<Property, 'agent'>;
 
 export function loadPublishedProperties(signal?: AbortSignal) {
   return loadCatalog<PublicProperty>('properties', signal);
+}
+
+export function loadPublishedHvacServices(signal?: AbortSignal) {
+  return loadCatalog<HVACService>('hvac_services', signal);
+}
+
+export type PublishedConstructionProject = Pick<ConstructionProject,
+  'id' | 'titleAr' | 'titleEn' | 'descriptionAr' | 'descriptionEn' | 'locationAr' | 'locationEn' |
+  'cityAr' | 'cityEn' | 'image' | 'galleryImages' | 'status' | 'featured' | 'buaM2'
+> & { categoryLabelAr?: string; categoryLabelEn?: string };
+
+export function loadPublishedConstructionProjects(signal?: AbortSignal) {
+  return loadCatalog<PublishedConstructionProject>('construction_projects', signal);
 }

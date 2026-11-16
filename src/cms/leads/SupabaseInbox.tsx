@@ -29,9 +29,11 @@ export default function SupabaseInbox() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [rows, setRows] = useState<Submission[]>([]);
-  const [view, setView] = useState<'requests' | 'articles' | 'projects' | 'properties'>('requests');
+  const [view, setView] = useState<'requests' | 'appointments' | 'articles' | 'projects' | 'properties' | 'construction_projects' | 'hvac_services'>('requests');
   const [page, setPage] = useState(0);
   const [refresh, setRefresh] = useState(0);
+  const isAppointments = view === 'appointments';
+  const isIntake = view === 'requests' || isAppointments;
   const isAdmin = session?.user.app_metadata.hard_role === 'superadmin';
 
   useEffect(() => {
@@ -43,7 +45,7 @@ export default function SupabaseInbox() {
   }, []);
 
   useEffect(() => {
-    if (!isAdmin) {
+    if (!isAdmin || !isIntake) {
       setRows([]);
       return;
     }
@@ -53,8 +55,10 @@ export default function SupabaseInbox() {
     setRows([]);
     const load = async () => {
       try {
-        const { data, error: queryError } = await client.from('hard_form_submissions')
-          .select('id,tracking_code,sector,form_type,received_at,payload,status,status_history')
+        const query = client.from('hard_form_submissions')
+          .select('id,tracking_code,sector,form_type,received_at,payload,status,status_history');
+        if (isAppointments) query.or('form_type.eq.book_viewing,and(form_type.eq.hvac_service,payload->details->>date.not.is.null)');
+        const { data, error: queryError } = await query
           .order('received_at', { ascending: false }).order('id')
           .range(page * pageSize, (page + 1) * pageSize - 1)
           .abortSignal(controller.signal);
@@ -69,7 +73,7 @@ export default function SupabaseInbox() {
     };
     void load();
     return () => controller.abort();
-  }, [isAdmin, page, refresh]);
+  }, [isAdmin, isAppointments, isIntake, page, refresh]);
 
   async function updateStatus(id: string, status: Submission['status']) {
     setBusy(true);
@@ -118,11 +122,14 @@ export default function SupabaseInbox() {
         <button disabled={busy} className="rounded bg-slate-900 px-4 py-2 text-white">دخول المسؤول</button>
       </form>
     ) : <>
-      <nav aria-label="أقسام الإدارة" className="flex gap-3">
-        <button aria-pressed={view === 'requests'} onClick={() => setView('requests')} className="rounded border px-3 py-1">الطلبات</button>
+      <nav aria-label="أقسام الإدارة" className="flex flex-wrap gap-3">
+        <button aria-pressed={view === 'requests'} onClick={() => { setPage(0); setView('requests'); }} className="rounded border px-3 py-1">الطلبات</button>
+        <button aria-pressed={isAppointments} onClick={() => { setPage(0); setView('appointments'); }} className="rounded border px-3 py-1">المواعيد والمعاينات</button>
         <button aria-pressed={view === 'articles'} onClick={() => setView('articles')} className="rounded border px-3 py-1">المقالات المنشورة</button>
         <button aria-pressed={view === 'projects'} onClick={() => setView('projects')} className="rounded border px-3 py-1">المشاريع العقارية</button>
         <button aria-pressed={view === 'properties'} onClick={() => setView('properties')} className="rounded border px-3 py-1">العقارات</button>
+        <button aria-pressed={view === 'construction_projects'} onClick={() => setView('construction_projects')} className="rounded border px-3 py-1">مشاريع الإنشاءات</button>
+        <button aria-pressed={view === 'hvac_services'} onClick={() => setView('hvac_services')} className="rounded border px-3 py-1">خدمات التكييف</button>
       </nav>
       <div className="flex gap-3">
         <button onClick={() => setRefresh((value) => value + 1)} disabled={busy} className="rounded border px-3 py-1">تحديث</button>
@@ -132,7 +139,7 @@ export default function SupabaseInbox() {
           else setPage(0);
         }} className="rounded border px-3 py-1">خروج</button>
       </div>
-      {view !== 'requests' ? <SupabaseArticleEditor key={view} client={client} collection={view === 'projects' || view === 'properties' ? view : 'blog_posts'} /> : <>
+      {view !== 'requests' && view !== 'appointments' ? <SupabaseArticleEditor key={view} client={client} collection={view === 'articles' ? 'blog_posts' : view} /> : <>
       {busy ? <p role="status">جارٍ تحميل الطلبات…</p> : !error && rows.length === 0 && <p>لا توجد طلبات في هذه الصفحة.</p>}
       {rows.map((row) => <article key={row.id} className="space-y-2 rounded-lg border p-4">
         <h2 className="font-bold">{String(row.payload.name || row.tracking_code)}</h2>

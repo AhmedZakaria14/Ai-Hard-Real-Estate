@@ -1,9 +1,10 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { loadPublishedArticles, loadPublishedProjects, loadPublishedProperties, type PublicProperty, type CatalogCollection, type CatalogEntry } from '../../lib/db/hardCatalog';
+import { loadPublishedArticles, loadPublishedProjects, loadPublishedProperties, loadPublishedHvacServices, loadPublishedConstructionProjects, catalogTable, type PublishedConstructionProject, type PublicProperty, type CatalogCollection, type CatalogEntry } from '../../lib/db/hardCatalog';
+import type { HVACService } from '../../hvac/types';
 import type { BlogPost, Project } from '../../types';
 
-type Entry = CatalogEntry<BlogPost | Project | PublicProperty>;
+type Entry = CatalogEntry<BlogPost | Project | PublicProperty | HVACService | PublishedConstructionProject>;
 
 const imageTypes: Record<string, string> = {
   'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp',
@@ -16,7 +17,10 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
 }) {
   const projects = collection === 'projects';
   const properties = collection === 'properties';
-  const heading = projects ? 'المشاريع العقارية المنشورة' : properties ? 'العقارات المنشورة' : 'المقالات المنشورة';
+  const construction = collection === 'construction_projects';
+  const hvac = collection === 'hvac_services';
+  const heading = construction ? 'مشاريع الإنشاءات المنشورة' : hvac ? 'خدمات التكييف المنشورة'
+    : projects ? 'المشاريع العقارية المنشورة' : properties ? 'العقارات المنشورة' : 'المقالات المنشورة';
   const [entries, setEntries] = useState<Entry[]>([]);
   const [selected, setSelected] = useState<Entry | null>(null);
   const [notice, setNotice] = useState('');
@@ -24,14 +28,14 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
 
   useEffect(() => {
     const controller = new AbortController();
-    const load = projects ? loadPublishedProjects : properties ? loadPublishedProperties : loadPublishedArticles;
+    const load = construction ? loadPublishedConstructionProjects : hvac ? loadPublishedHvacServices : projects ? loadPublishedProjects : properties ? loadPublishedProperties : loadPublishedArticles;
     load(controller.signal).then((items) => {
       if (!controller.signal.aborted) setEntries(items);
     }).catch(() => {
       if (!controller.signal.aborted) setNotice('تعذر تحميل ' + heading + '.');
     });
     return () => controller.abort();
-  }, [heading, projects, properties]);
+  }, [heading, construction, hvac, projects, properties]);
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -40,8 +44,14 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
     const field = (name: string) => String(fields.get(name) ?? '').trim();
     const imageFile = fields.get('image');
     const content = { ...selected.content };
-    content.title = { ar: field('titleAr'), en: field('titleEn') };
-    if ('description' in content) {
+    const title = { ar: field('titleAr'), en: field('titleEn') };
+    if ('titleAr' in content) {
+      content.titleAr = title.ar;
+      content.titleEn = title.en;
+      content.descriptionAr = field('descriptionAr');
+      content.descriptionEn = field('descriptionEn');
+    } else if ('description' in content) {
+      content.title = title;
       content.description = { ar: field('descriptionAr'), en: field('descriptionEn') };
       if ('price' in content) {
         const sar = Number(field('price'));
@@ -52,17 +62,18 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
         content.lastUpdated = new Date().toISOString().slice(0, 10);
       }
     } else {
+      content.title = title;
       content.excerpt = { ar: field('excerptAr'), en: field('excerptEn') };
       content.content = { ar: field('contentAr'), en: field('contentEn') };
     }
-    if (!content.title.ar || !content.title.en) {
+    if (!title.ar || !title.en) {
       setNotice('أدخل العنوان بالعربية والإنجليزية.');
       return;
     }
     setNotice('');
     setSaving(true);
     try {
-      const { data: current, error: readError } = await client.from('hard_catalog')
+      const { data: current, error: readError } = await client.from(catalogTable(collection))
         .select('updated_at').eq('collection', collection).eq('id', selected.id).single();
       if (readError || current.updated_at !== selected.updated_at) {
         setNotice('تغيّر السجل منذ فتحه. أعد تحميل الصفحة قبل الحفظ.');
@@ -86,7 +97,7 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
         if ('images' in content) content.images = [url, ...content.images.slice(1)];
         else content.image = url;
       }
-      const { data, error } = await client.from('hard_catalog')
+      const { data, error } = await client.from(catalogTable(collection))
         .update({ content, updated_at: new Date().toISOString() })
         .eq('collection', collection).eq('id', selected.id)
         .eq('updated_at', selected.updated_at)
@@ -112,15 +123,17 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
     {notice && <p role="status">{notice}</p>}
     <ul className="space-y-2">{entries.map((article) => <li key={article.id}>
       <button type="button" disabled={saving} className="rounded border px-3 py-1"
-        onClick={() => { setSelected(article); setNotice(''); }}>{article.content.title.ar}</button>
+        onClick={() => { setSelected(article); setNotice(''); }}>{'titleAr' in article.content ? article.content.titleAr : article.content.title.ar}</button>
     </li>)}</ul>
     {selected && <form key={selected.id} onSubmit={save} className="grid gap-3 rounded border p-4">
       {(['Ar', 'En'] as const).map((suffix) => {
         const lang = suffix === 'Ar' ? 'ar' : 'en';
         const label = suffix === 'Ar' ? 'العربية' : 'الإنجليزية';
         return <div key={suffix} className="grid gap-2">
-          <label>العنوان ({label})<input required name={'title' + suffix} lang={lang} dir={lang === 'ar' ? 'rtl' : 'ltr'} className={inputClass} defaultValue={selected.content.title[lang]} /></label>
-          {'description' in selected.content ? (
+          <label>العنوان ({label})<input required name={'title' + suffix} lang={lang} dir={lang === 'ar' ? 'rtl' : 'ltr'} className={inputClass} defaultValue={'titleAr' in selected.content ? (lang === 'ar' ? selected.content.titleAr : selected.content.titleEn) : selected.content.title[lang]} /></label>
+          {'descriptionAr' in selected.content ? (
+            <label>الوصف ({label})<textarea name={'description' + suffix} lang={lang} dir="auto" className={inputClass} defaultValue={lang === 'ar' ? selected.content.descriptionAr : selected.content.descriptionEn} /></label>
+          ) : 'description' in selected.content ? (
             <label>الوصف ({label})<textarea name={'description' + suffix} lang={lang} dir="auto" className={inputClass} defaultValue={selected.content.description[lang]} /></label>
           ) : <>
             <label>الملخص ({label})<textarea name={'excerpt' + suffix} lang={lang} dir="auto" className={inputClass} defaultValue={selected.content.excerpt[lang]} /></label>

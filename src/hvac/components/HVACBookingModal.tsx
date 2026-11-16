@@ -26,7 +26,6 @@ export function HVACBookingModal() {
     isBookingModalOpen,
     bookingInitialService,
     closeBookingModal,
-    addLead,
     services,
     serviceAreas,
     bookingCopy,
@@ -169,19 +168,8 @@ export function HVACBookingModal() {
         },
       });
 
-      const lead = addLead({
-        clientName: name.trim(),
-        phoneNumber: phone.trim(),
-        city: cityName,
-        customCity: city === 'other' ? customCity : undefined,
-        service: service,
-        preferredDate: `${date} (${slot})`,
-        notes: notes.trim() || undefined,
-        isUrgent: slot === 'emergency',
-      });
-
       setConfirmedLead({
-        referenceNumber: result.trackingCode || lead.referenceNumber,
+        referenceNumber: result.trackingCode,
         clientName: name.trim(),
       });
     } catch (err: any) {

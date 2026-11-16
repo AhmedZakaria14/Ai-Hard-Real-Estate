@@ -30,7 +30,6 @@ export function QuoteModal() {
     isQuoteModalOpen,
     closeQuoteModal,
     quoteModalInitialData,
-    addLead,
   } = useConstruction();
 
   const t = constructionTranslations[language];
@@ -49,7 +48,7 @@ export function QuoteModal() {
   const [notes, setNotes] = useState('');
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
 
-  const [submittedLead, setSubmittedLead] = useState<ConstructionQuoteLead | null>(null);
+  const [submittedLead, setSubmittedLead] = useState<Pick<ConstructionQuoteLead, 'referenceNumber' | 'clientName'> | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copiedRef, setCopiedRef] = useState(false);
   const [validationError, setValidationError] = useState('');
@@ -105,35 +104,16 @@ export function QuoteModal() {
           budgetRangeSAR,
           timeline,
           uploadedFileName,
+          source: quoteModalInitialData?.source || 'quote_form',
+          inquiredProjectId: quoteModalInitialData?.inquiredProjectId,
+          estimatedValueSAR: quoteModalInitialData?.estimatedValueSAR,
           calculatorVersion: quoteModalInitialData?.calculatorVersion,
           inputSnapshot: quoteModalInitialData?.inputSnapshot,
           calculationSnapshot: quoteModalInitialData?.calculationSnapshot,
         },
       });
 
-      const newLead = addLead({
-        clientName,
-        phoneNumber,
-        email,
-        city,
-        district: district || (isAr ? 'وسط المدينة' : 'Downtown'),
-        projectType,
-        builtUpArea: Number(builtUpArea) || 1200,
-        budgetRangeSAR: budgetRangeSAR || (isAr ? 'حسب الدراسة الهندسية' : 'Pending BOQ Study'),
-        timeline: timeline || (isAr ? 'خلال ٣ أشهر' : 'Within 3 months'),
-        notes,
-        hasArchitecturalPlans: Boolean(uploadedFileName),
-        fileName: uploadedFileName || undefined,
-        source: quoteModalInitialData?.source || 'quote_form',
-        inquiredProjectId: quoteModalInitialData?.inquiredProjectId,
-        estimatedValueSAR: quoteModalInitialData?.estimatedValueSAR,
-        calculatorVersion: quoteModalInitialData?.calculatorVersion,
-        inputSnapshot: quoteModalInitialData?.inputSnapshot,
-        calculationSnapshot: quoteModalInitialData?.calculationSnapshot,
-      });
-
-      newLead.referenceNumber = result.trackingCode;
-      setSubmittedLead(newLead);
+      setSubmittedLead({ clientName: clientName.trim(), referenceNumber: result.trackingCode });
     } catch (err: any) {
       console.error('Failed to submit quote request', err);
       if (err instanceof FormValidationError) {

@@ -1,3 +1,4 @@
+import { loadPublishedHvacServices } from '../../lib/db/hardCatalog';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   Language,
@@ -18,7 +19,6 @@ import {
   initialSampleLeads,
 } from '../data/initialData';
 import {
-  subscribeHVACServices,
   saveHVACServiceDoc,
   deleteHVACServiceDoc,
   subscribeHVACSectionContent,
@@ -156,14 +156,16 @@ export function HVACProvider({
     return () => unsub();
   }, []);
 
-  // Services with Firestore Sync
-  const [services, setServices] = useState<HVACService[]>(initialServices);
-
+  const [services, setServices] = useState<HVACService[]>([]);
   useEffect(() => {
-    const unsub = subscribeHVACServices((list) => {
-      setServices(list);
+    const controller = new AbortController();
+    loadPublishedHvacServices(controller.signal).then((entries) => {
+      if (controller.signal.aborted) return;
+      setServices(entries.map(({ content }) => content).sort((a, b) => a.sortOrder - b.sortOrder));
+    }).catch((error) => {
+      if (!controller.signal.aborted) console.error('Unable to load the HVAC services catalog', error);
     });
-    return () => unsub();
+    return () => controller.abort();
   }, []);
 
   const addService = async (svc: Omit<HVACService, 'id'>) => {

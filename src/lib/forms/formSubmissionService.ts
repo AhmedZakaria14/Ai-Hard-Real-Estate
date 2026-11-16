@@ -85,7 +85,9 @@ export function generateIdempotencyKey(payload: FormSubmissionPayload): string {
     payload.email.trim().toLowerCase(),
     (payload.phone || '').replace(/\D/g, ''),
     payload.entityId || '',
-    (payload.message || '').slice(0, 30),
+    payload.message || '',
+    payload.details?.date || payload.details?.preferredDate || '',
+    payload.details?.slot || payload.details?.preferredTime || '',
   ].join('|');
 
   let hash = 0;
@@ -109,9 +111,10 @@ export function validateFormPayload(
 
   const emailTrimmed = payload.email ? payload.email.trim() : '';
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailTrimmed) {
+  const emailOptional = payload.formType === 'hvac_service' && payload.sector === 'hvac';
+  if (!emailTrimmed && !emailOptional) {
     errors.email = isAr ? 'يرجى إدخال البريد الإلكتروني.' : 'Email address is required.';
-  } else if (!emailRegex.test(emailTrimmed)) {
+  } else if (emailTrimmed && !emailRegex.test(emailTrimmed)) {
     errors.email = isAr
       ? 'يرجى إدخال عنوان بريد إلكتروني صحيح (مثال: name@domain.com).'
       : 'Please enter a valid email address.';

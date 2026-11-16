@@ -17,7 +17,7 @@ import { T, pick } from '../translations';
 import { submitCustomerForm } from '../../lib/forms/formSubmissionService';
 
 export function HVACContactSection() {
-  const { language, isAr, addLead, services } = useHVAC();
+  const { language, isAr, services } = useHVAC();
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -50,16 +50,7 @@ export function HVACContactSection() {
         },
       });
 
-      const newLead = addLead({
-        clientName: name.trim(),
-        phoneNumber: phone.trim(),
-        email: email.trim() || undefined,
-        city: 'Eastern Province Hub',
-        service: service || 'General Contact Inquiry',
-        notes: message.trim() || undefined,
-      });
-
-      setSuccessStatus(result.trackingCode || newLead.referenceNumber);
+      setSuccessStatus(result.trackingCode);
       setName('');
       setPhone('');
       setEmail('');
@@ -163,6 +154,7 @@ export function HVACContactSection() {
                 </label>
                 <input
                   type="email"
+                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@company.com"
