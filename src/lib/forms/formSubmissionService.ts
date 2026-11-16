@@ -68,7 +68,7 @@ export class FormValidationError extends Error {
   }
 }
 
-const IDEMPOTENCY_STORAGE_KEY = 'hard_submitted_form_keys_v1';
+const IDEMPOTENCY_STORAGE_KEY = 'hard_submitted_form_keys_v2';
 const OFFLINE_QUEUE_KEY = 'hard_offline_leads_queue_v1';
 
 function getLocalIdempotencyCache(): Record<string, { leadId: string; trackingCode: string; timestamp: number }> {
@@ -304,8 +304,48 @@ export async function submitCustomerForm(
 
   const trackingPrefix = formSchema?.workflowSettings?.trackingPrefix || prefixMap[payload.formType] || 'HARD';
   const trackingCode = `${trackingPrefix}-2026-${Math.floor(100000 + Math.random() * 900000)}`;
-  const leadId = `lead-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+  const leadId = `lead-${Date.now()}-${crypto.randomUUID().replace(/-/g, '')}`;
 
+  // Require confirmation from Supabase before accepting new submissions.
+  try {
+    await retryOperation(async () => {
+      const response = await fetch('https://vlpdiyicmupghfcualoe.supabase.co/rest/v1/hard_form_submissions', {
+        method: 'POST',
+        headers: {
+          apikey: 'sb_publishable_jam6dG2vyvPi65DHUEgqXQ_4YZfJGxF',
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal',
+        },
+        body: JSON.stringify({
+          id: leadId,
+          tracking_code: trackingCode,
+          form_type: payload.formType,
+          sector: payload.sector,
+          payload: {
+            ...payload,
+            email: payload.email.trim().toLowerCase(),
+            schemaVersion: activeSchemaVersion,
+          },
+        }),
+        signal: AbortSignal.timeout(8000),
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => null);
+        // A retry can follow a committed insert whose response was lost.
+        if (response.status === 409 && error?.code === '23505') return;
+        throw new Error(`Form intake returned HTTP ${response.status}`);
+      }
+    }, 3, 600);
+  } catch (error) {
+    throw new DataAccessError(
+      isAr ? 'تعذر حفظ طلبك. يرجى المحاولة مرة أخرى.' : 'Your request could not be saved. Please try again.',
+      'DATABASE_ERROR',
+      error,
+    );
+  }
+
+  // Keep the existing Firestore dashboard and notification workflows in sync.
   // Handle Newsletter Signups special collection sync
   if (payload.formType === 'newsletter_signup') {
     const subDocRef = doc(db, 'subscribers', leadId);
@@ -328,7 +368,8 @@ export async function submitCustomerForm(
       return { success: true, leadId, trackingCode, isDuplicate: false };
     } catch (err: any) {
       console.error('Failed to write subscriber to Firestore:', err);
-      throw new DataAccessError(err?.message || 'Database write error for subscriber', 'DATABASE_ERROR', err);
+      saveLocalIdempotencyCache(idempotencyKey, { leadId, trackingCode });
+      return { success: true, leadId, trackingCode, isDuplicate: false };
     }
   }
 
@@ -499,8 +540,8 @@ export async function submitCustomerForm(
       trackingCode,
       isDuplicate: false,
       message: isAr
-        ? 'تم حفظ طلبك محلياً وسيتم مزامنته مع قاعدة البيانات فور عودة الاتصال.'
-        : 'Your request was saved locally and will sync with the database upon connection restoration.',
+        ? 'تم استلام طلبك وحفظه في قاعدة البيانات بنجاح.'
+        : 'Your request was successfully saved.',
     };
   }
 }
