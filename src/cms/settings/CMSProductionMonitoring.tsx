@@ -81,22 +81,26 @@ export const CMSProductionMonitoring: React.FC<CMSProductionMonitoringProps> = (
     return true;
   });
 
+  const [diagnosticStatus, setDiagnosticStatus] = useState('');
+  const [isWritingDiagnostic, setIsWritingDiagnostic] = useState(false);
   const handleSimulateTestLog = async () => {
-    await logProductionEvent({
-      level: 'WARN',
-      category: 'failed_notification',
-      errorCode: 'ERR_NOTIF_WEBHOOK_TIMEOUT',
-      component: 'NotificationDispatcher',
-      message: 'Webhook endpoint timeout after 5000ms. Queued for automatic retry.',
-      statusClassification: 'TEMPORARILY_UNKNOWN',
-      userRole: 'system',
-      userEmail: 'admin@hard.sa',
-      meta: {
-        endpointUrl: 'https://crm.hard.sa/api/webhooks/v1',
-        attemptNumber: 1,
-        idempotencyKey: 'idemp_test_sample_123',
-      },
-    });
+    setIsWritingDiagnostic(true);
+    setDiagnosticStatus('');
+    try {
+      await logProductionEvent({
+        level: 'INFO',
+        category: 'backend_failure',
+        errorCode: 'DIAGNOSTIC_TEST',
+        component: 'CMSProductionMonitoring',
+        message: 'Manual test of the Supabase monitoring log.',
+        statusClassification: 'SUCCESS',
+      });
+      setDiagnosticStatus(isAr ? 'حُفظ السجل التجريبي.' : 'Diagnostic log saved.');
+    } catch {
+      setDiagnosticStatus(isAr ? 'تعذر حفظ السجل التجريبي.' : 'Could not save the diagnostic log.');
+    } finally {
+      setIsWritingDiagnostic(false);
+    }
   };
 
   return (
@@ -122,12 +126,15 @@ export const CMSProductionMonitoring: React.FC<CMSProductionMonitoringProps> = (
         <button
           type="button"
           onClick={handleSimulateTestLog}
+          disabled={isWritingDiagnostic}
           className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
         >
           <Terminal className="w-3.5 h-3.5 text-sky-400" />
           <span>{isAr ? 'اختبار السجل التجريبي' : 'Simulate Diagnostic Log'}</span>
         </button>
       </div>
+
+      {diagnosticStatus && <p role="status">{diagnosticStatus}</p>}
 
       {/* Metrics Summary Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs">

@@ -4,7 +4,6 @@
  * Provides:
  * - Correlation ID generation & propagation
  * - Structured JSON logging with PII/Secret redaction (No passwords, tokens, or raw credentials)
- * - Safe Idempotency vs Temporarily Unknown status checking
  * - Live subscription for CMS Operations Center
  */
 
@@ -15,17 +14,9 @@ import {
   OperationStatusClassification,
   FailureSummaryMetrics,
 } from './monitoringTypes';
-import { db } from '../firebase';
-import {
-  collection,
-  addDoc,
-  onSnapshot,
-  query,
-  orderBy,
-  limit,
-  where,
-  getDocs,
-} from 'firebase/firestore';
+import { hardAdminClient } from '../db/hardAdminClient';
+
+const logsChanged = 'hard-system-logs-changed';
 
 /**
  * Generate a unique correlation ID for tracking operations across frontend and backend
@@ -86,7 +77,7 @@ export function maskUserEmail(email?: string): string | undefined {
 }
 
 /**
- * Write a structured log entry to Firestore system_production_logs
+ * Write a structured log entry to the private Supabase monitoring log
  */
 export async function logProductionEvent(params: {
   correlationId?: string;
@@ -129,73 +120,33 @@ export async function logProductionEvent(params: {
     console.info(`[PRODUCTION_INFO][${correlationId}][${params.category}] ${params.message}`, logDoc);
   }
 
-  // Persist to Firestore
-  try {
-    const docRef = await addDoc(collection(db, 'system_production_logs'), logDoc);
-    return docRef.id;
-  } catch (err) {
-    console.warn('Fallback: Failed to write system log to Firestore:', err);
-    return 'local_fallback_log_id';
-  }
+  const { data, error } = await hardAdminClient.from('hard_system_logs')
+    .insert({ body: logDoc }).select('id').single();
+  if (error) throw error;
+  window.dispatchEvent(new Event(logsChanged));
+  return data.id;
 }
 
-/**
- * Distinguish a failed operation from an operation whose final status is temporarily unknown
- * Checks if a submission with idempotencyKey was successfully processed during network drop
- */
-export async function verifyUnknownSubmissionStatus(idempotencyKey: string): Promise<{
-  isProcessed: boolean;
-  leadData?: any;
-}> {
-  if (!idempotencyKey) return { isProcessed: false };
-
-  try {
-    const q = query(
-      collection(db, 'leads'),
-      where('idempotencyKey', '==', idempotencyKey),
-      limit(1)
-    );
-    const snap = await getDocs(q);
-
-    if (!snap.empty) {
-      const doc = snap.docs[0];
-      return {
-        isProcessed: true,
-        leadData: { id: doc.id, ...doc.data() },
-      };
-    }
-  } catch (e) {
-    console.warn('Failed to verify unknown submission status:', e);
-  }
-
-  return { isProcessed: false };
-}
-
-/**
- * Real-time subscription to production logs for CMS Monitoring Center
- */
 export function subscribeToProductionLogs(
   onLogsUpdated: (logs: StructuredLogDoc[], metrics: FailureSummaryMetrics) => void,
   maxLogs: number = 50
 ): () => void {
-  const q = query(
-    collection(db, 'system_production_logs'),
-    orderBy('createdAt', 'desc'),
-    limit(maxLogs)
-  );
-
-  return onSnapshot(
-    q,
-    (snap) => {
-      const logs: StructuredLogDoc[] = snap.docs.map((doc) => ({
-        id: doc.id,
-        ...(doc.data() as Omit<StructuredLogDoc, 'id'>),
-      }));
+  const controller = new AbortController();
+  let generation = 0;
+  async function refresh() {
+    const request = ++generation;
+    try {
+      const { data, error } = await hardAdminClient.from('hard_system_logs')
+        .select('id,body').order('created_at', { ascending: false }).order('id')
+        .limit(Math.max(1, Math.min(250, maxLogs))).abortSignal(controller.signal);
+      if (controller.signal.aborted || request !== generation) return;
+      if (error) throw error;
+      const logs = (data ?? []).map(({ id, body }): StructuredLogDoc => ({ ...body, id }));
 
       // Calculate summary metrics
       const metrics: FailureSummaryMetrics = {
         totalLogCount: logs.length,
-        backendFailuresCount: logs.filter((l) => l.category === 'backend_failure').length,
+        backendFailuresCount: logs.filter((l) => l.category === 'backend_failure' && l.statusClassification !== 'SUCCESS').length,
         rejectedSubmissionsCount: logs.filter((l) => l.category === 'rejected_submission').length,
         failedNotificationsCount: logs.filter((l) => l.category === 'failed_notification').length,
         uploadErrorsCount: logs.filter((l) => l.category === 'upload_error').length,
@@ -205,9 +156,17 @@ export function subscribeToProductionLogs(
       };
 
       onLogsUpdated(logs, metrics);
-    },
-    (err) => {
-      console.warn('Production log listener error:', err);
+    } catch (error) {
+      if (!controller.signal.aborted) console.warn('Could not refresh Supabase monitoring logs:', error);
     }
-  );
+  }
+
+  window.addEventListener(logsChanged, refresh);
+  window.addEventListener('focus', refresh);
+  void refresh();
+  return () => {
+    controller.abort();
+    window.removeEventListener(logsChanged, refresh);
+    window.removeEventListener('focus', refresh);
+  };
 }
