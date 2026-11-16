@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Upload, Link2, X, Image as ImageIcon, Check, Trash2, Plus, Sparkles, FolderOpen } from 'lucide-react';
 import { Language } from '../../types';
-import { uploadCmsFile } from '../../lib/firebaseService';
+import { uploadMediaAsset } from '../../lib/cmsMediaLibrary';
 import { CMSMediaLibrary } from './CMSMediaLibrary';
 
 interface SingleImageUploadProps {
@@ -58,17 +58,10 @@ export const CMSImageUpload: React.FC<SingleImageUploadProps> = ({
     setFileName(file.name);
 
     try {
-      const downloadUrl = await uploadCmsFile(file, 'property_cms');
-      onChange(downloadUrl);
+      const asset = await uploadMediaAsset({ file });
+      onChange(asset.downloadUrl);
     } catch {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const result = event.target?.result as string;
-        if (result) {
-          onChange(result);
-        }
-      };
-      reader.readAsDataURL(file);
+      setError(isAr ? 'تعذر رفع الصورة إلى Supabase. حاول مرة أخرى.' : 'Could not upload the image to Supabase. Try again.');
     }
   };
 
@@ -384,31 +377,23 @@ export const CMSMultiImageGallery: React.FC<MultiImageGalleryProps> = ({
     }
   };
 
-  const processFiles = (files: File[]) => {
-    const imageFiles = files.filter((f) => f.type.startsWith('image/'));
+  const processFiles = async (files: File[]) => {
+    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
     if (imageFiles.length === 0) {
       setError(isAr ? 'يرجى اختيار ملفات صور صالحة' : 'Please select valid image files');
       return;
     }
-
     setError(null);
-    const newImagesList: string[] = [];
-    let processedCount = 0;
-
-    imageFiles.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const res = event.target?.result as string;
-        if (res) {
-          newImagesList.push(res);
-        }
-        processedCount++;
-        if (processedCount === imageFiles.length) {
-          onChange([...images, ...newImagesList]);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+    const uploaded: string[] = [];
+    for (const file of imageFiles) {
+      try {
+        const asset = await uploadMediaAsset({ file });
+        uploaded.push(asset.downloadUrl);
+      } catch {
+        setError(isAr ? 'تعذر رفع صورة واحدة أو أكثر.' : 'One or more images could not be uploaded.');
+      }
+    }
+    if (uploaded.length) onChange([...images, ...uploaded]);
   };
 
   const handleDragOver = (e: React.DragEvent) => {

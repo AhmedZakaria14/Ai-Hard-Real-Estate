@@ -1,30 +1,12 @@
-import {
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-  deleteObject,
-} from 'firebase/storage';
-import {
-  collection,
-  doc,
-  getDocs,
-  getDoc,
-  setDoc,
-  deleteDoc,
-  query,
-  where,
-  orderBy,
-  onSnapshot,
-} from 'firebase/firestore';
-import { storage, db } from './firebase';
-import { LocalizedText, SectorId } from '../types/firestore-schema';
-import { sanitizePayload, withServerTimestamps } from './firebase/serializers';
+import { hardAdminClient } from './db/hardAdminClient';
+import type { LocalizedText, SectorId } from '../types/firestore-schema';
 
 export type AllowedMimeType =
   | 'image/jpeg'
   | 'image/png'
   | 'image/webp'
-  | 'image/svg+xml'
+  | 'image/gif'
+  | 'image/avif'
   | 'application/pdf'
   | 'application/msword'
   | 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -33,7 +15,8 @@ export const APPROVED_FILE_TYPES: AllowedMimeType[] = [
   'image/jpeg',
   'image/png',
   'image/webp',
-  'image/svg+xml',
+  'image/gif',
+  'image/avif',
   'application/pdf',
   'application/msword',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -75,7 +58,7 @@ export function validateMediaUpload(file: File): { isValid: boolean; error?: str
   if (!APPROVED_FILE_TYPES.includes(file.type as AllowedMimeType)) {
     return {
       isValid: false,
-      error: `File type '${file.type}' is not allowed. Approved types: JPG, PNG, WebP, SVG, PDF, DOCX`,
+      error: `File type '${file.type}' is not allowed. Approved types: JPG, PNG, WebP, GIF, AVIF, PDF, DOCX`,
     };
   }
 
@@ -111,9 +94,20 @@ export function getImageDimensions(file: File): Promise<{ width: number; height:
   });
 }
 
-/**
- * Uploads media asset with upload progress callback and saves Firestore metadata.
- */
+const publicBucket = 'hard-public-catalog';
+const privateBucket = 'hard-cms-private-media';
+
+async function resolveMedia(asset: MediaAssetDoc, bucket: string, path: string): Promise<MediaAssetDoc> {
+  const storage = hardAdminClient.storage.from(bucket);
+  if (asset.isPrivate) {
+    const { data, error } = await storage.createSignedUrl(path, 600);
+    if (error) throw error;
+    return { ...asset, downloadUrl: data.signedUrl, thumbnailUrl: data.signedUrl };
+  }
+  const url = storage.getPublicUrl(path).data.publicUrl;
+  return { ...asset, downloadUrl: url, thumbnailUrl: url };
+}
+
 export async function uploadMediaAsset({
   file,
   sector = 'portal',
@@ -121,7 +115,6 @@ export async function uploadMediaAsset({
   altText = { ar: '', en: '' },
   caption = { ar: '', en: '' },
   isPrivate = false,
-  uploadedBy = 'admin',
   onProgress,
 }: {
   file: File;
@@ -134,147 +127,53 @@ export async function uploadMediaAsset({
   onProgress?: (progressPercent: number) => void;
 }): Promise<MediaAssetDoc> {
   const validation = validateMediaUpload(file);
-  if (!validation.isValid) {
-    throw new Error(validation.error);
+  if (!validation.isValid) throw new Error(validation.error);
+  if (!isPrivate && !file.type.startsWith('image/')) throw new Error('ارفع المستندات في قسم الملفات الخاصة.');
+  const { data: { user }, error: authError } = await hardAdminClient.auth.getUser();
+  if (authError || user?.app_metadata.hard_role !== 'superadmin') throw new Error('سجّل الدخول بحساب مسؤول هارد.');
+  const id = crypto.randomUUID();
+  const bucket = isPrivate ? privateBucket : publicBucket;
+  const storagePath = `cms-media/${id}/${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+  const storage = hardAdminClient.storage.from(bucket);
+  const now = new Date().toISOString();
+  const asset: MediaAssetDoc = {
+    id, fileName: file.name, storagePath, downloadUrl: '',
+    fileSizeBytes: file.size, contentType: file.type, dimensions: await getImageDimensions(file),
+    altText: { ar: altText.ar || file.name, en: altText.en || file.name }, caption,
+    sector, tags, isPrivate, references: [], uploadedBy: user.id, createdAt: now, updatedAt: now,
+  };
+  onProgress?.(0);
+  const { error } = await storage.upload(storagePath, file, { contentType: file.type, upsert: false });
+  if (error) throw error;
+  const { error: dbError } = await hardAdminClient.from('hard_media_assets')
+    .insert({ id, bucket, path: storagePath, asset });
+  if (dbError) {
+    await storage.remove([storagePath]);
+    throw dbError;
   }
-
-  const dimensions = await getImageDimensions(file);
-  const mediaId = `media-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-
-  // Public vs Private path separation
-  const folderPath = isPrivate ? 'private_attachments' : `public_media/${sector}`;
-  const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-  const storagePath = `${folderPath}/${mediaId}_${sanitizedFileName}`;
-
-  const storageRef = ref(storage, storagePath);
-  const uploadTask = uploadBytesResumable(storageRef, file, {
-    contentType: file.type,
-    customMetadata: { sector, isPrivate: String(isPrivate) },
-  });
-
-  return new Promise((resolve, reject) => {
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-        if (onProgress) onProgress(progress);
-      },
-      async (error) => {
-        console.error('[uploadMediaAsset] Storage error:', error);
-        reject(error);
-      },
-      async () => {
-        try {
-          const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
-
-          const assetDoc: MediaAssetDoc = {
-            id: mediaId,
-            fileName: file.name,
-            storagePath,
-            downloadUrl,
-            thumbnailUrl: downloadUrl, // Primary image or derivative
-            fileSizeBytes: file.size,
-            contentType: file.type,
-            dimensions,
-            altText: {
-              ar: altText.ar || file.name.split('.')[0],
-              en: altText.en || file.name.split('.')[0],
-            },
-            caption,
-            sector,
-            tags,
-            isPrivate,
-            references: [],
-            uploadedBy,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          };
-
-          // Save metadata to Firestore /media_metadata
-          const docRef = doc(db, 'media_metadata', mediaId);
-          await setDoc(docRef, withServerTimestamps(assetDoc));
-          resolve(assetDoc);
-        } catch (dbErr) {
-          // Clean up failed storage object safely
-          try {
-            await deleteObject(storageRef);
-          } catch (cleanErr) {
-            console.warn('[uploadMediaAsset] Storage cleanup warning:', cleanErr);
-          }
-          reject(dbErr);
-        }
-      }
-    );
-  });
+  onProgress?.(100);
+  return resolveMedia(asset, bucket, storagePath);
 }
 
-/**
- * Fetches all media metadata documents with filtering.
- */
 export async function getMediaAssets(filters?: {
-  sector?: SectorId;
-  isPrivate?: boolean;
-  searchQuery?: string;
+  sector?: SectorId; isPrivate?: boolean; searchQuery?: string;
 }): Promise<MediaAssetDoc[]> {
-  try {
-    const colRef = collection(db, 'media_metadata');
-    const snap = await getDocs(colRef);
-    let items = snap.docs.map((d) => d.data() as MediaAssetDoc);
-
-    if (filters?.sector) {
-      items = items.filter((i) => i.sector === filters.sector || i.sector === 'portal');
-    }
-    if (filters?.isPrivate !== undefined) {
-      items = items.filter((i) => Boolean(i.isPrivate) === filters.isPrivate);
-    }
-    if (filters?.searchQuery?.trim()) {
-      const q = filters.searchQuery.trim().toLowerCase();
-      items = items.filter(
-        (i) =>
-          i.fileName.toLowerCase().includes(q) ||
-          i.tags.some((t) => t.toLowerCase().includes(q)) ||
-          i.altText?.ar?.toLowerCase().includes(q) ||
-          i.altText?.en?.toLowerCase().includes(q)
-      );
-    }
-
-    return items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  } catch (e) {
-    console.warn('[getMediaAssets] Error fetching assets:', e);
-    return [];
-  }
+  const q = filters?.searchQuery?.trim().toLowerCase();
+  const query = hardAdminClient.from('hard_media_assets').select('bucket,path,asset').order('created_at', { ascending: false });
+  if (filters?.isPrivate !== undefined) query.eq('bucket', filters.isPrivate ? privateBucket : publicBucket);
+  const { data, error } = await query;
+  if (error) throw error;
+  return Promise.all((data ?? []).filter(({ asset }) =>
+    (!filters?.sector || asset.sector === filters.sector || asset.sector === 'portal') &&
+    (!q || [asset.fileName, ...asset.tags, asset.altText.ar, asset.altText.en].some((v) => v.toLowerCase().includes(q)))
+  ).map(({ asset, bucket, path }) => resolveMedia(asset, bucket, path)));
 }
 
-/**
- * Safely deletes a media asset if it has no published references.
- */
-export async function deleteMediaAsset(assetId: string): Promise<{ success: boolean; blockedReason?: string }> {
-  const docRef = doc(db, 'media_metadata', assetId);
-  const snap = await getDoc(docRef);
-
-  if (!snap.exists()) {
-    return { success: false, blockedReason: 'Asset metadata not found' };
-  }
-
-  const asset = snap.data() as MediaAssetDoc;
-
-  // Block deletion if asset is referenced by active content
-  if (asset.references && asset.references.length > 0) {
-    return {
-      success: false,
-      blockedReason: `Asset is referenced in ${asset.references.length} published document(s). Remove references first.`,
-    };
-  }
-
-  // Delete from Cloud Storage
-  try {
-    const storageRef = ref(storage, asset.storagePath);
-    await deleteObject(storageRef);
-  } catch (e) {
-    console.warn('[deleteMediaAsset] Cloud Storage deletion warning:', e);
-  }
-
-  // Delete metadata from Firestore
-  await deleteDoc(docRef);
-  return { success: true };
+export async function deleteMediaAsset(id: string): Promise<{ success: boolean; blockedReason?: string }> {
+  const { data, error } = await hardAdminClient.from('hard_media_assets').select('asset').eq('id', id).single();
+  if (error || !data) return { success: false, blockedReason: 'تعذر العثور على الملف.' };
+  if (data.asset.references?.length) return { success: false, blockedReason: 'الملف مرتبط بمحتوى منشور.' };
+  // Content in the legacy CMS can still reference public URLs without library metadata.
+  const { error: removeError } = await hardAdminClient.from('hard_media_assets').delete().eq('id', id);
+  return removeError ? { success: false, blockedReason: 'تعذرت إزالة الملف من المكتبة.' } : { success: true };
 }

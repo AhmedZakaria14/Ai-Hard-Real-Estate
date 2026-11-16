@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { type Session } from '@supabase/supabase-js';
 
+import { CMSMediaLibrary } from '../components/CMSMediaLibrary';
 import SupabaseArticleEditor from '../catalog/SupabaseArticleEditor';
 import { hardAdminClient as client } from '../../lib/db/hardAdminClient';
 
@@ -24,7 +25,7 @@ export default function SupabaseInbox() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [rows, setRows] = useState<Submission[]>([]);
-  const [view, setView] = useState<'requests' | 'appointments' | 'articles' | 'projects' | 'properties' | 'construction_projects' | 'hvac_services'>('requests');
+  const [view, setView] = useState<'requests' | 'appointments' | 'articles' | 'projects' | 'properties' | 'construction_projects' | 'hvac_services' | 'media'>('requests');
   const [page, setPage] = useState(0);
   const [refresh, setRefresh] = useState(0);
   const isAppointments = view === 'appointments';
@@ -125,6 +126,7 @@ export default function SupabaseInbox() {
         <button aria-pressed={view === 'properties'} onClick={() => setView('properties')} className="rounded border px-3 py-1">العقارات</button>
         <button aria-pressed={view === 'construction_projects'} onClick={() => setView('construction_projects')} className="rounded border px-3 py-1">مشاريع الإنشاءات</button>
         <button aria-pressed={view === 'hvac_services'} onClick={() => setView('hvac_services')} className="rounded border px-3 py-1">خدمات التكييف</button>
+        <button aria-pressed={view === 'media'} onClick={() => setView('media')} className="rounded border px-3 py-1">مكتبة الوسائط</button>
       </nav>
       <div className="flex gap-3">
         <button onClick={() => setRefresh((value) => value + 1)} disabled={busy} className="rounded border px-3 py-1">تحديث</button>
@@ -134,7 +136,7 @@ export default function SupabaseInbox() {
           else setPage(0);
         }} className="rounded border px-3 py-1">خروج</button>
       </div>
-      {view !== 'requests' && view !== 'appointments' ? <SupabaseArticleEditor key={view} client={client} collection={view === 'articles' ? 'blog_posts' : view} /> : <>
+      {view === 'media' ? <CMSMediaLibrary language="ar" /> : view !== 'requests' && view !== 'appointments' ? <SupabaseArticleEditor key={view} client={client} collection={view === 'articles' ? 'blog_posts' : view} /> : <>
       {busy ? <p role="status">جارٍ تحميل الطلبات…</p> : !error && rows.length === 0 && <p>لا توجد طلبات في هذه الصفحة.</p>}
       {rows.map((row) => <article key={row.id} className="space-y-2 rounded-lg border p-4">
         <h2 className="font-bold">{String(row.payload.name || row.tracking_code)}</h2>

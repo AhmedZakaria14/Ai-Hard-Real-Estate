@@ -75,13 +75,18 @@ export const CMSMediaLibrary: React.FC<CMSMediaLibraryProps> = ({
   // Load assets
   const fetchAssets = async () => {
     setIsLoading(true);
-    const list = await getMediaAssets({
-      sector: activeSector === 'all' ? undefined : activeSector,
-      isPrivate: showPrivate,
-      searchQuery,
-    });
-    setAssets(list);
-    setIsLoading(false);
+    try {
+      const list = await getMediaAssets({
+        sector: activeSector === 'all' ? undefined : activeSector,
+        isPrivate: showPrivate,
+        searchQuery,
+      });
+      setAssets(list);
+    } catch {
+      setActionStatus({ type: 'error', text: isAr ? 'تعذر تحميل مكتبة الوسائط.' : 'Could not load the media library.' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -122,7 +127,7 @@ export const CMSMediaLibrary: React.FC<CMSMediaLibraryProps> = ({
   };
 
   const handleDelete = async (assetId: string) => {
-    if (!window.confirm(isAr ? 'هل أنت أصل من حذف هذا الملف نهائياً؟' : 'Are you sure you want to delete this asset?')) {
+    if (!window.confirm(isAr ? 'هل تريد إزالة هذا الملف من المكتبة؟' : 'Remove this asset from the library?')) {
       return;
     }
 
@@ -130,7 +135,7 @@ export const CMSMediaLibrary: React.FC<CMSMediaLibraryProps> = ({
     if (result.success) {
       setAssets(assets.filter((a) => a.id !== assetId));
       if (selectedAsset?.id === assetId) setSelectedAsset(null);
-      setActionStatus({ type: 'success', text: isAr ? 'تم حذف الملف نهائياً' : 'Asset deleted permanently' });
+      setActionStatus({ type: 'success', text: isAr ? 'تمت إزالة الملف من المكتبة' : 'Asset removed from the library' });
     } else {
       setActionStatus({ type: 'error', text: result.blockedReason || (isAr ? 'محظور الحذف' : 'Delete blocked') });
     }
@@ -301,7 +306,7 @@ export const CMSMediaLibrary: React.FC<CMSMediaLibraryProps> = ({
                     key={asset.id}
                     onClick={() => {
                       setSelectedAsset(asset);
-                      if (isPickerMode && onSelectAsset) {
+                      if (isPickerMode && onSelectAsset && !asset.isPrivate) {
                         onSelectAsset(asset.downloadUrl, asset);
                       }
                     }}
