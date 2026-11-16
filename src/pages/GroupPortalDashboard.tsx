@@ -216,48 +216,8 @@ export function GroupPortalDashboard({
       </main>
 
       {/* Corporate Group Footer matching Real Estate palette */}
-      <footer className="bg-white border-t border-slate-200/80 py-8 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <div className="flex items-center gap-2.5">
-            <img src={emblem} onError={({ currentTarget }) => { if (!currentTarget.src.endsWith('/logo.svg')) currentTarget.src = '/logo.svg'; }} alt="HARD Group" className="h-5 w-auto object-contain" />
-            <span className="font-medium text-slate-700">
-              {isAr ? 'مجموعة هارد © ٢٠٢٦' : 'HARD Group © 2026. All rights reserved.'}
-            </span>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3 sm:gap-5 font-medium">
-            <span className="text-slate-400 font-semibold uppercase text-[10px] tracking-wider">
-              {isAr ? 'قطاعات هارد:' : 'Sectors:'}
-            </span>
-            <span className="text-sky-600 font-bold">
-              {isAr ? 'بوابة مجموعة هارد (القطاع الحالي)' : 'HARD Group Portal (Current)'}
-            </span>
-            <span className="text-slate-300">•</span>
-            <a
-              href="/realestate"
-              onClick={(e) => handleSemanticClick(e, () => onNavigateToRealEstate('home'))}
-              className="text-slate-600 hover:text-sky-600 transition-colors"
-            >
-              {isAr ? 'هارد للعقارات' : 'HARD Real Estate'}
-            </a>
-            <span className="text-slate-300">•</span>
-            <a
-              href="/construction"
-              onClick={(e) => handleSemanticClick(e, handleConstructionClick)}
-              className="text-slate-600 hover:text-sky-600 transition-colors"
-            >
-              {isAr ? 'هارد للمقاولات الإنشائية' : 'HARD Construction'}
-            </a>
-            <span className="text-slate-300">•</span>
-            <a
-              href="/hvac"
-              onClick={(e) => handleSemanticClick(e, handleHVACClick)}
-              className="text-slate-600 hover:text-sky-600 transition-colors"
-            >
-              {isAr ? 'هارد لصيانة التكييف' : 'HARD HVAC Maintenance'}
-            </a>
-          </div>
-        </div>
+      <footer className="bg-white border-t border-slate-200/80 px-4 py-8 mt-auto text-center text-xs text-slate-600">
+        <p>{isAr ? 'جميع الحقوق محفوظة. مجموعة هارد@2026' : 'Copyright. HARD Group@2026'}</p>
       </footer>
 
       {/* Interactive Modals */}

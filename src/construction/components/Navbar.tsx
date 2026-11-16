@@ -1,7 +1,6 @@
 import { BrandLogo } from '../../components/ui/BrandLogo';
 import React, { useState, useEffect } from 'react';
 import {
-  HardHat,
   Phone,
   FileText,
   Calculator,
@@ -12,7 +11,6 @@ import {
   ArrowRight,
   ArrowLeft,
   Building,
-  CheckCircle2,
 } from 'lucide-react';
 import { useConstruction } from '../context/ConstructionContext';
 import { constructionTranslations } from '../utils/translations';
@@ -46,6 +44,20 @@ export function Navbar({
   const t = constructionTranslations[language];
   const isAr = language === 'ar';
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
+
+  const [activeSection, setActiveSection] = useState(() =>
+    window.location.hash || (/\/projects?\/?$/.test(window.location.pathname) ? '#projects' : '#home'),
+  );
+
+  useEffect(() => {
+    const syncSection = () => setActiveSection(window.location.hash || (/\/projects?\/?$/.test(window.location.pathname) ? '#projects' : '#home'));
+    window.addEventListener('hashchange', syncSection);
+    window.addEventListener('popstate', syncSection);
+    return () => {
+      window.removeEventListener('hashchange', syncSection);
+      window.removeEventListener('popstate', syncSection);
+    };
+  }, []);
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -89,6 +101,7 @@ export function Navbar({
       openCostEstimator();
       return;
     }
+    setActiveSection(href);
     const targetElement = document.querySelector(href);
     if (targetElement) {
       targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -97,31 +110,6 @@ export function Navbar({
 
   return (
     <>
-      {/* Top Credentials Micro-Bar */}
-      <div className="bg-[#f8fafc] text-slate-600 text-[11px] font-medium border-b border-slate-200/80 py-1.5 px-4 hidden md:block">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4 divide-x divide-slate-200 rtl:divide-x-reverse">
-            <div className="flex items-center gap-1.5 text-[#009ee2] font-semibold">
-              <HardHat className="w-3.5 h-3.5" />
-              <span>{t.credentials.classA}</span>
-            </div>
-            <div className="ps-4 flex items-center gap-1.5 text-emerald-600 font-semibold">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>{t.credentials.sbc}</span>
-            </div>
-            <div className="ps-4 text-amber-600 font-semibold">
-              <span>{t.credentials.warranty}</span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 text-slate-500">
-            <span>{COMPANY_CREDENTIALS.sceAccreditation[language]}</span>
-            <span className="text-slate-300">•</span>
-            <span>{t.credentials.cr}</span>
-          </div>
-        </div>
-      </div>
-
       {/* Main Glassmorphic Sticky Header */}
       <header
         className={`sticky top-0 z-50 transition-all duration-300 ${
@@ -138,6 +126,7 @@ export function Navbar({
               className="flex items-center gap-3 group focus:outline-none"
               onClick={(e) => {
                 handleSemanticClick(e, () => {
+                  setActiveSection('#home');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
               }}
@@ -148,15 +137,16 @@ export function Navbar({
 
           {/* Desktop Nav Links */}
           <nav className="hidden lg:flex items-center gap-2 text-xs font-semibold text-slate-700">
-            {navLinks.map((link, idx) => {
-              const isHome = idx === 0;
+            {navLinks.map((link) => {
+              const isActive = activeSection === link.href;
               return (
                 <a
                   key={link.href}
                   href={link.href}
+                  aria-current={activeSection === link.href ? 'location' : undefined}
                   onClick={(e) => handleLinkClick(e, link.href, link.isCalc)}
                   className={`px-3 py-1.5 rounded-lg transition-all ${
-                    isHome
+                    isActive
                       ? 'bg-[#e8f4fc] text-[#009ee2] font-bold border border-[#d0e9fa]/80 shadow-2xs'
                       : link.isCalc
                       ? 'text-amber-600 hover:text-amber-700 hover:bg-amber-50 font-bold inline-flex items-center gap-1'
@@ -289,9 +279,10 @@ export function Navbar({
                 <a
                   key={link.href}
                   href={link.href}
+                  aria-current={activeSection === link.href ? 'location' : undefined}
                   onClick={(e) => handleLinkClick(e, link.href, link.isCalc)}
                   className={`px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 ${
-                    link.isCalc ? 'text-amber-600 font-bold' : ''
+                    activeSection === link.href ? 'bg-blue-50 !text-blue-700 font-bold' : link.isCalc ? 'text-amber-600 font-bold' : ''
                   }`}
                 >
                   {link.label}

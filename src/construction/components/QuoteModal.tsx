@@ -39,10 +39,10 @@ export function QuoteModal() {
   const [clientName, setClientName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
-  const [city, setCity] = useState(isAr ? 'الرياض' : 'Riyadh');
+  const [city, setCity] = useState('');
   const [district, setDistrict] = useState('');
-  const [projectType, setProjectType] = useState<ConstructionProjectType>('villa');
-  const [builtUpArea, setBuiltUpArea] = useState<string>('1200');
+  const [projectType, setProjectType] = useState<ConstructionProjectType | ''>('');
+  const [builtUpArea, setBuiltUpArea] = useState('');
   const [budgetRangeSAR, setBudgetRangeSAR] = useState('');
   const [timeline, setTimeline] = useState('');
   const [notes, setNotes] = useState('');
@@ -100,7 +100,7 @@ export function QuoteModal() {
           city,
           district,
           projectType,
-          builtUpArea: Number(builtUpArea) || 1200,
+          builtUpArea: builtUpArea ? Number(builtUpArea) : undefined,
           budgetRangeSAR,
           timeline,
           uploadedFileName,
@@ -297,7 +297,7 @@ export function QuoteModal() {
                       type="text"
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      placeholder={isAr ? 'المدينة (الرياض)' : 'City (Riyadh)'}
+                      placeholder={isAr ? 'المدينة' : 'City'}
                       className="w-full px-3.5 py-2.5 bg-white border border-slate-300 hover:border-slate-400 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-500 focus:border-[#0072b8] focus:ring-2 focus:ring-[#0072b8]/20 focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
                     />
                     <input
@@ -323,6 +323,7 @@ export function QuoteModal() {
                     onChange={(e) => setProjectType(e.target.value as ConstructionProjectType)}
                     className="w-full px-3.5 py-2.5 bg-white border border-slate-300 hover:border-slate-400 rounded-xl text-xs sm:text-sm font-medium text-slate-900 focus:border-[#0072b8] focus:ring-2 focus:ring-[#0072b8]/20 focus:outline-none disabled:bg-slate-100 disabled:text-slate-500 cursor-pointer"
                   >
+                    <option value="">{isAr ? 'اختر نوع المشروع' : 'Select project type'}</option>
                     <option value="villa">{t.calculator.types.villa}</option>
                     <option value="commercial-building">{t.calculator.types.commercial}</option>
                     <option value="duplex">{t.calculator.types.duplex}</option>
@@ -340,7 +341,6 @@ export function QuoteModal() {
                     type="number"
                     value={builtUpArea}
                     onChange={(e) => setBuiltUpArea(e.target.value)}
-                    placeholder="1200"
                     className="w-full px-3.5 py-2.5 bg-white border border-slate-300 hover:border-slate-400 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-500 focus:border-[#0072b8] focus:ring-2 focus:ring-[#0072b8]/20 focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
                   />
                 </div>

@@ -13,7 +13,6 @@ import { QuoteModal } from '../construction/components/QuoteModal';
 import { ProjectDetailModal } from '../construction/components/ProjectDetailModal';
 import { FloatingWidgets } from '../construction/components/FloatingWidgets';
 import { getPageTitle, updateDocumentTitle } from '../lib/pageTitles';
-import { SectorNav } from '../components/layout/SectorNav';
 
 interface ConstructionPageProps {
   language: Language;
@@ -97,13 +96,6 @@ function ConstructionPageInner({
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-ui-sans selection:bg-[#009ee2] selection:text-white">
-      {/* 0. Global Sector Utility Navigation Bar */}
-      <SectorNav
-        currentPage="construction"
-        language={language}
-        onNavigate={onNavigate}
-      />
-
       {/* Sticky Top Header */}
       <Navbar
         onNavigate={onNavigate}

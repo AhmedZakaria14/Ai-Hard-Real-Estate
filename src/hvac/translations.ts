@@ -655,8 +655,8 @@ export const T = {
       ar: 'تابع مجموعة هارد',
     },
     rights: {
-      en: 'HARD HVAC Maintenance © 2026. All rights reserved.',
-      ar: 'هارد لصيانة التكييف © ٢٠٢٦. جميع الحقوق محفوظة.',
+      en: 'Copyright. HARD HVAC Maintenance@2026',
+      ar: 'جميع الحقوق محفوظة. هارد لصيانة التكييف@2026',
     },
     slogan: {
       en: 'Engineered for the Kingdom’s Climate.',

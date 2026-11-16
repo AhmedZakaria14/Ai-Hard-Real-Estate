@@ -10,7 +10,6 @@ import {
   ArrowRight,
   ArrowLeft,
   Building,
-  Sparkles,
   Maximize2,
   Wrench,
   Clock,
@@ -25,9 +24,11 @@ export function Hero() {
   const isAr = language === 'ar';
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
 
-  const badgeText = isAr ? heroContent.badgeAr : heroContent.badgeEn;
+  const badgeText = isAr ? 'هارد للمقاولات العامة والإنشائية' : 'HARD General & Construction Contracting';
   const headlineText = isAr ? heroContent.headlineAr : heroContent.headlineEn;
-  const subtitleText = isAr ? heroContent.subtitleAr : heroContent.subtitleEn;
+  const subtitleText = isAr
+    ? heroContent.subtitleAr.replace('في المملكة العربية السعودية', 'في المنطقة الشرقية')
+    : heroContent.subtitleEn.replace(/across (?:the Kingdom of )?Saudi Arabia/i, 'across the Eastern Province');
   const ctaPrimaryText = isAr ? heroContent.ctaPrimaryAr : heroContent.ctaPrimaryEn;
   const ctaSecondaryText = isAr ? heroContent.ctaSecondaryAr : heroContent.ctaSecondaryEn;
 
@@ -53,12 +54,11 @@ export function Hero() {
           <div className="lg:col-span-7 space-y-6 text-start">
             {/* Pill Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#e8f4fc] border border-[#cbe4f7] text-[#009ee2] text-xs font-bold shadow-2xs">
-              <Sparkles className="w-3.5 h-3.5 text-[#009ee2]" />
               <span>{badgeText}</span>
             </div>
 
             {/* Main Display Headline */}
-            <h1 className="text-3xl sm:text-5xl lg:text-[52px] font-black font-display-serif text-[#0f243e] tracking-tight leading-[1.2]">
+            <h1 className="text-3xl sm:text-5xl lg:text-[52px] font-black font-display-serif text-[#0f243e] tracking-tight leading-[1.32]">
               {headlineText}
             </h1>
 

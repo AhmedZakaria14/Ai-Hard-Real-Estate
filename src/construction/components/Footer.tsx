@@ -258,7 +258,7 @@ export function Footer({ onNavigate, onOpenCMS }: FooterProps) {
       <div className="border-t border-slate-900 py-6 bg-[#071320]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400">
           <div>
-            © {new Date().getFullYear()} {isAr ? 'شركة هارد للمقاولات العامة والإنشاءات. جميع الحقوق محفوظة.' : 'HARD Contracting Co. All rights reserved.'}
+            {isAr ? 'جميع الحقوق محفوظة. هارد للمقاولات@2026' : 'Copyright. HARD Contracting@2026'}
           </div>
           <div className="flex flex-wrap items-center gap-3 sm:gap-4 font-medium">
             <span className="text-slate-500 uppercase tracking-wider text-[10px]">
