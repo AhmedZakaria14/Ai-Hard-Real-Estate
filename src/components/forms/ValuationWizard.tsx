@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import {
   Building2,
-  Home,
-  Sparkles,
-  Crown,
   KeyRound,
   MapPin,
   Bed,
@@ -32,6 +29,8 @@ import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSub
 import { FileUploadZone } from './FileUploadZone';
 import { SAUDI_CITIES } from '../../data/cities';
 import { CitySearchDropdown } from '../ui/CitySearchDropdown';
+import { usePropertyTypes } from '../../lib/usePropertyTypes';
+import { propertyTypeIcons } from '../../lib/propertyTaxonomy';
 
 interface ValuationWizardProps {
   language: Language;
@@ -50,7 +49,10 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
   const totalSteps = 4;
 
   // Step 1: Property Location & Architecture
-  const [propertyType, setPropertyType] = useState<PropertyType>('villa');
+  const activePropertyTypes = usePropertyTypes().filter(({ active }) => active);
+  const [selectedPropertyType, setPropertyType] = useState<PropertyType>('villa');
+  const propertyType = activePropertyTypes.find(({ id }) => id === selectedPropertyType)?.id
+    ?? activePropertyTypes[0].id;
   const [cityArea, setCityArea] = useState('Al Khobar Corniche');
   const [customAddress, setCustomAddress] = useState('');
   const [bedrooms, setBedrooms] = useState('4');
@@ -235,7 +237,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
       <div className="space-y-4 border-b border-slate-100 pb-6">
         <div className="flex items-center justify-between">
           <Badge variant="primary">
-            {isAr ? 'حاسبة التقييم والتسويق المعتمدة' : 'Instant CMA Valuation Engine'}
+            {isAr ? 'حاسبة التقييم العقاري التقريبي' : 'Indicative Property Valuation'}
           </Badge>
           <span className="text-xs font-semibold text-slate-500">
             {isAr ? `الخطوة ${currentStep} من ${totalSteps}` : `Step ${currentStep} of ${totalSteps}`}
@@ -248,7 +250,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 mt-1">
             {isAr
-              ? 'أدخل مواصفات عقارك لحساب القيمة السوقية التقديرية بناءً على الصفقات المعتمدة وطلب خطة التسويق.'
+              ? 'أدخل مواصفات عقارك للحصول على تقدير أولي وإرسال طلب متابعة.'
               : 'Provide your property specifications for an instant algorithmic benchmark and a tailored brokerage listing proposal.'}
           </p>
         </div>
@@ -326,8 +328,8 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                 <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span>
                   {isAr
-                    ? 'تقدير أولي مستند لبيانات الصفقات العقارية المعتمدة بالمنطقة الشرقية لعام 2026.'
-                    : 'Algorithmic benchmark derived from 2026 Eastern Province registered transactional comps.'}
+                    ? 'تقدير إرشادي يحسبه الموقع باستخدام معاملات ثابتة.'
+                    : 'This indicative estimate uses fixed assumptions.'}
                 </span>
               </div>
             </div>
@@ -366,28 +368,21 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                   </h3>
                   <p className="text-xs text-slate-500">
                     {isAr
-                      ? 'حدد موقع العقار ونوعه لتقدير السعر العادل للمتر المربع.'
+                      ? 'حدد موقع العقار ونوعه لحساب التقدير الأولي.'
                       : 'Specify the physical classification and prime community location.'}
                   </p>
                 </div>
 
                 {/* Property Type Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
-                  {[
-                    { id: 'villa', label: isAr ? 'فيلا' : 'Villa', icon: Home },
-                    { id: 'apartment', label: isAr ? 'شقة' : 'Apartment', icon: Building2 },
-                    { id: 'penthouse', label: isAr ? 'بنتهاوس' : 'Penthouse', icon: Sparkles },
-                    { id: 'mansion', label: isAr ? 'قصر' : 'Mansion', icon: Crown },
-                    { id: 'townhouse', label: isAr ? 'تاون هاوس' : 'Townhouse', icon: Building2 },
-                    { id: 'commercial', label: isAr ? 'تجاري' : 'Commercial', icon: Building2 },
-                  ].map((item) => {
-                    const Icon = item.icon;
+                  {activePropertyTypes.map((item) => {
+                    const Icon = propertyTypeIcons.get(item.id) ?? Building2;
                     const isSelected = propertyType === item.id;
                     return (
                       <button
                         key={item.id}
                         type="button"
-                        onClick={() => setPropertyType(item.id as PropertyType)}
+                        onClick={() => setPropertyType(item.id)}
                         className={`p-3 rounded-2xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5 ${
                           isSelected
                             ? 'border-blue-600 bg-blue-50/60 text-blue-800 ring-2 ring-blue-500/20 font-bold shadow-xs'
@@ -395,7 +390,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                         }`}
                       >
                         <Icon className={`w-5 h-5 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
-                        <span className="text-xs">{item.label}</span>
+                        <span className="text-xs">{isAr ? item.nameAr : item.nameEn}</span>
                       </button>
                     );
                   })}
@@ -953,7 +948,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                   ) : (
                     <>
                       <FileText className="w-4 h-4" />
-                      <span>{isAr ? 'إصدار تقرير التقييم المعتمد' : 'Generate Full CMA Dossier'}</span>
+                      <span>{isAr ? 'إرسال طلب التقييم' : 'Submit Valuation Request'}</span>
                     </>
                   )}
                 </Button>

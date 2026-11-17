@@ -202,7 +202,7 @@ export function RequestBrochureModal({
           <div className="pt-2">
             <Button type="submit" isLoading={isLoading} className="w-full">
               <Send className="w-4 h-4" />
-              <span>{language === 'en' ? 'Send Brochure to Email' : 'إرسال الكتيب باستخدام البريد الإلكتروني'}</span>
+              <span>{language === 'en' ? 'Submit Brochure Request' : 'تسجيل طلب الكتيب'}</span>
             </Button>
           </div>
         </form>
