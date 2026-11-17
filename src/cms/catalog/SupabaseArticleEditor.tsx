@@ -23,6 +23,7 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
     : projects ? 'المشاريع العقارية المنشورة' : properties ? 'العقارات المنشورة' : 'المقالات المنشورة';
   const [showArchived, setShowArchived] = useState(false);
   const [entries, setEntries] = useState<Entry[]>([]);
+  const [creating, setCreating] = useState(false);
   const [selected, setSelected] = useState<Entry | null>(null);
   const [notice, setNotice] = useState('');
   const [saving, setSaving] = useState(false);
@@ -76,6 +77,10 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
     const fields = new FormData(event.currentTarget);
     const field = (name: string) => String(fields.get(name) ?? '').trim();
     const imageFile = fields.get('image');
+    if (creating && (!(imageFile instanceof File) || imageFile.size === 0)) {
+      setNotice('اختر صورة للخدمة الجديدة.');
+      return;
+    }
     const content = { ...selected.content };
     const title = { ar: field('titleAr'), en: field('titleEn') };
     if ('titleAr' in content) {
@@ -106,11 +111,13 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
     setNotice('');
     setSaving(true);
     try {
+      if (!creating) {
       const { data: current, error: readError } = await client.from(catalogTable(collection))
         .select('updated_at').eq('collection', collection).eq('id', selected.id).single();
       if (readError || current.updated_at !== selected.updated_at) {
         setNotice('تغيّر السجل منذ فتحه. أعد تحميل الصفحة قبل الحفظ.');
         return;
+      }
       }
       if (imageFile instanceof File && imageFile.size > 0) {
         const extension = imageTypes[imageFile.type];
@@ -130,8 +137,10 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
         if ('images' in content) content.images = [url, ...content.images.slice(1)];
         else content.image = url;
       }
-      const { data, error } = await client.from(catalogTable(collection))
-        .update({ content, updated_at: new Date().toISOString() })
+      const table = client.from(catalogTable(collection));
+      const { data, error } = creating
+        ? await table.insert({ collection, id: selected.id, content }).select('id,content,updated_at').single()
+        : await table.update({ content, updated_at: new Date().toISOString() })
         .eq('collection', collection).eq('id', selected.id)
         .eq('updated_at', selected.updated_at)
         .select('id,content,updated_at').maybeSingle();
@@ -140,7 +149,8 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
         setNotice('تغيّر السجل أثناء الحفظ. أعد تحميل الصفحة قبل المحاولة مرة أخرى.');
         return;
       }
-      setEntries((items) => items.map((item) => item.id === data.id ? data : item));
+      setEntries((items) => creating ? [...items, data] : items.map((item) => item.id === data.id ? data : item));
+      setCreating(false);
       setSelected(null);
       setNotice('حُفظ السجل ونُشر التعديل.');
     } catch {
@@ -154,11 +164,18 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
   return <section className="space-y-4" aria-label={heading}>
     <h2 className="text-xl font-bold">{heading}</h2>
     <label className="block text-sm"><input type="checkbox" checked={showArchived} disabled={saving}
-      onChange={(event) => { setShowArchived(event.target.checked); setSelected(null); setNotice(''); }} /> عرض السجلات المؤرشفة</label>
+      onChange={(event) => { setShowArchived(event.target.checked); setCreating(false); setSelected(null); setNotice(''); }} /> عرض السجلات المؤرشفة</label>
+    {hvac && !showArchived && <button type="button" disabled={saving} className="rounded bg-blue-700 px-3 py-2 text-white" onClick={() => {
+      const id = 'svc-' + crypto.randomUUID();
+      const sortOrder = Math.max(0, ...entries.map(({ content }) => 'sortOrder' in content ? Number(content.sortOrder) || 0 : 0)) + 1;
+      setSelected({ id, updated_at: '', content: { id, slug: id, titleAr: '', titleEn: '', descriptionAr: '', descriptionEn: '', image: '', active: true, sortOrder } });
+      setCreating(true);
+      setNotice('');
+    }}>إضافة خدمة تكييف</button>}
     {notice && <p role="status">{notice}</p>}
     <ul className="space-y-2">{entries.map((article) => <li key={article.id} className="flex flex-wrap items-center gap-2">
       <button type="button" disabled={saving || showArchived} className="rounded border px-3 py-1"
-        onClick={() => { setSelected(article); setNotice(''); }}>{'titleAr' in article.content ? article.content.titleAr : article.content.title.ar}</button>
+        onClick={() => { setCreating(false); setSelected(article); setNotice(''); }}>{'titleAr' in article.content ? article.content.titleAr : article.content.title.ar}</button>
       <button type="button" disabled={saving} className="rounded border px-3 py-1 text-sm"
         onClick={() => void toggleArchive(article)}>{showArchived ? 'استعادة ونشر' : 'أرشفة'}</button>
     </li>)}</ul>
@@ -184,7 +201,7 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
         <label>نسبة الإنجاز<input name="progress" type="number" min="0" max="100" required className={inputClass} defaultValue={selected.content.progressPercentage ?? 0} /></label>
       </>}
       {('images' in selected.content ? selected.content.images[0] : selected.content.image) && <img src={'images' in selected.content ? selected.content.images[0] : selected.content.image} alt="الصورة الحالية" className="max-h-40 w-fit rounded" />}
-      <label>استبدال الصورة المنشورة<input className={inputClass} type="file" name="image" accept={Object.keys(imageTypes).join(',')} /></label>
+      <label>{creating ? 'صورة الخدمة' : 'استبدال الصورة المنشورة'}<input className={inputClass} type="file" name="image" accept={Object.keys(imageTypes).join(',')} /></label>
       <button type="submit" disabled={saving} className="w-fit rounded bg-slate-900 px-4 py-2 text-white">{saving ? 'جارٍ الحفظ…' : 'حفظ ونشر'}</button>
     </form>}
   </section>;

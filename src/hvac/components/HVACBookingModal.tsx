@@ -36,7 +36,9 @@ export function HVACBookingModal() {
   const [slot, setSlot] = useState<'morning' | 'afternoon' | 'evening' | 'emergency'>('morning');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [city, setCity] = useState('khobar');
+  const [selectedCity, setCity] = useState('');
+  const activeCities = serviceAreas.filter((area) => area.active);
+  const city = activeCities.some((area) => area.id === selectedCity) ? selectedCity : activeCities[0]?.id ?? '';
   const [customCity, setCustomCity] = useState('');
   const [notes, setNotes] = useState('');
   const [attachments, setAttachments] = useState<FormAttachmentMeta[]>([]);
@@ -142,7 +144,7 @@ export function HVACBookingModal() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBookingError('');
-    if (!name.trim() || !phone.trim() || !date || !service) return;
+    if (!name.trim() || !phone.trim() || !date || !service || !city) return;
 
     setIsSubmitting(true);
     try {
@@ -373,7 +375,7 @@ City: ${cityName}`;
                     onChange={(e) => setCity(e.target.value)}
                     className="w-full ps-9 pe-8 py-2.5 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed cursor-pointer"
                   >
-                    {serviceAreas.filter((c) => c.active).map((c) => (
+                    {activeCities.map((c) => (
                       <option key={c.id} value={c.id}>
                         {isAr ? c.cityNameAr : c.cityNameEn} ({c.responseTimeMin} {isAr ? 'دقيقة' : 'min'})
                       </option>
