@@ -1,4 +1,3 @@
-import { SectorNav } from './components/layout/SectorNav';
 import { SectorQuickActions } from './components/layout/SectorQuickActions';
 import { SECTOR_CONTACT_DETAILS } from './lib/sectors';
 import { ClientStoriesSection } from './components/home/ClientStoriesSection';
@@ -499,7 +498,6 @@ function AppContent() {
   // 3. HARD Real Estate Sub-Website (/realestate)
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-ui-sans">
-      <SectorNav currentSector="realestate" language={language} onNavigate={handleNavigate} />
       {/* Global Navigation Header */}
       <Navbar
         currentPage={currentPage}

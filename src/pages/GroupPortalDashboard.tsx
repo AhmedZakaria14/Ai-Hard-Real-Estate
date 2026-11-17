@@ -14,7 +14,6 @@ import { Language, PageId } from '../types';
 import { ConstructionShowcaseModal } from '../components/portal/ConstructionShowcaseModal';
 import { HVACShowcaseModal } from '../components/portal/HVACShowcaseModal';
 import { handleSemanticClick } from '../lib/navigation';
-import { SectorNav } from '../components/layout/SectorNav';
 
 interface GroupPortalDashboardProps {
   language: Language;
@@ -69,18 +68,6 @@ export function GroupPortalDashboard({
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-ui-sans selection:bg-blue-600 selection:text-white">
-      {/* 0. Global Sector Utility Navigation Bar */}
-      <SectorNav
-        currentPage="portal"
-        language={language}
-        onNavigate={(pageId) => {
-          if (pageId === 'portal') return;
-          if (pageId === 'construction') handleConstructionClick();
-          else if (pageId === 'hvac') handleHVACClick();
-          else onNavigateToRealEstate(pageId);
-        }}
-      />
-
       {/* Top Corporate Nav Bar matching Real Estate palette */}
       <header className="sticky top-0 z-40 bg-white border-b border-slate-100 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
