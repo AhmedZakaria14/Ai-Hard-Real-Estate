@@ -183,9 +183,9 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
   }
 
   const selectedPropertyType = selected && 'price' in selected.content ? selected.content.type : '';
-  const inputClass = 'block w-full rounded border p-2';
+  const inputClass = 'block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 outline-none';
   return <section className="space-y-4" aria-label={heading}>
-    <h2 className="text-xl font-bold">{heading}</h2>
+    <h2 className="text-lg font-extrabold tracking-tight text-slate-900">{heading}</h2>
     <label className="block text-sm"><input type="checkbox" checked={showArchived} disabled={saving}
       onChange={(event) => { setShowArchived(event.target.checked); setCreating(false); setSelected(null); setNotice(''); }} /> عرض السجلات المؤرشفة</label>
     {(hvac || construction) && !showArchived && <button type="button" disabled={saving} className="rounded bg-blue-700 px-3 py-2 text-white" onClick={() => {
@@ -202,9 +202,9 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
     }}>{construction ? 'إضافة مشروع مقاولات' : 'إضافة خدمة تكييف'}</button>}
     {notice && <p role="status">{notice}</p>}
     <ul className="space-y-2">{entries.map((article) => <li key={article.id} className="flex flex-wrap items-center gap-2">
-      <button type="button" disabled={saving || showArchived} className="rounded border px-3 py-1"
+      <button type="button" disabled={saving || showArchived} className="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:border-blue-300 hover:text-blue-700 transition-colors disabled:opacity-40"
         onClick={() => { setCreating(false); setSelected(article); setNotice(''); }}>{'titleAr' in article.content ? article.content.titleAr : article.content.title.ar}</button>
-      <button type="button" disabled={saving} className="rounded border px-3 py-1 text-sm"
+      <button type="button" disabled={saving} className="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:border-blue-300 hover:text-blue-700 transition-colors disabled:opacity-40 text-sm"
         onClick={() => void toggleArchive(article)}>{showArchived ? 'استعادة ونشر' : 'أرشفة'}</button>
     </li>)}</ul>
     {selected && <form key={selected.id} onSubmit={save} className="grid gap-3 rounded border p-4">
@@ -246,7 +246,7 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
       </>}
       {('images' in selected.content ? selected.content.images[0] : selected.content.image) && <img src={'images' in selected.content ? selected.content.images[0] : selected.content.image} alt="الصورة الحالية" className="max-h-40 w-fit rounded" />}
       <label>{creating ? 'الصورة الرئيسية' : 'استبدال الصورة المنشورة'}<input className={inputClass} type="file" name="image" accept={Object.keys(imageTypes).join(',')} /></label>
-      <button type="submit" disabled={saving} className="w-fit rounded bg-slate-900 px-4 py-2 text-white">{saving ? 'جارٍ الحفظ…' : 'حفظ ونشر'}</button>
+      <button type="submit" disabled={saving} className="w-fit rounded-xl bg-blue-600 hover:bg-blue-700 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-colors disabled:opacity-40">{saving ? 'جارٍ الحفظ…' : 'حفظ ونشر'}</button>
     </form>}
   </section>;
 }

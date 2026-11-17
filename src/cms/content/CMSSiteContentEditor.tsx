@@ -17,9 +17,9 @@ export function CMSSiteContentEditor({ language }: { language: Language }) {
     { id: 'seo', ar: 'السيو والنصوص القانونية', en: 'SEO and legal' },
   ];
   return <div dir={ar ? 'rtl' : 'ltr'} className="space-y-6">
-    <nav className="flex flex-wrap gap-2" aria-label={ar ? 'أقسام إدارة المحتوى' : 'Content management'}>
+    <nav className="flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-xs" aria-label={ar ? 'أقسام إدارة المحتوى' : 'Content management'}>
       {tabs.map((tab) => <button key={tab.id} type="button" aria-pressed={active === tab.id} onClick={() => setActive(tab.id)}
-        className="rounded border px-3 py-2 aria-pressed:bg-blue-800 aria-pressed:text-white">{tab[language]}</button>)}
+        className="rounded-xl px-4 py-2.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-50 aria-pressed:bg-blue-600 aria-pressed:text-white aria-pressed:shadow-sm">{tab[language]}</button>)}
     </nav>
     {active === 'sectors' && <SupabaseSectorSections />}
     {active === 'text' && <CMSSiteText language={language} />}

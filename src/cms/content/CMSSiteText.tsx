@@ -58,11 +58,11 @@ export function CMSSiteText({ language }: { language: Language }) {
     }
   }
 
-  return <section className="space-y-4 rounded-xl border bg-white p-5">
+  return <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs sm:p-8">
     <h2 className="text-lg font-bold">{ar ? 'نصوص الواجهة والقطاعات' : 'Interface and sector copy'}</h2>
     {message && <p role="status">{message}</p>}
     <label className="block">{ar ? 'القطاع' : 'Sector'}
-      <select className="block w-full rounded border p-2" value={sector} onChange={(event) => setSector(event.target.value)}>
+      <select className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 outline-none" value={sector} onChange={(event) => setSector(event.target.value)}>
         <option value="all">{ar ? 'جميع القطاعات' : 'All sectors'}</option>
         <option value="realestate">{ar ? 'العقارات' : 'Real estate'}</option>
         <option value="construction">{ar ? 'المقاولات' : 'Construction'}</option>
@@ -70,10 +70,10 @@ export function CMSSiteText({ language }: { language: Language }) {
       </select>
     </label>
     <label className="block">{ar ? 'ابحث بالعربية أو الإنجليزية' : 'Search in Arabic or English'}
-      <input className="block w-full rounded border p-2" value={search} onChange={(event) => setSearch(event.target.value)} />
+      <input className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 outline-none" value={search} onChange={(event) => setSearch(event.target.value)} />
     </label>
     <label className="block">{ar ? 'النص المطلوب' : 'Text to edit'}
-      <select className="block w-full rounded border p-2" value={path} disabled={!text || busy} onChange={(event) => setPath(event.target.value)}>
+      <select className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 outline-none" value={path} disabled={!text || busy} onChange={(event) => setPath(event.target.value)}>
         <option value="">{ar ? 'اختر نصًا' : 'Select a text'}</option>
         {results.map((key) => <option key={key} value={key}>{key} · {(text?.[language]?.[key] ?? siteTextDefaults[language][key] ?? '').slice(0, 90)}</option>)}
       </select>
@@ -81,10 +81,10 @@ export function CMSSiteText({ language }: { language: Language }) {
     {text && path && <form key={path} onSubmit={save} className="grid gap-3">
       {(['ar', 'en'] as const).filter((lang) => Object.hasOwn(siteTextDefaults[lang], path)).map((lang) =>
         <label key={lang}>{lang === 'ar' ? 'العربية' : 'English'}
-          <textarea dir={lang === 'ar' ? 'rtl' : 'ltr'} name={lang} maxLength={6000} className="block w-full rounded border p-2" defaultValue={text[lang]?.[path] ?? siteTextDefaults[lang][path]} />
+          <textarea dir={lang === 'ar' ? 'rtl' : 'ltr'} name={lang} maxLength={6000} className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 outline-none" defaultValue={text[lang]?.[path] ?? siteTextDefaults[lang][path]} />
         </label>
       )}
-      <button disabled={busy} className="w-fit rounded bg-blue-800 px-4 py-2 text-white">{ar ? 'حفظ ونشر النص' : 'Publish copy'}</button>
+      <button disabled={busy} className="w-fit rounded-xl bg-blue-600 hover:bg-blue-700 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-colors disabled:opacity-40">{ar ? 'حفظ ونشر النص' : 'Publish copy'}</button>
     </form>}
   </section>;
 }

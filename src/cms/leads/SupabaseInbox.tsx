@@ -1,3 +1,4 @@
+import { Inbox, CalendarDays, RefreshCw, Archive, ArchiveRestore, Paperclip } from 'lucide-react';
 import { downloadCsv } from '../../lib/csv';
 import SupabaseDataExport from '../catalog/SupabaseDataExport';
 import SupabaseOperations from './SupabaseOperations';
@@ -189,6 +190,14 @@ export default function OperationsWorkspace({ initialSection, adminEmail, langua
   }
 
   return <section dir="rtl" className="space-y-5 text-slate-900">
+    <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex items-center gap-3">
+        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+          {isAppointments ? <CalendarDays className="h-5 w-5" /> : <Inbox className="h-5 w-5" />}
+        </span>
+        <h2 className="text-lg font-extrabold text-slate-900">{sections[view]}</h2>
+      </div>
+    </div>
     {error && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-red-700">{error}</p>}
     <nav aria-label="أقسام العمليات" className="flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-xs">
       {(Object.keys(sections) as OperationsSection[]).map((section) => (
@@ -209,7 +218,7 @@ export default function OperationsWorkspace({ initialSection, adminEmail, langua
     </nav>
     {(isIntake || view === 'reports' || view === 'notifications') && (
       <button type="button" onClick={() => setRefresh((value) => value + 1)} disabled={busy}
-        className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold">تحديث</button>
+        className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold"><RefreshCw className="me-2 inline h-4 w-4" />تحديث</button>
     )}
       {view === 'backup' ? <SupabaseDataExport /> : view === 'reports' || view === 'notifications' ? <SupabaseOperations key={view} section={view} refresh={refresh} /> : view === 'calculators' ? <CMSCalculatorConfig language={language} adminEmail={adminEmail} /> : view === 'sector_sections' ? <SupabaseSectorSections /> : view === 'media' ? <CMSMediaLibrary language={language} /> : view !== 'requests' && view !== 'appointments' && view !== 'archive' ? <SupabaseArticleEditor key={view} client={client} collection={view === 'articles' ? 'blog_posts' : view} /> : <>
       {isAppointments && <details className="rounded-lg border p-4 text-sm">
@@ -221,34 +230,34 @@ export default function OperationsWorkspace({ initialSection, adminEmail, langua
           <li>أرشف الطلب التجريبي بعد المراجعة.</li>
         </ol>
       </details>}
-      <button type="button" disabled={busy || exporting} onClick={() => void exportRequests()} className="rounded border px-3 py-1">
+      <button type="button" disabled={busy || exporting} onClick={() => void exportRequests()} className="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:border-blue-300 hover:text-blue-700 transition-colors disabled:opacity-40">
         {exporting ? 'جارٍ إعداد ملف الطلبات…' : 'تصدير الطلبات CSV'}
       </button>
-      {busy ? <p role="status">جارٍ تحميل الطلبات…</p> : !error && rows.length === 0 && <p>لا توجد طلبات في هذه الصفحة.</p>}
+      {busy ? <p role="status">جارٍ تحميل الطلبات…</p> : !error && rows.length === 0 && <p className="rounded-2xl border border-dashed border-slate-200 bg-white py-12 text-center text-sm text-slate-500">لا توجد طلبات في هذه الصفحة.</p>}
       {rows.map((row) => <article key={row.id} className="space-y-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
-        <h2 className="font-bold">{String(row.payload.name || row.tracking_code)}</h2>
+        <h2 className="text-base font-extrabold text-slate-900">{String(row.payload.name || row.tracking_code)}</h2>
         <p><bdi>{row.tracking_code} · {row.sector} · {row.form_type}</bdi></p>
         <p><bdi>{new Date(row.received_at).toLocaleString('ar-SA')} · {String(row.payload.email || '')} · {String(row.payload.phone || '')}</bdi></p>
-        {typeof row.payload.message === 'string' && <p className="whitespace-pre-wrap">{row.payload.message}</p>}
+        {typeof row.payload.message === 'string' && <p className="whitespace-pre-wrap rounded-xl bg-slate-50 p-4 text-sm leading-relaxed text-slate-600">{row.payload.message}</p>}
         {attachmentsFor(row.payload).map((attachment) => (
-          <button key={attachment.id} type="button" className="block text-blue-700 underline"
-            onClick={() => void downloadAttachment(attachment)}>تنزيل {attachment.fileName}</button>
+          <button key={attachment.id} type="button" className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100 disabled:opacity-40"
+            onClick={() => void downloadAttachment(attachment)}><Paperclip className="h-3.5 w-3.5" />تنزيل {attachment.fileName}</button>
         ))}
         <label className="block">الحالة{' '}
-          <select value={row.status} disabled={busy} onChange={(event) => void updateStatus(row.id, event.target.value as Submission['status'])} className="rounded border p-1">
+          <select value={row.status} disabled={busy} onChange={(event) => void updateStatus(row.id, event.target.value as Submission['status'])} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 outline-none">
             {Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
           </select>
         </label>
-        <button type="button" disabled={busy} className="block text-blue-700 underline"
-          onClick={() => void archiveRequest(row.id, !isArchive)}>{isArchive ? 'استعادة إلى الطلبات' : 'نقل إلى الأرشيف'}</button>
+        <button type="button" disabled={busy} className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100 disabled:opacity-40"
+          onClick={() => void archiveRequest(row.id, !isArchive)}>{isArchive ? <ArchiveRestore className="h-3.5 w-3.5" /> : <Archive className="h-3.5 w-3.5" />}{isArchive ? 'استعادة إلى الطلبات' : 'نقل إلى الأرشيف'}</button>
         {row.status_history.length > 0 && <details>
           <summary>سجل تغييرات الحالة</summary>
           <ul>{row.status_history.map((change, index) => <li key={index}>{new Date(change.at).toLocaleString('ar-SA')} · {statusLabels[change.from]} ← {statusLabels[change.to]}</li>)}</ul>
         </details>}
       </article>)}
       <nav aria-label="صفحات الطلبات" className="flex gap-3">
-        <button disabled={busy || page === 0} onClick={() => setPage((value) => value - 1)} className="rounded border px-3 py-1 disabled:opacity-40">السابق</button>
-        <button disabled={busy || rows.length < pageSize} onClick={() => setPage((value) => value + 1)} className="rounded border px-3 py-1 disabled:opacity-40">التالي</button>
+        <button disabled={busy || page === 0} onClick={() => setPage((value) => value - 1)} className="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:border-blue-300 hover:text-blue-700 transition-colors disabled:opacity-40 disabled:opacity-40">السابق</button>
+        <button disabled={busy || rows.length < pageSize} onClick={() => setPage((value) => value + 1)} className="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:border-blue-300 hover:text-blue-700 transition-colors disabled:opacity-40 disabled:opacity-40">التالي</button>
       </nav>
       </>}
   </section>;

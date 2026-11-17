@@ -56,7 +56,7 @@ const labels: Record<string, string> = {
   responseTimeMin: 'مدة الاستجابة بالدقائق', isPrimaryArea: 'منطقة رئيسية',
   whatsappNumber: 'رقم واتساب', active: 'مفعّل',
 };
-const inputStyle = 'block w-full rounded border px-2 py-1';
+const inputStyle = 'block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 outline-none';
 const fixedKeys = new Set(['id', 'isPublished']);
 const imageKey = /(?:image(?:url)?|avatar(?:url)?|logo(?:url)?)$/i;
 const urlKey = /url$/i;
@@ -183,8 +183,8 @@ export default function SupabaseSectorSections() {
     }
   }
 
-  return <section className="space-y-4">
-    <h2 className="text-xl font-bold">محتوى قطاعات هارد</h2>
+  return <section className="space-y-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs sm:p-7">
+    <h2 className="text-lg font-extrabold tracking-tight text-slate-900">محتوى قطاعات هارد</h2>
     <label className="block">القسم <select disabled={busy} value={active} onChange={(event) => setActive(Number(event.target.value))} className={inputStyle}>
       {sections.map((item, index) => <option value={index} key={item.title}>{item.title}</option>)}
     </select></label>
@@ -200,12 +200,12 @@ export default function SupabaseSectorSections() {
           {form.map((city, index) => (
             <div key={city && typeof city === 'object' && !Array.isArray(city) ? String(city.id ?? index) : index} className="space-y-2">
               {renderField(city, [index])}
-              {!editingTypes && <button type="button" className="rounded border px-3 py-1 text-rose-700" onClick={() =>
+              {!editingTypes && <button type="button" className="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:border-blue-300 hover:text-blue-700 transition-colors disabled:opacity-40 text-rose-700" onClick={() =>
                 setForm((current) => Array.isArray(current) ? current.filter((_, i) => i !== index) : current)
               }>حذف {itemLabel} من القائمة</button>}
             </div>
           ))}
-          <button type="button" className="w-fit rounded border px-3 py-1" onClick={() => {
+          <button type="button" className="w-fit rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:border-blue-300 hover:text-blue-700 transition-colors disabled:opacity-40" onClick={() => {
             const template = (section.fallback as Json[])[0];
             if (!template || typeof template !== 'object' || Array.isArray(template)) return;
             const item = Object.fromEntries(Object.entries(template).map(([key, value]) =>
@@ -214,7 +214,7 @@ export default function SupabaseSectorSections() {
             setForm((current) => Array.isArray(current) ? [...current, item] : current);
           }}>إضافة {itemLabel}</button>
         </> : renderField(form)}
-        <button type="submit" className="w-fit rounded bg-slate-900 px-4 py-2 text-white">حفظ ونشر</button>
+        <button type="submit" className="w-fit rounded-xl bg-blue-600 hover:bg-blue-700 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-colors disabled:opacity-40">حفظ ونشر</button>
       </fieldset>
     </form>}
   </section>;

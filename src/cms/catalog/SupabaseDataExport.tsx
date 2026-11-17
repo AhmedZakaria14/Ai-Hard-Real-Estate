@@ -1,3 +1,4 @@
+import { Download, Database } from 'lucide-react';
 import { useState } from 'react';
 import { hardAdminClient, toHardAdmin } from '../../lib/db/hardAdminClient';
 
@@ -63,12 +64,12 @@ export default function SupabaseDataExport() {
     }
   }
 
-  return <section className="space-y-4">
-    <h2 className="text-xl font-bold">تصدير البيانات</h2>
-    <p>ينزّل ملف JSON بجداول هارد، بما فيها الطلبات والكتالوج والإعدادات ومسودات المحتوى. يشمل مراجع الملفات فقط.</p>
-    <label className="block"><input type="checkbox" checked={confirmPrivate} disabled={busy} onChange={(event) => setConfirmPrivate(event.target.checked)} /> سأحفظ النسخة التي تتضمن بيانات العملاء في مكان خاص.</label>
-    <button type="button" disabled={busy || !confirmPrivate} onClick={() => void download()} className="rounded bg-slate-900 px-4 py-2 text-white disabled:opacity-40">
-      {busy ? 'جارٍ إعداد التصدير…' : 'تنزيل البيانات'}
+  return <section className="space-y-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs sm:p-7">
+    <h2 className="text-lg font-extrabold tracking-tight text-slate-900"><Database className="me-2 inline h-5 w-5 text-blue-600" />تصدير البيانات</h2>
+    <p className="max-w-3xl text-sm leading-7 text-slate-500">ينزّل ملف JSON بجداول هارد، بما فيها الطلبات والكتالوج والإعدادات ومسودات المحتوى. يشمل مراجع الملفات فقط.</p>
+    <label className="flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50/50 p-4 text-sm leading-relaxed text-slate-700"><input type="checkbox" checked={confirmPrivate} disabled={busy} onChange={(event) => setConfirmPrivate(event.target.checked)} /> سأحفظ النسخة التي تتضمن بيانات العملاء في مكان خاص.</label>
+    <button type="button" disabled={busy || !confirmPrivate} onClick={() => void download()} className="rounded-xl bg-blue-600 hover:bg-blue-700 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-colors disabled:opacity-40 disabled:opacity-40">
+      <Download className="me-2 inline h-4 w-4" />{busy ? 'جارٍ إعداد التصدير…' : 'تنزيل البيانات'}
     </button>
     {message && <p role="status">{message}</p>}
   </section>;
