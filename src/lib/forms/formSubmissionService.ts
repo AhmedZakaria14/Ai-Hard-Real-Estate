@@ -1,3 +1,4 @@
+import { hardPublishableKey, hardSupabaseUrl } from '../db/hardCatalog';
 import type { Language } from '../../types';
 import type { FormAttachmentMeta } from '../../types/firestore-schema';
 
@@ -48,55 +49,13 @@ export class FormValidationError extends Error {
   }
 }
 
-const IDEMPOTENCY_STORAGE_KEY = 'hard_submitted_form_keys_v2';
+const pendingSubmissions = new Map<string, Promise<FormSubmissionResult>>();
 
-function getLocalIdempotencyCache(): Record<string, { leadId: string; trackingCode: string; timestamp: number }> {
-  try {
-    const raw = localStorage.getItem(IDEMPOTENCY_STORAGE_KEY);
-    if (!raw) return {};
-    return JSON.parse(raw);
-  } catch {
-    return {};
-  }
-}
-
-function saveLocalIdempotencyCache(
-  key: string,
-  data: { leadId: string; trackingCode: string }
-) {
-  try {
-    const cache = getLocalIdempotencyCache();
-    cache[key] = { ...data, timestamp: Date.now() };
-    localStorage.setItem(IDEMPOTENCY_STORAGE_KEY, JSON.stringify(cache));
-  } catch (e) {
-    console.warn('Failed to save idempotency cache to localStorage', e);
-  }
-}
-
-/**
- * Generates a deterministic idempotency key string from payload values
- */
-export function generateIdempotencyKey(payload: FormSubmissionPayload): string {
-  if (payload.idempotencyKey) return payload.idempotencyKey;
-
-  const rawString = [
-    payload.formType,
-    payload.sector,
-    payload.email.trim().toLowerCase(),
-    (payload.phone || '').replace(/\D/g, ''),
-    payload.entityId || '',
-    payload.message || '',
-    payload.details?.date || payload.details?.preferredDate || '',
-    payload.details?.slot || payload.details?.preferredTime || '',
-  ].join('|');
-
-  let hash = 0;
-  for (let i = 0; i < rawString.length; i++) {
-    const char = rawString.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash |= 0;
-  }
-  return `idem_${Math.abs(hash)}_${payload.formType}`;
+function submissionKey(payload: FormSubmissionPayload): string {
+  return JSON.stringify(payload, (_key, value) => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return value;
+    return Object.fromEntries(Object.keys(value).sort().map((key) => [key, value[key]]));
+  });
 }
 
 /**
@@ -141,7 +100,10 @@ export function validateFormPayload(
     errors.phone = isAr
       ? 'رقم الهاتف يجب أن يحتوي على 7 أرقام على الأقل.'
       : 'Phone number must contain at least 7 digits.';
-  } else if (isPropertyContact && (phoneDigits.length > 20 || /[^\d()+.-]/.test(phoneTrimmed))) {
+  } else if (
+    ((isPropertyContact || (emailOptional && !emailTrimmed)) && phoneDigits.length > 20)
+    || (isPropertyContact && /[^\d()+.-]/.test(phoneTrimmed))
+  ) {
     errors.phone = isAr ? 'يرجى إدخال رقم هاتف صحيح.' : 'Please enter a valid phone number.';
   }
 
@@ -151,11 +113,19 @@ export function validateFormPayload(
 /**
  * Robust retry helper with exponential backoff for synchronous database writes
  */
+class FormIntakeError extends Error {
+  constructor(readonly status: number) {
+    super(`Form intake returned HTTP ${status}`);
+  }
+}
+
 async function retryOperation<T>(operation: () => Promise<T>, retries = 3, delayMs = 600): Promise<T> {
   try {
     return await operation();
   } catch (error) {
-    if (retries <= 0) throw error;
+    const permanent = error instanceof FormIntakeError
+      && error.status < 500 && error.status !== 408 && error.status !== 429;
+    if (retries <= 0 || permanent) throw error;
     await new Promise((resolve) => setTimeout(resolve, delayMs));
     return retryOperation(operation, retries - 1, delayMs * 2);
   }
@@ -176,23 +146,21 @@ export async function submitCustomerForm(
     );
   }
 
-  // 2. IDEMPOTENCY & DUPLICATE PREVENTION
-  const idempotencyKey = generateIdempotencyKey(payload);
+  const normalizedPayload = { ...payload, email: payload.email.trim().toLowerCase() };
+  const key = submissionKey(normalizedPayload);
+  const pending = pendingSubmissions.get(key);
+  if (pending) return pending;
 
-  const localCache = getLocalIdempotencyCache();
-  const cached = localCache[idempotencyKey];
-  if (payload.formType !== 'newsletter_signup' && cached && Date.now() - cached.timestamp < 60 * 60 * 1000) {
-    return {
-      success: true,
-      leadId: cached.leadId,
-      trackingCode: cached.trackingCode,
-      isDuplicate: true,
-      message: isAr
-        ? 'تم استلام هذا الطلب سابقاً وإدراجه في النظام بنجاح.'
-        : 'This request was previously submitted and processed successfully.',
-    };
+  const submission = saveSubmission(normalizedPayload, isAr);
+  pendingSubmissions.set(key, submission);
+  try {
+    return await submission;
+  } finally {
+    pendingSubmissions.delete(key);
   }
+}
 
+async function saveSubmission(payload: FormSubmissionPayload, isAr: boolean): Promise<FormSubmissionResult> {
   const activeSchemaVersion = '1.0.0';
 
   const prefixMap: Record<CustomerFormType, string> = {
@@ -214,10 +182,10 @@ export async function submitCustomerForm(
   // Require confirmation from Supabase before accepting new submissions.
   try {
     await retryOperation(async () => {
-      const response = await fetch('https://vlpdiyicmupghfcualoe.supabase.co/rest/v1/hard_form_submissions', {
+      const response = await fetch(`${hardSupabaseUrl}/rest/v1/hard_form_submissions`, {
         method: 'POST',
         headers: {
-          apikey: 'sb_publishable_jam6dG2vyvPi65DHUEgqXQ_4YZfJGxF',
+          apikey: hardPublishableKey,
           'Content-Type': 'application/json',
           Prefer: 'return=minimal',
         },
@@ -228,7 +196,6 @@ export async function submitCustomerForm(
           sector: payload.sector,
           payload: {
             ...payload,
-            email: payload.email.trim().toLowerCase(),
             schemaVersion: activeSchemaVersion,
           },
         }),
@@ -238,8 +205,9 @@ export async function submitCustomerForm(
       if (!response.ok) {
         const error = await response.json().catch(() => null);
         // A retry can follow a committed insert whose response was lost.
-        if (response.status === 409 && error?.code === '23505') return;
-        throw new Error(`Form intake returned HTTP ${response.status}`);
+        if (response.status === 409 && error?.code === '23505'
+          && error.message?.includes('"hard_form_submissions_pkey"')) return;
+        throw new FormIntakeError(response.status);
       }
     }, 3, 600);
   } catch (error) {
@@ -249,6 +217,5 @@ export async function submitCustomerForm(
     );
   }
 
-  if (payload.formType !== 'newsletter_signup') saveLocalIdempotencyCache(idempotencyKey, { leadId, trackingCode });
   return { success: true, leadId, trackingCode, isDuplicate: false };
 }
