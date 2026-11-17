@@ -1,17 +1,17 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { IncomingMessage, ServerResponse } from 'node:http';
-import { hardPublishableKey, hardSupabaseUrl } from '../src/lib/db/hardCatalog';
+const hardSupabaseUrl = 'https://vlpdiyicmupghfcualoe.supabase.co';
+const hardPublishableKey = 'sb_publishable_jam6dG2vyvPi65DHUEgqXQ_4YZfJGxF';
 
 const internalPath = /^\/[a-z0-9][a-z0-9/-]*$/;
 const protectedPath = /^\/(?:admin|login|api|static|assets|cms|realestate\/(?:admin|cms)|construction\/(?:admin|cms)|hvac\/(?:admin|cms))(?:\/|$)/;
 const routeParameter = '__hard_path';
 
-function eligible(path: string) {
+function eligible(path) {
   return path.length <= 500 && internalPath.test(path) && !path.includes('//') && !protectedPath.test(path);
 }
 
-export default async function handler(request: IncomingMessage, response: ServerResponse) {
+export default async function handler(request, response) {
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     response.setHeader('Allow', 'GET, HEAD');
     response.statusCode = 405;
@@ -30,7 +30,7 @@ export default async function handler(request: IncomingMessage, response: Server
         signal: AbortSignal.timeout(1200),
       });
       if (result.ok) {
-        const [rule] = await result.json() as { target_path: string; status_code: number }[];
+        const [rule] = await result.json();
         if (rule && (rule.status_code === 301 || rule.status_code === 302)
           && eligible(rule.target_path) && rule.target_path !== path) {
           response.statusCode = rule.status_code;
