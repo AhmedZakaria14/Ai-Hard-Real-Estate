@@ -61,7 +61,7 @@ export function ContactSection() {
           <p>{address}</p>
           <p><a href="tel:+966556125711" dir="ltr">+966 55 612 5711</a></p>
           <p><a href="mailto:info@hardgp.com">info@hardgp.com</a></p>
-          <iframe title={ar ? 'خريطة المقر الرئيسي' : 'Head office map''} src={'https://maps.google.com/maps?q=' + mapQuery + '&output=embed'} className="h-64 w-full rounded-xl border-0" loading="lazy" />
+          <iframe title={ar ? 'خريطة المقر الرئيسي' : 'Head office map'} src={'https://maps.google.com/maps?q=' + mapQuery + '&output=embed'} className="h-64 w-full rounded-xl border-0" loading="lazy" />
         </div>
         <form onSubmit={submit} className="space-y-4 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="text-xl font-bold">{ar ? 'اتصل بنا' : 'Contact us'}</h2>
