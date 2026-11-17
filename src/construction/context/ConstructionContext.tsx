@@ -1,4 +1,4 @@
-import { loadPublishedConstructionProjects } from '../../lib/db/hardCatalog';
+import { isConstructionProjectCategory, loadPublishedConstructionProjects } from '../../lib/db/hardCatalog';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   ConstructionLanguage,
@@ -123,7 +123,7 @@ export const ConstructionProvider: React.FC<{
       if (controller.signal.aborted) return;
       setProjects(entries.map(({ content }) => ({
         ...content,
-        category: 'residential',
+        category: isConstructionProjectCategory(content.category) ? content.category : 'residential',
         year: '', durationMonths: 0, valueSAR: '', clientAr: '', clientEn: '',
         scopeAr: [], scopeEn: [], structuralSystemAr: '', structuralSystemEn: '',
         finishingLevelAr: '', finishingLevelEn: '', highlightsAr: [], highlightsEn: [],

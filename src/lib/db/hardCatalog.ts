@@ -69,7 +69,18 @@ export function loadPublishedHvacServices(signal?: AbortSignal) {
 export type PublishedConstructionProject = Pick<ConstructionProject,
   'id' | 'titleAr' | 'titleEn' | 'descriptionAr' | 'descriptionEn' | 'locationAr' | 'locationEn' |
   'cityAr' | 'cityEn' | 'image' | 'galleryImages' | 'status' | 'featured' | 'buaM2'
-> & { categoryLabelAr?: string; categoryLabelEn?: string };
+> & { category?: ConstructionProject['category']; categoryLabelAr?: string; categoryLabelEn?: string };
+
+export const constructionProjectCategories = {
+  residential: 'سكني',
+  commercial: 'تجاري',
+  industrial: 'صناعي ولوجستي',
+  finishing: 'تشطيبات',
+} satisfies Record<ConstructionProject['category'], string>;
+
+export function isConstructionProjectCategory(value: unknown): value is ConstructionProject['category'] {
+  return typeof value === 'string' && Object.hasOwn(constructionProjectCategories, value);
+}
 
 export function loadPublishedConstructionProjects(signal?: AbortSignal) {
   return loadCatalog<PublishedConstructionProject>('construction_projects', signal);

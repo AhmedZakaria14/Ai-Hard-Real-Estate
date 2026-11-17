@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { loadPublishedArticles, loadPublishedProjects, loadPublishedProperties, loadPublishedHvacServices, loadPublishedConstructionProjects, catalogTable, type PublishedConstructionProject, type PublicProperty, type CatalogCollection, type CatalogEntry } from '../../lib/db/hardCatalog';
+import { loadPublishedArticles, loadPublishedProjects, loadPublishedProperties, loadPublishedHvacServices, loadPublishedConstructionProjects, constructionProjectCategories, isConstructionProjectCategory, catalogTable, type PublishedConstructionProject, type PublicProperty, type CatalogCollection, type CatalogEntry } from '../../lib/db/hardCatalog';
 import type { HVACService } from '../../hvac/types';
 import type { BlogPost, Project } from '../../types';
 
@@ -104,6 +104,14 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
       content.excerpt = { ar: field('excerptAr'), en: field('excerptEn') };
       content.content = { ar: field('contentAr'), en: field('contentEn') };
     }
+    if (construction) {
+      const category = field('projectCategory');
+      if (!isConstructionProjectCategory(category)) {
+        setNotice('اختر تصنيف المشروع.');
+        return;
+      }
+      Object.assign(content, { category });
+    }
     if (!title.ar || !title.en) {
       setNotice('أدخل العنوان بالعربية والإنجليزية.');
       return;
@@ -195,6 +203,10 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
           </>}
         </div>;
       })}
+      {construction && <label>تصنيف المشروع<select name="projectCategory" required className={inputClass}
+        defaultValue={'category' in selected.content && isConstructionProjectCategory(selected.content.category) ? selected.content.category : 'residential'}>
+        {Object.entries(constructionProjectCategories).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+      </select></label>}
       {'price' in selected.content && <label>السعر بالريال<input name="price" type="number" min="0" step="0.01" required className={inputClass} defaultValue={selected.content.price.sar} /></label>}
       {'startingPriceSAR' in selected.content && <>
         <label>السعر الابتدائي<input name="price" className={inputClass} defaultValue={selected.content.startingPriceSAR} /></label>
