@@ -126,7 +126,7 @@ export const CMSTestimonialFormModal: React.FC<CMSTestimonialFormModalProps> = (
       await onSave(formData);
       onClose();
     } catch {
-      setErrors({ save: isAr ? 'تعذّر حفظ القصة في Supabase.' : 'Could not save the story in Supabase.' });
+      setErrors({ save: isAr ? 'تعذّر حفظ القصة.' : 'Could not save the story.' });
     } finally {
       setSaving(false);
     }

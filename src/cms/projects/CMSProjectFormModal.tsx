@@ -205,7 +205,7 @@ export const CMSProjectFormModal: React.FC<CMSProjectFormModalProps> = ({
       await onSave(projectPayload);
       onClose();
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : (isAr ? 'تعذر حفظ التعديل في Supabase.' : 'Could not save the change in Supabase.'));
+      setSaveError(err instanceof Error ? err.message : (isAr ? 'تعذر حفظ التعديل.' : 'Could not save the change.'));
       console.error('Error saving project:', err);
     } finally {
       setIsSubmitting(false);

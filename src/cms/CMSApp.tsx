@@ -196,7 +196,7 @@ export const CMSApp: React.FC<CMSAppProps> = ({
 
   const handleLogout = async () => {
     const { error } = await hardAdminClient.auth.signOut({ scope: 'local' });
-    if (error) console.error('Supabase sign out failed', error.message);
+    if (error) console.error('Sign-out failed', error.message);
   };
 
   // --- PROPERTIES HANDLERS ---
@@ -491,8 +491,8 @@ export const CMSApp: React.FC<CMSAppProps> = ({
           </h3>
           <p className="text-xs text-slate-500">
             {isAr
-              ? "التحقق الآمن عبر Supabase Auth"
-              : "Verifying encrypted identity via Supabase Auth"}
+              ? "التحقق الآمن"
+              : "Verifying your identity securely"}
           </p>
         </div>
       </div>
@@ -520,8 +520,8 @@ export const CMSApp: React.FC<CMSAppProps> = ({
       onLanguageChange={onLanguageChange}
     >
       <p className="mb-4 rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-700">
-        <a className="font-semibold text-blue-700 underline" href="/admin/supabase-inbox">
-          {isAr ? 'إدارة الطلبات والمواعيد والكتالوج على Supabase' : 'Manage requests, appointments and catalog in Supabase'}
+        <a className="font-semibold text-blue-700 underline" href="/admin/operations">
+          {isAr ? 'إدارة الطلبات والمواعيد والكتالوج' : 'Manage requests, appointments and catalog'}
         </a>
       </p>
       {(activeTab === 'dashboard' || activeTab === 'properties') && propertyLoadStatus !== 'ready' && (
@@ -536,8 +536,8 @@ export const CMSApp: React.FC<CMSAppProps> = ({
         <div className="space-y-4">
           {propertyLoadStatus === 'ready' && <PropertyCatalogStats properties={properties} language={language} />}
           <RequestDashboardCounts language={language} />
-        <a className="inline-block rounded-lg border bg-white px-4 py-3 text-sm font-semibold text-blue-700" href="/admin/supabase-inbox?section=reports">
-          {isAr ? "فتح تقارير الطلبات في Supabase" : "Open request reports in Supabase"}
+        <a className="inline-block rounded-lg border bg-white px-4 py-3 text-sm font-semibold text-blue-700" href="/admin/operations?section=reports">
+          {isAr ? "فتح تقارير الطلبات" : "Open request reports"}
         </a>
         </div>
       )}
@@ -702,15 +702,15 @@ export const CMSApp: React.FC<CMSAppProps> = ({
 
       {/* 7. Inbound Leads */}
       {activeTab === "leads" && (
-        <a className="inline-block rounded-lg border bg-white px-4 py-3 text-sm font-semibold text-blue-700" href="/admin/supabase-inbox?section=requests">
-          {isAr ? "فتح صندوق الطلبات في Supabase" : "Open the request inbox in Supabase"}
+        <a className="inline-block rounded-lg border bg-white px-4 py-3 text-sm font-semibold text-blue-700" href="/admin/operations?section=requests">
+          {isAr ? "فتح صندوق الطلبات" : "Open the request inbox"}
         </a>
       )}
 
       {/* 8. Appointments & Field Viewings */}
       {activeTab === "appointments" && (
-        <a className="inline-block rounded-lg border bg-white px-4 py-3 text-sm font-semibold text-blue-700" href="/admin/supabase-inbox?section=appointments">
-          {isAr ? "فتح المواعيد والمعاينات في Supabase" : "Open appointments in Supabase"}
+        <a className="inline-block rounded-lg border bg-white px-4 py-3 text-sm font-semibold text-blue-700" href="/admin/operations?section=appointments">
+          {isAr ? "فتح المواعيد والمعاينات" : "Open appointments"}
         </a>
       )}
 

@@ -176,7 +176,7 @@ export const CMSNavigationManager: React.FC<CMSNavigationManagerProps> = ({ lang
         updatedAt: new Date().toISOString(),
       };
       await saveNavigationDoc(navDoc);
-      setStatusMessage({ type: 'success', text: isAr ? 'تم حفظ الترتيب والقوائم بنجاح في Supabase!' : 'Navigation menu saved to Supabase!' });
+      setStatusMessage({ type: 'success', text: isAr ? 'تم حفظ الترتيب والقوائم بنجاح!' : 'Navigation menu saved!' });
     } catch (e: any) {
       setStatusMessage({ type: 'error', text: e?.message || (isAr ? 'فشل حفظ القائمة' : 'Failed to save menu') });
     }
@@ -199,7 +199,7 @@ export const CMSNavigationManager: React.FC<CMSNavigationManagerProps> = ({ lang
       setRedirects([created, ...redirects]);
       setRedirectSource('');
       setRedirectTarget('');
-      setStatusMessage({ type: 'success', text: isAr ? 'تم حفظ قاعدة التحويل في Supabase' : 'Redirect rule saved in Supabase' });
+      setStatusMessage({ type: 'success', text: isAr ? 'تم حفظ قاعدة التحويل' : 'Redirect rule saved' });
     } catch (e: any) {
       setRedirectError(e?.message || (isAr ? 'فشل إنشاء التوجيه' : 'Failed to create redirect'));
     }
@@ -483,7 +483,7 @@ export const CMSNavigationManager: React.FC<CMSNavigationManagerProps> = ({ lang
                 className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-2 shadow-xs ml-auto"
               >
                 <Save className="w-4 h-4" />
-                <span>{isAr ? 'حفظ التغييرات في Supabase' : 'Save Navigation to Supabase'}</span>
+                <span>{isAr ? 'حفظ التغييرات' : 'Save Navigation'}</span>
               </button>
             </div>
           </div>

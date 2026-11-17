@@ -418,7 +418,7 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
 
           <div className="flex items-center gap-3">
             <a
-              href="/admin/supabase-inbox?section=properties"
+              href="/admin/operations?section=properties"
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-colors cursor-pointer"
             >
               <Trash2 className="w-3.5 h-3.5 text-rose-600" />

@@ -94,7 +94,7 @@ export const CMSStatisticFormModal: React.FC<CMSStatisticFormModalProps> = ({
       });
       onClose();
     } catch (err) {
-      setSaveError(isAr ? 'تعذّر الحفظ في Supabase.' : 'Could not save to Supabase.');
+      setSaveError(isAr ? 'تعذّر الحفظ.' : 'Could not save.');
       console.error('Failed to save statistic:', err);
     } finally {
       setIsSubmitting(false);

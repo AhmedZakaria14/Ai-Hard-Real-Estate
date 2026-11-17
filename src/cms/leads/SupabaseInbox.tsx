@@ -132,15 +132,17 @@ export default function SupabaseInbox() {
     setError('');
     const safeName = attachment.fileName.replace(/[\/:*?"<>|]/g, '_');
     const { data, error: fileError } = await client.storage.from('hard-form-attachments')
-      .createSignedUrl(attachment.storagePath, 60, { download: safeName });
+      .download(attachment.storagePath);
     if (fileError || !data) {
       setError('تعذر فتح المرفق الخاص.');
       return;
     }
+    const url = URL.createObjectURL(data);
     const link = document.createElement('a');
-    link.href = data.signedUrl;
-    link.rel = 'noreferrer';
+    link.href = url;
+    link.download = safeName;
     link.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 30_000);
   }
 
   async function archiveRequest(id: string, archive: boolean) {

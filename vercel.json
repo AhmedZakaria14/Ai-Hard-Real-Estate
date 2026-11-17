@@ -4,6 +4,10 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/media/catalog/:assetPath*",
+      "destination": "https://vlpdiyicmupghfcualoe.supabase.co/storage/v1/object/public/hard-public-catalog/:assetPath*"
+    },
+    {
       "source": "/:__hard_path((?!(?:admin|login|api|static|assets|cms)(?:/|$)|(?:realestate|construction|hvac)/(?:admin|cms)(?:/|$))[a-zA-Z0-9][a-zA-Z0-9/-]{0,499})",
       "destination": "/api/hard-redirect"
     },
@@ -16,5 +20,12 @@
     "api/hard-redirect.js": {
       "includeFiles": "dist/index.html"
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/admin/supabase-inbox",
+      "destination": "/admin/operations",
+      "permanent": true
+    }
+  ]
 }

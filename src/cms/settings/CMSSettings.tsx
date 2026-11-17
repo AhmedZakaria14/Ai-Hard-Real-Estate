@@ -2,7 +2,6 @@ import type { Language } from '../../types';
 import { CMSAdminManagement } from './CMSAdminManagement';
 import { CMSBrandingSettings } from './CMSBrandingSettings';
 import { CMSProductionMonitoring } from './CMSProductionMonitoring';
-import { hardSupabaseUrl } from '../../lib/db/hardCatalog';
 
 interface CMSSettingsProps {
   language: Language;
@@ -17,8 +16,7 @@ export function CMSSettings({ language, onResetToDefaults, currentAdminUser }: C
     {currentAdminUser?.role === 'superadmin' && <CMSAdminManagement language={language} />}
     <section className="space-y-3 rounded-xl border bg-white p-5">
       <h2 className="font-bold">{ar ? 'قاعدة البيانات السحابية' : 'Cloud database'}</h2>
-      <p dir="ltr">Supabase · {new URL(hardSupabaseUrl).hostname}</p>
-      <a href="/admin/supabase-inbox?section=backup" className="inline-block rounded border px-3 py-2 text-blue-800">
+      <a href="/admin/operations?section=backup" className="inline-block rounded border px-3 py-2 text-blue-800">
         {ar ? 'تصدير بيانات هارد' : 'Export HARD data'}
       </a>
       <button type="button" className="block rounded border px-3 py-2" onClick={async () => {

@@ -111,7 +111,7 @@ export const CMSJoinList: React.FC<CMSJoinListProps> = ({
 
   const [actionError, setActionError] = useState('');
   const [busy, setBusy] = useState(false);
-  const failure = isAr ? 'تعذر إكمال العملية في Supabase. يرجى إعادة المحاولة.' : 'Supabase did not confirm the operation. Please retry.';
+  const failure = isAr ? 'تعذر إكمال العملية. يرجى إعادة المحاولة.' : 'Could not complete the operation. Please retry.';
 
   useEffect(() => {
     void onRefresh().catch(() => setActionError(failure));

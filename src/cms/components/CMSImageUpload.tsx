@@ -64,7 +64,7 @@ export const CMSImageUpload: React.FC<SingleImageUploadProps> = ({
       const asset = await uploadMediaAsset({ file });
       onChange(asset.downloadUrl);
     } catch {
-      setError(isAr ? 'تعذر رفع الصورة إلى Supabase. حاول مرة أخرى.' : 'Could not upload the image to Supabase. Try again.');
+      setError(isAr ? 'تعذر رفع الصورة. حاول مرة أخرى.' : 'Could not upload the image. Try again.');
     } finally {
       setUploading(false);
     }

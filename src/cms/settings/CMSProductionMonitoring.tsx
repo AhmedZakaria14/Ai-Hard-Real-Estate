@@ -92,7 +92,7 @@ export const CMSProductionMonitoring: React.FC<CMSProductionMonitoringProps> = (
         category: 'backend_failure',
         errorCode: 'DIAGNOSTIC_TEST',
         component: 'CMSProductionMonitoring',
-        message: 'Manual test of the Supabase monitoring log.',
+        message: 'Manual test of the monitoring log.',
         statusClassification: 'SUCCESS',
       });
       setDiagnosticStatus(isAr ? 'حُفظ السجل التجريبي.' : 'Diagnostic log saved.');

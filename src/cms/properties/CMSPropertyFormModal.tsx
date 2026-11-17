@@ -274,7 +274,7 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
       await onSave(propertyPayload);
       onClose();
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : (isAr ? 'تعذر حفظ التعديل في Supabase.' : 'Could not save the change in Supabase.'));
+      setSaveError(err instanceof Error ? err.message : (isAr ? 'تعذر حفظ التعديل.' : 'Could not save the change.'));
       console.error('Failed to save property:', err);
     } finally {
       setIsSubmitting(false);

@@ -47,12 +47,12 @@ export default function SupabaseDataExport() {
       const tables = Object.keys(exportTables) as (keyof typeof exportTables)[];
       const entries = [];
       for (const table of tables) entries.push([table, await readRows(table)] as const);
-      const snapshot = { createdAt: new Date().toISOString(), format: 'hard-supabase-data-v1', tables: Object.fromEntries(entries) };
+      const snapshot = { createdAt: new Date().toISOString(), format: 'hard-data-v1', tables: Object.fromEntries(entries) };
       const blob = new Blob([JSON.stringify(snapshot,null,2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'hard-supabase-' + snapshot.createdAt.slice(0,10) + '.json';
+      link.download = 'hard-data-' + snapshot.createdAt.slice(0,10) + '.json';
       link.click();
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
       setMessage('اكتمل إنشاء ملف تصدير البيانات.');
@@ -64,7 +64,7 @@ export default function SupabaseDataExport() {
   }
 
   return <section className="space-y-4">
-    <h2 className="text-xl font-bold">تصدير بيانات Supabase</h2>
+    <h2 className="text-xl font-bold">تصدير البيانات</h2>
     <p>ينزّل ملف JSON بجداول هارد، بما فيها الطلبات والكتالوج والإعدادات ومسودات المحتوى. يشمل مراجع الملفات فقط.</p>
     <label className="block"><input type="checkbox" checked={confirmPrivate} disabled={busy} onChange={(event) => setConfirmPrivate(event.target.checked)} /> سأحفظ النسخة التي تتضمن بيانات العملاء في مكان خاص.</label>
     <button type="button" disabled={busy || !confirmPrivate} onClick={() => void download()} className="rounded bg-slate-900 px-4 py-2 text-white disabled:opacity-40">

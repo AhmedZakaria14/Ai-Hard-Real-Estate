@@ -36,7 +36,7 @@ export default function SupabaseOperations({ section, refresh }: { section: 'rep
           if (!controller.signal.aborted) setEvents(data ?? []);
         }
       } catch {
-        if (!controller.signal.aborted) setError('تعذر تحميل البيانات من Supabase.');
+        if (!controller.signal.aborted) setError('تعذر تحميل البيانات.');
       } finally {
         if (!controller.signal.aborted) setLoading(false);
       }

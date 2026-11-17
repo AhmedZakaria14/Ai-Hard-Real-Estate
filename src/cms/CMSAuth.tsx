@@ -293,7 +293,7 @@ export const CMSAuth: React.FC<CMSAuthProps> = ({
 
         {/* Security Notice */}
         <div className="text-center pt-3 text-[11px] text-slate-500 border-t border-slate-800/80 space-y-1">
-          <p>{isAr ? '🔒 منطقة محمية بمصادقة مشفرة عبر Supabase Auth' : '🔒 Environment protected by Supabase Auth'}</p>
+          <p>{isAr ? '🔒 منطقة محمية بمصادقة مشفرة' : '🔒 Environment protected by secure sign-in'}</p>
           <p className="text-[10px] text-slate-600">{isAr ? 'مقتصرة على المسؤوليين المعتمدين - يمنع تسجيل الزوار' : 'Restricted to pre-authorized administrative identities'}</p>
         </div>
       </div>

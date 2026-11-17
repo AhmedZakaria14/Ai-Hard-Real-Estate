@@ -230,8 +230,8 @@ export const CMSFormSchemaEditor: React.FC<CMSFormSchemaEditorProps> = ({
         <ol className="mt-3 list-decimal space-y-2 ps-5">
           <li>{isAr ? 'اختر النموذج المطلوب، ثم راجع نوع الحقل واسمه وخياراته وما إذا كان إلزاميًا.' : 'Select a form and review each field’s type, label, options, and required setting.'}</li>
           <li>{isAr ? 'أدخل تسميات الحقول ونصوص المساعدة بالعربية والإنجليزية. احفظ المسودة وراجعها في المعاينة.' : 'Enter Arabic and English labels and help text. Save and preview the draft.'}</li>
-          <li>{isAr ? 'استخدم التحقق قبل النشر واتبع رسائل التحقق. يحفظ النشر إصدارًا من تعريف النموذج في Supabase.' : 'Run the publishing checks and address any validation messages. Publishing stores a version of the form definition in Supabase.'}</li>
-          <li>{isAr ? 'راجع النموذج العام المعني بعد النشر. تظهر الطلبات التي يرسلها الزوار في صندوق طلبات Supabase.' : 'Review the corresponding public form after publishing. Visitor submissions go to the Supabase request inbox.'}</li>
+          <li>{isAr ? 'استخدم التحقق قبل النشر واتبع رسائل التحقق. يحفظ النشر إصدارًا من تعريف النموذج.' : 'Run the publishing checks and address any validation messages. Publishing stores a version of the form definition.'}</li>
+          <li>{isAr ? 'راجع النموذج العام المعني بعد النشر. تظهر الطلبات التي يرسلها الزوار في صندوق الطلبات.' : 'Review the corresponding public form after publishing. Visitor submissions go to the request inbox.'}</li>
         </ol>
       </details>
       {/* Header Banner */}

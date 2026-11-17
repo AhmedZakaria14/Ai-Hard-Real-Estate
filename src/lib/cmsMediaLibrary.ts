@@ -104,7 +104,8 @@ async function resolveMedia(asset: MediaAssetDoc, bucket: string, path: string):
     if (error) throw error;
     return { ...asset, downloadUrl: data.signedUrl, thumbnailUrl: data.signedUrl };
   }
-  const url = storage.getPublicUrl(path).data.publicUrl;
+  const encodedPath = path.split('/').map(encodeURIComponent).join('/');
+  const url = new URL('/media/catalog/' + encodedPath, window.location.origin).href;
   return { ...asset, downloadUrl: url, thumbnailUrl: url };
 }
 

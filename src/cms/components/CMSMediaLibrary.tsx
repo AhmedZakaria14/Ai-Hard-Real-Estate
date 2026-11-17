@@ -391,8 +391,9 @@ export const CMSMediaLibrary: React.FC<CMSMediaLibraryProps> = ({
               language={language}
             />
 
-            {/* Copy Download URL & Delete Action */}
+            {/* Public link and delete action */}
             <div className="pt-2 flex flex-col gap-2">
+              {!selectedAsset.isPrivate && (
               <button
                 type="button"
                 onClick={() => {
@@ -404,6 +405,7 @@ export const CMSMediaLibrary: React.FC<CMSMediaLibraryProps> = ({
                 <Copy className="w-3.5 h-3.5" />
                 <span>{isAr ? 'نسخ رابط الملف' : 'Copy Direct URL'}</span>
               </button>
+              )}
 
               <button
                 type="button"

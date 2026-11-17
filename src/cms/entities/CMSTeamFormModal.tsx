@@ -107,7 +107,7 @@ export const CMSTeamFormModal: React.FC<CMSTeamFormModalProps> = ({
       });
       onClose();
     } catch (err) {
-      setSaveError(isAr ? 'تعذّر الحفظ في Supabase.' : 'Could not save to Supabase.');
+      setSaveError(isAr ? 'تعذّر الحفظ.' : 'Could not save.');
       console.error('Failed to save team member:', err);
     } finally {
       setIsSubmitting(false);
