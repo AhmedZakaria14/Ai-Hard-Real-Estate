@@ -23,7 +23,6 @@ import {
   deleteHVACServiceDoc,
   subscribeHVACSectionContent,
   saveHVACSectionContent,
-  subscribeHVACLeads,
   saveHVACLeadDoc,
   updateHVACLeadStatusDoc,
   deleteHVACLeadDoc,
@@ -143,12 +142,6 @@ export function HVACProvider({
   // Leads state with Firestore sync
   const [leads, setLeads] = useState<HVACLead[]>(initialSampleLeads);
 
-  useEffect(() => {
-    const unsub = subscribeHVACLeads((list) => {
-      if (list && list.length > 0) setLeads(list);
-    });
-    return () => unsub();
-  }, []);
 
   const [services, setServices] = useState<HVACService[]>([]);
   useEffect(() => {

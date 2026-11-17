@@ -1,5 +1,5 @@
 import { hardAdminClient } from '../lib/db/hardAdminClient';
-import { readAdminCompanyContent, saveCompanyContent, deleteCompanyContent } from '../lib/db/companyContent';
+import { readAdminCompanyContent, readCompanyContent, saveCompanyContent, deleteCompanyContent, resetCompanyContent } from '../lib/db/companyContent';
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { Property, Project, BlogPost, Testimonial, JoinListSubscriber } from '../types';
 import {
@@ -15,16 +15,7 @@ import {
   LeadsRepository,
   JoinListRepository,
 } from '../lib/db/repository';
-import {
-  FaqsRepository,
-  CertificationsRepository,
-  EnhancedTestimonialsRepository,
-} from '../lib/db/entitiesRepository';
-import {
-  FirestoreFaqsRepository,
-  FirestoreCertificationsRepository,
-  FirestoreEnhancedTestimonialsRepository,
-} from '../lib/db/firestoreEntitiesRepository';
+import { mockFaqs, mockCertifications, mockEnhancedTestimonials } from '../data/entitiesMockData';
 import {
   LeadRecord,
   CrmSyncLog,
@@ -93,7 +84,7 @@ interface DataContextType {
   addFaq: (data: Partial<FaqEntity>) => Promise<FaqEntity>;
   updateFaq: (id: string, updates: Partial<FaqEntity>) => Promise<FaqEntity | null>;
   deleteFaq: (id: string) => Promise<boolean>;
-  resetFaqsToDefault: () => void;
+  resetFaqsToDefault: () => Promise<void>;
 
   // Offices
   addOffice: (data: Partial<OfficeLocation>) => Promise<OfficeLocation>;
@@ -104,7 +95,7 @@ interface DataContextType {
   addCertification: (data: Partial<Certification>) => Promise<Certification>;
   updateCertification: (id: string, updates: Partial<Certification>) => Promise<Certification | null>;
   deleteCertification: (id: string) => Promise<boolean>;
-  resetCertificationsToDefault: () => void;
+  resetCertificationsToDefault: () => Promise<void>;
 
   // Business Statistics
   addStatistic: (data: Partial<BusinessStatistic>) => Promise<BusinessStatistic>;
@@ -120,7 +111,7 @@ interface DataContextType {
   addEnhancedTestimonial: (data: Partial<EnhancedTestimonial>) => Promise<EnhancedTestimonial>;
   updateEnhancedTestimonial: (id: string, updates: Partial<EnhancedTestimonial>) => Promise<EnhancedTestimonial | null>;
   deleteEnhancedTestimonial: (id: string) => Promise<boolean>;
-  resetEnhancedTestimonialsToDefault: () => void;
+  resetEnhancedTestimonialsToDefault: () => Promise<void>;
 
   // Leads & CRM
   submitLead: (leadInput: {
@@ -150,6 +141,10 @@ function withPropertyContact(content: PublicProperty): Property {
       phone, whatsapp, email, avatar: '',
     },
   };
+}
+
+function byOrder(a: { order: number }, b: { order: number }) {
+  return a.order - b.order;
 }
 
 export function DataProvider({ children }: { children: React.ReactNode }) {
@@ -198,28 +193,40 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
+    let controller: AbortController;
     let version = 0;
     const { data: { subscription } } = hardAdminClient.auth.onAuthStateChange((event, session) => {
       if (event === 'TOKEN_REFRESHED') return;
       const current = ++version;
       clearTimeout(timer);
-      if (session?.user.app_metadata.hard_role !== 'superadmin') {
+      controller?.abort();
+      controller = new AbortController();
+      const signal = controller.signal;
+      const isAdmin = session?.user.app_metadata.hard_role === 'superadmin';
+      setFaqs([]); setCertifications([]); setEnhancedTestimonials([]);
+      if (!isAdmin) {
         setTeamMembers([]); setOffices([]); setStatistics([]); setPartnerBrands([]); setTestimonials([]);
-        return;
       }
       timer = setTimeout(() => {
-        void readAdminCompanyContent().then((rows) => {
+        const request = isAdmin ? readAdminCompanyContent() : readCompanyContent(signal);
+        void request.then((rows) => {
           if (current !== version) return;
           const list = <T,>(kind: string) => rows.filter((row) => row.kind === kind).map((row) => row.body as T);
+          setFaqs(list<FaqEntity>('faqs').sort(byOrder));
+          setCertifications(list<Certification>('certifications').sort(byOrder));
+          setEnhancedTestimonials(list<EnhancedTestimonial>('enhanced_testimonials').sort(byOrder));
+          if (!isAdmin) return;
           setTeamMembers(list<TeamMember>('team'));
           setOffices(list<OfficeLocation>('offices'));
           setStatistics(list<BusinessStatistic>('statistics'));
           setPartnerBrands(list<PartnerBrand>('partners'));
           setTestimonials(list<Testimonial>('stories'));
-        }).catch((error) => console.error('Could not load company content', error));
+        }).catch((error) => {
+          if (!signal.aborted) console.error('Could not load company content', error);
+        });
       }, 0);
     });
-    return () => { version++; clearTimeout(timer); subscription.unsubscribe(); };
+    return () => { version++; clearTimeout(timer); controller?.abort(); subscription.unsubscribe(); };
   }, []);
 
   const refreshData = useCallback(async () => {
@@ -231,26 +238,17 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         projs,
         posts,
         subs,
-        fq,
-        certs,
-        enhTests,
       ] = await Promise.all([
         LeadsRepository.getAll(),
         loadPublishedProjects().then((rows) => rows.map(({ content }) => content)),
         loadPublishedArticles().then((rows) => rows.map(({ content }) => content)),
         JoinListRepository.getAll(),
-        FirestoreFaqsRepository.getAll().catch(() => FaqsRepository.getAll()),
-        FirestoreCertificationsRepository.getAll().catch(() => CertificationsRepository.getAll()),
-        FirestoreEnhancedTestimonialsRepository.getAll().catch(() => EnhancedTestimonialsRepository.getAll()),
       ]);
 
       setLeads(lds);
       setProjects(projs);
       setBlogPosts(posts);
       setSubscribers(subs);
-      setFaqs(fq);
-      setCertifications(certs);
-      setEnhancedTestimonials(enhTests);
     } catch (err) {
       console.error('Failed to load data from repositories:', err);
     } finally {
@@ -424,30 +422,33 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   // 2. FAQs
   const addFaq = async (data: Partial<FaqEntity>): Promise<FaqEntity> => {
-    const item = FaqsRepository.create(data);
-    await FirestoreFaqsRepository.create(item).catch(() => {});
-    setFaqs((prev) => [item, ...prev.filter((f) => f.id !== item.id)].sort((a, b) => a.order - b.order));
+    const item = await saveCompanyContent('faqs', {
+      question: { ar: '', en: '' }, answer: { ar: '', en: '' },
+      sector: 'group', order: faqs.length + 1, status: 'draft',
+      ...data, id: crypto.randomUUID(),
+    } as FaqEntity, true);
+    setFaqs((previous) => [...previous, item].sort(byOrder));
     return item;
   };
+
   const updateFaq = async (id: string, updates: Partial<FaqEntity>): Promise<FaqEntity | null> => {
-    const item = FaqsRepository.update(id, updates);
-    if (item) {
-      await FirestoreFaqsRepository.update(id, updates).catch(() => {});
-      setFaqs((prev) => prev.map((f) => (f.id === id ? item : f)).sort((a, b) => a.order - b.order));
-    }
-    return item;
+    const current = faqs.find((item) => item.id === id);
+    if (!current) return null;
+    const saved = await saveCompanyContent('faqs', { ...current, ...updates, id });
+    setFaqs((previous) => previous.map((item) => item.id === id ? saved : item).sort(byOrder));
+    return saved;
   };
+
   const deleteFaq = async (id: string): Promise<boolean> => {
-    const ok = FaqsRepository.delete(id);
-    if (ok) {
-      await FirestoreFaqsRepository.delete(id).catch(() => {});
-      setFaqs((prev) => prev.filter((f) => f.id !== id));
-    }
-    return ok;
+    const removed = await deleteCompanyContent('faqs', id);
+    if (removed) setFaqs((previous) => previous.filter((item) => item.id !== id));
+    return removed;
   };
-  const resetFaqsToDefault = () => {
-    const defaults = FaqsRepository.resetToDefaults();
-    setFaqs(defaults);
+
+  const resetFaqsToDefault = async () => {
+    const defaults = mockFaqs;
+    await resetCompanyContent('faqs', defaults);
+    setFaqs([...defaults].sort(byOrder));
   };
 
   const addOffice = async (data: Partial<OfficeLocation>): Promise<OfficeLocation> => {
@@ -470,30 +471,33 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   // 4. Certifications
   const addCertification = async (data: Partial<Certification>): Promise<Certification> => {
-    const item = CertificationsRepository.create(data);
-    await FirestoreCertificationsRepository.create(item).catch(() => {});
-    setCertifications((prev) => [item, ...prev.filter((c) => c.id !== item.id)].sort((a, b) => a.order - b.order));
+    const item = await saveCompanyContent('certifications', {
+      title: { ar: '', en: '' }, issuer: { ar: '', en: '' },
+      sector: 'group', order: certifications.length + 1, status: 'draft',
+      ...data, id: crypto.randomUUID(),
+    } as Certification, true);
+    setCertifications((previous) => [...previous, item].sort(byOrder));
     return item;
   };
+
   const updateCertification = async (id: string, updates: Partial<Certification>): Promise<Certification | null> => {
-    const item = CertificationsRepository.update(id, updates);
-    if (item) {
-      await FirestoreCertificationsRepository.update(id, updates).catch(() => {});
-      setCertifications((prev) => prev.map((c) => (c.id === id ? item : c)).sort((a, b) => a.order - b.order));
-    }
-    return item;
+    const current = certifications.find((item) => item.id === id);
+    if (!current) return null;
+    const saved = await saveCompanyContent('certifications', { ...current, ...updates, id });
+    setCertifications((previous) => previous.map((item) => item.id === id ? saved : item).sort(byOrder));
+    return saved;
   };
+
   const deleteCertification = async (id: string): Promise<boolean> => {
-    const ok = CertificationsRepository.delete(id);
-    if (ok) {
-      await FirestoreCertificationsRepository.delete(id).catch(() => {});
-      setCertifications((prev) => prev.filter((c) => c.id !== id));
-    }
-    return ok;
+    const removed = await deleteCompanyContent('certifications', id);
+    if (removed) setCertifications((previous) => previous.filter((item) => item.id !== id));
+    return removed;
   };
-  const resetCertificationsToDefault = () => {
-    const defaults = CertificationsRepository.resetToDefaults();
-    setCertifications(defaults);
+
+  const resetCertificationsToDefault = async () => {
+    const defaults = mockCertifications.map((item) => ({ ...item, status: 'draft' as const }));
+    await resetCompanyContent('certifications', defaults);
+    setCertifications([...defaults].sort(byOrder));
   };
 
   const addStatistic = async (data: Partial<BusinessStatistic>): Promise<BusinessStatistic> => {
@@ -534,30 +538,33 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   // 7. Enhanced Testimonials
   const addEnhancedTestimonial = async (data: Partial<EnhancedTestimonial>): Promise<EnhancedTestimonial> => {
-    const item = EnhancedTestimonialsRepository.create(data);
-    await FirestoreEnhancedTestimonialsRepository.create(item).catch(() => {});
-    setEnhancedTestimonials((prev) => [item, ...prev.filter((t) => t.id !== item.id)].sort((a, b) => a.order - b.order));
+    const item = await saveCompanyContent('enhanced_testimonials', {
+      name: { ar: '', en: '' }, role: { ar: '', en: '' }, quote: { ar: '', en: '' }, avatar: '', rating: 5,
+      sector: 'group', order: enhancedTestimonials.length + 1, status: 'draft',
+      ...data, id: crypto.randomUUID(),
+    } as EnhancedTestimonial, true);
+    setEnhancedTestimonials((previous) => [...previous, item].sort(byOrder));
     return item;
   };
+
   const updateEnhancedTestimonial = async (id: string, updates: Partial<EnhancedTestimonial>): Promise<EnhancedTestimonial | null> => {
-    const item = EnhancedTestimonialsRepository.update(id, updates);
-    if (item) {
-      await FirestoreEnhancedTestimonialsRepository.update(id, updates).catch(() => {});
-      setEnhancedTestimonials((prev) => prev.map((t) => (t.id === id ? item : t)).sort((a, b) => a.order - b.order));
-    }
-    return item;
+    const current = enhancedTestimonials.find((item) => item.id === id);
+    if (!current) return null;
+    const saved = await saveCompanyContent('enhanced_testimonials', { ...current, ...updates, id });
+    setEnhancedTestimonials((previous) => previous.map((item) => item.id === id ? saved : item).sort(byOrder));
+    return saved;
   };
+
   const deleteEnhancedTestimonial = async (id: string): Promise<boolean> => {
-    const ok = EnhancedTestimonialsRepository.delete(id);
-    if (ok) {
-      await FirestoreEnhancedTestimonialsRepository.delete(id).catch(() => {});
-      setEnhancedTestimonials((prev) => prev.filter((t) => t.id !== id));
-    }
-    return ok;
+    const removed = await deleteCompanyContent('enhanced_testimonials', id);
+    if (removed) setEnhancedTestimonials((previous) => previous.filter((item) => item.id !== id));
+    return removed;
   };
-  const resetEnhancedTestimonialsToDefault = () => {
-    const defaults = EnhancedTestimonialsRepository.resetToDefaults();
-    setEnhancedTestimonials(defaults);
+
+  const resetEnhancedTestimonialsToDefault = async () => {
+    const defaults = mockEnhancedTestimonials.map((item) => ({ ...item, status: 'draft' as const }));
+    await resetCompanyContent('enhanced_testimonials', defaults);
+    setEnhancedTestimonials([...defaults].sort(byOrder));
   };
 
   // Leads & CRM

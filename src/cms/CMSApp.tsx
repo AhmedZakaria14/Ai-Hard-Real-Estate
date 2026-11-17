@@ -452,8 +452,8 @@ export const CMSApp: React.FC<CMSAppProps> = ({
   // Reset all repository data
   const handleResetAllData = async () => {
     await resetSubscribersToDefault();
-    resetFaqsToDefault();
-    resetCertificationsToDefault();
+    await resetFaqsToDefault();
+    await resetCertificationsToDefault();
   };
 
   const isAr = language === "ar";

@@ -23,7 +23,6 @@ import {
   deleteConstructionProject as deleteConstructionProjectFromDb,
   subscribeConstructionSectionContent,
   saveConstructionSectionContent,
-  subscribeConstructionLeads,
   saveConstructionLead,
   updateConstructionLeadStatusInDb,
   deleteConstructionLeadInDb,
@@ -237,14 +236,6 @@ export const ConstructionProvider: React.FC<{
   // Leads State with Firestore sync
   const [leads, setLeads] = useState<ConstructionQuoteLead[]>(INITIAL_LEADS);
 
-  useEffect(() => {
-    const unsub = subscribeConstructionLeads((list) => {
-      if (list && list.length > 0) {
-        setLeads(list);
-      }
-    });
-    return () => unsub();
-  }, []);
 
   const addLead = (
     data: Omit<ConstructionQuoteLead, 'id' | 'referenceNumber' | 'createdAt' | 'status'>

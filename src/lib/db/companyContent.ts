@@ -1,10 +1,10 @@
 import { hardAdminClient } from './hardAdminClient';
 import { hardPublishableKey, hardSupabaseUrl } from './hardCatalog';
 
-export type CompanyContentKind = 'team' | 'offices' | 'statistics' | 'partners' | 'stories';
+export type CompanyContentKind = 'team' | 'offices' | 'statistics' | 'partners' | 'stories' | 'faqs' | 'certifications' | 'enhanced_testimonials';
 type CompanyContentRow<T> = { kind: CompanyContentKind; id: string; body: T };
 
-export async function readCompanyContent(signal: AbortSignal) {
+export async function readCompanyContent(signal: AbortSignal): Promise<CompanyContentRow<unknown>[]> {
   const response = await fetch(hardSupabaseUrl + '/rest/v1/hard_public_company_content?select=kind,id,body&order=kind.asc,id.asc', {
     headers: { apikey: hardPublishableKey }, cache: 'no-store', signal,
   });
@@ -31,4 +31,12 @@ export async function deleteCompanyContent(kind: CompanyContentKind, id: string)
   const { data, error } = await hardAdminClient.from('hard_company_content').delete().eq('kind', kind).eq('id', id).select('id').maybeSingle();
   if (error) throw error;
   return Boolean(data);
+}
+
+export async function resetCompanyContent(kind: CompanyContentKind, items: { id: string }[]) {
+  const { error } = await hardAdminClient.rpc('hard_reset_company_entities', {
+    entity_kind: kind,
+    entity_items: items,
+  });
+  if (error) throw error;
 }

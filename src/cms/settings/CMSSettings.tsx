@@ -31,7 +31,7 @@ import { CMSProductionMonitoring } from './CMSProductionMonitoring';
 
 interface CMSSettingsProps {
   language: Language;
-  onResetToDefaults: () => void;
+  onResetToDefaults: () => Promise<void>;
   currentAdminUser?: { uid?: string; name: string; email: string; role: string };
 }
 
@@ -202,10 +202,15 @@ export const CMSSettings: React.FC<CMSSettingsProps> = ({
   } | null>(null);
   const [isTestingConn, setIsTestingConn] = useState(false);
 
-  const handleReset = () => {
-    onResetToDefaults();
-    setResetMessage(true);
-    setTimeout(() => setResetMessage(false), 3000);
+  const handleReset = async () => {
+    if (!window.confirm(isAr ? 'استبدال السجلات الحالية بالمحتوى الافتراضي؟' : 'Replace current records with defaults?')) return;
+    try {
+      await onResetToDefaults();
+      setResetMessage(true);
+      setTimeout(() => setResetMessage(false), 3000);
+    } catch {
+      window.alert(isAr ? 'تعذر إكمال إعادة الضبط.' : 'Could not complete reset.');
+    }
   };
 
   const copySqlToClipboard = async () => {

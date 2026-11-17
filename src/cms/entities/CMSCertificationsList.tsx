@@ -19,7 +19,7 @@ interface CMSCertificationsListProps {
   onAddCertification: () => void;
   onEditCertification: (cert: Certification) => void;
   onDeleteCertification: (id: string) => void;
-  onResetToDefaults: () => void;
+  onResetToDefaults: () => Promise<void>;
   language: Language;
 }
 
@@ -69,7 +69,10 @@ export const CMSCertificationsList: React.FC<CMSCertificationsListProps> = ({
 
         <div className="flex items-center gap-2.5">
           <button
-            onClick={onResetToDefaults}
+            onClick={() => {
+              if (!window.confirm(isAr ? 'استبدال السجلات الحالية بالمحتوى الافتراضي؟' : 'Replace current records with defaults?')) return;
+              void onResetToDefaults().catch(() => window.alert(isAr ? 'تعذرت إعادة الضبط.' : 'Reset failed.'));
+            }}
             className="px-3.5 py-2 text-xs font-semibold rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition-colors"
           >
             {isAr ? 'عادة ضبط الافتراضي' : 'Reset Defaults'}

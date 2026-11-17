@@ -22,7 +22,7 @@ export function usePublishedCompanyContent() {
       if (controller.signal.aborted) return;
       const byKind = <T,>(kind: keyof PublicCompanyContent) =>
         rows.filter((row: { kind: string }) => row.kind === kind)
-          .map((row: { body: T }) => row.body);
+          .map((row) => row.body as T);
       const ordered = <T extends { order?: number }>(items: T[]) => items.sort((a,b) => (a.order ?? 0) - (b.order ?? 0));
       setContent({
         team: ordered(byKind<TeamMember>('team')),
