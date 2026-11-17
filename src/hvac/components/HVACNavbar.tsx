@@ -31,6 +31,17 @@ export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
   const { language, isAr, toggleLanguage, openBookingModal } = useHVAC();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState(() => window.location.hash);
+
+  useEffect(() => {
+    const syncSection = () => setActiveSection(window.location.hash);
+    window.addEventListener('hashchange', syncSection);
+    window.addEventListener('popstate', syncSection);
+    return () => {
+      window.removeEventListener('hashchange', syncSection);
+      window.removeEventListener('popstate', syncSection);
+    };
+  }, []);
   const [isAdmin, setIsAdmin] = useState<boolean>(() => isAuthorizedAdmin());
 
   useEffect(() => {
@@ -81,6 +92,7 @@ export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
               if (window.location.hash) {
                 window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search);
               }
+              setActiveSection('');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
           >
@@ -90,27 +102,18 @@ export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
 
         {/* Desktop Navigation Links */}
         <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-700">
-          {navLinks.slice(0, 5).map((link) => (
+          {navLinks.filter((link) => link.href !== '#faq').map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="hover:text-[#0EA5E9] transition-colors py-1 cursor-pointer"
+              aria-current={activeSection === link.href ? 'location' : undefined}
+              className={`border-b-2 transition-colors py-1 hover:text-[#034DA2] ${
+                activeSection === link.href ? 'border-[#034DA2] text-[#034DA2] font-semibold' : 'border-transparent'
+              }`}
             >
               {link.label}
             </a>
           ))}
-          <a
-            href="#reviews"
-            className="hover:text-[#0EA5E9] transition-colors py-1 cursor-pointer"
-          >
-            {pick(T.nav.reviews, language)}
-          </a>
-          <a
-            href="#contact"
-            className="hover:text-[#0EA5E9] transition-colors py-1 cursor-pointer"
-          >
-            {pick(T.nav.contact, language)}
-          </a>
         </nav>
 
         {/* Right CTA Actions */}
@@ -181,7 +184,10 @@ export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-100 text-sm font-medium"
+                  aria-current={activeSection === link.href ? 'location' : undefined}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium ${
+                    activeSection === link.href ? 'bg-sky-50 text-[#034DA2]' : 'text-slate-700 hover:bg-slate-100'
+                  }`}
                 >
                   <Icon className="w-4 h-4 text-[#0EA5E9]" />
                   <span>{link.label}</span>
