@@ -30,7 +30,6 @@ const sections: { target: SectorSection; title: string; fallback: object }[] = [
 const labels: Record<string, string> = {
   realestate: 'قطاع العقارات', construction: 'قطاع المقاولات', hvac: 'قطاع التكييف',
   titleAr: 'العنوان بالعربية', titleEn: 'العنوان بالإنجليزية',
-
   introAr: 'المقدمة بالعربية', introEn: 'المقدمة بالإنجليزية',
   footerAr: 'التذييل بالعربية', footerEn: 'التذييل بالإنجليزية',
   descriptionAr: 'الوصف بالعربية', descriptionEn: 'الوصف بالإنجليزية', image: 'رابط الصورة',
@@ -69,6 +68,7 @@ export default function SupabaseSectorSections() {
   const [message, setMessage] = useState('');
   const section = sections[active];
   const editingTypes = section.target.key === 'property_types';
+  const editingPortal = section.target.sector === 'portal';
   const editingList = (editingTypes || section.target.sector === 'hvac') && Array.isArray(section.fallback);
   const itemLabel = editingTypes ? 'نوع عقار' : section.target.key === 'work_gallery' ? 'عمل' : section.target.key === 'reviews' ? 'تقييم' : section.target.key === 'maintenance_guide' ? 'خطوة' : 'مدينة';
   const editingCities = section.target.sector === 'hvac' && section.target.key === 'service_areas';
@@ -124,7 +124,10 @@ export default function SupabaseSectorSections() {
         {fields}
       </fieldset> : fields;
     }
-    const label = labels[key] ?? (/^\d+$/.test(key) ? 'البند ' + (Number(key) + 1) : key);
+    const localizedName = key === 'nameAr' ? 'بالعربية' : key === 'nameEn' ? 'بالإنجليزية' : null;
+    const nameLabel = localizedName && editingTypes ? 'اسم النوع ' + localizedName
+      : localizedName && editingPortal ? 'اسم القطاع ' + localizedName : undefined;
+    const label = nameLabel ?? labels[key] ?? (/^\d+$/.test(key) ? 'البند ' + (Number(key) + 1) : key);
     return <div key={path.join('.')} className="space-y-1">
       <label className="block text-sm font-medium">
         {label}{' '}
