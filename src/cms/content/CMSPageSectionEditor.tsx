@@ -1,3 +1,4 @@
+import { CMSSectionImage } from './CMSSectionImage';
 import React, { useState, useEffect } from 'react';
 import {
   Layers,
@@ -199,6 +200,27 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
       sections.map((s) => (s.id === selectedSectionId ? { ...s, content: newContent, updatedAt: new Date().toISOString() } : s))
     );
   };
+
+  function updateSectionImage(sectionId: string, url: string, itemId?: string) {
+    setSections((current) => current.map((section) => {
+      if (section.id !== sectionId) return section;
+      const updatedAt = new Date().toISOString();
+      switch (section.type) {
+        case 'hero':
+          return { ...section, updatedAt, content: { ...section.content as HeroContent, bgImageUrl: url } };
+        case 'card_grid': {
+          const content = section.content as CardGridContent;
+          return { ...section, updatedAt, content: { ...content, cards: (content.cards ?? []).map((card) => card.id === itemId ? { ...card, imageUrl: url } : card) } };
+        }
+        case 'image_gallery': {
+          const content = section.content as ImageGalleryContent;
+          return { ...section, updatedAt, content: { ...content, images: (content.images ?? []).map((image) => image.id === itemId ? { ...image, imageUrl: url } : image) } };
+        }
+        default:
+          return section;
+      }
+    }));
+  }
 
   const handleSaveDraft = async () => {
     setSaveStatus(null);
@@ -457,15 +479,15 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
                     />
                   </div>
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">{isAr ? 'رابط صورة الخلفية (Background Image URL)' : 'Background Image URL'}</label>
-                    <input
-                      type="text"
-                      value={(activeSection.content as HeroContent).bgImageUrl || ''}
-                      onChange={(e) => handleUpdateActiveSectionContent({ ...activeSection.content, bgImageUrl: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono"
-                    />
-                  </div>
+                  <label className="block">{isAr ? 'الوصف الفرعي (بالإنجليزية)' : 'Hero subtitle (English)'}
+                    <textarea className="block w-full rounded border p-2" dir="ltr"
+                      value={(activeSection.content as HeroContent).subtitle?.en || ''}
+                      onChange={(e) => handleUpdateActiveSectionContent({ ...activeSection.content, subtitle: { ...(activeSection.content as HeroContent).subtitle, en: e.target.value } })} />
+                  </label>
+                  <CMSSectionImage key={activeSection.id} label={isAr ? 'صورة خلفية القسم' : 'Section background image'}
+                    language={language} sector={currentPageMeta.sector}
+                    url={(activeSection.content as HeroContent).bgImageUrl || ''}
+                    onChange={(url) => updateSectionImage(activeSection.id, url)} />
                 </div>
               )}
 
@@ -489,8 +511,32 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
                     />
                   </div>
+                  <label className="block">{isAr ? 'العنوان الرئيسي (بالإنجليزية)' : 'Heading (English)'}
+                    <input dir="ltr" className="block w-full rounded border p-2"
+                      value={(activeSection.content as TextBlockContent).heading?.en || ''}
+                      onChange={(e) => handleUpdateActiveSectionContent({ ...activeSection.content, heading: { ...(activeSection.content as TextBlockContent).heading, en: e.target.value } })} />
+                  </label>
+                  <label className="block">{isAr ? 'محتوى الفقرة (بالإنجليزية)' : 'Paragraph body (English)'}
+                    <textarea dir="ltr" className="block w-full rounded border p-2" rows={4}
+                      value={(activeSection.content as TextBlockContent).bodyParagraphs?.en || ''}
+                      onChange={(e) => handleUpdateActiveSectionContent({ ...activeSection.content, bodyParagraphs: { ...(activeSection.content as TextBlockContent).bodyParagraphs, en: e.target.value } })} />
+                  </label>
                 </div>
               )}
+
+              {activeSection.type === 'card_grid' && ((activeSection.content as CardGridContent).cards ?? []).map((card, index) => (
+                <CMSSectionImage key={activeSection.id + ':' + card.id}
+                  label={isAr ? 'صورة البطاقة ' + (index + 1) : 'Card image ' + (index + 1)}
+                  language={language} sector={currentPageMeta.sector} url={card.imageUrl || ''}
+                  onChange={(url) => updateSectionImage(activeSection.id, url, card.id)} />
+              ))}
+
+              {activeSection.type === 'image_gallery' && ((activeSection.content as ImageGalleryContent).images ?? []).map((image, index) => (
+                <CMSSectionImage key={activeSection.id + ':' + image.id}
+                  label={isAr ? 'صورة المعرض ' + (index + 1) : 'Gallery image ' + (index + 1)}
+                  language={language} sector={currentPageMeta.sector} url={image.imageUrl || ''}
+                  onChange={(url) => updateSectionImage(activeSection.id, url, image.id)} />
+              ))}
 
               {/* Render Section Live Preview Container */}
               <div className="pt-6 border-t border-slate-200 space-y-3">

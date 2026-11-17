@@ -58,11 +58,12 @@ const labels: Record<string, string> = {
 };
 const inputStyle = 'block w-full rounded border px-2 py-1';
 const fixedKeys = new Set(['id', 'isPublished']);
-const urlKey = /(?:url|image)$/i;
+const imageKey = /(?:image(?:url)?|avatar(?:url)?|logo(?:url)?)$/i;
+const urlKey = /url$/i;
 const publicAssetUrl = /^(https:\/\/|\/(?!\/))/i;
 
 function invalidLink(data: Json, key = ''): boolean {
-  if (typeof data === 'string' && urlKey.test(key)) {
+  if (typeof data === 'string' && (urlKey.test(key) || imageKey.test(key))) {
     return Boolean(data && (!publicAssetUrl.test(data) || /[\\\s]|\/object\/sign\//i.test(data)));
   }
   if (data && typeof data === 'object') return Object.entries(data).some(([k, v]) => invalidLink(v, k));
@@ -144,7 +145,7 @@ export default function SupabaseSectorSections() {
           : typeof value === 'number' ? <input type="number" step="any" min={key === 'lat' ? -90 : key === 'lng' ? -180 : undefined} max={key === 'lat' ? 90 : key === 'lng' ? 180 : undefined} required className={inputStyle} value={value} onChange={(event) => edit(path, Number(event.target.value))} />
           : <textarea className={inputStyle} rows={value.length > 80 ? 3 : 1} dir="auto" required={editingCities && (key === 'cityNameAr' || key === 'cityNameEn')} value={value} onChange={(event) => edit(path, event.target.value)} />}
       </label>
-      {(key === 'bgImageUrl' || /image$/i.test(key)) && <label className="text-sm">رفع الصورة <input type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif" onChange={(event) => {
+      {imageKey.test(key) && <label className="text-sm">رفع الصورة <input type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif" onChange={(event) => {
         const file = event.target.files?.[0];
         if (file) void upload(file, path);
       }} /></label>}
