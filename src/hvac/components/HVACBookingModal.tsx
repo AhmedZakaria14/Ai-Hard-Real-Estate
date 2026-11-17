@@ -377,7 +377,7 @@ City: ${cityName}`;
                   >
                     {activeCities.map((c) => (
                       <option key={c.id} value={c.id}>
-                        {isAr ? c.cityNameAr : c.cityNameEn} ({c.responseTimeMin} {isAr ? 'دقيقة' : 'min'})
+                        {isAr ? c.cityNameAr : c.cityNameEn}
                       </option>
                     ))}
                   </select>
