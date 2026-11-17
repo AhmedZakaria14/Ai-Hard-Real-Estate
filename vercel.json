@@ -7,5 +7,11 @@
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ]
+  ],
+  "proxy": {
+    "entrypoint": "middleware.ts",
+    "matcher": [
+      "/qa-redirect-301-1711"
+    ]
+  }
 }
