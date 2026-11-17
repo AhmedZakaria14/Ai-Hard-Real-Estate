@@ -1,3 +1,5 @@
+import { usePropertyTypes } from '../../lib/usePropertyTypes';
+import { getPropertyTypeLabel } from '../../lib/propertyTaxonomy';
 import { useEffect, useState, type FormEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { loadPublishedArticles, loadPublishedProjects, loadPublishedProperties, loadPublishedHvacServices, loadPublishedConstructionProjects, constructionProjectCategories, isConstructionProjectCategory, catalogTable, type PublishedConstructionProject, type PublicProperty, type CatalogCollection, type CatalogEntry } from '../../lib/db/hardCatalog';
@@ -17,6 +19,7 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
 }) {
   const projects = collection === 'projects';
   const properties = collection === 'properties';
+  const propertyTypes = usePropertyTypes();
   const construction = collection === 'construction_projects';
   const hvac = collection === 'hvac_services';
   const heading = construction ? 'مشاريع الإنشاءات المنشورة' : hvac ? 'خدمات التكييف المنشورة'
@@ -92,6 +95,12 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
       content.title = title;
       content.description = { ar: field('descriptionAr'), en: field('descriptionEn') };
       if ('price' in content) {
+        const type = field('propertyType');
+        if (type !== content.type && !propertyTypes.some((item) => item.id === type && item.active)) {
+          setNotice('اختر نوع عقار مفعّلًا.');
+          return;
+        }
+        content.type = type;
         const sar = Number(field('price'));
         content.price = { ...content.price, sar, formattedSAR: new Intl.NumberFormat('en-SA', { style: 'currency', currency: 'SAR' }).format(sar) };
       } else {
@@ -173,6 +182,7 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
     }
   }
 
+  const selectedPropertyType = selected && 'price' in selected.content ? selected.content.type : '';
   const inputClass = 'block w-full rounded border p-2';
   return <section className="space-y-4" aria-label={heading}>
     <h2 className="text-xl font-bold">{heading}</h2>
@@ -225,6 +235,10 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
         <label>المدينة بالعربية<input name="cityAr" className={inputClass} defaultValue={selected.content.cityAr} /></label>
         <label>المدينة بالإنجليزية<input name="cityEn" className={inputClass} defaultValue={selected.content.cityEn} /></label>
       </>}
+      {'price' in selected.content && <label>نوع العقار<select name="propertyType" required className={inputClass} defaultValue={selectedPropertyType}>
+        {!propertyTypes.some((item) => item.id === selectedPropertyType) && <option value={selectedPropertyType}>{getPropertyTypeLabel(selectedPropertyType, 'ar', propertyTypes)}</option>}
+        {propertyTypes.filter((item) => item.active || item.id === selectedPropertyType).map((item) => <option key={item.id} value={item.id}>{item.nameAr}</option>)}
+      </select></label>}
       {'price' in selected.content && <label>السعر بالريال<input name="price" type="number" min="0" step="0.01" required className={inputClass} defaultValue={selected.content.price.sar} /></label>}
       {'startingPriceSAR' in selected.content && <>
         <label>السعر الابتدائي<input name="price" className={inputClass} defaultValue={selected.content.startingPriceSAR} /></label>

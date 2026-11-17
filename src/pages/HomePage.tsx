@@ -1,3 +1,4 @@
+import { usePropertyTypes } from '../lib/usePropertyTypes';
 import { getLocalizedText } from '../lib/utils';
 import { SECTOR_CONTACT_DETAILS } from '../lib/sectors';
 import { subscribeSectorSection } from '../lib/db/hardSectorSections';
@@ -51,6 +52,7 @@ export function HomePage({
   onOpenListPropertyModal,
   onOpenInquiryModal,
 }: HomePageProps) {
+  const propertyTypes = usePropertyTypes();
   const { translations } = useTextOverride();
   const t = translations[language] || defaultTranslations[language];
   const { properties } = useData();
@@ -186,12 +188,9 @@ export function HomePage({
                   className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
                 >
                   <option value="all">{t.properties.filters.allTypes}</option>
-                  <option value="villa">{t.properties.filters.villa}</option>
-                  <option value="apartment">{t.properties.filters.apartment}</option>
-                  <option value="penthouse">{t.properties.filters.penthouse}</option>
-                  <option value="mansion">{t.properties.filters.mansion}</option>
-                  <option value="townhouse">{t.properties.filters.townhouse}</option>
-                  <option value="commercial">{t.properties.filters.commercial}</option>
+                  {propertyTypes.filter((item) => item.active).map((item) => (
+                    <option key={item.id} value={item.id}>{language === 'ar' ? item.nameAr : item.nameEn}</option>
+                  ))}
                 </select>
               </div>
 

@@ -1,3 +1,4 @@
+import { usePropertyTypes } from '../../lib/usePropertyTypes';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   MapPin,
@@ -55,6 +56,7 @@ export function PropertyMapView({
   const googleMarkersRef = useRef<{ [id: string]: any }>({});
   const tileLayerRef = useRef<L.TileLayer | null>(null);
 
+  const propertyTypes = usePropertyTypes();
   const [mapStyle, setMapStyle] = useState<'luxury-dark' | 'blueprint' | 'satellite'>('luxury-dark');
   const [activeAreaFilter, setActiveAreaFilter] = useState<string>('all');
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(properties[0] || null);
@@ -528,7 +530,7 @@ export function PropertyMapView({
             <div className="space-y-1.5 flex-1 min-w-0 text-start">
               <div className="flex items-center justify-between gap-2">
                 <Badge variant="primary" className="text-[10px] py-0.5">
-                  {getPropertyTypeLabel(selectedProperty.type, language)}
+                  {getPropertyTypeLabel(selectedProperty.type, language, propertyTypes)}
                 </Badge>
                 <span className="text-xs text-blue-400 font-extrabold font-display-serif">
                   {formatCurrency(selectedProperty.price.sar, 'SAR', language)}

@@ -1,3 +1,4 @@
+import { usePropertyTypes } from '../lib/usePropertyTypes';
 import React, { useState } from 'react';
 import {
   ArrowLeft,
@@ -41,6 +42,7 @@ export function PropertyDetailPage({
   language,
   onOpenBookViewingModal,
 }: PropertyDetailPageProps) {
+  const propertyTypes = usePropertyTypes();
   const t = translations[language];
   const ArrowIcon = language === 'ar' ? ArrowRight : ArrowLeft;
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -60,7 +62,7 @@ export function PropertyDetailPage({
   }
 
   const specificationRows = [
-    { label: t.propertyDetails.quickFacts.propertyType, value: getPropertyTypeLabel(property.type, language) },
+    { label: t.propertyDetails.quickFacts.propertyType, value: getPropertyTypeLabel(property.type, language, propertyTypes) },
     { label: t.propertyDetails.quickFacts.yearBuilt, value: property.features?.yearBuilt || '' },
     { label: t.propertyDetails.quickFacts.furnishing, value: getLocalizedText(property.features?.furnishing, language) },
     { label: t.propertyDetails.quickFacts.view, value: getLocalizedText(property.features?.view, language) },
@@ -91,7 +93,7 @@ export function PropertyDetailPage({
                 ? t.properties.filters.forRent
                 : t.properties.filters.offPlan}
             </Badge>
-            <Badge variant="outline">{getPropertyTypeLabel(property.type, language)}</Badge>
+            <Badge variant="outline">{getPropertyTypeLabel(property.type, language, propertyTypes)}</Badge>
             <span className="text-xs text-slate-400">ID: {property.id}</span>
           </div>
 

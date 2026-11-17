@@ -17,7 +17,7 @@ export type PageId =
   | 'admin'
   | 'not-found';
 
-export type PropertyType = 'villa' | 'apartment' | 'penthouse' | 'townhouse' | 'commercial' | 'mansion';
+export type PropertyType = string;
 export type ListingStatus = 'for-sale' | 'for-rent' | 'off-plan' | 'exclusive' | 'new-launch';
 
 export interface PropertySpecification {

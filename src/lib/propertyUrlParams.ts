@@ -1,6 +1,6 @@
 import { PropertyType } from '../types';
 import { RentalPeriod, DEFAULT_PURCHASE_MAX, DEFAULT_RENTAL_YEAR_MAX, DEFAULT_RENTAL_MONTH_MAX } from './priceNormalization';
-import { ALL_PROPERTY_TYPE_IDS } from './propertyTaxonomy';
+import { isPropertyTypeId } from './propertyTaxonomy';
 
 export type PropertySortOption = 'featured' | 'price-asc' | 'price-desc' | 'area-desc' | 'beds-desc';
 export type PropertyViewMode = 'grid' | 'list' | 'map';
@@ -34,7 +34,6 @@ export const DEFAULT_PROPERTY_FILTER_STATE: PropertyFilterUrlState = {
   viewMode: 'grid',
 };
 
-const VALID_TYPES: PropertyTypeFilter[] = ['all', ...ALL_PROPERTY_TYPE_IDS];
 const VALID_STATUSES: PropertyStatusFilter[] = ['all', 'for-sale', 'for-rent', 'off-plan'];
 const VALID_BEDROOMS: PropertyBedroomFilter[] = ['all', '1', '2', '3', '4', '5+'];
 const VALID_SORTS: PropertySortOption[] = ['featured', 'price-asc', 'price-desc', 'area-desc', 'beds-desc'];
@@ -56,9 +55,7 @@ export function parsePropertyQueryParams(searchStr: string): PropertyFilterUrlSt
 
   // 3. Property Type
   const rawType = (params.get('type') || '').trim().toLowerCase();
-  const type: PropertyTypeFilter = (VALID_TYPES as string[]).includes(rawType)
-    ? (rawType as PropertyTypeFilter)
-    : 'all';
+  const type: PropertyTypeFilter = isPropertyTypeId(rawType) ? rawType : 'all';
 
   // 4. Listing Status & Rental Period
   let rawStatus = (params.get('status') || '').trim().toLowerCase();

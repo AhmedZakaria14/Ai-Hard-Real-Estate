@@ -1,3 +1,4 @@
+import { usePropertyTypes } from '../../lib/usePropertyTypes';
 import React, { useState, useMemo } from 'react';
 import {
   Search,
@@ -78,6 +79,7 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
   onViewLive,
   language,
 }) => {
+  const propertyTypes = usePropertyTypes();
   const isAr = language === 'ar';
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -222,12 +224,9 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
             className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
           >
             <option value="all">{isAr ? 'جميع أنواع العقارات' : 'All Property Types'}</option>
-            <option value="villa">{isAr ? 'فيلا (Villa)' : 'Villa'}</option>
-            <option value="apartment">{isAr ? 'شقة (Apartment)' : 'Apartment'}</option>
-            <option value="penthouse">{isAr ? 'بنتهاوس (Penthouse)' : 'Penthouse'}</option>
-            <option value="townhouse">{isAr ? 'تاون هاوس (Townhouse)' : 'Townhouse'}</option>
-            <option value="commercial">{isAr ? 'تجاري (Commercial)' : 'Commercial'}</option>
-            <option value="mansion">{isAr ? 'قصر (Mansion)' : 'Mansion'}</option>
+            {propertyTypes.filter((item) => item.active).map((item) => (
+                    <option key={item.id} value={item.id}>{isAr ? item.nameAr : item.nameEn}</option>
+                  ))}
           </select>
 
           {/* Status Filter */}

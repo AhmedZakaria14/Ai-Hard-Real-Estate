@@ -1,3 +1,5 @@
+import { defaultGroupPortal, groupPortalSection } from '../../lib/groupPortalContent';
+import { defaultPropertyTypes, propertyTypesSection, validPropertyTypes } from '../../lib/propertyTaxonomy';
 import { defaultRealEstateHero, defaultRealEstateServiceMedia, realEstateHeroSection, realEstateServiceMediaSection } from '../../lib/realEstateHomeContent';
 import { useEffect, useState, type FormEvent } from 'react';
 import { DEFAULT_HERO_CONTENT, DEFAULT_COMPANY_CONTENT, DEFAULT_WORK_STAGES, DEFAULT_OFFICES } from '../../construction/services/sectionDefaults';
@@ -11,6 +13,8 @@ type FieldPath = (string | number)[];
 const sections: { target: SectorSection; title: string; fallback: object }[] = [
   { target: realEstateHeroSection, title: 'العقارات — صورة الهيرو', fallback: defaultRealEstateHero },
   { target: realEstateServiceMediaSection, title: 'العقارات — صور وأرقام الخدمات', fallback: defaultRealEstateServiceMedia },
+  { target: propertyTypesSection, title: 'العقارات — أنواع العقارات', fallback: defaultPropertyTypes },
+  { target: groupPortalSection, title: 'المجموعة — نصوص وصور البوابة', fallback: defaultGroupPortal },
   { target: { sector: 'construction', key: 'hero' }, title: 'الإنشاءات — الصفحة الرئيسية', fallback: DEFAULT_HERO_CONTENT },
   { target: { sector: 'construction', key: 'company' }, title: 'الإنشاءات — عن الشركة', fallback: DEFAULT_COMPANY_CONTENT },
   { target: { sector: 'construction', key: 'stages' }, title: 'الإنشاءات — مراحل العمل', fallback: DEFAULT_WORK_STAGES },
@@ -24,6 +28,12 @@ const sections: { target: SectorSection; title: string; fallback: object }[] = [
   { target: { sector: 'hvac', key: 'service_areas' }, title: 'التكييف — مناطق الخدمة', fallback: DEFAULT_HVAC_CITIES },
 ];
 const labels: Record<string, string> = {
+  realestate: 'قطاع العقارات', construction: 'قطاع المقاولات', hvac: 'قطاع التكييف',
+  titleAr: 'العنوان بالعربية', titleEn: 'العنوان بالإنجليزية',
+
+  introAr: 'المقدمة بالعربية', introEn: 'المقدمة بالإنجليزية',
+  footerAr: 'التذييل بالعربية', footerEn: 'التذييل بالإنجليزية',
+  descriptionAr: 'الوصف بالعربية', descriptionEn: 'الوصف بالإنجليزية', image: 'رابط الصورة',
   badgeAr: 'العبارة العلوية بالعربية', badgeEn: 'العبارة العلوية بالإنجليزية',
   headlineAr: 'العنوان بالعربية', headlineEn: 'العنوان بالإنجليزية',
   subtitleAr: 'الوصف بالعربية', subtitleEn: 'الوصف بالإنجليزية',
@@ -58,8 +68,9 @@ export default function SupabaseSectorSections() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const section = sections[active];
-  const editingList = section.target.sector === 'hvac' && Array.isArray(section.fallback);
-  const itemLabel = section.target.key === 'work_gallery' ? 'عمل' : section.target.key === 'reviews' ? 'تقييم' : section.target.key === 'maintenance_guide' ? 'خطوة' : 'مدينة';
+  const editingTypes = section.target.key === 'property_types';
+  const editingList = (editingTypes || section.target.sector === 'hvac') && Array.isArray(section.fallback);
+  const itemLabel = editingTypes ? 'نوع عقار' : section.target.key === 'work_gallery' ? 'عمل' : section.target.key === 'reviews' ? 'تقييم' : section.target.key === 'maintenance_guide' ? 'خطوة' : 'مدينة';
   const editingCities = section.target.sector === 'hvac' && section.target.key === 'service_areas';
 
   useEffect(() => {
@@ -139,6 +150,10 @@ export default function SupabaseSectorSections() {
       setMessage('أدخل اسم كل مدينة بالعربية والإنجليزية.');
       return;
     }
+    if (editingTypes && !validPropertyTypes(form)) {
+      setMessage('أدخل اسم كل نوع بالعربية والإنجليزية وأبقِ نوعًا واحدًا على الأقل مفعّلًا.');
+      return;
+    }
     if (invalidLink(form)) {
       setMessage('استخدم روابط عامة ثابتة عبر HTTPS أو روابط نسبية من الموقع.');
       return;
@@ -163,6 +178,7 @@ export default function SupabaseSectorSections() {
     {section.target.sector === 'construction' && section.target.key === 'offices' && (
       <p className="text-sm text-slate-600">لتثبيت الدبوس، أدخل خط العرض والطول للمقر ثم اضغط «حفظ ونشر». إذا تركت القيمتين صفرًا، تبحث الخريطة باستخدام عنوان المقر.</p>
     )}
+    {editingTypes && <p className="text-sm text-slate-600">لإزالة نوع من القوائم، ألغِ تفعيله. يظل الاسم محفوظًا للعقارات والطلبات السابقة.</p>}
     {message && <p role="status">{message}</p>}
     {loading && <p role="status">جارٍ تحميل القسم…</p>}
     {form !== undefined && <form key={active} onSubmit={save}>
@@ -171,9 +187,9 @@ export default function SupabaseSectorSections() {
           {form.map((city, index) => (
             <div key={city && typeof city === 'object' && !Array.isArray(city) ? String(city.id ?? index) : index} className="space-y-2">
               {renderField(city, [index])}
-              <button type="button" className="rounded border px-3 py-1 text-rose-700" onClick={() =>
+              {!editingTypes && <button type="button" className="rounded border px-3 py-1 text-rose-700" onClick={() =>
                 setForm((current) => Array.isArray(current) ? current.filter((_, i) => i !== index) : current)
-              }>حذف {itemLabel} من القائمة</button>
+              }>حذف {itemLabel} من القائمة</button>}
             </div>
           ))}
           <button type="button" className="w-fit rounded border px-3 py-1" onClick={() => {

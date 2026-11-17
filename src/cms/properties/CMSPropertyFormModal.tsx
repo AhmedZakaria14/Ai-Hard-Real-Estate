@@ -1,3 +1,4 @@
+import { usePropertyTypes } from '../../lib/usePropertyTypes';
 import React, { useState, useEffect } from 'react';
 import {
   X,
@@ -35,6 +36,7 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
   initialData,
   language,
 }) => {
+  const propertyTypes = usePropertyTypes();
   const isAr = language === 'ar';
   const isEditing = !!initialData;
 
@@ -47,7 +49,7 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
   const [titleAr, setTitleAr] = useState('');
   const [descEn, setDescEn] = useState('');
   const [descAr, setDescAr] = useState('');
-  const [type, setType] = useState<PropertyType>('villa');
+  const [type, setType] = useState<PropertyType>('');
   const [status, setStatus] = useState<ListingStatus>('for-sale');
   const [availabilityStatus, setAvailabilityStatus] = useState<'available' | 'reserved' | 'sold' | 'rented'>('available');
   const [publicationStatus, setPublicationStatus] = useState<'draft' | 'published' | 'archived'>('published');
@@ -109,7 +111,7 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
       setTitleAr(initialData.title?.ar || '');
       setDescEn(initialData.description?.en || '');
       setDescAr(initialData.description?.ar || '');
-      setType(initialData.type || 'villa');
+      setType(initialData.type || '');
       setStatus(initialData.status || 'for-sale');
       setRegaLicenseNumber(initialData.regaLicenseNumber ?? '');
       setAdLicenseNumber(initialData.adLicenseNumber ?? '');
@@ -183,6 +185,11 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!propertyTypes.some((item) => item.id === type && item.active) && type !== initialData?.type) {
+      setSaveError(isAr ? 'اختر نوع عقار مفعّلًا.' : 'Select an active property type.');
+      setActiveTab('basic');
+      return;
+    }
     setSaveError('');
     if (e.currentTarget.querySelector('[data-upload-pending="true"]')) {
       setSaveError(isAr ? 'انتظر حتى يكتمل رفع الصورة ثم احفظ.' : 'Wait for the image upload before saving.');
@@ -449,15 +456,15 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
                   </label>
                   <select
                     value={type}
+                    required
                     onChange={(e) => setType(e.target.value as PropertyType)}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
                   >
-                    <option value="villa">{isAr ? 'فيلا (Villa)' : 'Villa'}</option>
-                    <option value="apartment">{isAr ? 'شقة سكنية (Apartment)' : 'Apartment'}</option>
-                    <option value="penthouse">{isAr ? 'بنتهاوس (Penthouse)' : 'Penthouse'}</option>
-                    <option value="townhouse">{isAr ? 'تاون هاوس (Townhouse)' : 'Townhouse'}</option>
-                    <option value="commercial">{isAr ? 'عقار تجاري (Commercial)' : 'Commercial'}</option>
-                    <option value="mansion">{isAr ? 'قصر فاخر (Mansion)' : 'Mansion'}</option>
+                    {initialData?.type && !propertyTypes.some((item) => item.id === initialData.type) && <option value={initialData.type}>{initialData.type}</option>}
+                    <option value="" disabled>{isAr ? 'اختر نوع العقار' : 'Choose a property type'}</option>
+                    {propertyTypes.filter((item) => item.active || item.id === initialData?.type).map((item) => (
+                      <option key={item.id} value={item.id}>{isAr ? item.nameAr : item.nameEn}</option>
+                    ))}
                   </select>
                 </div>
 

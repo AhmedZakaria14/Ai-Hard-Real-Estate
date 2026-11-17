@@ -1,3 +1,4 @@
+import { usePropertyTypes } from '../../lib/usePropertyTypes';
 import React, { useState } from 'react';
 import {
   MapPin,
@@ -35,6 +36,7 @@ export function ListPropertyModal({
   onClose,
   language,
 }: ListPropertyModalProps) {
+  const propertyTypes = usePropertyTypes();
   const isAr = language === 'ar';
 
   // Primary Intent State
@@ -73,38 +75,12 @@ export function ListPropertyModal({
 
   if (!isOpen) return null;
 
-  const propertyTypes = isAr
-    ? [
-        { id: 'apartment', label: 'شقة' },
-        { id: 'villa', label: 'فيلا' },
-        { id: 'townhouse', label: 'تاون هاوس' },
-        { id: 'penthouse', label: 'بنتهاوس' },
-        { id: 'mansion', label: 'قصر ومقر فاخر' },
-        { id: 'land', label: 'أرض' },
-        { id: 'building', label: 'عمارة سكنية / تجارية' },
-        { id: 'floor', label: 'دور مستقل' },
-        { id: 'office', label: 'مكتب تجاري' },
-        { id: 'retail', label: 'محل / معرض تجاري' },
-        { id: 'warehouse', label: 'مستودع / هنجر' },
-      ]
-    : [
-        { id: 'apartment', label: 'Apartment' },
-        { id: 'villa', label: 'Villa' },
-        { id: 'townhouse', label: 'Townhouse' },
-        { id: 'penthouse', label: 'Penthouse' },
-        { id: 'mansion', label: 'Mansion & Palace' },
-        { id: 'land', label: 'Land Plot' },
-        { id: 'building', label: 'Full Building' },
-        { id: 'floor', label: 'Independent Floor' },
-        { id: 'office', label: 'Commercial Office' },
-        { id: 'retail', label: 'Retail / Showroom' },
-        { id: 'warehouse', label: 'Warehouse / Industrial' },
-      ];
-
-  propertyTypes.push({ id: 'other', label: isAr ? 'نوع آخر' : 'Other' });
+  const typeOptions = propertyTypes.filter((item) => item.active)
+    .map((item) => ({ id: item.id, label: isAr ? item.nameAr : item.nameEn }));
+  typeOptions.push({ id: 'other', label: isAr ? 'نوع آخر' : 'Other' });
 
   const getPropTypeLabel = (id: string) => {
-    const found = propertyTypes.find((p) => p.id === id);
+    const found = typeOptions.find((p) => p.id === id);
     return found ? found.label : id || (isAr ? 'غير محدد' : 'Unspecified');
   };
 
@@ -118,6 +94,10 @@ export function ListPropertyModal({
       return;
     }
 
+    if (!typeOptions.some((item) => item.id === propertyType)) {
+      setContactError(isAr ? 'اختر نوع عقار من القائمة.' : 'Select a property type from the list.');
+      return;
+    }
     setSubmitting(true);
 
     const propTypeLabel = getPropTypeLabel(propertyType);
@@ -527,7 +507,7 @@ export function ListPropertyModal({
                       <option value="" disabled>
                         {isAr ? 'اختر النوع' : 'Select Type'}
                       </option>
-                      {propertyTypes.map((t) => (
+                      {typeOptions.map((t) => (
                         <option key={t.id} value={t.id}>
                           {t.label}
                         </option>
@@ -625,7 +605,7 @@ export function ListPropertyModal({
                       <option value="" disabled>
                         {isAr ? 'اختر النوع' : 'Select Type'}
                       </option>
-                      {propertyTypes.map((t) => (
+                      {typeOptions.map((t) => (
                         <option key={t.id} value={t.id}>
                           {t.label}
                         </option>

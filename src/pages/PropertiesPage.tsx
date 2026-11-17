@@ -1,3 +1,4 @@
+import { usePropertyTypes } from '../lib/usePropertyTypes';
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   Search,
@@ -48,7 +49,7 @@ import {
   getNormalizedPropertyPrice,
 } from '../lib/priceNormalization';
 import {
-  PROPERTY_TAXONOMY,
+  propertyTypeIcons,
   calculatePropertyTypeCounts,
   getPropertyTypeLabel,
 } from '../lib/propertyTaxonomy';
@@ -100,6 +101,7 @@ export function PropertiesPage({
   // Filters State
   const [searchQuery, setSearchQuery] = useState<string>(initialParams.searchQuery);
   const [statusFilter, setStatusFilter] = useState<PropertyStatusFilter>(initialParams.status);
+  const propertyTypes = usePropertyTypes();
   const [typeFilter, setTypeFilter] = useState<PropertyTypeFilter>(initialParams.type);
   const [bedroomFilter, setBedroomFilter] = useState<PropertyBedroomFilter>(initialParams.bedroom);
   const [locationFilter, setLocationFilter] = useState<string>(initialParams.city);
@@ -367,12 +369,12 @@ export function PropertiesPage({
 
   const propertyTypeTabs = useMemo(() => [
     { id: 'all', label: t.properties.filters.allTypes, icon: Layers },
-    ...PROPERTY_TAXONOMY.map((item) => ({
+    ...propertyTypes.filter((item) => item.active || item.id === typeFilter).map((item) => ({
       id: item.id,
-      label: getPropertyTypeLabel(item.id, language, t),
-      icon: item.icon,
+      label: getPropertyTypeLabel(item.id, language, propertyTypes),
+      icon: propertyTypeIcons.get(item.id) ?? Layers,
     })),
-  ], [language, t]);
+  ], [language, t, propertyTypes, typeFilter]);
 
 
   return (
@@ -688,7 +690,7 @@ export function PropertiesPage({
 
               {typeFilter !== 'all' && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 font-medium capitalize">
-                  {t.properties.filters[typeFilter as keyof typeof t.properties.filters] || typeFilter}
+                  {getPropertyTypeLabel(typeFilter, language, propertyTypes)}
                   <button onClick={() => setTypeFilter('all')} className="cursor-pointer hover:text-blue-900">
                     <X className="w-3 h-3" />
                   </button>

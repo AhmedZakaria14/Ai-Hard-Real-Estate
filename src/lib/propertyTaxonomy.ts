@@ -1,5 +1,6 @@
-import { Home, Building2, Sparkles, Crown, Building, Store, Layers, LucideIcon } from 'lucide-react';
-import { Property, PropertyType, Language } from '../types';
+import { Home, Building2, Sparkles, Crown, Building, Store, LucideIcon } from 'lucide-react';
+import type { Property, PropertyType, Language } from '../types';
+import type { SectorSection } from './db/hardSectorSections';
 
 export interface PropertyTypeConfig {
   id: PropertyType;
@@ -50,40 +51,55 @@ export const PROPERTY_TAXONOMY: PropertyTypeConfig[] = [
   },
 ];
 
-export const ALL_PROPERTY_TYPE_IDS: PropertyType[] = PROPERTY_TAXONOMY.map((t) => t.id);
+export interface PropertyTypeOption {
+  id: PropertyType;
+  nameAr: string;
+  nameEn: string;
+  active: boolean;
+}
 
-/**
- * Calculates dynamic counts for 'all' and every defined property type category.
- * Guaranteed: Sum of category counts === count of 'all'.
- */
+export const propertyTypesSection = { sector: 'realestate', key: 'property_types' } satisfies SectorSection;
+export const propertyTypeIcons = new Map(PROPERTY_TAXONOMY.map((item) => [item.id, item.icon]));
+
+export const defaultPropertyTypes: PropertyTypeOption[] = [
+  ...PROPERTY_TAXONOMY.map(({ id, defaultLabel }) => ({
+    id, nameAr: defaultLabel.ar, nameEn: defaultLabel.en, active: true,
+  })),
+  { id: 'land', nameAr: 'أرض', nameEn: 'Land Plot', active: true },
+  { id: 'building', nameAr: 'عمارة سكنية / تجارية', nameEn: 'Full Building', active: true },
+  { id: 'floor', nameAr: 'دور مستقل', nameEn: 'Independent Floor', active: true },
+  { id: 'office', nameAr: 'مكتب تجاري', nameEn: 'Commercial Office', active: true },
+  { id: 'retail', nameAr: 'محل / معرض تجاري', nameEn: 'Retail / Showroom', active: true },
+  { id: 'warehouse', nameAr: 'مستودع / هنجر', nameEn: 'Warehouse / Industrial', active: true },
+];
+
+export function isPropertyTypeId(value: string) {
+  return defaultPropertyTypes.some(({ id }) => id === value) ||
+    /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(value);
+}
+
+export function validPropertyTypes(value: unknown): value is PropertyTypeOption[] {
+  if (!Array.isArray(value) || value.length === 0 || !value.some((item) => item?.active === true)) return false;
+  const ids = new Set<string>();
+  for (const item of value) {
+    if (!item || typeof item.id !== 'string' || !isPropertyTypeId(item.id) || ids.has(item.id) ||
+        typeof item.active !== 'boolean' || typeof item.nameAr !== 'string' || !item.nameAr.trim() ||
+        typeof item.nameEn !== 'string' || !item.nameEn.trim()) return false;
+    ids.add(item.id);
+  }
+  return true;
+}
+
 export function calculatePropertyTypeCounts(properties: Property[]): Record<string, number> {
-  const counts: Record<string, number> = {
-    all: properties.length,
-  };
-
-  PROPERTY_TAXONOMY.forEach((typeConfig) => {
-    counts[typeConfig.id] = 0;
-  });
-
-  properties.forEach((prop) => {
-    if (prop.type && counts[prop.type] !== undefined) {
-      counts[prop.type]++;
-    }
-  });
-
+  const counts: Record<string, number> = Object.create(null);
+  counts.all = properties.length;
+  for (const property of properties) {
+    if (isPropertyTypeId(property.type)) counts[property.type] = (counts[property.type] ?? 0) + 1;
+  }
   return counts;
 }
 
-/**
- * Returns localized property type label.
- */
-export function getPropertyTypeLabel(type: PropertyType, lang: Language, translationsObj?: any): string {
-  if (translationsObj?.properties?.filters?.[type]) {
-    return translationsObj.properties.filters[type];
-  }
-  const match = PROPERTY_TAXONOMY.find((t) => t.id === type);
-  if (match) {
-    return match.defaultLabel[lang];
-  }
-  return type;
+export function getPropertyTypeLabel(type: PropertyType, language: Language, types = defaultPropertyTypes): string {
+  const item = types.find((option) => option.id === type);
+  return (language === 'ar' ? item?.nameAr : item?.nameEn) ?? type;
 }
