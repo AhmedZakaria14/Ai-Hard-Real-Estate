@@ -253,19 +253,19 @@ export function HVACProvider({
     return () => unsub();
   }, []);
 
-  const addGallery = async (item: Omit<HVACGalleryItem, 'id'>) => {
+  const addGalleryItem = async (item: Omit<HVACGalleryItem, 'id'>) => {
     const next = [...galleryItems, { ...item, id: crypto.randomUUID() }];
     await saveHVACSectionContent('work_gallery', next);
     setGalleryItems(next);
   };
 
-  const updateGallery = async (id: string, updated: Partial<HVACGalleryItem>) => {
+  const updateGalleryItem = async (id: string, updated: Partial<HVACGalleryItem>) => {
     const next = galleryItems.map((item) => item.id === id ? { ...item, ...updated } : item);
     await saveHVACSectionContent('work_gallery', next);
     setGalleryItems(next);
   };
 
-  const deleteGallery = async (id: string) => {
+  const deleteGalleryItem = async (id: string) => {
     const next = galleryItems.filter((item) => item.id !== id);
     await saveHVACSectionContent('work_gallery', next);
     setGalleryItems(next);
