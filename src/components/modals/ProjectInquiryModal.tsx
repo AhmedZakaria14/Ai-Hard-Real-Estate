@@ -3,7 +3,7 @@ import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Language, Project } from '../../types';
-import { translations } from '../../lib/translations';
+import { useTextOverride } from '../../context/TextOverrideContext';
 import {
   CheckCircle2,
   Building2,
@@ -33,6 +33,7 @@ export function ProjectInquiryModal({
   language,
   project,
 }: ProjectInquiryModalProps) {
+  const { translations } = useTextOverride();
   const t = translations[language];
 
   const [fullName, setFullName] = useState('');

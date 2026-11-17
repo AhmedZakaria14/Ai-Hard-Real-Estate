@@ -1,3 +1,4 @@
+import { useTextOverride } from '../../context/TextOverrideContext';
 import React, { useState, useEffect } from 'react';
 import {
   Globe,
@@ -17,7 +18,7 @@ import {
 
 import { useHVAC } from '../context/HVACContext';
 import { BrandLogo } from '../../components/ui/BrandLogo';
-import { T, pick } from '../translations';
+import { pick } from '../translations';
 import { PageId } from '../../types';
 import { handleSemanticClick } from '../../lib/navigation';
 import { isAuthorizedAdmin } from '../../lib/adminAuth';
@@ -28,6 +29,7 @@ interface HVACNavbarProps {
 }
 
 export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
+  const { hvac: T } = useTextOverride();
   const { language, isAr, toggleLanguage, openBookingModal } = useHVAC();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);

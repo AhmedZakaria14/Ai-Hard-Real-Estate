@@ -1,3 +1,4 @@
+import { useTextOverride } from '../../context/TextOverrideContext';
 import React, { useState, useEffect, useRef, useId } from 'react';
 import {
   X,
@@ -14,12 +15,13 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useHVAC } from '../context/HVACContext';
-import { T, pick } from '../translations';
+import { pick } from '../translations';
 import { FormAttachmentMeta } from '../../types/firestore-schema';
 import { submitCustomerForm } from '../../lib/forms/formSubmissionService';
 import { FileUploadZone } from '../../components/forms/FileUploadZone';
 
 export function HVACBookingModal() {
+  const { hvac: T } = useTextOverride();
   const {
     language,
     isAr,

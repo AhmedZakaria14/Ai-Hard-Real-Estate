@@ -1,3 +1,5 @@
+import { usePageMedia } from '../../lib/pageMedia';
+import { useTextOverride } from '../../context/TextOverrideContext';
 import React from 'react';
 import {
   HardHat,
@@ -13,10 +15,11 @@ import {
   Bookmark,
 } from 'lucide-react';
 import { useConstruction } from '../context/ConstructionContext';
-import { constructionTranslations } from '../utils/translations';
 
 export function AboutSection() {
+  const { constructionAboutImage } = usePageMedia();
   const { language, companyContent } = useConstruction();
+  const { construction: constructionTranslations } = useTextOverride();
   const t = constructionTranslations[language];
   const isAr = language === 'ar';
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
@@ -116,7 +119,7 @@ export function AboutSection() {
                 </div>
                 <div className="relative rounded-2xl overflow-hidden aspect-16/10 border border-sky-100 bg-slate-100 shadow-sm">
                   <img
-                    src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=80"
+                    src={constructionAboutImage}
                     alt="Quality Inspection"
                     className="w-full h-full object-cover"
                   />

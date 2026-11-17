@@ -1,11 +1,12 @@
+import { useTextOverride } from '../../context/TextOverrideContext';
 import React, { useState } from 'react';
 import { ChevronDown, HelpCircle, Sparkles } from 'lucide-react';
 import { useHVAC } from '../context/HVACContext';
-import { T, pick } from '../translations';
-import { initialFaqs } from '../data/initialData';
+import { pick } from '../translations';
 
 export function HVACFAQSection() {
-  const { language, isAr } = useHVAC();
+  const { hvac: T } = useTextOverride();
+  const { language, isAr, faqItems } = useHVAC();
   const [openFaqId, setOpenFaqId] = useState<string | null>('faq-1');
 
   const toggleFaq = (id: string) => {
@@ -27,7 +28,7 @@ export function HVACFAQSection() {
 
         {/* Shadcn-style Accordion */}
         <div className="space-y-3">
-          {initialFaqs.map((faq) => {
+          {faqItems.map((faq) => {
             const isOpen = openFaqId === faq.id;
             return (
               <div

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, User, Save, Sparkles, Mail, Linkedin } from 'lucide-react';
 import { Language, BlogAuthor } from '../../types';
-import { generateSlug } from '../../lib/blogFirestore';
+import { generateSlug } from '../../lib/blogText';
 import { CMSImageUpload } from '../components/CMSImageUpload';
 
 interface CMSAuthorModalProps {

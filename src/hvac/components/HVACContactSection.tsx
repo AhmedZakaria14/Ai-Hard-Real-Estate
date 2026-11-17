@@ -1,3 +1,4 @@
+import { useTextOverride } from '../../context/TextOverrideContext';
 import React, { useState } from 'react';
 import {
   MapPin,
@@ -13,10 +14,11 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { useHVAC } from '../context/HVACContext';
-import { T, pick } from '../translations';
+import { pick } from '../translations';
 import { submitCustomerForm } from '../../lib/forms/formSubmissionService';
 
 export function HVACContactSection() {
+  const { hvac: T } = useTextOverride();
   const { language, isAr, services } = useHVAC();
 
   const [name, setName] = useState('');

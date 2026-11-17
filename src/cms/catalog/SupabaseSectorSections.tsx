@@ -1,3 +1,4 @@
+import { defaultPageMedia, pageMediaSection } from '../../lib/pageMedia';
 import { defaultGroupPortal, groupPortalSection } from '../../lib/groupPortalContent';
 import { defaultPropertyTypes, propertyTypesSection, validPropertyTypes } from '../../lib/propertyTaxonomy';
 import { defaultRealEstateHero, defaultRealEstateServiceMedia, realEstateHeroSection, realEstateServiceMediaSection } from '../../lib/realEstateHomeContent';
@@ -5,7 +6,8 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { DEFAULT_HERO_CONTENT, DEFAULT_COMPANY_CONTENT, DEFAULT_WORK_STAGES, DEFAULT_OFFICES } from '../../construction/services/sectionDefaults';
 import { DEFAULT_HVAC_HERO, DEFAULT_HVAC_HOURS_CONTACT, DEFAULT_HVAC_BOOKING_COPY, DEFAULT_HVAC_CITIES } from '../../hvac/services/sectionDefaults';
 import { readSectorSection, saveSectorSection, type SectorSection } from '../../lib/db/hardSectorSections';
-import { initialGallery, initialTestimonials, yearRoundChecklist } from '../../hvac/data/initialData';
+import { INITIAL_SERVICES } from '../../construction/data/seedData';
+import { initialFaqs, initialGallery, initialTestimonials, yearRoundChecklist } from '../../hvac/data/initialData';
 import { uploadMediaAsset } from '../../lib/cmsMediaLibrary';
 
 type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
@@ -13,12 +15,15 @@ type FieldPath = (string | number)[];
 const sections: { target: SectorSection; title: string; fallback: object }[] = [
   { target: realEstateHeroSection, title: 'العقارات — صورة الهيرو', fallback: defaultRealEstateHero },
   { target: realEstateServiceMediaSection, title: 'العقارات — صور وأرقام الخدمات', fallback: defaultRealEstateServiceMedia },
+  { target: pageMediaSection, title: 'صور صفحات القطاعات والصور الافتراضية', fallback: defaultPageMedia },
   { target: propertyTypesSection, title: 'العقارات — أنواع العقارات', fallback: defaultPropertyTypes },
   { target: groupPortalSection, title: 'المجموعة — نصوص وصور البوابة', fallback: defaultGroupPortal },
+  { target: { sector: 'construction', key: 'services' }, title: 'المقاولات — بطاقات الخدمات', fallback: INITIAL_SERVICES },
   { target: { sector: 'construction', key: 'hero' }, title: 'الإنشاءات — الصفحة الرئيسية', fallback: DEFAULT_HERO_CONTENT },
   { target: { sector: 'construction', key: 'company' }, title: 'الإنشاءات — عن الشركة', fallback: DEFAULT_COMPANY_CONTENT },
   { target: { sector: 'construction', key: 'stages' }, title: 'الإنشاءات — مراحل العمل', fallback: DEFAULT_WORK_STAGES },
   { target: { sector: 'construction', key: 'offices' }, title: 'الإنشاءات — المقر الرئيسي والخريطة', fallback: DEFAULT_OFFICES },
+  { target: { sector: 'hvac', key: 'faq' }, title: 'التكييف — الأسئلة الشائعة', fallback: initialFaqs },
   { target: { sector: 'hvac', key: 'hero' }, title: 'التكييف — الصفحة الرئيسية', fallback: DEFAULT_HVAC_HERO },
   { target: { sector: 'hvac', key: 'hours_contact' }, title: 'التكييف — الاتصال وساعات العمل', fallback: DEFAULT_HVAC_HOURS_CONTACT },
   { target: { sector: 'hvac', key: 'booking_copy' }, title: 'التكييف — نصوص الحجز', fallback: DEFAULT_HVAC_BOOKING_COPY },
@@ -28,6 +33,10 @@ const sections: { target: SectorSection; title: string; fallback: object }[] = [
   { target: { sector: 'hvac', key: 'service_areas' }, title: 'التكييف — مناطق الخدمة', fallback: DEFAULT_HVAC_CITIES },
 ];
 const labels: Record<string, string> = {
+  constructionHeroImage: 'غلاف صفحة المقاولات', constructionAboutImage: 'صورة التعريف بالمقاولات',
+  hvacHeroImage: 'غلاف صفحة التكييف', propertyPlaceholderImage: 'الصورة الافتراضية للعقار والمقال',
+  questionAr: 'السؤال بالعربية', questionEn: 'السؤال بالإنجليزية', answerAr: 'الإجابة بالعربية', answerEn: 'الإجابة بالإنجليزية',
+  aboutImage: 'صورة صفحة من نحن', projectPlaceholderImage: 'الصورة الافتراضية للمشاريع',
   realestate: 'قطاع العقارات', construction: 'قطاع المقاولات', hvac: 'قطاع التكييف',
   titleAr: 'العنوان بالعربية', titleEn: 'العنوان بالإنجليزية',
   introAr: 'المقدمة بالعربية', introEn: 'المقدمة بالإنجليزية',
@@ -49,7 +58,7 @@ const labels: Record<string, string> = {
 };
 const inputStyle = 'block w-full rounded border px-2 py-1';
 const fixedKeys = new Set(['id', 'isPublished']);
-const urlKey = /(?:url|^image)$/i;
+const urlKey = /(?:url|image)$/i;
 const publicAssetUrl = /^(https:\/\/|\/(?!\/))/i;
 
 function invalidLink(data: Json, key = ''): boolean {
@@ -70,7 +79,7 @@ export default function SupabaseSectorSections() {
   const editingTypes = section.target.key === 'property_types';
   const editingPortal = section.target.sector === 'portal';
   const editingList = (editingTypes || section.target.sector === 'hvac') && Array.isArray(section.fallback);
-  const itemLabel = editingTypes ? 'نوع عقار' : section.target.key === 'work_gallery' ? 'عمل' : section.target.key === 'reviews' ? 'تقييم' : section.target.key === 'maintenance_guide' ? 'خطوة' : 'مدينة';
+  const itemLabel = editingTypes ? 'نوع عقار' : section.target.key === 'faq' ? 'سؤال' : section.target.key === 'work_gallery' ? 'عمل' : section.target.key === 'reviews' ? 'تقييم' : section.target.key === 'maintenance_guide' ? 'خطوة' : 'مدينة';
   const editingCities = section.target.sector === 'hvac' && section.target.key === 'service_areas';
 
   useEffect(() => {
@@ -135,7 +144,7 @@ export default function SupabaseSectorSections() {
           : typeof value === 'number' ? <input type="number" step="any" min={key === 'lat' ? -90 : key === 'lng' ? -180 : undefined} max={key === 'lat' ? 90 : key === 'lng' ? 180 : undefined} required className={inputStyle} value={value} onChange={(event) => edit(path, Number(event.target.value))} />
           : <textarea className={inputStyle} rows={value.length > 80 ? 3 : 1} dir="auto" required={editingCities && (key === 'cityNameAr' || key === 'cityNameEn')} value={value} onChange={(event) => edit(path, event.target.value)} />}
       </label>
-      {(key === 'bgImageUrl' || key === 'image') && <label className="text-sm">رفع الصورة <input type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif" onChange={(event) => {
+      {(key === 'bgImageUrl' || /image$/i.test(key)) && <label className="text-sm">رفع الصورة <input type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif" onChange={(event) => {
         const file = event.target.files?.[0];
         if (file) void upload(file, path);
       }} /></label>}

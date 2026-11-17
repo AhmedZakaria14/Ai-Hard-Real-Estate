@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import { Language, PropertyType } from '../../types';
 import { FormAttachmentMeta } from '../../types/firestore-schema';
-import { translations } from '../../lib/translations';
+import { useTextOverride } from '../../context/TextOverrideContext';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSubmissionService';
@@ -40,6 +40,7 @@ interface ValuationWizardProps {
 }
 
 export function ValuationWizard({ language, onSuccess, isModal = false }: ValuationWizardProps) {
+  const { translations } = useTextOverride();
   const t = translations[language];
   const isAr = language === 'ar';
   const ArrowNext = isAr ? ArrowLeft : ArrowRight;

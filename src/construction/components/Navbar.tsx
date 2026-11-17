@@ -1,3 +1,4 @@
+import { useTextOverride } from '../../context/TextOverrideContext';
 import { BrandLogo } from '../../components/ui/BrandLogo';
 import React, { useState, useEffect } from 'react';
 import {
@@ -11,7 +12,6 @@ import {
   Building,
 } from 'lucide-react';
 import { useConstruction } from '../context/ConstructionContext';
-import { constructionTranslations } from '../utils/translations';
 import { handleSemanticClick } from '../../lib/navigation';
 import { HARD_GROUP_SECTORS } from '../../lib/sectors';
 
@@ -36,6 +36,7 @@ export function Navbar({
     selectedProjectForModal,
     unknownProjectId,
   } = useConstruction();
+  const { construction: constructionTranslations } = useTextOverride();
   const t = constructionTranslations[language];
   const isAr = language === 'ar';
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;

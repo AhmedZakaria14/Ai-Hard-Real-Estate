@@ -1,7 +1,8 @@
+import { usePageMedia } from '../lib/pageMedia';
 import { useEffect, useState } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import type { Language, BlogPost } from '../types';
-import { translations } from '../lib/translations';
+import { useTextOverride } from '../context/TextOverrideContext';
 import { blogCategories, blogCategoryKey, useCatalogBlogCategories } from '../lib/blogCategories';
 import { loadPublishedArticles } from '../lib/db/hardCatalog';
 import { Badge } from '../components/ui/Badge';
@@ -9,9 +10,10 @@ import { SafeRichContent } from '../components/blog/SafeRichContent';
 import { getPageTitle, updateDocumentTitle } from '../lib/pageTitles';
 import { getLocalizedText } from '../lib/utils';
 
-const fallbackCover = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80';
 
 export function BlogPage({ language, articleId }: { language: Language; articleId: string | null }) {
+  const { propertyPlaceholderImage } = usePageMedia();
+  const { translations } = useTextOverride();
   const copy = translations[language].blog;
   const ar = language === 'ar';
   const ArrowIcon = ar ? ArrowLeft : ArrowRight;
@@ -51,7 +53,7 @@ export function BlogPage({ language, articleId }: { language: Language; articleI
       <Badge variant="primary">{label(article)}</Badge>
       <h1 className="text-3xl font-extrabold text-slate-900 sm:text-4xl">{getLocalizedText(article.title, language)}</h1>
       <p className="text-sm text-slate-600">{date(article)}</p>
-      <img src={article.image || fallbackCover} alt={getLocalizedText(article.title, language)} className="aspect-video w-full rounded-2xl object-cover" />
+      <img src={article.image || propertyPlaceholderImage} alt={getLocalizedText(article.title, language)} className="aspect-video w-full rounded-2xl object-cover" />
       <p className="text-lg text-slate-700">{getLocalizedText(article.excerpt, language)}</p>
       <SafeRichContent content={getLocalizedText(article.content, language)} dir={ar ? 'rtl' : 'ltr'} />
     </article> : status === 'ready' && <h1>{ar ? 'المقال غير متاح' : 'Article unavailable'}</h1> : <>
@@ -70,7 +72,7 @@ export function BlogPage({ language, articleId }: { language: Language; articleI
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {visible.map((post) => <article key={post.id} className="flex flex-col overflow-hidden rounded-3xl border bg-white shadow-sm">
           <a href={href(post)} aria-label={getLocalizedText(post.title, language)} className="relative block">
-            <img src={post.image || fallbackCover} alt="" className="aspect-16/10 w-full object-cover" loading="lazy" />
+            <img src={post.image || propertyPlaceholderImage} alt="" className="aspect-16/10 w-full object-cover" loading="lazy" />
             <div className="absolute start-3 top-3"><Badge variant="gradient">{label(post)}</Badge></div>
           </a>
           <div className="flex grow flex-col gap-3 p-6">

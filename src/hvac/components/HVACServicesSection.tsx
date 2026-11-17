@@ -1,8 +1,10 @@
+import { useTextOverride } from '../../context/TextOverrideContext';
 import React from 'react';
 import { useHVAC } from '../context/HVACContext';
-import { T, pick } from '../translations';
+import { pick } from '../translations';
 
 export function HVACServicesSection() {
+  const { hvac: T } = useTextOverride();
   const { language, isAr, services } = useHVAC();
 
   const activeServices = services.filter((s) => s.active);

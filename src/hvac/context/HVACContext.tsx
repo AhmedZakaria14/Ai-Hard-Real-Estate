@@ -1,9 +1,8 @@
+import { subscribeSectorSection, saveSectorSection } from '../../lib/db/hardSectorSections';
 import { loadPublishedHvacServices } from '../../lib/db/hardCatalog';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   Language,
-  HVACLead,
-  HVACLeadStatus,
   HVACService,
   HVACGalleryItem,
   HVACTestimonial,
@@ -16,16 +15,8 @@ import {
   initialTestimonials,
   initialFaqs,
   yearRoundChecklist as initialChecklist,
-  initialSampleLeads,
 } from '../data/initialData';
 import {
-  saveHVACServiceDoc,
-  deleteHVACServiceDoc,
-  subscribeHVACSectionContent,
-  saveHVACSectionContent,
-  saveHVACLeadDoc,
-  updateHVACLeadStatusDoc,
-  deleteHVACLeadDoc,
   HVACCityArea,
   HVACHeroContent,
   HVACOperatingHoursContact,
@@ -34,7 +25,7 @@ import {
   DEFAULT_HVAC_HERO,
   DEFAULT_HVAC_HOURS_CONTACT,
   DEFAULT_HVAC_BOOKING_COPY,
-} from '../services/hvacFirestore';
+} from '../services/sectionDefaults';
 
 interface QuoteInitData {
   city: string;
@@ -48,15 +39,8 @@ interface HVACContextType {
   setLanguage: (lang: Language) => void;
   toggleLanguage: () => void;
   // Leads
-  leads: HVACLead[];
-  addLead: (leadData: Omit<HVACLead, 'id' | 'referenceNumber' | 'createdAt' | 'status' | 'source'>) => HVACLead;
-  updateLeadStatus: (id: string, status: HVACLeadStatus) => void;
-  deleteLead: (id: string) => void;
   // Services
   services: HVACService[];
-  addService: (svc: Omit<HVACService, 'id'>) => Promise<void>;
-  updateService: (id: string, svc: Partial<HVACService>) => Promise<void>;
-  deleteService: (id: string) => Promise<void>;
   updateServices: (services: HVACService[]) => void;
   // Cities & Service Areas
   serviceAreas: HVACCityArea[];
@@ -139,10 +123,6 @@ export function HVACProvider({
     setLanguage(next);
   };
 
-  // Leads state with Firestore sync
-  const [leads, setLeads] = useState<HVACLead[]>(initialSampleLeads);
-
-
   const [services, setServices] = useState<HVACService[]>([]);
   useEffect(() => {
     const controller = new AbortController();
@@ -155,31 +135,11 @@ export function HVACProvider({
     return () => controller.abort();
   }, []);
 
-  const addService = async (svc: Omit<HVACService, 'id'>) => {
-    const newSvc: HVACService = {
-      ...svc,
-      id: `hvac-svc-${Date.now()}`,
-    };
-    await saveHVACServiceDoc(newSvc);
-  };
-
-  const updateService = async (id: string, updated: Partial<HVACService>) => {
-    const existing = services.find((s) => s.id === id);
-    if (!existing) return;
-    const merged = { ...existing, ...updated };
-    await saveHVACServiceDoc(merged);
-  };
-
-  const deleteService = async (id: string) => {
-    await deleteHVACServiceDoc(id);
-  };
-
   // Shared Service Areas / Cities
   const [serviceAreas, setServiceAreas] = useState<HVACCityArea[]>(DEFAULT_HVAC_CITIES);
 
   useEffect(() => {
-    const unsub = subscribeHVACSectionContent<HVACCityArea[]>(
-      'service_areas',
+    const unsub = subscribeSectorSection<HVACCityArea[]>({ sector: 'hvac', key: 'service_areas' },
       DEFAULT_HVAC_CITIES,
       (data) => setServiceAreas(data)
     );
@@ -187,7 +147,7 @@ export function HVACProvider({
   }, []);
 
   const updateServiceAreas = async (areas: HVACCityArea[]) => {
-    await saveHVACSectionContent('service_areas', areas);
+    await saveSectorSection({ sector: 'hvac', key: 'service_areas' }, areas);
     setServiceAreas(areas);
   };
 
@@ -197,18 +157,15 @@ export function HVACProvider({
   const [bookingCopy, setBookingCopy] = useState<HVACBookingCopy>(DEFAULT_HVAC_BOOKING_COPY);
 
   useEffect(() => {
-    const unsubHero = subscribeHVACSectionContent<HVACHeroContent>(
-      'hero',
+    const unsubHero = subscribeSectorSection<HVACHeroContent>({ sector: 'hvac', key: 'hero' },
       DEFAULT_HVAC_HERO,
       (data) => setHeroContent(data)
     );
-    const unsubHours = subscribeHVACSectionContent<HVACOperatingHoursContact>(
-      'hours_contact',
+    const unsubHours = subscribeSectorSection<HVACOperatingHoursContact>({ sector: 'hvac', key: 'hours_contact' },
       DEFAULT_HVAC_HOURS_CONTACT,
       (data) => setOperatingHours(data)
     );
-    const unsubBooking = subscribeHVACSectionContent<HVACBookingCopy>(
-      'booking_copy',
+    const unsubBooking = subscribeSectorSection<HVACBookingCopy>({ sector: 'hvac', key: 'booking_copy' },
       DEFAULT_HVAC_BOOKING_COPY,
       (data) => setBookingCopy(data)
     );
@@ -222,19 +179,19 @@ export function HVACProvider({
 
   const updateHeroContent = async (data: Partial<HVACHeroContent>) => {
     const merged = { ...heroContent, ...data };
-    await saveHVACSectionContent('hero', merged);
+    await saveSectorSection({ sector: 'hvac', key: 'hero' }, merged);
     setHeroContent(merged);
   };
 
   const updateOperatingHours = async (data: Partial<HVACOperatingHoursContact>) => {
     const merged = { ...operatingHours, ...data };
-    await saveHVACSectionContent('hours_contact', merged);
+    await saveSectorSection({ sector: 'hvac', key: 'hours_contact' }, merged);
     setOperatingHours(merged);
   };
 
   const updateBookingCopy = async (data: Partial<HVACBookingCopy>) => {
     const merged = { ...bookingCopy, ...data };
-    await saveHVACSectionContent('booking_copy', merged);
+    await saveSectorSection({ sector: 'hvac', key: 'booking_copy' }, merged);
     setBookingCopy(merged);
   };
 
@@ -242,25 +199,25 @@ export function HVACProvider({
   const [galleryItems, setGalleryItems] = useState<HVACGalleryItem[]>(initialGallery);
 
   useEffect(() => {
-    const unsub = subscribeHVACSectionContent<HVACGalleryItem[]>('work_gallery', initialGallery, setGalleryItems);
+    const unsub = subscribeSectorSection<HVACGalleryItem[]>({ sector: 'hvac', key: 'work_gallery' }, initialGallery, setGalleryItems);
     return () => unsub();
   }, []);
 
   const addGalleryItem = async (item: Omit<HVACGalleryItem, 'id'>) => {
     const next = [...galleryItems, { ...item, id: crypto.randomUUID() }];
-    await saveHVACSectionContent('work_gallery', next);
+    await saveSectorSection({ sector: 'hvac', key: 'work_gallery' }, next);
     setGalleryItems(next);
   };
 
   const updateGalleryItem = async (id: string, updated: Partial<HVACGalleryItem>) => {
     const next = galleryItems.map((item) => item.id === id ? { ...item, ...updated } : item);
-    await saveHVACSectionContent('work_gallery', next);
+    await saveSectorSection({ sector: 'hvac', key: 'work_gallery' }, next);
     setGalleryItems(next);
   };
 
   const deleteGalleryItem = async (id: string) => {
     const next = galleryItems.filter((item) => item.id !== id);
-    await saveHVACSectionContent('work_gallery', next);
+    await saveSectorSection({ sector: 'hvac', key: 'work_gallery' }, next);
     setGalleryItems(next);
   };
 
@@ -268,33 +225,34 @@ export function HVACProvider({
   const [testimonials, setTestimonials] = useState<HVACTestimonial[]>(initialTestimonials);
 
   useEffect(() => {
-    const unsub = subscribeHVACSectionContent<HVACTestimonial[]>('reviews', initialTestimonials, setTestimonials);
+    const unsub = subscribeSectorSection<HVACTestimonial[]>({ sector: 'hvac', key: 'reviews' }, initialTestimonials, setTestimonials);
     return () => unsub();
   }, []);
 
   const addTestimonial = async (item: Omit<HVACTestimonial, 'id'>) => {
     const next = [...testimonials, { ...item, id: crypto.randomUUID() }];
-    await saveHVACSectionContent('reviews', next);
+    await saveSectorSection({ sector: 'hvac', key: 'reviews' }, next);
     setTestimonials(next);
   };
 
   const updateTestimonial = async (id: string, updated: Partial<HVACTestimonial>) => {
     const next = testimonials.map((item) => item.id === id ? { ...item, ...updated } : item);
-    await saveHVACSectionContent('reviews', next);
+    await saveSectorSection({ sector: 'hvac', key: 'reviews' }, next);
     setTestimonials(next);
   };
 
   const deleteTestimonial = async (id: string) => {
     const next = testimonials.filter((item) => item.id !== id);
-    await saveHVACSectionContent('reviews', next);
+    await saveSectorSection({ sector: 'hvac', key: 'reviews' }, next);
     setTestimonials(next);
   };
 
   // FAQs & Maintenance Guides
   const [faqItems, setFaqItems] = useState<HVACFaqItem[]>(initialFaqs);
+  useEffect(() => subscribeSectorSection({ sector: 'hvac', key: 'faq' }, initialFaqs, setFaqItems), []);
   const [maintenanceGuides, setMaintenanceGuides] = useState<HVACChecklistItem[]>(initialChecklist);
 
-  useEffect(() => subscribeHVACSectionContent<HVACChecklistItem[]>('maintenance_guide', initialChecklist, setMaintenanceGuides), []);
+  useEffect(() => subscribeSectorSection<HVACChecklistItem[]>({ sector: 'hvac', key: 'maintenance_guide' }, initialChecklist, setMaintenanceGuides), []);
 
   // Booking Modal
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -335,59 +293,10 @@ export function HVACProvider({
     setIsQuoteDialogOpen(false);
   };
 
-  // Add lead function
-  const addLead = (leadData: Omit<HVACLead, 'id' | 'referenceNumber' | 'createdAt' | 'status' | 'source'>): HVACLead => {
-    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-    const referenceNumber = `HVAC-2026-${randomSuffix}`;
-    const newLead: HVACLead = {
-      ...leadData,
-      id: `hvac-lead-${Date.now()}-${randomSuffix}`,
-      referenceNumber,
-      source: 'hvac',
-      createdAt: new Date().toISOString(),
-      status: 'new',
-    };
-
-    setLeads((prev) => [newLead, ...prev]);
-    saveHVACLeadDoc(newLead).catch((e) => console.warn(e));
-
-    // Optional API dispatch / email trigger (non-blocking)
-    try {
-      fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          recipient: 'info@hardgp.com',
-          subject: `New HVAC Lead [${referenceNumber}]: ${leadData.clientName}`,
-          data: newLead,
-        }),
-      }).catch(() => {
-        // graceful offline fallback
-      });
-    } catch {
-      // ignore
-    }
-
-    return newLead;
-  };
-
-  const updateLeadStatus = (id: string, status: HVACLeadStatus) => {
-    updateHVACLeadStatusDoc(id, status).catch((e) => console.warn(e));
-    setLeads((prev) =>
-      prev.map((l) => (l.id === id ? { ...l, status } : l))
-    );
-  };
-
-  const deleteLead = (id: string) => {
-    deleteHVACLeadDoc(id).catch((e) => console.warn(e));
-    setLeads((prev) => prev.filter((l) => l.id !== id));
-  };
-
   const resetAllToDefaults = () => {
     setServices(initialServices);
     setGalleryItems(initialGallery);
     setTestimonials(initialTestimonials);
-    setLeads(initialSampleLeads);
     setServiceAreas(DEFAULT_HVAC_CITIES);
     setHeroContent(DEFAULT_HVAC_HERO);
     setOperatingHours(DEFAULT_HVAC_HOURS_CONTACT);
@@ -404,14 +313,7 @@ export function HVACProvider({
         isAr: language === 'ar',
         setLanguage,
         toggleLanguage,
-        leads,
-        addLead,
-        updateLeadStatus,
-        deleteLead,
         services,
-        addService,
-        updateService,
-        deleteService,
         updateServices: setServices,
         serviceAreas,
         updateServiceAreas,

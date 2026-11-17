@@ -1,9 +1,11 @@
+import { useTextOverride } from '../../context/TextOverrideContext';
 import React from 'react';
 import { Phone, AlertCircle } from 'lucide-react';
 import { useHVAC } from '../context/HVACContext';
-import { T, pick } from '../translations';
+import { pick } from '../translations';
 
 export function EmergencyTopBar() {
+  const { hvac: T } = useTextOverride();
   const { language, isAr } = useHVAC();
 
   return (

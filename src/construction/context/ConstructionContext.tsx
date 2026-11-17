@@ -1,3 +1,4 @@
+import { subscribeSectorSection, saveSectorSection } from '../../lib/db/hardSectorSections';
 import { isConstructionProjectCategory, loadPublishedConstructionProjects } from '../../lib/db/hardCatalog';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
@@ -9,7 +10,7 @@ import {
   CostEstimateParams,
   CostEstimateResult,
 } from '../types';
-import { INITIAL_PROJECTS, INITIAL_LEADS, INITIAL_SERVICES } from '../data/seedData';
+import { INITIAL_PROJECTS, INITIAL_SERVICES } from '../data/seedData';
 import { calculateConstructionCost } from '../utils/costCalculator';
 import { subscribeToPublishedCalculatorConfig } from '../../lib/calculators/calculatorConfigService';
 import { calculateConstructionCostWithConfig } from '../../lib/calculators/calculatorEngine';
@@ -19,13 +20,6 @@ import {
   syncConstructionUrl,
 } from '../utils/constructionUrlParams';
 import {
-  saveConstructionProject,
-  deleteConstructionProject as deleteConstructionProjectFromDb,
-  subscribeConstructionSectionContent,
-  saveConstructionSectionContent,
-  saveConstructionLead,
-  updateConstructionLeadStatusInDb,
-  deleteConstructionLeadInDb,
   ConstructionHeroContent,
   ConstructionCompanyContent,
   ConstructionWorkStage,
@@ -34,17 +28,13 @@ import {
   DEFAULT_COMPANY_CONTENT,
   DEFAULT_WORK_STAGES,
   DEFAULT_OFFICES,
-} from '../services/constructionFirestore';
+} from '../services/sectionDefaults';
 
 interface ConstructionContextType {
   language: ConstructionLanguage;
   setLanguage: (lang: ConstructionLanguage) => void;
   toggleLanguage: () => void;
   projects: ConstructionProject[];
-  addProject: (proj: Omit<ConstructionProject, 'id'>) => Promise<void>;
-  updateProject: (id: string, proj: Partial<ConstructionProject>) => Promise<void>;
-  deleteProject: (id: string) => Promise<void>;
-  resetProjectsToDefault: () => void;
   services: ConstructionService[];
   addService: (svc: Omit<ConstructionService, 'id'>) => Promise<void>;
   updateService: (id: string, svc: Partial<ConstructionService>) => Promise<void>;
@@ -57,10 +47,6 @@ interface ConstructionContextType {
   updateWorkStages: (stages: ConstructionWorkStage[]) => Promise<void>;
   officeLocations: ConstructionOfficeLocation[];
   updateOfficeLocations: (offices: ConstructionOfficeLocation[]) => Promise<void>;
-  leads: ConstructionQuoteLead[];
-  addLead: (lead: Omit<ConstructionQuoteLead, 'id' | 'referenceNumber' | 'createdAt' | 'status'>) => ConstructionQuoteLead;
-  updateLeadStatus: (id: string, status: ConstructionQuoteLead['status'], adminNotes?: string) => void;
-  deleteLead: (id: string) => void;
   // Modals & Project routing
   isCostEstimatorOpen: boolean;
   openCostEstimator: () => void;
@@ -133,31 +119,9 @@ export const ConstructionProvider: React.FC<{
     return () => controller.abort();
   }, []);
 
-  const addProject = async (proj: Omit<ConstructionProject, 'id'>) => {
-    const newProj: ConstructionProject = {
-      ...proj,
-      id: `hard-proj-${Date.now()}`,
-    };
-    await saveConstructionProject(newProj);
-  };
-
-  const updateProject = async (id: string, updated: Partial<ConstructionProject>) => {
-    const existing = projects.find((p) => p.id === id);
-    if (!existing) return;
-    const merged = { ...existing, ...updated };
-    await saveConstructionProject(merged);
-  };
-
-  const deleteProject = async (id: string) => {
-    await deleteConstructionProjectFromDb(id);
-  };
-
-  const resetProjectsToDefault = () => {
-    setProjects(INITIAL_PROJECTS);
-  };
-
   // Services State
   const [services, setServices] = useState<ConstructionService[]>(INITIAL_SERVICES);
+  useEffect(() => subscribeSectorSection({ sector: 'construction', key: 'services' }, INITIAL_SERVICES, setServices), []);
 
   const addService = async (svc: Omit<ConstructionService, 'id'>) => {
     const newSvc: ConstructionService = {
@@ -175,30 +139,26 @@ export const ConstructionProvider: React.FC<{
     setServices((prev) => prev.filter((s) => s.id !== id));
   };
 
-  // Hero & Company Section Content with Firestore Sync
+  // Hero & Company Section Content
   const [heroContent, setHeroContent] = useState<ConstructionHeroContent>(DEFAULT_HERO_CONTENT);
   const [companyContent, setCompanyContent] = useState<ConstructionCompanyContent>(DEFAULT_COMPANY_CONTENT);
   const [workStages, setWorkStages] = useState<ConstructionWorkStage[]>(DEFAULT_WORK_STAGES);
   const [officeLocations, setOfficeLocations] = useState<ConstructionOfficeLocation[]>(DEFAULT_OFFICES);
 
   useEffect(() => {
-    const unsubHero = subscribeConstructionSectionContent<ConstructionHeroContent>(
-      'hero',
+    const unsubHero = subscribeSectorSection<ConstructionHeroContent>({ sector: 'construction', key: 'hero' },
       DEFAULT_HERO_CONTENT,
       (data) => setHeroContent(data)
     );
-    const unsubCompany = subscribeConstructionSectionContent<ConstructionCompanyContent>(
-      'company',
+    const unsubCompany = subscribeSectorSection<ConstructionCompanyContent>({ sector: 'construction', key: 'company' },
       DEFAULT_COMPANY_CONTENT,
       (data) => setCompanyContent(data)
     );
-    const unsubStages = subscribeConstructionSectionContent<ConstructionWorkStage[]>(
-      'stages',
+    const unsubStages = subscribeSectorSection<ConstructionWorkStage[]>({ sector: 'construction', key: 'stages' },
       DEFAULT_WORK_STAGES,
       (data) => setWorkStages(data)
     );
-    const unsubOffices = subscribeConstructionSectionContent<ConstructionOfficeLocation[]>(
-      'offices',
+    const unsubOffices = subscribeSectorSection<ConstructionOfficeLocation[]>({ sector: 'construction', key: 'offices' },
       DEFAULT_OFFICES,
       (data) => setOfficeLocations(data)
     );
@@ -213,70 +173,24 @@ export const ConstructionProvider: React.FC<{
 
   const updateHeroContent = async (data: Partial<ConstructionHeroContent>) => {
     const updated = { ...heroContent, ...data };
-    await saveConstructionSectionContent('hero', updated);
+    await saveSectorSection({ sector: 'construction', key: 'hero' }, updated);
     setHeroContent(updated);
   };
 
   const updateCompanyContent = async (data: Partial<ConstructionCompanyContent>) => {
     const updated = { ...companyContent, ...data };
-    await saveConstructionSectionContent('company', updated);
+    await saveSectorSection({ sector: 'construction', key: 'company' }, updated);
     setCompanyContent(updated);
   };
 
   const updateWorkStages = async (stages: ConstructionWorkStage[]) => {
-    await saveConstructionSectionContent('stages', stages);
+    await saveSectorSection({ sector: 'construction', key: 'stages' }, stages);
     setWorkStages(stages);
   };
 
   const updateOfficeLocations = async (offices: ConstructionOfficeLocation[]) => {
-    await saveConstructionSectionContent('offices', offices);
+    await saveSectorSection({ sector: 'construction', key: 'offices' }, offices);
     setOfficeLocations(offices);
-  };
-
-  // Leads State with Firestore sync
-  const [leads, setLeads] = useState<ConstructionQuoteLead[]>(INITIAL_LEADS);
-
-
-  const addLead = (
-    data: Omit<ConstructionQuoteLead, 'id' | 'referenceNumber' | 'createdAt' | 'status'>
-  ) => {
-    const randomSuffix = Math.floor(100 + Math.random() * 900);
-    const year = new Date().getFullYear();
-    const referenceNumber = `HARD-REQ-${year}-${randomSuffix}`;
-    const newLead: ConstructionQuoteLead = {
-      ...data,
-      id: `lead-${Date.now()}`,
-      referenceNumber,
-      createdAt: new Date().toISOString(),
-      status: 'new',
-    };
-    saveConstructionLead(newLead).catch((e) => console.warn('Lead save err:', e));
-    setLeads((prev) => [newLead, ...prev]);
-    return newLead;
-  };
-
-  const updateLeadStatus = (
-    id: string,
-    status: ConstructionQuoteLead['status'],
-    adminNotes?: string
-  ) => {
-    updateConstructionLeadStatusInDb(id, status, adminNotes).catch((e) => console.warn(e));
-    setLeads((prev) =>
-      prev.map((l) =>
-        l.id === id
-          ? {
-              ...l,
-              status,
-              adminNotes: adminNotes !== undefined ? adminNotes : l.adminNotes,
-            }
-          : l
-      )
-    );
-  };
-
-  const deleteLead = (id: string) => {
-    deleteConstructionLeadInDb(id).catch((e) => console.warn(e));
-    setLeads((prev) => prev.filter((l) => l.id !== id));
   };
 
   // Project list filters state (initialized from URL)
@@ -561,10 +475,6 @@ export const ConstructionProvider: React.FC<{
         setLanguage,
         toggleLanguage,
         projects,
-        addProject,
-        updateProject,
-        deleteProject,
-        resetProjectsToDefault,
         services,
         addService,
         updateService,
@@ -577,10 +487,6 @@ export const ConstructionProvider: React.FC<{
         updateWorkStages,
         officeLocations,
         updateOfficeLocations,
-        leads,
-        addLead,
-        updateLeadStatus,
-        deleteLead,
         isCostEstimatorOpen,
         openCostEstimator,
         closeCostEstimator,

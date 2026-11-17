@@ -1,3 +1,4 @@
+import { useTextOverride } from '../../context/TextOverrideContext';
 import React from 'react';
 import {
   Sparkles,
@@ -11,9 +12,10 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { useHVAC } from '../context/HVACContext';
-import { T, pick } from '../translations';
+import { pick } from '../translations';
 
 export function HVACSeasonalChecklist() {
+  const { hvac: T } = useTextOverride();
   const { language, isAr, openBookingModal, maintenanceGuides } = useHVAC();
 
   const iconComponents: Record<string, React.ElementType> = {

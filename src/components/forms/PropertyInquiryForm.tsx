@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { Language, Property } from '../../types';
 import { FormAttachmentMeta } from '../../types/firestore-schema';
-import { translations } from '../../lib/translations';
+import { useTextOverride } from '../../context/TextOverrideContext';
 import { Button } from '../ui/Button';
 import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSubmissionService';
 import { FileUploadZone } from './FileUploadZone';
@@ -30,6 +30,7 @@ export function PropertyInquiryForm({
   language,
   onSuccess,
 }: PropertyInquiryFormProps) {
+  const { translations } = useTextOverride();
   const t = translations[language];
   const isAr = language === 'ar';
 

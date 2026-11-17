@@ -1,3 +1,4 @@
+import { usePageMedia } from '../lib/pageMedia';
 import { getLocalizedText } from '../lib/utils';
 import React, { useState } from 'react';
 import {
@@ -18,7 +19,7 @@ import {
   Activity,
 } from 'lucide-react';
 import { Language, PageId, Project } from '../types';
-import { translations } from '../lib/translations';
+import { useTextOverride } from '../context/TextOverrideContext';
 import { loadPublishedProjects } from '../lib/db/hardCatalog';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
@@ -37,6 +38,8 @@ export function ProjectsPage({
   onOpenInquiryModal,
   onOpenProjectInquiryModal,
 }: ProjectsPageProps) {
+  const { translations } = useTextOverride();
+  const { projectPlaceholderImage } = usePageMedia();
   const t = translations[language];
   const [projects, setProjects] = useState<Project[]>([]);
   const [loadAttempt, setLoadAttempt] = useState(0);
@@ -98,7 +101,7 @@ export function ProjectsPage({
             {/* Image side (5 cols) */}
             <div className="lg:col-span-5 relative aspect-16/10 lg:aspect-auto bg-slate-950 overflow-hidden">
               <img
-                src={project.image || project.gallery?.[0] || 'https://images.unsplash.com/photo-1541888946425-d0fbb186156a?auto=format&fit=crop&w=800&q=80'}
+                src={project.image || project.gallery?.[0] || projectPlaceholderImage}
                 alt={getLocalizedText(project.title, language)}
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover"

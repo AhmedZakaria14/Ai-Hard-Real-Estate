@@ -8,8 +8,9 @@ export default function CMSPasswordReset() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
+    const invitation = new URLSearchParams(window.location.search).get('flow') === 'invite';
     const { data: { subscription } } = hardAdminClient.auth.onAuthStateChange((event, session) => {
-      if (event === 'PASSWORD_RECOVERY' && session && toHardAdmin(session.user)) setReady(true);
+      if (session && toHardAdmin(session.user) && (event === 'PASSWORD_RECOVERY' || (invitation && event === 'SIGNED_IN'))) setReady(true);
     });
     return () => subscription.unsubscribe();
   }, []);

@@ -1,3 +1,4 @@
+import { useTextOverride } from '../../context/TextOverrideContext';
 import React, { useState, useEffect, useRef, useId } from 'react';
 import {
   X,
@@ -14,10 +15,11 @@ import {
   Clock,
 } from 'lucide-react';
 import { useHVAC } from '../context/HVACContext';
-import { T, pick } from '../translations';
+import { pick } from '../translations';
 import { submitCustomerForm } from '../../lib/forms/formSubmissionService';
 
 export function HVACQuoteDialog() {
+  const { hvac: T } = useTextOverride();
   const {
     language,
     isAr,

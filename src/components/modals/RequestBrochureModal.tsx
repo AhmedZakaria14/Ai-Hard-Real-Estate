@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Language, Project } from '../../types';
-import { translations } from '../../lib/translations';
+import { useTextOverride } from '../../context/TextOverrideContext';
 import { CheckCircle2, FileText, Send, Sparkles } from 'lucide-react';
 import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSubmissionService';
 
@@ -19,6 +19,7 @@ export function RequestBrochureModal({
   language,
   project,
 }: RequestBrochureModalProps) {
+  const { translations } = useTextOverride();
   const t = translations[language];
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');

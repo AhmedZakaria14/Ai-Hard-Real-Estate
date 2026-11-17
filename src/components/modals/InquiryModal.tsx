@@ -3,7 +3,7 @@ import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Language } from '../../types';
 import { FormAttachmentMeta } from '../../types/firestore-schema';
-import { translations } from '../../lib/translations';
+import { useTextOverride } from '../../context/TextOverrideContext';
 import { CheckCircle2, MessageSquare, Sparkles } from 'lucide-react';
 import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSubmissionService';
 import { FileUploadZone } from '../forms/FileUploadZone';
@@ -21,6 +21,7 @@ export function InquiryModal({
   language,
   initialSubject = '',
 }: InquiryModalProps) {
+  const { translations } = useTextOverride();
   const t = translations[language];
 
   const [fullName, setFullName] = useState('');

@@ -16,7 +16,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { Language, PageId, Property, Project } from '../../types';
-import { translations } from '../../lib/translations';
+import { useTextOverride } from '../../context/TextOverrideContext';
 import { useData } from '../../context/DataContext';
 import { HARD_GROUP_SECTORS } from '../../lib/sectors';
 import { getPageHref } from '../../lib/navigation';
@@ -38,6 +38,7 @@ export function SitemapModal({
   onSelectProperty,
 }: SitemapModalProps) {
   const isAr = language === 'ar';
+  const { translations } = useTextOverride();
   const t = translations[language];
   const { properties, projects } = useData();
 

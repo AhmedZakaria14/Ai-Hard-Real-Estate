@@ -1,3 +1,4 @@
+import { useTextOverride } from '../../context/TextOverrideContext';
 import React from 'react';
 import {
   ShieldCheck,
@@ -7,9 +8,10 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { useHVAC } from '../context/HVACContext';
-import { T, pick } from '../translations';
+import { pick } from '../translations';
 
 export function HVACWhyChooseUs() {
+  const { hvac: T } = useTextOverride();
   const { language, isAr } = useHVAC();
 
   const iconMap: Record<string, React.ElementType> = {

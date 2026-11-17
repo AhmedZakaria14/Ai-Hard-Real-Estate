@@ -3,9 +3,9 @@ import { hardPublishableKey, hardSupabaseUrl } from './hardCatalog';
 
 export type SectorSection =
   | { sector: 'portal'; key: 'landing' }
-  | { sector: 'construction'; key: 'hero' | 'company' | 'stages' | 'offices' }
-  | { sector: 'realestate'; key: 'hero' | 'service_media' | 'property_types' }
-  | { sector: 'hvac'; key: 'hero' | 'hours_contact' | 'booking_copy' | 'service_areas' | 'work_gallery' | 'maintenance_guide' | 'reviews' };
+  | { sector: 'construction'; key: 'hero' | 'company' | 'stages' | 'offices' | 'services' }
+  | { sector: 'realestate'; key: 'hero' | 'service_media' | 'property_types' | 'site_text' | 'page_media' }
+  | { sector: 'hvac'; key: 'hero' | 'hours_contact' | 'booking_copy' | 'service_areas' | 'work_gallery' | 'maintenance_guide' | 'reviews' | 'faq' };
 
 const refreshEvent = 'hard-sector-section-saved';
 
@@ -50,5 +50,9 @@ export async function saveSectorSection({ sector, key }: SectorSection, body: ob
     sector, section_key: key, body, updated_at: new Date().toISOString(),
   }, { onConflict: 'sector,section_key' });
   if (error) throw error;
-  window.dispatchEvent(new CustomEvent(refreshEvent, { detail: { sector, key } }));
+  notifySectorSectionSaved({ sector, key } as SectorSection);
+}
+
+export function notifySectorSectionSaved(section: SectorSection) {
+  window.dispatchEvent(new CustomEvent(refreshEvent, { detail: section }));
 }

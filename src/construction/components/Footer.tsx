@@ -1,3 +1,4 @@
+import { useTextOverride } from '../../context/TextOverrideContext';
 import { usePublishedBrandEmblem } from '../../components/ui/BrandLogo';
 import React from 'react';
 import {
@@ -9,7 +10,6 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { useConstruction } from '../context/ConstructionContext';
-import { constructionTranslations } from '../utils/translations';
 import { COMPANY_CREDENTIALS } from '../data/seedData';
 import { handleSemanticClick } from '../../lib/navigation';
 
@@ -21,6 +21,7 @@ interface FooterProps {
 export function Footer({ onNavigate }: FooterProps) {
   const emblem = usePublishedBrandEmblem('construction', 'light');
   const { language, openCostEstimator, openQuoteModal } = useConstruction();
+  const { construction: constructionTranslations } = useTextOverride();
   const t = constructionTranslations[language];
   const isAr = language === 'ar';
 

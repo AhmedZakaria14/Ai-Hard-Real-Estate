@@ -1,3 +1,5 @@
+import { usePageMedia } from '../../lib/pageMedia';
+import { useTextOverride } from '../../context/TextOverrideContext';
 import React from 'react';
 import {
   HardHat,
@@ -15,11 +17,12 @@ import {
   Clock,
 } from 'lucide-react';
 import { useConstruction } from '../context/ConstructionContext';
-import { constructionTranslations } from '../utils/translations';
 import { COMPANY_CREDENTIALS } from '../data/seedData';
 
 export function Hero() {
+  const { constructionHeroImage } = usePageMedia();
   const { language, openCostEstimator, openQuoteModal, heroContent } = useConstruction();
+  const { construction: constructionTranslations } = useTextOverride();
   const t = constructionTranslations[language];
   const isAr = language === 'ar';
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
@@ -123,7 +126,7 @@ export function Hero() {
               {/* Image with Tag */}
               <div className="relative aspect-4/3 rounded-2xl overflow-hidden bg-slate-900 shadow-inner group">
                 <img
-                  src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80"
+                  src={constructionHeroImage}
                   alt="HARD Business Center Towers"
                   loading="eager"
                   fetchPriority="high"

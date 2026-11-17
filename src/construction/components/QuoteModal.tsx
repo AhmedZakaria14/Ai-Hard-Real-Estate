@@ -1,3 +1,4 @@
+import { useTextOverride } from '../../context/TextOverrideContext';
 import React, { useState, useEffect } from 'react';
 import {
   X,
@@ -19,7 +20,6 @@ import {
   File,
 } from 'lucide-react';
 import { useConstruction } from '../context/ConstructionContext';
-import { constructionTranslations } from '../utils/translations';
 import { ConstructionProjectType, ConstructionQuoteLead } from '../types';
 import { COMPANY_CREDENTIALS } from '../data/seedData';
 import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSubmissionService';
@@ -36,6 +36,7 @@ function QuoteModalContent() {
     quoteModalInitialData,
   } = useConstruction();
 
+  const { construction: constructionTranslations } = useTextOverride();
   const t = constructionTranslations[language];
   const isAr = language === 'ar';
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;

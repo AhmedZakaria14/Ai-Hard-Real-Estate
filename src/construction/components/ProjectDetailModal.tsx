@@ -1,3 +1,4 @@
+import { useTextOverride } from '../../context/TextOverrideContext';
 import React, { useState, useEffect } from 'react';
 import {
   X,
@@ -16,7 +17,6 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { useConstruction } from '../context/ConstructionContext';
-import { constructionTranslations } from '../utils/translations';
 import { buildConstructionProjectUrl } from '../utils/constructionUrlParams';
 import { getLocalizedCategoryLabel, formatAreaBUA } from '../utils/constructionFormatters';
 
@@ -53,6 +53,7 @@ export function ProjectDetailModal() {
 
   if (!selectedProjectForModal && !unknownProjectId) return null;
 
+  const { construction: constructionTranslations } = useTextOverride();
   const t = constructionTranslations[language];
   const isAr = language === 'ar';
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;

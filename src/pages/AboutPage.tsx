@@ -1,3 +1,4 @@
+import { usePageMedia } from '../lib/pageMedia';
 import {
   ShieldCheck,
   Award,
@@ -5,7 +6,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { Language, PageId } from '../types';
-import { translations } from '../lib/translations';
+import { useTextOverride } from '../context/TextOverrideContext';
 import { BrandLogo } from '../components/ui/BrandLogo';
 import { getPageHref, handleSemanticClick } from '../lib/navigation';
 
@@ -15,6 +16,8 @@ interface AboutPageProps {
 }
 
 export function AboutPage({ onNavigate, language }: AboutPageProps) {
+  const { translations } = useTextOverride();
+  const { aboutImage } = usePageMedia();
   const t = translations[language];
   const ArrowIcon = language === 'ar' ? ArrowLeft : ArrowRight;
 
@@ -53,7 +56,7 @@ export function AboutPage({ onNavigate, language }: AboutPageProps) {
 
         <div className="lg:col-span-5 relative aspect-16/10 rounded-2xl overflow-hidden bg-slate-100">
           <img
-            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80"
+            src={aboutImage}
             alt="HARD Headquarters"
             referrerPolicy="no-referrer"
             className="w-full h-full object-cover"

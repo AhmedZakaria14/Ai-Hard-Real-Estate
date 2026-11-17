@@ -1,3 +1,4 @@
+import { usePageMedia } from '../../lib/pageMedia';
 import React, { useState } from 'react';
 import {
   MapPin,
@@ -13,7 +14,7 @@ import {
   Check,
 } from 'lucide-react';
 import { Language, Property } from '../../types';
-import { translations } from '../../lib/translations';
+import { useTextOverride } from '../../context/TextOverrideContext';
 import { Button } from './Button';
 import { Badge } from './Badge';
 import { getPageHref, handleSemanticClick } from '../../lib/navigation';
@@ -46,6 +47,8 @@ export function PropertyCard({
   badgeType,
   activeRentalPeriod,
 }: PropertyCardProps) {
+  const { propertyPlaceholderImage } = usePageMedia();
+  const { translations } = useTextOverride();
   const t = translations[language];
   const ArrowIcon = language === 'ar' ? ArrowLeft : ArrowRight;
   const [copied, setCopied] = useState(false);
@@ -94,7 +97,7 @@ export function PropertyCard({
             aria-label={property?.title?.[language] || (language === 'ar' ? 'عقار' : 'Property')}
           >
             <img
-              src={property?.images?.[activeImageIdx] || property?.images?.[0] || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'}
+              src={property?.images?.[activeImageIdx] || property?.images?.[0] || propertyPlaceholderImage}
               alt={property?.title?.[language] || (language === 'ar' ? 'عقار' : 'Property')}
               loading="lazy"
               decoding="async"
@@ -250,7 +253,7 @@ export function PropertyCard({
             aria-label={property?.title?.[language] || (language === 'ar' ? 'عقار' : 'Property')}
           >
             <img
-              src={property?.images?.[activeImageIdx] || property?.images?.[0] || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'}
+              src={property?.images?.[activeImageIdx] || property?.images?.[0] || propertyPlaceholderImage}
               alt={property?.title?.[language] || (language === 'ar' ? 'عقار' : 'Property')}
               loading="lazy"
               decoding="async"

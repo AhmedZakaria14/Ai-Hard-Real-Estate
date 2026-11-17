@@ -11,7 +11,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { Language, PageId } from '../types';
-import { translations } from '../lib/translations';
+import { useTextOverride } from '../context/TextOverrideContext';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { submitCustomerForm } from '../lib/forms/formSubmissionService';
@@ -22,6 +22,7 @@ interface ContactPageProps {
 }
 
 export function ContactPage({ onNavigate, language }: ContactPageProps) {
+  const { translations } = useTextOverride();
   const t = translations[language];
 
   const [fullName, setFullName] = useState('');

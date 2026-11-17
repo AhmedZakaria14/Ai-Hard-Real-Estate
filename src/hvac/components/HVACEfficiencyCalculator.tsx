@@ -1,3 +1,4 @@
+import { useTextOverride } from '../../context/TextOverrideContext';
 import React, { useState, useEffect } from 'react';
 import {
   Calculator,
@@ -15,13 +16,14 @@ import {
   ShieldAlert,
 } from 'lucide-react';
 import { useHVAC } from '../context/HVACContext';
-import { T, pick } from '../translations';
+import { pick } from '../translations';
 import { EfficiencyTier } from '../types';
 import { subscribeToPublishedCalculatorConfig } from '../../lib/calculators/calculatorConfigService';
 import { calculateHVACEfficiencyWithConfig } from '../../lib/calculators/calculatorEngine';
 import { HVACCalculatorConfigDoc } from '../../lib/calculators/calculatorTypes';
 
 export function HVACEfficiencyCalculator() {
+  const { hvac: T } = useTextOverride();
   const { language, isAr, openBookingModal } = useHVAC();
 
   const [publishedConfig, setPublishedConfig] = useState<HVACCalculatorConfigDoc | null>(null);

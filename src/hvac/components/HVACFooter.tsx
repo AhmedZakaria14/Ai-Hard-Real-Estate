@@ -1,3 +1,4 @@
+import { useTextOverride } from '../../context/TextOverrideContext';
 import React from 'react';
 import {
   Phone,
@@ -11,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useHVAC } from '../context/HVACContext';
 import { HVACBrandLockup } from './HVACBrandLockup';
-import { T, pick } from '../translations';
+import { pick } from '../translations';
 import { PageId } from '../../types';
 import { handleSemanticClick } from '../../lib/navigation';
 import { isAuthorizedAdmin } from '../../lib/adminAuth';
@@ -22,6 +23,7 @@ interface HVACFooterProps {
 }
 
 export function HVACFooter({ onNavigatePage, onOpenCMS }: HVACFooterProps) {
+  const { hvac: T } = useTextOverride();
   const { language, isAr } = useHVAC();
   const [isAdmin, setIsAdmin] = React.useState<boolean>(() => isAuthorizedAdmin());
 

@@ -13,7 +13,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { Language, PageId, Property } from '../types';
-import { translations } from '../lib/translations';
+import { useTextOverride } from '../context/TextOverrideContext';
 import { useData } from '../context/DataContext';
 import { WhatsAppIcon } from '../components/ui/PropertyCard';
 import { propertySpecificationIcons } from '../components/properties/propertySpecificationIcons';
@@ -43,6 +43,7 @@ export function PropertyDetailPage({
   onOpenBookViewingModal,
 }: PropertyDetailPageProps) {
   const propertyTypes = usePropertyTypes();
+  const { translations } = useTextOverride();
   const t = translations[language];
   const ArrowIcon = language === 'ar' ? ArrowRight : ArrowLeft;
   const [activeImageIndex, setActiveImageIndex] = useState(0);

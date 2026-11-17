@@ -1,3 +1,4 @@
+import { useTextOverride } from '../../context/TextOverrideContext';
 import React from 'react';
 import {
   Building2,
@@ -11,11 +12,10 @@ import {
   FileText,
 } from 'lucide-react';
 import { useConstruction } from '../context/ConstructionContext';
-import { INITIAL_SERVICES } from '../data/seedData';
-import { constructionTranslations } from '../utils/translations';
 
 export function ServicesSection() {
-  const { language } = useConstruction();
+  const { language, services } = useConstruction();
+  const { construction: constructionTranslations } = useTextOverride();
   const t = constructionTranslations[language];
   const isAr = language === 'ar';
 
@@ -57,7 +57,7 @@ export function ServicesSection() {
 
         {/* Services Bento Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {INITIAL_SERVICES.map((srv) => {
+          {services.map((srv) => {
             const IconComponent = getIcon(srv.iconName);
             const deliverables = isAr ? srv.deliverablesAr : srv.deliverablesEn;
             const badge = isAr ? srv.badgeAr : srv.badgeEn;

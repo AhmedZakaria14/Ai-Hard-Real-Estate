@@ -27,6 +27,7 @@ import { InquiryModal } from './components/modals/InquiryModal';
 import { ProjectInquiryModal } from './components/modals/ProjectInquiryModal';
 import { FloatingTextEditor } from './components/ui/FloatingTextEditor';
 import { DataProvider, useData } from './context/DataContext';
+import { PageMediaProvider } from './lib/pageMedia';
 import { TextOverrideProvider } from './context/TextOverrideContext';
 import { SiteSettingsProvider } from './context/SiteSettingsContext';
 import { parsePropertyQueryParams, serializePropertyQueryParams } from './lib/propertyUrlParams';
@@ -654,9 +655,9 @@ export default function App() {
     <ErrorBoundary>
       <DataProvider>
         <SiteSettingsProvider>
-          <TextOverrideProvider>
+          <TextOverrideProvider><PageMediaProvider>
             <AppContent />
-          </TextOverrideProvider>
+          </PageMediaProvider></TextOverrideProvider>
         </SiteSettingsProvider>
       </DataProvider>
     </ErrorBoundary>

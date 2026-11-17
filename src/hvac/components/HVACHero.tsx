@@ -1,3 +1,5 @@
+import { usePageMedia } from '../../lib/pageMedia';
+import { useTextOverride } from '../../context/TextOverrideContext';
 import React, { useState } from 'react';
 import {
   MapPin,
@@ -8,9 +10,11 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { useHVAC } from '../context/HVACContext';
-import { T, pick } from '../translations';
+import { pick } from '../translations';
 
 export function HVACHero() {
+  const { hvacHeroImage } = usePageMedia();
+  const { hvac: T } = useTextOverride();
   const { language, isAr, services, serviceAreas, openQuoteDialog, openBookingModal } = useHVAC();
 
   const [selectedCity, setSelectedCity] = useState('');
@@ -37,7 +41,7 @@ export function HVACHero() {
       {/* Background HVAC Field Photo with darkened overlay bg-[#0F172A]/35 */}
       <div className="absolute inset-0 z-0">
         <img
-          src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=2000&q=85"
+          src={hvacHeroImage}
           alt="HARD HVAC Maintenance Engineer at Work"
           loading="eager"
           fetchPriority="high"

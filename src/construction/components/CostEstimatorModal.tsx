@@ -1,3 +1,4 @@
+import { useTextOverride } from '../../context/TextOverrideContext';
 import React, { useState } from 'react';
 import {
   X,
@@ -17,7 +18,6 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import { useConstruction } from '../context/ConstructionContext';
-import { constructionTranslations } from '../utils/translations';
 import { formatAreaBUA, formatAreaSimple } from '../utils/constructionFormatters';
 import { ConstructionProjectType, FinishingLevel, CostEstimateParams } from '../types';
 import { formatSAR } from '../utils/costCalculator';
@@ -45,6 +45,7 @@ export function CostEstimatorModal() {
     transferEstimateToQuote,
   } = useConstruction();
 
+  const { construction: constructionTranslations } = useTextOverride();
   const t = constructionTranslations[language];
   const isAr = language === 'ar';
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;

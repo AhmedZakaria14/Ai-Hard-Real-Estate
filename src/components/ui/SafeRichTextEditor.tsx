@@ -18,7 +18,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { Language } from '../../types';
-import { calculateReadingTime, sanitizeHtml } from '../../lib/blogFirestore';
+import { calculateReadingTime, sanitizeHtml } from '../../lib/blogText';
 
 interface SafeRichTextEditorProps {
   value: string;

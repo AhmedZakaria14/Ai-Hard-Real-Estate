@@ -1,9 +1,11 @@
+import { useTextOverride } from '../../context/TextOverrideContext';
 import React, { useState } from 'react';
 import { MapPin, Image as ImageIcon, Sparkles } from 'lucide-react';
 import { useHVAC } from '../context/HVACContext';
-import { T, pick } from '../translations';
+import { pick } from '../translations';
 
 export function HVACWorkGallery() {
+  const { hvac: T } = useTextOverride();
   const { language, isAr, galleryItems } = useHVAC();
   const [activeFilter, setActiveFilter] = useState('all');
 

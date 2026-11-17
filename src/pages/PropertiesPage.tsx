@@ -24,7 +24,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { Language, PageId, Property, PropertyFilterParams, PropertyType } from '../types';
-import { translations } from '../lib/translations';
+import { useTextOverride } from '../context/TextOverrideContext';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { PropertyCard } from '../components/ui/PropertyCard';
@@ -75,6 +75,7 @@ export function PropertiesPage({
   onOpenBookViewingModal,
   initialFilters,
 }: PropertiesPageProps) {
+  const { translations } = useTextOverride();
   const t = translations[language];
   const { properties: liveProperties, propertyLoadStatus, refreshProperties } = useData();
 

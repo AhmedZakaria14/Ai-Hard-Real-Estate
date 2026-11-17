@@ -1,3 +1,5 @@
+import { usePageMedia } from '../../lib/pageMedia';
+import { useTextOverride } from '../../context/TextOverrideContext';
 import React, { useState } from 'react';
 import {
   Building2,
@@ -14,11 +16,11 @@ import {
 } from 'lucide-react';
 import { useConstruction } from '../context/ConstructionContext';
 import { ConstructionProjectCategory, ConstructionProject } from '../types';
-import { constructionTranslations } from '../utils/translations';
 import { buildConstructionProjectUrl } from '../utils/constructionUrlParams';
 import { getLocalizedCategoryLabel, formatAreaBUA } from '../utils/constructionFormatters';
 
 export function ProjectsSection() {
+  const { projectPlaceholderImage } = usePageMedia();
   const {
     language,
     projects,
@@ -30,6 +32,7 @@ export function ProjectsSection() {
     setSearchQuery,
     resetProjectFilters,
   } = useConstruction();
+  const { construction: constructionTranslations } = useTextOverride();
   const t = constructionTranslations[language];
   const isAr = language === 'ar';
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
@@ -171,7 +174,7 @@ export function ProjectsSection() {
                     aria-label={isAr ? proj.titleAr || '' : proj.titleEn || ''}
                   >
                     <img
-                      src={proj.image || 'https://images.unsplash.com/photo-1541888946425-d0fbb186156a?auto=format&fit=crop&w=800&q=80'}
+                      src={proj.image || projectPlaceholderImage}
                       alt={isAr ? proj.titleAr || '' : proj.titleEn || ''}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       loading="lazy"

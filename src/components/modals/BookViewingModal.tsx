@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Property, Language } from '../../types';
-import { translations } from '../../lib/translations';
+import { useTextOverride } from '../../context/TextOverrideContext';
 import { Calendar, Clock, User, Mail, Phone, CheckCircle2, MessageSquare, Sparkles } from 'lucide-react';
 import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSubmissionService';
 
@@ -19,6 +19,7 @@ export function BookViewingModal({
   property,
   language,
 }: BookViewingModalProps) {
+  const { translations } = useTextOverride();
   const t = translations[language];
 
   const tourType = 'in-person';

@@ -1,9 +1,11 @@
+import { useTextOverride } from '../../context/TextOverrideContext';
 import React from 'react';
 import { Star, Quote, MessageSquare, MapPin } from 'lucide-react';
 import { useHVAC } from '../context/HVACContext';
-import { T, pick } from '../translations';
+import { pick } from '../translations';
 
 export function HVACTestimonials() {
+  const { hvac: T } = useTextOverride();
   const { language, isAr, testimonials } = useHVAC();
 
   const activeReviews = testimonials.filter((t) => t.active);

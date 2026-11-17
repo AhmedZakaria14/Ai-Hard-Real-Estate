@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Tag, Save, Sparkles, FolderTree } from 'lucide-react';
 import { Language, BlogCategory } from '../../types';
-import { generateSlug } from '../../lib/blogFirestore';
+import { generateSlug } from '../../lib/blogText';
 
 interface CMSCategoryModalProps {
   isOpen: boolean;
