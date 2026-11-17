@@ -1,36 +1,45 @@
 import { useEffect, useState } from 'react';
-import { hardAdminClient } from '../../lib/db/hardAdminClient';
+import { readRequestMetrics, type RequestMetrics } from '../../lib/db/hardRequestMetrics';
 import type { Language } from '../../types';
 
+const cards = [
+  { key: 'unarchived', ar: 'الطلبات غير المؤرشفة', en: 'Unarchived requests' },
+  { key: 'pending', ar: 'الطلبات الجديدة', en: 'New requests' },
+  { key: 'appointments', ar: 'طلبات المواعيد غير المؤرشفة', en: 'Unarchived appointment requests' },
+  { key: 'archived', ar: 'الطلبات المؤرشفة', en: 'Archived requests' },
+] as const;
+
 export function RequestDashboardCounts({ language }: { language: Language }) {
-  const [result, setResult] = useState<{ open: number; fresh: number } | 'loading' | 'error'>('loading');
+  const [result, setResult] = useState<RequestMetrics | 'loading' | 'error'>('loading');
+  const [revision, setRevision] = useState(0);
   const ar = language === 'ar';
 
   useEffect(() => {
-    const controller = new AbortController();
-    const query = () => hardAdminClient.from('hard_form_submissions')
-      .select('id', { count: 'exact', head: true }).is('archived_at', null)
-      .neq('form_type', 'newsletter_signup');
-    async function load() {
-      try {
-        const [open, fresh] = await Promise.all([
-          query().abortSignal(controller.signal),
-          query().eq('status', 'new').abortSignal(controller.signal),
-        ]);
-        if (open.error || fresh.error || open.count == null || fresh.count == null) throw new Error('Missing request totals');
-        if (!controller.signal.aborted) setResult({ open: open.count, fresh: fresh.count });
-      } catch {
-        if (!controller.signal.aborted) setResult('error');
-      }
-    }
-    void load();
-    return () => controller.abort();
+    const onFocus = () => setRevision((value) => value + 1);
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
   }, []);
 
-  if (result === 'loading') return <p role="status">{ar ? 'جاري تحميل أعداد الطلبات…' : 'Loading request totals…'}</p>;
-  if (result === 'error') return <p role="alert">{ar ? 'تعذر تحميل أعداد الطلبات.' : 'Could not load request totals.'}</p>;
-  return <dl className="grid grid-cols-2 gap-3">
-    <div className="rounded-xl border bg-white p-4"><dt>{ar ? 'الطلبات غير المؤرشفة' : 'Unarchived requests'}</dt><dd className="text-xl font-bold">{result.open}</dd></div>
-    <div className="rounded-xl border bg-white p-4"><dt>{ar ? 'الطلبات الجديدة' : 'New requests'}</dt><dd className="text-xl font-bold">{result.fresh}</dd></div>
-  </dl>;
+  useEffect(() => {
+    const controller = new AbortController();
+    setResult('loading');
+    void readRequestMetrics(0, controller.signal).then((data) => {
+      if (!controller.signal.aborted) setResult(data);
+    }).catch(() => {
+      if (!controller.signal.aborted) setResult('error');
+    });
+    return () => controller.abort();
+  }, [revision]);
+
+  return <section className="space-y-2">
+    <button className="rounded border bg-white px-3 py-2 text-sm" type="button" disabled={result === 'loading'}
+      onClick={() => setRevision((value) => value + 1)}>{ar ? 'تحديث أعداد الطلبات' : 'Refresh request totals'}</button>
+    {result === 'loading' ? <p role="status">{ar ? 'جاري تحميل أعداد الطلبات…' : 'Loading request totals…'}</p>
+      : result === 'error' ? <p role="alert">{ar ? 'تعذر تحميل أعداد الطلبات.' : 'Could not load request totals.'}</p>
+      : <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {cards.map((card) => <div key={card.key} className="rounded-xl border bg-white p-4">
+          <dt>{card[language]}</dt><dd className="text-xl font-bold">{result[card.key]}</dd>
+        </div>)}
+      </dl>}
+  </section>;
 }

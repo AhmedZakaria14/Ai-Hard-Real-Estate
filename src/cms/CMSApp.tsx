@@ -83,7 +83,6 @@ export const CMSApp: React.FC<CMSAppProps> = ({
     blogPosts,
     testimonials,
     subscribers,
-    leads,
     teamMembers,
     faqs,
     offices,

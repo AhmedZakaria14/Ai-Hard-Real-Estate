@@ -13,29 +13,17 @@ import {
   PartnerBrand,
   EnhancedTestimonial,
 } from '../types/businessEntities';
-import {
-  LeadsRepository,
-} from '../lib/db/repository';
 import { mockFaqs, mockCertifications, mockEnhancedTestimonials } from '../data/entitiesMockData';
-import {
-  LeadRecord,
-  CrmSyncLog,
-  subscribeToCrmLogs,
-  getCrmSyncLogs,
-} from '../lib/integrations/crmSync';
-import { isSupabaseConfigured } from '../lib/db/supabaseClient';
 import { loadPublishedArticles, loadPublishedProjects, loadPublishedProperties, type PublicProperty } from '../lib/db/hardCatalog';
 import { createPublishedProperty, archivePublishedCatalog, createPublishedProject, createPublishedArticle, updatePublishedCatalog } from '../lib/db/hardCatalogWrites';
 import { SECTOR_CONTACT_DETAILS } from '../lib/sectors';
 
 interface DataContextType {
   properties: Property[];
-  leads: LeadRecord[];
   projects: Project[];
   blogPosts: BlogPost[];
   testimonials: Testimonial[];
   subscribers: JoinListSubscriber[];
-  crmLogs: CrmSyncLog[];
   // Reusable Business Entities
   teamMembers: TeamMember[];
   faqs: FaqEntity[];
@@ -45,7 +33,6 @@ interface DataContextType {
   partnerBrands: PartnerBrand[];
   enhancedTestimonials: EnhancedTestimonial[];
   isLoading: boolean;
-  isSupabaseConnected: boolean;
 
   addProperty: (propertyData: Partial<Property>) => Promise<Property>;
   updateProperty: (id: string, updates: Partial<Property>) => Promise<Property>;
@@ -114,19 +101,6 @@ interface DataContextType {
   deleteEnhancedTestimonial: (id: string) => Promise<boolean>;
   resetEnhancedTestimonialsToDefault: () => Promise<void>;
 
-  // Leads & CRM
-  submitLead: (leadInput: {
-    name: string;
-    email: string;
-    phone: string;
-    property_id?: string;
-    property_title?: string;
-    inquiry_type: LeadRecord['inquiry_type'];
-    recipient_email?: string;
-    message?: string;
-    source?: string;
-    metadata?: Record<string, any>;
-  }) => Promise<{ lead: LeadRecord; crmResult: { success: boolean; crmReferenceId: string; crmSystem: string } }>;
   refreshData: () => Promise<void>;
 }
 
@@ -150,12 +124,10 @@ function byOrder(a: { order: number }, b: { order: number }) {
 
 export function DataProvider({ children }: { children: React.ReactNode }) {
   const [properties, setProperties] = useState<Property[]>([]);
-  const [leads, setLeads] = useState<LeadRecord[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [subscribers, setSubscribers] = useState<JoinListSubscriber[]>([]);
-  const [crmLogs, setCrmLogs] = useState<CrmSyncLog[]>(getCrmSyncLogs());
 
   // Entities state
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
@@ -236,16 +208,13 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     const propertiesRequest = refreshProperties();
     try {
       const [
-        lds,
         projs,
         posts,
       ] = await Promise.all([
-        LeadsRepository.getAll(),
         loadPublishedProjects().then((rows) => rows.map(({ content }) => content)),
         loadPublishedArticles().then((rows) => rows.map(({ content }) => content)),
       ]);
 
-      setLeads(lds);
       setProjects(projs);
       setBlogPosts(posts);
     } catch (err) {
@@ -257,16 +226,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   }, [refreshProperties]);
 
   useEffect(() => {
-    refreshData();
-
-    // 3. Listener for CRM sync logs
-    const unsubCrm = subscribeToCrmLogs((newLogs) => {
-      setCrmLogs(newLogs);
-    });
-
-    return () => {
-      unsubCrm();
-    };
+    void refreshData();
   }, [refreshData]);
 
   // Properties CRUD
@@ -573,34 +533,14 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     setEnhancedTestimonials([...defaults].sort(byOrder));
   };
 
-  // Leads & CRM
-  const submitLead = async (leadInput: {
-    name: string;
-    email: string;
-    phone: string;
-    property_id?: string;
-    property_title?: string;
-    inquiry_type: LeadRecord['inquiry_type'];
-    recipient_email?: string;
-    message?: string;
-    source?: string;
-    metadata?: Record<string, any>;
-  }) => {
-    const result = await LeadsRepository.create(leadInput);
-    setLeads((prev) => [result.lead, ...prev]);
-    return result;
-  };
-
   return (
     <DataContext.Provider
       value={{
         properties,
-        leads,
         projects,
         blogPosts,
         testimonials,
         subscribers,
-        crmLogs,
         teamMembers,
         faqs,
         offices,
@@ -609,7 +549,6 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         partnerBrands,
         enhancedTestimonials,
         isLoading,
-        isSupabaseConnected: isSupabaseConfigured,
         addProperty,
         updateProperty,
         deleteProperty,
@@ -653,7 +592,6 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         updateEnhancedTestimonial,
         deleteEnhancedTestimonial,
         resetEnhancedTestimonialsToDefault,
-        submitLead,
         refreshData,
       }}
     >

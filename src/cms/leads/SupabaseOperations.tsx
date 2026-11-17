@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import { hardAdminClient } from '../../lib/db/hardAdminClient';
 
-type Report = { requests: number; pending: number; appointments: number; archived: number; subscribers: number };
+import { readRequestMetrics, type RequestMetrics } from '../../lib/db/hardRequestMetrics';
 type InboxEvent = { submission_id: string; tracking_code: string; sector: string; form_type: string; occurred_at: string; seen_at: string | null };
-const labels: Record<keyof Report, string> = {
-  requests: 'إجمالي الطلبات', pending: 'طلبات جديدة مفتوحة', appointments: 'طلبات المواعيد',
+const labels: Record<keyof RequestMetrics, string> = {
+  requests: 'إجمالي الطلبات', unarchived: 'الطلبات غير المؤرشفة', pending: 'طلبات جديدة مفتوحة', appointments: 'طلبات المواعيد غير المؤرشفة',
   archived: 'الطلبات المؤرشفة', subscribers: 'الاشتراكات',
 };
 
 export default function SupabaseOperations({ section, refresh }: { section: 'reports' | 'notifications'; refresh: number }) {
   const [days, setDays] = useState(30);
-  const [report, setReport] = useState<Report | null>(null);
+  const [report, setReport] = useState<RequestMetrics | null>(null);
   const [events, setEvents] = useState<InboxEvent[]>([]);
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -25,8 +25,7 @@ export default function SupabaseOperations({ section, refresh }: { section: 'rep
     async function load() {
       try {
         if (section === 'reports') {
-          const { data, error: queryError } = await hardAdminClient.rpc('hard_operations_report', { p_days: days }).abortSignal(controller.signal);
-          if (queryError) throw queryError;
+          const data = await readRequestMetrics(days, controller.signal);
           if (!controller.signal.aborted) setReport(data);
         } else {
           const { data, error: queryError } = await hardAdminClient.from('hard_operation_events')
@@ -70,7 +69,7 @@ export default function SupabaseOperations({ section, refresh }: { section: 'rep
         {[30, 90, 365].map((value) => <option key={value} value={value}>{value} يومًا</option>)}
       </select></label>
       {!loading && !error && report && <dl className="grid gap-3 sm:grid-cols-3">
-        {(Object.keys(labels) as (keyof Report)[]).map((key) => <div key={key} className="rounded border p-4">
+        {(Object.keys(labels) as (keyof RequestMetrics)[]).map((key) => <div key={key} className="rounded border p-4">
           <dt>{labels[key]}</dt><dd className="text-xl font-bold">{report[key]}</dd>
         </div>)}
       </dl>}
