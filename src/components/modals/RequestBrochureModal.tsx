@@ -105,20 +105,20 @@ export function RequestBrochureModal({
           </div>
 
           <h4 className="text-lg font-bold text-slate-900 font-display-serif">
-            {language === 'en' ? 'Brochure Dispatched!' : 'تم طلب الكتيب بنجاح!'}
+            {language === 'en' ? 'Brochure Request Received!' : 'تم طلب الكتيب بنجاح!'}
           </h4>
 
           <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-md mx-auto">
             {language === 'en' ? (
               <>
-                We have registered your request and sent the full investment brochure for{' '}
-                <strong className="text-slate-900">{project.title[language]}</strong> to{' '}
+                We have registered your request for the full investment brochure for{' '}
+                <strong className="text-slate-900">{project.title[language]}</strong> using{' '}
                 <strong className="text-blue-700 font-mono">{confirmedEmail}</strong>.
               </>
             ) : (
               <>
-                تم تسجيل طلبك وإرسال الكتيب التعريفي الشامل لمشروع{' '}
-                <strong className="text-slate-900">{project.title[language]}</strong> إلى البريد الإلكتروني{' '}
+                تم تسجيل طلبك للحصول على الكتيب التعريفي الشامل لمشروع{' '}
+                <strong className="text-slate-900">{project.title[language]}</strong> باستخدام البريد الإلكتروني{' '}
                 <strong className="text-blue-700 font-mono">{confirmedEmail}</strong>.
               </>
             )}
@@ -131,7 +131,7 @@ export function RequestBrochureModal({
             </p>
             <p className="flex items-center gap-1 text-blue-600 font-semibold pt-1 border-t border-slate-200">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>{language === 'en' ? `Dispatched via CRM (${crmRef || 'Synced'})` : `تم التوثيق بالنظام (${crmRef || 'مكتمل'})`}</span>
+              <span>{language === 'en' ? `Recorded in CRM (${crmRef || 'Synced'})` : `تم التوثيق بالنظام (${crmRef || 'مكتمل'})`}</span>
             </p>
           </div>
 
@@ -202,7 +202,7 @@ export function RequestBrochureModal({
           <div className="pt-2">
             <Button type="submit" isLoading={isLoading} className="w-full">
               <Send className="w-4 h-4" />
-              <span>{language === 'en' ? 'Send Brochure to Email' : 'إرسال الكتيب إلى البريد الإلكتروني'}</span>
+              <span>{language === 'en' ? 'Send Brochure to Email' : 'إرسال الكتيب باستخدام البريد الإلكتروني'}</span>
             </Button>
           </div>
         </form>

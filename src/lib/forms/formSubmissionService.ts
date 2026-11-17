@@ -72,7 +72,10 @@ export function validateFormPayload(
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const isPropertyContact = payload.sector === 'realestate'
     && (payload.formType === 'property_inquiry' || payload.formType === 'book_viewing');
-  const emailOptional = isPropertyContact || (payload.formType === 'hvac_service' && payload.sector === 'hvac');
+  const isProjectContact = payload.formType === 'project_inquiry' && payload.sector === 'realestate';
+  const isBrochure = isProjectContact && payload.details?.requestType === 'brochure';
+  const emailOptional = isPropertyContact || (isProjectContact && !isBrochure)
+    || (payload.formType === 'hvac_service' && payload.sector === 'hvac');
   if (!emailTrimmed && !emailOptional) {
     errors.email = isAr ? 'يرجى إدخال البريد الإلكتروني.' : 'Email address is required.';
   } else if (emailTrimmed && (!emailRegex.test(emailTrimmed) || emailTrimmed.length > 254)) {
@@ -95,14 +98,16 @@ export function validateFormPayload(
   const phoneTrimmed = payload.phone ? payload.phone.trim().replace(/\s+/g, '') : '';
   const phoneDigits = phoneTrimmed.replace(/\D/g, '');
   if (!phoneTrimmed) {
-    errors.phone = isAr ? 'يرجى إدخال رقم الهاتف/الواتساب.' : 'Phone number is required.';
+    if (!isProjectContact || (!isBrochure && !emailTrimmed)) {
+      errors.phone = isAr ? 'يرجى إدخال رقم الهاتف/الواتساب.' : 'Phone number is required.';
+    }
   } else if (phoneDigits.length < 7) {
     errors.phone = isAr
       ? 'رقم الهاتف يجب أن يحتوي على 7 أرقام على الأقل.'
       : 'Phone number must contain at least 7 digits.';
   } else if (
-    ((isPropertyContact || (emailOptional && !emailTrimmed)) && phoneDigits.length > 20)
-    || (isPropertyContact && /[^\d()+.-]/.test(phoneTrimmed))
+    ((isPropertyContact || isProjectContact || (emailOptional && !emailTrimmed)) && phoneDigits.length > 20)
+    || ((isPropertyContact || isProjectContact) && /[^\d()+.-]/.test(phoneTrimmed))
   ) {
     errors.phone = isAr ? 'يرجى إدخال رقم هاتف صحيح.' : 'Please enter a valid phone number.';
   }
