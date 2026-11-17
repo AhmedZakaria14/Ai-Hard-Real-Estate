@@ -17,7 +17,7 @@ import {
 import { useConstruction } from '../context/ConstructionContext';
 import { ConstructionProjectCategory, ConstructionProject } from '../types';
 import { buildConstructionProjectUrl } from '../utils/constructionUrlParams';
-import { getLocalizedCategoryLabel, formatAreaBUA } from '../utils/constructionFormatters';
+import { getLocalizedCategoryLabel, formatAreaBUA, formatConstructionDigits } from '../utils/constructionFormatters';
 
 export function ProjectsSection() {
   const { projectPlaceholderImage } = usePageMedia();
@@ -222,7 +222,7 @@ export function ProjectsSection() {
                       </a>
 
                       <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
-                        {isAr ? proj.descriptionAr : proj.descriptionEn}
+                        {formatConstructionDigits(isAr ? proj.descriptionAr : proj.descriptionEn, language)}
                       </p>
                     </div>
 
@@ -234,7 +234,7 @@ export function ProjectsSection() {
                       </div>
                       <div className="flex items-center gap-1.5 min-w-0">
                         <Calendar className="w-3.5 h-3.5 text-[#0072b8] shrink-0" />
-                        <span className="truncate">{String(proj.year ?? '').replace(/[0-9٠-٩]/g, (digit) => { const index = '٠١٢٣٤٥٦٧٨٩'.indexOf(digit); return isAr ? '٠١٢٣٤٥٦٧٨٩'[index < 0 ? Number(digit) : index] : (index < 0 ? digit : String(index)); })}</span>
+                        <span className="truncate">{formatConstructionDigits(proj.year, language)}</span>
                       </div>
                     </div>
 

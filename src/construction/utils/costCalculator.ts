@@ -124,7 +124,7 @@ export function calculateConstructionCost(params: CostEstimateParams): CostEstim
 }
 
 export function formatSAR(amount: number, isAr: boolean = true): string {
-  const formatted = new Intl.NumberFormat('en-US', {
+  const formatted = new Intl.NumberFormat(isAr ? 'ar-SA-u-nu-arab' : 'en-US', {
     maximumFractionDigits: 0,
   }).format(amount);
   return isAr ? `${formatted} ر.س` : `${formatted} SAR`;

@@ -1,3 +1,4 @@
+import { formatConstructionDigits } from '../utils/constructionFormatters';
 import { usePageMedia } from '../../lib/pageMedia';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import React from 'react';
@@ -201,7 +202,7 @@ export function Hero() {
           <div className="p-5 rounded-2xl bg-white border border-sky-100 shadow-sm text-start space-y-1 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <span className="text-2xl sm:text-4xl font-black font-display-serif text-[#0f243e] tracking-tight">
-                {t.hero.stats.yearsCount}
+                {formatConstructionDigits(t.hero.stats.yearsCount, language)}
               </span>
               <div className="p-2.5 rounded-xl bg-[#eef7ff] text-[#009ee2] border border-sky-100">
                 <Award className="w-5 h-5" />
@@ -214,7 +215,7 @@ export function Hero() {
           <div className="p-5 rounded-2xl bg-white border border-sky-100 shadow-sm text-start space-y-1 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <span className="text-2xl sm:text-4xl font-black font-display-serif text-[#0f243e] tracking-tight">
-                {t.hero.stats.projectsCount}
+                {formatConstructionDigits(t.hero.stats.projectsCount, language)}
               </span>
               <div className="p-2.5 rounded-xl bg-[#eef7ff] text-[#009ee2] border border-sky-100">
                 <Building className="w-5 h-5" />
@@ -227,7 +228,7 @@ export function Hero() {
           <div className="p-5 rounded-2xl bg-white border border-sky-100 shadow-sm text-start space-y-1 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <span className="text-2xl sm:text-4xl font-black font-display-serif text-[#0f243e] tracking-tight">
-                {t.hero.stats.satisfactionCount}
+                {formatConstructionDigits(t.hero.stats.satisfactionCount, language)}
               </span>
               <div className="p-2.5 rounded-xl bg-[#eef7ff] text-[#009ee2] border border-sky-100">
                 <CheckCircle2 className="w-5 h-5" />

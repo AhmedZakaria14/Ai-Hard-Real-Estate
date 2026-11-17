@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { useConstruction } from '../context/ConstructionContext';
 import { buildConstructionProjectUrl } from '../utils/constructionUrlParams';
-import { getLocalizedCategoryLabel, formatAreaBUA } from '../utils/constructionFormatters';
+import { getLocalizedCategoryLabel, formatAreaBUA, formatConstructionDigits } from '../utils/constructionFormatters';
 
 export function ProjectDetailModal() {
   const {
@@ -223,7 +223,7 @@ export function ProjectDetailModal() {
               {getLocalizedCategoryLabel(proj.category, language)}
             </span>
             <span className="text-xs text-slate-500">
-              {isAr ? proj.cityAr : proj.cityEn}{proj.year && ' • ' + proj.year}
+              {isAr ? proj.cityAr : proj.cityEn}{proj.year && ' • ' + formatConstructionDigits(proj.year, language)}
             </span>
           </div>
           <h2 id="project-modal-title" className="text-xl sm:text-2xl font-bold font-display-serif text-[#0f243e]">
@@ -294,7 +294,7 @@ export function ProjectDetailModal() {
               <div className="text-[10px] text-slate-500">{t.projects.durationLabel}</div>
               <div className="text-sm sm:text-base font-bold text-[#0f243e] flex items-center gap-1.5">
                 <Clock className="w-4 h-4 text-sky-600" />
-                <span>{proj.durationMonths} {isAr ? 'أشهر' : 'Months'}</span>
+                <span>{formatConstructionDigits(proj.durationMonths, language)} {isAr ? 'أشهر' : 'Months'}</span>
               </div>
             </div>
             )}
@@ -304,7 +304,7 @@ export function ProjectDetailModal() {
               <div className="text-[10px] text-slate-500">{t.projects.valueLabel}</div>
               <div className="text-sm sm:text-base font-bold text-emerald-600 flex items-center gap-1.5">
                 <Coins className="w-4 h-4 text-emerald-600" />
-                <span>{proj.valueSAR}</span>
+                <span>{formatConstructionDigits(proj.valueSAR, language)}</span>
               </div>
             </div>
             )}
@@ -324,7 +324,7 @@ export function ProjectDetailModal() {
               {isAr ? 'الوصف الهندسي والمعماري' : 'Architectural & Engineering Overview'}
             </h3>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              {isAr ? proj.descriptionAr : proj.descriptionEn}
+              {formatConstructionDigits(isAr ? proj.descriptionAr : proj.descriptionEn, language)}
             </p>
           </div>
 

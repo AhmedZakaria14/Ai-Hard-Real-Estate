@@ -18,7 +18,7 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import { useConstruction } from '../context/ConstructionContext';
-import { formatAreaBUA, formatAreaSimple } from '../utils/constructionFormatters';
+import { formatAreaBUA, formatAreaSimple, formatConstructionDigits } from '../utils/constructionFormatters';
 import { ConstructionProjectType, FinishingLevel, CostEstimateParams } from '../types';
 import { formatSAR } from '../utils/costCalculator';
 
@@ -258,7 +258,7 @@ export function CostEstimatorModal() {
                   </span>
                 </div>
                 <div className="text-xs font-bold text-slate-900 truncate">
-                  {formatAreaBUA(costParams.builtUpArea, language)} • {costParams.floors} {isAr ? 'أدوار' : 'Fl.'}
+                  {formatAreaBUA(costParams.builtUpArea, language)} • {formatConstructionDigits(costParams.floors, language)} {isAr ? 'أدوار' : 'Fl.'}
                 </div>
               </div>
 
@@ -551,7 +551,7 @@ export function CostEstimatorModal() {
                   <div className="text-base font-bold text-[#009ee2] flex items-center gap-1">
                     <Clock className="w-4 h-4" />
                     <span>
-                      {currentEstimate.estimatedDurationMonths} {t.calculator.months}
+                      {formatConstructionDigits(currentEstimate.estimatedDurationMonths, language)} {t.calculator.months}
                     </span>
                   </div>
                 </div>

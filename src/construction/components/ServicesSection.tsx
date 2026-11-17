@@ -1,3 +1,4 @@
+import { formatConstructionDigits } from '../utils/constructionFormatters';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import React from 'react';
 import {
@@ -117,7 +118,7 @@ export function ServicesSection() {
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
                     <ShieldCheck className="w-4 h-4" />
                     <span>
-                      {srv.warrantyYears} {t.services.warrantyLabel}
+                      {formatConstructionDigits(srv.warrantyYears, language)} {t.services.warrantyLabel}
                     </span>
                   </div>
 

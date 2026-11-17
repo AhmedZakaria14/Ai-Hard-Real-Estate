@@ -1,3 +1,4 @@
+import { formatConstructionDigits } from '../utils/constructionFormatters';
 import { usePageMedia } from '../../lib/pageMedia';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import React from 'react';
@@ -26,7 +27,7 @@ export function AboutSection() {
 
   const aboutTitle = isAr ? companyContent.aboutTitleAr : companyContent.aboutTitleEn;
   const aboutText = isAr ? companyContent.aboutTextAr.replace('تأسست شركة هارد للمقاولات', 'تأسست مؤسسة عبد المحسن الدوسري (هارد) للمقاولات').replace('قطاع المقاولات والإنشاءات بالمملكة', 'قطاع المقاولات والإنشاءات بالمنطقة الشرقية') : companyContent.aboutTextEn.replace(/^.*?(?= was established)/i, 'Abdul Mohsen Al-Dosari Establishment (HARD) for Contracting');
-  const visionText = isAr ? companyContent.visionAr : companyContent.visionEn;
+  const visionText = formatConstructionDigits(isAr ? companyContent.visionAr : companyContent.visionEn, language);
   const missionText = isAr ? companyContent.missionAr : companyContent.missionEn;
 
 

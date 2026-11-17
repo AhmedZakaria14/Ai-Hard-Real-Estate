@@ -117,7 +117,7 @@ export const DEFAULT_COMPANY_CONTENT: ConstructionCompanyContent = {
   aboutTextEn:
     'HARD Contracting was founded as a cornerstone in the Kingdom’s contracting and construction sector, combining deep engineering expertise with state-of-the-art machinery to deliver turnkey projects adhering strictly to the Saudi Building Code (SBC).',
   visionAr:
-    'أن نكون الخيار الأول في قطاع المقاولات العامة والإنشاءات الكبرى عبر تقديم حلول هندسية مبتكرة ومستدامة تلبي تطلعات رؤية السعودية 2030.',
+    'أن نكون الخيار الأول في قطاع المقاولات العامة والإنشاءات الكبرى عبر تقديم حلول هندسية مبتكرة ومستدامة تلبي تطلعات رؤية السعودية ٢٠٣٠.',
   visionEn:
     'To be the premier choice in general contracting and major engineering construction by providing innovative and sustainable engineering solutions aligned with Saudi Vision 2030.',
   missionAr:

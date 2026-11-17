@@ -82,7 +82,7 @@ export const initialServices: HVACService[] = [
     descriptionAr:
       'كشف إلكتروني لتسريبات غاز التبريد بواسطة النيتروجين، تفريغ فاكيوم بالمايكرون، وتعبئة فريون R410A و R32 بموازين دقيقة.',
     image:
-      'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80',
     badgeEn: 'Pure R410A/R32',
     badgeAr: 'فريون أمريكي وأوروبي أصلي',
     active: true,
@@ -98,7 +98,7 @@ export const initialServices: HVACService[] = [
     descriptionAr:
       'فحص شامل قبل موسم الصيف، تنظيف واستبدال فلاتر الهواء، معايرة تدفق الهواء، تشحيم المحركات وفحص استهلاك الأمبير.',
     image:
-      'https://images.unsplash.com/photo-1541888946425-d0fbb18f15f6?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=800&q=80',
     badgeEn: 'Pre-Summer Tuning',
     badgeAr: 'جاهزية تامة للصيف',
     active: true,
@@ -152,7 +152,7 @@ export const initialGallery: HVACGalleryItem[] = [
   {
     id: 'gal-4',
     image:
-      'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1000&q=80',
+      'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1000&q=80',
     titleEn: 'Electronic Nitrogen Leak Detection',
     titleAr: 'كشف تسريبات الغاز بالنيتروجين المضغوط',
     categoryEn: 'Diagnostics',
@@ -180,7 +180,7 @@ export const initialGallery: HVACGalleryItem[] = [
   {
     id: 'gal-6',
     image:
-      'https://images.unsplash.com/photo-1541888946425-d0fbb18f15f6?auto=format&fit=crop&w=1000&q=80',
+      'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1000&q=80',
     titleEn: 'Luxury Villa Multi-Split Overhaul',
     titleAr: 'صيانة وتجديد منظومة تكييف قصر سكني',
     categoryEn: 'Residential Villa',

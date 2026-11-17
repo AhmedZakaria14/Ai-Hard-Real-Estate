@@ -29,3 +29,10 @@ export function formatAreaBUA(areaM2: number, language: Language): string {
 export function formatAreaSimple(areaM2: number, language: Language): string {
   return formatArea(areaM2, language);
 }
+
+const arabicDigits = '٠١٢٣٤٥٦٧٨٩';
+
+export function formatConstructionDigits(value: string | number | null | undefined, language: Language): string {
+  const western = String(value ?? '').replace(/[٠-٩]/g, (digit) => String(arabicDigits.indexOf(digit)));
+  return language === 'ar' ? western.replace(/[0-9]/g, (digit) => arabicDigits[Number(digit)]) : western;
+}

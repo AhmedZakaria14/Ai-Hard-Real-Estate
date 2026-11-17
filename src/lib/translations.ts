@@ -344,7 +344,7 @@ export const translations = {
     footer: {
       quickLinks: 'Quick Links',
       services: 'Specialized Desks',
-      contactInfo: 'Contact Information',
+      contactInfo: 'Contact Information and Channels',
       newsletterTitle: 'Stay Ahead of the Market',
       newsletterSubtitle: 'Receive exclusive off-market listings, weekly price indexes, and VIP launch invites.',
       newsletterPlaceholder: 'Enter your email address...',
@@ -747,7 +747,7 @@ export const translations = {
     footer: {
       quickLinks: 'روابط سريعة',
       services: 'الأقسام المتخصصة',
-      contactInfo: 'معلومات الاتصال',
+      contactInfo: 'معلومات الاتصال وقنوات التواصل',
       newsletterTitle: 'ابقَ على اطلاع بأحدث فرص السوق',
       newsletterSubtitle: 'احصل على عروض حصرية غير معلنة وتقارير أسعار أسبوعية وإشعارات الإطلاقات الجديدة.',
       newsletterPlaceholder: 'أدخل بريدك الإلكتروني...',

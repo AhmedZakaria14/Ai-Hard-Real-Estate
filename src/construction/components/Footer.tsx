@@ -158,7 +158,7 @@ export function Footer({ onNavigate }: FooterProps) {
       <div className="border-t border-slate-900 py-6 bg-[#071320]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-[11px] text-slate-400">
           <div>
-            {isAr ? 'جميع الحقوق محفوظة. هارد للمقاولات@2026' : 'Copyright. HARD Contracting@2026'}
+            {isAr ? 'جميع الحقوق محفوظة. هارد للمقاولات@٢٠٢٦' : 'Copyright. HARD Contracting@2026'}
           </div>
         </div>
       </div>
