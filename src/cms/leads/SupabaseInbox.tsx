@@ -1,6 +1,7 @@
 import { downloadCsv } from '../../lib/csv';
 import SupabaseDataExport from '../catalog/SupabaseDataExport';
 import SupabaseOperations from './SupabaseOperations';
+import { CMSCalculatorConfig } from '../calculators/CMSCalculatorConfig';
 import SupabaseSectorSections from '../catalog/SupabaseSectorSections';
 import { useEffect, useState, type FormEvent } from 'react';
 import { type Session } from '@supabase/supabase-js';
@@ -40,9 +41,9 @@ export default function SupabaseInbox() {
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState('');
   const [rows, setRows] = useState<Submission[]>([]);
-  const [view, setView] = useState<'requests' | 'appointments' | 'articles' | 'projects' | 'properties' | 'construction_projects' | 'hvac_services' | 'media' | 'sector_sections' | 'archive' | 'reports' | 'notifications' | 'backup'>(() => {
+  const [view, setView] = useState<'requests' | 'appointments' | 'articles' | 'projects' | 'properties' | 'construction_projects' | 'hvac_services' | 'media' | 'sector_sections' | 'calculators' | 'archive' | 'reports' | 'notifications' | 'backup'>(() => {
     const section = new URLSearchParams(window.location.search).get('section');
-    if (section === 'sector_sections' || section === 'appointments' || section === 'reports' || section === 'archive' || section === 'notifications' || section === 'backup' || section === 'properties') return section;
+    if (section === 'calculators' || section === 'sector_sections' || section === 'appointments' || section === 'reports' || section === 'archive' || section === 'notifications' || section === 'backup' || section === 'properties') return section;
     return 'requests';
   });
   const [page, setPage] = useState(0);
@@ -214,6 +215,7 @@ export default function SupabaseInbox() {
         <button aria-pressed={view === 'construction_projects'} onClick={() => setView('construction_projects')} className="rounded border px-3 py-1">مشاريع الإنشاءات</button>
         <button aria-pressed={view === 'hvac_services'} onClick={() => setView('hvac_services')} className="rounded border px-3 py-1">خدمات التكييف</button>
         <button aria-pressed={view === 'media'} onClick={() => setView('media')} className="rounded border px-3 py-1">مكتبة الوسائط</button>
+        <button aria-pressed={view === 'calculators'} onClick={() => setView('calculators')} className="rounded border px-3 py-1">حاسبات التكلفة والتقديرات</button>
         <button aria-pressed={view === 'sector_sections'} onClick={() => setView('sector_sections')} className="rounded border px-3 py-1">محتوى القطاعات</button>
         <button aria-pressed={isArchive} onClick={() => { setPage(0); setView('archive'); }} className="rounded border px-3 py-1">أرشيف الطلبات</button>
         <button aria-pressed={view === 'reports'} onClick={() => setView('reports')} className="rounded border px-3 py-1">التقارير</button>
@@ -228,7 +230,7 @@ export default function SupabaseInbox() {
           else setPage(0);
         }} className="rounded border px-3 py-1">خروج</button>
       </div>
-      {view === 'backup' ? <SupabaseDataExport /> : view === 'reports' || view === 'notifications' ? <SupabaseOperations key={view} section={view} refresh={refresh} /> : view === 'sector_sections' ? <SupabaseSectorSections /> : view === 'media' ? <CMSMediaLibrary language="ar" /> : view !== 'requests' && view !== 'appointments' && view !== 'archive' ? <SupabaseArticleEditor key={view} client={client} collection={view === 'articles' ? 'blog_posts' : view} /> : <>
+      {view === 'backup' ? <SupabaseDataExport /> : view === 'reports' || view === 'notifications' ? <SupabaseOperations key={view} section={view} refresh={refresh} /> : view === 'calculators' ? <CMSCalculatorConfig language="ar" adminEmail={session?.user.email} /> : view === 'sector_sections' ? <SupabaseSectorSections /> : view === 'media' ? <CMSMediaLibrary language="ar" /> : view !== 'requests' && view !== 'appointments' && view !== 'archive' ? <SupabaseArticleEditor key={view} client={client} collection={view === 'articles' ? 'blog_posts' : view} /> : <>
       {isAppointments && <details className="rounded-lg border p-4 text-sm">
         <summary className="cursor-pointer font-semibold">طريقة اختبار حجز المعاينة</summary>
         <ol className="mt-2 list-decimal space-y-2 ps-5">

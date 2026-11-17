@@ -4,7 +4,7 @@
  * Features:
  * 1. Admin editing of approved coefficients, options, descriptions, and assumptions through validated numeric/structured fields.
  * 2. Test Preview sandbox comparing current draft calculations vs active published config calculations.
- * 3. Explicit version publication generating versioned database snapshots in Firestore.
+ * 3. Explicit version publication generating versioned database snapshots in Supabase.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -219,7 +219,7 @@ export const CMSCalculatorConfig: React.FC<CMSCalculatorConfigProps> = ({
     setErrorMsg('');
     setSaveSuccessMsg('');
     try {
-      const newPub = await publishCalculatorConfig(activeType, adminEmail || 'admin@hardgroup.sa');
+      const newPub = await publishCalculatorConfig(activeType, effectiveEmail);
       setPublishedConfig(newPub);
       setDraftConfig({
         ...newPub,
