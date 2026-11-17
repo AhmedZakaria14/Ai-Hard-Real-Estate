@@ -44,6 +44,7 @@ export function PropertyDetailPage({
 }: PropertyDetailPageProps) {
   const propertyTypes = usePropertyTypes();
   const { translations } = useTextOverride();
+  const numberLocale = language === 'ar' ? 'ar-SA' : 'en-US';
   const t = translations[language];
   const ArrowIcon = language === 'ar' ? ArrowRight : ArrowLeft;
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -196,7 +197,7 @@ export function PropertyDetailPage({
                 {t.propertyDetails.quickFacts.bedrooms}
               </span>
               <p className="text-base font-bold text-slate-900">
-                {property.bedrooms > 0 ? `${property.bedrooms} ${t.properties.beds}` : (language === 'ar' ? 'تجاري' : 'Commercial')}
+                {property.bedrooms > 0 ? `${property.bedrooms.toLocaleString(numberLocale)} ${t.properties.beds}` : (language === 'ar' ? 'تجاري' : 'Commercial')}
               </p>
             </div>
 
@@ -205,7 +206,7 @@ export function PropertyDetailPage({
                 <Bath className="w-3.5 h-3.5 text-blue-600" />
                 {t.propertyDetails.quickFacts.bathrooms}
               </span>
-              <p className="text-base font-bold text-slate-900">{property.bathrooms} {t.properties.baths}</p>
+              <p className="text-base font-bold text-slate-900">{(property.bathrooms ?? 0).toLocaleString(numberLocale)} {t.properties.baths}</p>
             </div>
 
             <div className="space-y-1">

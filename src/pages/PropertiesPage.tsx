@@ -76,6 +76,7 @@ export function PropertiesPage({
   initialFilters,
 }: PropertiesPageProps) {
   const { translations } = useTextOverride();
+  const numberLocale = language === 'ar' ? 'ar-SA' : 'en-US';
   const t = translations[language];
   const { properties: liveProperties, propertyLoadStatus, refreshProperties } = useData();
 
@@ -396,7 +397,7 @@ export function PropertiesPage({
           <div className="px-4 py-2 bg-blue-50 border border-blue-200 text-blue-800 rounded-2xl text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-xs">
             <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
             <span>
-              {filteredProperties.length} {language === 'en' ? 'Units Available' : 'عقار متاح'}
+              {filteredProperties.length.toLocaleString(numberLocale)} {language === 'en' ? 'Units Available' : 'عقار متاح'}
             </span>
           </div>
         </div>
@@ -777,8 +778,8 @@ export function PropertiesPage({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <p className="text-xs sm:text-sm font-medium text-slate-600">
           {t.properties.filters.showing}{' '}
-          <strong className="text-slate-900 font-bold text-base">{filteredProperties.length}</strong>{' '}
-          {t.properties.filters.of} <strong className="text-slate-900">{liveProperties.length}</strong>{' '}
+          <strong className="text-slate-900 font-bold text-base">{filteredProperties.length.toLocaleString(numberLocale)}</strong>{' '}
+          {t.properties.filters.of} <strong className="text-slate-900">{liveProperties.length.toLocaleString(numberLocale)}</strong>{' '}
           {t.properties.filters.propertiesFound}
         </p>
 

@@ -49,6 +49,7 @@ export function PropertyCard({
 }: PropertyCardProps) {
   const { propertyPlaceholderImage } = usePageMedia();
   const { translations } = useTextOverride();
+  const numberLocale = language === 'ar' ? 'ar-SA' : 'en-US';
   const t = translations[language];
   const ArrowIcon = language === 'ar' ? ArrowLeft : ArrowRight;
   const [copied, setCopied] = useState(false);
@@ -164,12 +165,12 @@ export function PropertyCard({
             <div className="flex flex-wrap items-center gap-3 py-2 px-3 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-100 max-w-fit">
               <div className="flex items-center gap-1.5 font-medium">
                 <Bed className="w-4 h-4 text-blue-600" />
-                <span>{property.bedrooms > 0 ? `${property.bedrooms} ${t.properties.beds}` : (language === 'en' ? 'Commercial' : 'تجاري')}</span>
+                <span>{property.bedrooms > 0 ? `${property.bedrooms.toLocaleString(numberLocale)} ${t.properties.beds}` : (language === 'en' ? 'Commercial' : 'تجاري')}</span>
               </div>
               <span className="text-slate-300">•</span>
               <div className="flex items-center gap-1.5 font-medium">
                 <Bath className="w-4 h-4 text-blue-600" />
-                <span>{property.bathrooms} {t.properties.baths}</span>
+                <span>{(property.bathrooms ?? 0).toLocaleString(numberLocale)} {t.properties.baths}</span>
               </div>
               <span className="text-slate-300">•</span>
               <div className="flex items-center gap-1.5 font-medium">
@@ -331,12 +332,12 @@ export function PropertyCard({
             <div className="flex items-center gap-1">
               <Bed className="w-3.5 h-3.5 text-blue-600 shrink-0" />
               <span className="truncate font-medium">
-                {property.bedrooms > 0 ? `${property.bedrooms} ${t.properties.beds}` : (language === 'ar' ? 'تجاري' : 'Comm.')}
+                {property.bedrooms > 0 ? `${property.bedrooms.toLocaleString(numberLocale)} ${t.properties.beds}` : (language === 'ar' ? 'تجاري' : 'Comm.')}
               </span>
             </div>
             <div className="flex items-center gap-1">
               <Bath className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-              <span className="truncate font-medium">{property.bathrooms} {t.properties.baths}</span>
+              <span className="truncate font-medium">{(property.bathrooms ?? 0).toLocaleString(numberLocale)} {t.properties.baths}</span>
             </div>
             <div className="flex items-center gap-1">
               <Maximize className="w-3.5 h-3.5 text-blue-600 shrink-0" />
