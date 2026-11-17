@@ -14,7 +14,7 @@ const sections: { target: SectorSection; title: string; fallback: object }[] = [
   { target: { sector: 'construction', key: 'hero' }, title: 'الإنشاءات — الصفحة الرئيسية', fallback: DEFAULT_HERO_CONTENT },
   { target: { sector: 'construction', key: 'company' }, title: 'الإنشاءات — عن الشركة', fallback: DEFAULT_COMPANY_CONTENT },
   { target: { sector: 'construction', key: 'stages' }, title: 'الإنشاءات — مراحل العمل', fallback: DEFAULT_WORK_STAGES },
-  { target: { sector: 'construction', key: 'offices' }, title: 'الإنشاءات — المكاتب', fallback: DEFAULT_OFFICES },
+  { target: { sector: 'construction', key: 'offices' }, title: 'الإنشاءات — المقر الرئيسي والخريطة', fallback: DEFAULT_OFFICES },
   { target: { sector: 'hvac', key: 'hero' }, title: 'التكييف — الصفحة الرئيسية', fallback: DEFAULT_HVAC_HERO },
   { target: { sector: 'hvac', key: 'hours_contact' }, title: 'التكييف — الاتصال وساعات العمل', fallback: DEFAULT_HVAC_HOURS_CONTACT },
   { target: { sector: 'hvac', key: 'booking_copy' }, title: 'التكييف — نصوص الحجز', fallback: DEFAULT_HVAC_BOOKING_COPY },
@@ -33,6 +33,8 @@ const labels: Record<string, string> = {
   officeEmail: 'البريد الإلكتروني للمكتب', emergencyPhone: 'هاتف الطوارئ',
   cityNameAr: 'اسم المدينة بالعربية', cityNameEn: 'اسم المدينة بالإنجليزية',
   regionAr: 'المنطقة بالعربية', regionEn: 'المنطقة بالإنجليزية',
+  lat: 'خط العرض', lng: 'خط الطول', nameAr: 'اسم المقر بالعربية', nameEn: 'اسم المقر بالإنجليزية',
+  addressAr: 'العنوان بالعربية', addressEn: 'العنوان بالإنجليزية',
   responseTimeMin: 'مدة الاستجابة بالدقائق', isPrimaryArea: 'منطقة رئيسية',
   whatsappNumber: 'رقم واتساب', active: 'مفعّل',
 };
@@ -116,7 +118,7 @@ export default function SupabaseSectorSections() {
       <label className="block text-sm font-medium">
         {label}{' '}
         {typeof value === 'boolean' ? <input type="checkbox" checked={value} onChange={(event) => edit(path, event.target.checked)} />
-          : typeof value === 'number' ? <input type="number" step="any" required className={inputStyle} value={value} onChange={(event) => edit(path, Number(event.target.value))} />
+          : typeof value === 'number' ? <input type="number" step="any" min={key === 'lat' ? -90 : key === 'lng' ? -180 : undefined} max={key === 'lat' ? 90 : key === 'lng' ? 180 : undefined} required className={inputStyle} value={value} onChange={(event) => edit(path, Number(event.target.value))} />
           : <textarea className={inputStyle} rows={value.length > 80 ? 3 : 1} dir="auto" required={editingCities && (key === 'cityNameAr' || key === 'cityNameEn')} value={value} onChange={(event) => edit(path, event.target.value)} />}
       </label>
       {(key === 'bgImageUrl' || key === 'image') && <label className="text-sm">رفع الصورة <input type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif" onChange={(event) => {
@@ -158,6 +160,9 @@ export default function SupabaseSectorSections() {
     <label className="block">القسم <select disabled={busy} value={active} onChange={(event) => setActive(Number(event.target.value))} className={inputStyle}>
       {sections.map((item, index) => <option value={index} key={item.title}>{item.title}</option>)}
     </select></label>
+    {section.target.sector === 'construction' && section.target.key === 'offices' && (
+      <p className="text-sm text-slate-600">لتثبيت الدبوس، أدخل خط العرض والطول للمقر ثم اضغط «حفظ ونشر». إذا تركت القيمتين صفرًا، تبحث الخريطة باستخدام عنوان المقر.</p>
+    )}
     {message && <p role="status">{message}</p>}
     {loading && <p role="status">جارٍ تحميل القسم…</p>}
     {form !== undefined && <form key={active} onSubmit={save}>

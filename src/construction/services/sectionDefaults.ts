@@ -182,36 +182,21 @@ export const DEFAULT_WORK_STAGES: ConstructionWorkStage[] = [
   },
 ];
 
-export const DEFAULT_OFFICES: ConstructionOfficeLocation[] = [
-  {
-    id: 'hq-riyadh',
-    nameAr: 'المقر الرئيسي - الرياض',
-    nameEn: 'Headquarters - Riyadh',
-    addressAr: 'طريق الملك فهد، حي الصحافة، الرياض 13321، المملكة العربية السعودية',
-    addressEn: 'King Fahd Road, Al-Sahafa District, Riyadh 13321, Saudi Arabia',
-    phone: '+966 13 800 4272',
-    mobile: '+966 50 123 4567',
-    whatsapp: '+966501234567',
-    email: 'info@hard-sa.com',
-    lat: 24.795822,
-    lng: 46.634812,
-    googleMapsUrl: 'https://www.google.com/maps/dir/?api=1&destination=24.795822,46.634812',
-    isHQ: true,
-  },
-  {
-    id: 'branch-khobar',
-    nameAr: 'فرع المنطقة الشرقية - الخبر',
-    nameEn: 'Eastern Province Branch - Al Khobar',
-    addressAr: 'طريق الأمير تركي، حي الكورنيش، الخبر، المنطقة الشرقية',
-    addressEn: 'Prince Turki Road, Corniche District, Al Khobar, Eastern Province',
-    phone: '+966 13 800 4273',
-    mobile: '+966 50 123 4568',
-    whatsapp: '+966501234568',
-    email: 'khobar@hard-sa.com',
-    lat: 26.288412,
-    lng: 50.210543,
-    googleMapsUrl: 'https://www.google.com/maps/dir/?api=1&destination=26.288412,50.210543',
-    isHQ: false,
-  },
-];
+export const DEFAULT_CONSTRUCTION_HQ: ConstructionOfficeLocation = {
+  id: 'hq-dammam',
+  nameAr: 'المقر الرئيسي – الدمام',
+  nameEn: 'Head Office – Dammam',
+  addressAr: 'طريق الأمير متعب بن عبد العزيز، حي هجر، الدمام، المملكة العربية السعودية',
+  addressEn: 'Prince Mutaib bin Abdulaziz Road, Hajar District, Dammam, Saudi Arabia',
+  phone: '+966 55 612 5711',
+  mobile: '',
+  whatsapp: '+966556125711',
+  email: 'info@hardgp.com',
+  lat: 0,
+  lng: 0,
+  googleMapsUrl: '',
+  isHQ: true,
+};
+
+export const DEFAULT_OFFICES: ConstructionOfficeLocation[] = [DEFAULT_CONSTRUCTION_HQ];
 

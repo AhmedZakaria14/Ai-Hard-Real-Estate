@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
+import { DEFAULT_CONSTRUCTION_HQ } from '../services/sectionDefaults';
 import { useConstruction } from '../context/ConstructionContext';
 import { submitCustomerForm } from '../../lib/forms/formSubmissionService';
 
-const office = {
-  ar: 'طريق الأمير متعب بن عبد العزيز، حي هجر، الدمام، المملكة العربية السعودية',
-  en: 'Prince Mutaib bin Abdulaziz Road, Hajar District, Dammam, Saudi Arabia',
-};
 
 export function ContactSection() {
-  const { language } = useConstruction();
+  const { language, officeLocations } = useConstruction();
   const ar = language === 'ar';
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState('');
-  const mapQuery = encodeURIComponent(office.en);
+  const office = officeLocations.find((entry) => entry.isHQ) ?? DEFAULT_CONSTRUCTION_HQ;
+  const address = (ar ? office.addressAr : office.addressEn)?.trim()
+    || (ar ? DEFAULT_CONSTRUCTION_HQ.addressAr : DEFAULT_CONSTRUCTION_HQ.addressEn);
+  const { lat, lng } = office;
+  const pinned = Number.isFinite(lat) && Number.isFinite(lng)
+    && Math.abs(lat) <= 90 && Math.abs(lng) <= 180 && (lat !== 0 || lng !== 0);
+  const mapQuery = encodeURIComponent(pinned ? lat + ',' + lng : address);
   const fieldClass = 'w-full rounded-lg border border-slate-300 px-3 py-2';
   const labels = ar
     ? { name: 'الاسم', email: 'البريد الإلكتروني', phone: 'رقم الهاتف', message: 'الرسالة' }
@@ -54,11 +57,11 @@ export function ContactSection() {
     <section id="contact" className="scroll-mt-24 bg-slate-50 px-4 py-16">
       <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-2">
         <div className="space-y-4">
-          <h2 className="text-3xl font-bold">{ar ? 'المقر الرئيسي – الدمام' : 'Head Office – Dammam'}</h2>
-          <p>{office[language]}</p>
+          <h2 className="text-3xl font-bold">{ar ? office.nameAr : office.nameEn}</h2>
+          <p>{address}</p>
           <p><a href="tel:+966556125711" dir="ltr">+966 55 612 5711</a></p>
           <p><a href="mailto:info@hardgp.com">info@hardgp.com</a></p>
-          <iframe title={ar ? 'خريطة عنوان المقر في الدمام' : 'Dammam office address map'} src={'https://maps.google.com/maps?q=' + mapQuery + '&output=embed'} className="h-64 w-full rounded-xl border-0" loading="lazy" />
+          <iframe title={ar ? 'خريطة المقر الرئيسي' : 'Head office map''} src={'https://maps.google.com/maps?q=' + mapQuery + '&output=embed'} className="h-64 w-full rounded-xl border-0" loading="lazy" />
         </div>
         <form onSubmit={submit} className="space-y-4 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="text-xl font-bold">{ar ? 'اتصل بنا' : 'Contact us'}</h2>
