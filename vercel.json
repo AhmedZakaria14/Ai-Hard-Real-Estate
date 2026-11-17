@@ -4,8 +4,8 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/qa-redirect-301-1711",
-      "destination": "/api/hard-redirect?__hard_path=qa-redirect-301-1711"
+      "source": "/:hardPath((?!(?:admin|login|api|static|assets|cms)(?:/|$)|(?:realestate|construction|hvac)/(?:admin|cms)(?:/|$))[a-zA-Z0-9][a-zA-Z0-9/-]{0,499})",
+      "destination": "/api/hard-redirect?__hard_path=:hardPath"
     },
     {
       "source": "/(.*)",
