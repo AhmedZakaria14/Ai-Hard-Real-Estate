@@ -53,11 +53,13 @@ export type CMSTab =
   | "subscribers"
   | "leads"
   | "appointments"
+  | "operations"
   | "settings";
 
 interface CMSLayoutProps {
   activeTab: CMSTab;
   onSelectTab: (tab: CMSTab) => void;
+  onOpenCatalog: () => void;
   onLogout: () => void;
   onViewLiveSite: () => void;
   adminUser: { name: string; email: string; role: string };
@@ -69,6 +71,7 @@ interface CMSLayoutProps {
 export const CMSLayout: React.FC<CMSLayoutProps> = ({
   activeTab,
   onSelectTab,
+  onOpenCatalog,
   onLogout,
   onViewLiveSite,
   adminUser,
@@ -205,6 +208,13 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
       labelEn: "Viewings & Appointments",
       labelAr: "المعاينة والمواعيد الميدانية",
       icon: Calendar,
+      roleGuard: canManageLeads,
+    },
+    {
+      id: "operations",
+      labelAr: "إدارة العمليات",
+      labelEn: "Operations",
+      icon: Layers,
       roleGuard: canManageLeads,
     },
     {
@@ -417,13 +427,14 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
           </div>
 
           <div className="flex items-center gap-3">
-            <a
-              href="/admin/operations?section=properties"
+            <button
+              type="button"
+              onClick={onOpenCatalog}
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-colors cursor-pointer"
             >
               <Trash2 className="w-3.5 h-3.5 text-rose-600" />
               <span>{isAr ? "الكتالوج والأرشفة" : "Catalog & Archive"}</span>
-            </a>
+            </button>
 
             {/* Language Switcher */}
             <button

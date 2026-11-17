@@ -1,3 +1,4 @@
+import OperationsWorkspace, { readOperationsSection, type OperationsSection } from './leads/SupabaseInbox';
 import { CMSBlogCategories } from './blog/CMSBlogCategories';
 import { useCatalogBlogCategories } from '../lib/blogCategories';
 import React, { useState, useEffect } from "react";
@@ -149,7 +150,13 @@ export const CMSApp: React.FC<CMSAppProps> = ({
     };
   }, []);
 
-  const [activeTab, setActiveTab] = useState<CMSTab>("properties");
+  const requestedSection = readOperationsSection(new URLSearchParams(window.location.search).get('section'));
+  const [activeTab, setActiveTab] = useState<CMSTab>(() => requestedSection ? 'operations' : 'properties');
+  const [operationsSection, setOperationsSection] = useState<OperationsSection>(requestedSection ?? 'requests');
+  function openOperations(section: OperationsSection) {
+    setOperationsSection(section);
+    setActiveTab('operations');
+  }
 
   // Modals state
   const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
@@ -513,17 +520,13 @@ export const CMSApp: React.FC<CMSAppProps> = ({
     <CMSLayout
       activeTab={activeTab}
       onSelectTab={setActiveTab}
+      onOpenCatalog={() => openOperations('properties')}
       onLogout={handleLogout}
       onViewLiveSite={onReturnToSite}
       adminUser={adminUser}
       language={language}
       onLanguageChange={onLanguageChange}
     >
-      <p className="mb-4 rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-700">
-        <a className="font-semibold text-blue-700 underline" href="/admin/operations">
-          {isAr ? 'إدارة الطلبات والمواعيد والكتالوج' : 'Manage requests, appointments and catalog'}
-        </a>
-      </p>
       {(activeTab === 'dashboard' || activeTab === 'properties') && propertyLoadStatus !== 'ready' && (
         <div role="status" className="mb-4 rounded-lg border bg-white p-4 text-sm">
           {propertyLoadStatus === 'loading' ? (isAr ? 'جاري تحميل العقارات…' : 'Loading properties…') : <>
@@ -536,9 +539,9 @@ export const CMSApp: React.FC<CMSAppProps> = ({
         <div className="space-y-4">
           {propertyLoadStatus === 'ready' && <PropertyCatalogStats properties={properties} language={language} />}
           <RequestDashboardCounts language={language} />
-        <a className="inline-block rounded-lg border bg-white px-4 py-3 text-sm font-semibold text-blue-700" href="/admin/operations?section=reports">
+        <button type="button" className="inline-block rounded-lg border bg-white px-4 py-3 text-sm font-semibold text-blue-700" onClick={() => openOperations('reports')}>
           {isAr ? "فتح تقارير الطلبات" : "Open request reports"}
-        </a>
+        </button>
         </div>
       )}
 
@@ -700,25 +703,17 @@ export const CMSApp: React.FC<CMSAppProps> = ({
         />
       )}
 
-      {/* 7. Inbound Leads */}
-      {activeTab === "leads" && (
-        <a className="inline-block rounded-lg border bg-white px-4 py-3 text-sm font-semibold text-blue-700" href="/admin/operations?section=requests">
-          {isAr ? "فتح صندوق الطلبات" : "Open the request inbox"}
-        </a>
-      )}
-
-      {/* 8. Appointments & Field Viewings */}
-      {activeTab === "appointments" && (
-        <a className="inline-block rounded-lg border bg-white px-4 py-3 text-sm font-semibold text-blue-700" href="/admin/operations?section=appointments">
-          {isAr ? "فتح المواعيد والمعاينات" : "Open appointments"}
-        </a>
-      )}
+      {(activeTab === 'operations' || activeTab === 'leads' || activeTab === 'appointments') && (() => {
+        const section = activeTab === 'leads' ? 'requests' : activeTab === 'appointments' ? 'appointments' : operationsSection;
+        return <OperationsWorkspace key={activeTab + section} initialSection={section} language={language} adminEmail={adminUser.email} />;
+      })()}
 
       {/* 9. System Settings */}
       {activeTab === "settings" && (
         <CMSSettings
           language={language}
           onResetToDefaults={handleResetAllData}
+          onExportData={() => openOperations('backup')}
           currentAdminUser={adminUser || undefined}
         />
       )}

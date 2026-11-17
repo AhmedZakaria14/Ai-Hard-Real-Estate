@@ -3,8 +3,8 @@ import SupabaseDataExport from '../catalog/SupabaseDataExport';
 import SupabaseOperations from './SupabaseOperations';
 import { CMSCalculatorConfig } from '../calculators/CMSCalculatorConfig';
 import SupabaseSectorSections from '../catalog/SupabaseSectorSections';
-import { useEffect, useState, type FormEvent } from 'react';
-import { type Session } from '@supabase/supabase-js';
+import { useEffect, useState } from 'react';
+import type { Language } from '../../types';
 
 import { CMSMediaLibrary } from '../components/CMSMediaLibrary';
 import SupabaseArticleEditor from '../catalog/SupabaseArticleEditor';
@@ -34,33 +34,44 @@ type Submission = {
   payload: Record<string, unknown>;
 };
 
-export default function SupabaseInbox() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [ready, setReady] = useState(false);
+const sections = {
+  requests: 'الطلبات',
+  appointments: 'المواعيد والمعاينات',
+  articles: 'المقالات المنشورة',
+  projects: 'المشاريع العقارية',
+  properties: 'العقارات',
+  construction_projects: 'مشاريع الإنشاءات',
+  hvac_services: 'خدمات التكييف',
+  media: 'مكتبة الوسائط',
+  calculators: 'حاسبات التكلفة والتقديرات',
+  sector_sections: 'محتوى القطاعات',
+  archive: 'أرشيف الطلبات',
+  reports: 'التقارير',
+  notifications: 'الإشعارات',
+  backup: 'تصدير البيانات',
+} as const;
+
+export type OperationsSection = keyof typeof sections;
+
+export function readOperationsSection(value: string | null): OperationsSection | null {
+  return value && Object.hasOwn(sections, value) ? value as OperationsSection : null;
+}
+
+export default function OperationsWorkspace({ initialSection, adminEmail, language }: {
+  initialSection: OperationsSection;
+  adminEmail: string;
+  language: Language;
+}) {
   const [busy, setBusy] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState('');
   const [rows, setRows] = useState<Submission[]>([]);
-  const [view, setView] = useState<'requests' | 'appointments' | 'articles' | 'projects' | 'properties' | 'construction_projects' | 'hvac_services' | 'media' | 'sector_sections' | 'calculators' | 'archive' | 'reports' | 'notifications' | 'backup'>(() => {
-    const section = new URLSearchParams(window.location.search).get('section');
-    if (section === 'calculators' || section === 'sector_sections' || section === 'appointments' || section === 'reports' || section === 'archive' || section === 'notifications' || section === 'backup' || section === 'properties') return section;
-    return 'requests';
-  });
+  const [view, setView] = useState(initialSection);
   const [page, setPage] = useState(0);
   const [refresh, setRefresh] = useState(0);
   const isAppointments = view === 'appointments';
   const isArchive = view === 'archive';
   const isIntake = view === 'requests' || isAppointments || isArchive;
-  const isAdmin = session?.user.app_metadata.hard_role === 'superadmin';
-
-  useEffect(() => {
-    const { data: { subscription } } = client.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession);
-      setReady(true);
-    });
-    return () => subscription.unsubscribe();
-  }, []);
-
   function intakeQuery() {
     const query = client.from('hard_form_submissions')
       .select('id,tracking_code,sector,form_type,received_at,payload,status,status_history,archived_at')
@@ -72,7 +83,8 @@ export default function SupabaseInbox() {
   }
 
   useEffect(() => {
-    if (!isAdmin || !isIntake) {
+    if (!isIntake) {
+      setBusy(false);
       setRows([]);
       return;
     }
@@ -96,10 +108,10 @@ export default function SupabaseInbox() {
     };
     void load();
     return () => controller.abort();
-  }, [isAdmin, isAppointments, isArchive, isIntake, page, refresh]);
+  }, [isAppointments, isArchive, isIntake, page, refresh]);
 
   async function exportRequests() {
-    if (exporting || !isAdmin || !isIntake) return;
+    if (exporting || !isIntake) return;
     setError('');
     setExporting(true);
     try {
@@ -176,63 +188,30 @@ export default function SupabaseInbox() {
     }
   }
 
-  async function signIn(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const fields = new FormData(event.currentTarget);
-    setBusy(true);
-    setError('');
-    try {
-      const { data, error: signInError } = await client.auth.signInWithPassword({
-        email: String(fields.get('email')).trim(),
-        password: String(fields.get('password')),
-      });
-      if (signInError) throw signInError;
-      if (data.user.app_metadata.hard_role !== 'superadmin') {
-        await client.auth.signOut({ scope: 'local' });
-        setError('هذا الحساب لا يملك صلاحية قراءة الطلبات.');
-      }
-    } catch {
-      setError('تعذر تسجيل الدخول. تحقق من البريد وكلمة المرور.');
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return <main dir="rtl" className="mx-auto min-h-screen max-w-5xl space-y-6 p-6 text-slate-900">
-    <h1 className="text-3xl font-bold">إدارة هارد</h1>
-    {error && <p role="alert" className="text-red-700">{error}</p>}
-    {!ready ? <p role="status">جارٍ التحقق من الجلسة…</p> : !isAdmin ? (
-      <form onSubmit={signIn} className="grid max-w-md gap-4">
-        <label>البريد الإلكتروني<input dir="ltr" name="email" type="email" autoComplete="username" className="block w-full rounded border p-2" required /></label>
-        <label>كلمة المرور<input dir="ltr" name="password" type="password" autoComplete="current-password" className="block w-full rounded border p-2" required /></label>
-        <button disabled={busy} className="rounded bg-slate-900 px-4 py-2 text-white">دخول المسؤول</button>
-      </form>
-    ) : <>
-      <nav aria-label="أقسام الإدارة" className="flex flex-wrap gap-3">
-        <button aria-pressed={view === 'requests'} onClick={() => { setPage(0); setView('requests'); }} className="rounded border px-3 py-1">الطلبات</button>
-        <button aria-pressed={isAppointments} onClick={() => { setPage(0); setView('appointments'); }} className="rounded border px-3 py-1">المواعيد والمعاينات</button>
-        <button aria-pressed={view === 'articles'} onClick={() => setView('articles')} className="rounded border px-3 py-1">المقالات المنشورة</button>
-        <button aria-pressed={view === 'projects'} onClick={() => setView('projects')} className="rounded border px-3 py-1">المشاريع العقارية</button>
-        <button aria-pressed={view === 'properties'} onClick={() => setView('properties')} className="rounded border px-3 py-1">العقارات</button>
-        <button aria-pressed={view === 'construction_projects'} onClick={() => setView('construction_projects')} className="rounded border px-3 py-1">مشاريع الإنشاءات</button>
-        <button aria-pressed={view === 'hvac_services'} onClick={() => setView('hvac_services')} className="rounded border px-3 py-1">خدمات التكييف</button>
-        <button aria-pressed={view === 'media'} onClick={() => setView('media')} className="rounded border px-3 py-1">مكتبة الوسائط</button>
-        <button aria-pressed={view === 'calculators'} onClick={() => setView('calculators')} className="rounded border px-3 py-1">حاسبات التكلفة والتقديرات</button>
-        <button aria-pressed={view === 'sector_sections'} onClick={() => setView('sector_sections')} className="rounded border px-3 py-1">محتوى القطاعات</button>
-        <button aria-pressed={isArchive} onClick={() => { setPage(0); setView('archive'); }} className="rounded border px-3 py-1">أرشيف الطلبات</button>
-        <button aria-pressed={view === 'reports'} onClick={() => setView('reports')} className="rounded border px-3 py-1">التقارير</button>
-        <button aria-pressed={view === 'notifications'} onClick={() => setView('notifications')} className="rounded border px-3 py-1">الإشعارات</button>
-        <button aria-pressed={view === 'backup'} onClick={() => setView('backup')} className="rounded border px-3 py-1">تصدير البيانات</button>
-      </nav>
-      <div className="flex gap-3">
-        <button onClick={() => setRefresh((value) => value + 1)} disabled={busy} className="rounded border px-3 py-1">تحديث</button>
-        <button onClick={async () => {
-          const { error: logoutError } = await client.auth.signOut({ scope: 'local' });
-          if (logoutError) setError('تعذر تسجيل الخروج. حاول مرة أخرى.');
-          else setPage(0);
-        }} className="rounded border px-3 py-1">خروج</button>
-      </div>
-      {view === 'backup' ? <SupabaseDataExport /> : view === 'reports' || view === 'notifications' ? <SupabaseOperations key={view} section={view} refresh={refresh} /> : view === 'calculators' ? <CMSCalculatorConfig language="ar" adminEmail={session?.user.email} /> : view === 'sector_sections' ? <SupabaseSectorSections /> : view === 'media' ? <CMSMediaLibrary language="ar" /> : view !== 'requests' && view !== 'appointments' && view !== 'archive' ? <SupabaseArticleEditor key={view} client={client} collection={view === 'articles' ? 'blog_posts' : view} /> : <>
+  return <section dir="rtl" className="space-y-5 text-slate-900">
+    {error && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-red-700">{error}</p>}
+    <nav aria-label="أقسام العمليات" className="flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-xs">
+      {(Object.keys(sections) as OperationsSection[]).map((section) => (
+        <button
+          key={section}
+          type="button"
+          aria-pressed={view === section}
+          onClick={() => {
+            setPage(0);
+            setError('');
+            setView(section);
+          }}
+          className={`rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${view === section ? 'bg-blue-600 text-white' : 'text-slate-700 hover:bg-slate-100'}`}
+        >
+          {sections[section]}
+        </button>
+      ))}
+    </nav>
+    {(isIntake || view === 'reports' || view === 'notifications') && (
+      <button type="button" onClick={() => setRefresh((value) => value + 1)} disabled={busy}
+        className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold">تحديث</button>
+    )}
+      {view === 'backup' ? <SupabaseDataExport /> : view === 'reports' || view === 'notifications' ? <SupabaseOperations key={view} section={view} refresh={refresh} /> : view === 'calculators' ? <CMSCalculatorConfig language={language} adminEmail={adminEmail} /> : view === 'sector_sections' ? <SupabaseSectorSections /> : view === 'media' ? <CMSMediaLibrary language={language} /> : view !== 'requests' && view !== 'appointments' && view !== 'archive' ? <SupabaseArticleEditor key={view} client={client} collection={view === 'articles' ? 'blog_posts' : view} /> : <>
       {isAppointments && <details className="rounded-lg border p-4 text-sm">
         <summary className="cursor-pointer font-semibold">طريقة اختبار حجز المعاينة</summary>
         <ol className="mt-2 list-decimal space-y-2 ps-5">
@@ -246,7 +225,7 @@ export default function SupabaseInbox() {
         {exporting ? 'جارٍ إعداد ملف الطلبات…' : 'تصدير الطلبات CSV'}
       </button>
       {busy ? <p role="status">جارٍ تحميل الطلبات…</p> : !error && rows.length === 0 && <p>لا توجد طلبات في هذه الصفحة.</p>}
-      {rows.map((row) => <article key={row.id} className="space-y-2 rounded-lg border p-4">
+      {rows.map((row) => <article key={row.id} className="space-y-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
         <h2 className="font-bold">{String(row.payload.name || row.tracking_code)}</h2>
         <p><bdi>{row.tracking_code} · {row.sector} · {row.form_type}</bdi></p>
         <p><bdi>{new Date(row.received_at).toLocaleString('ar-SA')} · {String(row.payload.email || '')} · {String(row.payload.phone || '')}</bdi></p>
@@ -272,6 +251,5 @@ export default function SupabaseInbox() {
         <button disabled={busy || rows.length < pageSize} onClick={() => setPage((value) => value + 1)} className="rounded border px-3 py-1 disabled:opacity-40">التالي</button>
       </nav>
       </>}
-    </>}
-  </main>;
+  </section>;
 }

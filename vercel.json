@@ -22,9 +22,10 @@
     }
   },
   "redirects": [
+    { "source": "/admin/operations", "destination": "/admin", "permanent": true },
     {
       "source": "/admin/supabase-inbox",
-      "destination": "/admin/operations",
+      "destination": "/admin",
       "permanent": true
     }
   ]

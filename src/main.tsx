@@ -3,11 +3,9 @@ import {createRoot} from 'react-dom/client';
 import './index.css';
 import { ErrorBoundary } from './components/ui/ErrorBoundary.tsx';
 
-const Page = /^\/admin\/operations\/?$/.test(window.location.pathname)
-  ? lazy(() => import('./cms/leads/SupabaseInbox'))
-  : /^\/admin\/password-reset\/?$/.test(window.location.pathname)
-    ? lazy(() => import('./cms/CMSPasswordReset'))
-    : lazy(() => import('./App'));
+const Page = /^\/admin\/password-reset\/?$/.test(window.location.pathname)
+  ? lazy(() => import('./cms/CMSPasswordReset'))
+  : lazy(() => import('./App'));
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
