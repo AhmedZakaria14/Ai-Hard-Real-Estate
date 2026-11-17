@@ -108,7 +108,7 @@ export const CMSApp: React.FC<CMSAppProps> = ({
     updateSubscriber,
     deleteSubscriber,
     toggleSubscriberStatus,
-    resetSubscribersToDefault,
+    refreshSubscribers,
     addTeamMember,
     updateTeamMember,
     deleteTeamMember,
@@ -451,7 +451,6 @@ export const CMSApp: React.FC<CMSAppProps> = ({
 
   // Reset all repository data
   const handleResetAllData = async () => {
-    await resetSubscribersToDefault();
     await resetFaqsToDefault();
     await resetCertificationsToDefault();
   };
@@ -697,7 +696,7 @@ export const CMSApp: React.FC<CMSAppProps> = ({
           onUpdateSubscriber={updateSubscriber}
           onToggleStatus={toggleSubscriberStatus}
           onDeleteSubscriber={deleteSubscriber}
-          onResetToDefault={resetSubscribersToDefault}
+          onRefresh={refreshSubscribers}
           language={language}
         />
       )}

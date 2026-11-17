@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   MailCheck,
   Plus,
@@ -22,10 +22,10 @@ import { Language, JoinListSubscriber } from '../../types';
 interface CMSJoinListProps {
   subscribers: JoinListSubscriber[];
   onAddSubscriber: () => void;
-  onUpdateSubscriber: (id: string, updates: Partial<JoinListSubscriber>) => void;
-  onToggleStatus: (id: string) => void;
-  onDeleteSubscriber: (id: string) => void;
-  onResetToDefault: () => void;
+  onUpdateSubscriber: (id: string, updates: Partial<JoinListSubscriber>) => Promise<unknown>;
+  onToggleStatus: (id: string) => Promise<unknown>;
+  onDeleteSubscriber: (id: string) => Promise<unknown>;
+  onRefresh: () => Promise<void>;
   language: Language;
 }
 
@@ -35,7 +35,7 @@ export const CMSJoinList: React.FC<CMSJoinListProps> = ({
   onUpdateSubscriber,
   onToggleStatus,
   onDeleteSubscriber,
-  onResetToDefault,
+  onRefresh,
   language,
 }) => {
   const isAr = language === 'ar';
@@ -109,14 +109,35 @@ export const CMSJoinList: React.FC<CMSJoinListProps> = ({
     setTimeout(() => setCopiedAll(false), 2000);
   };
 
-  const handleSaveNotes = (id: string) => {
-    onUpdateSubscriber(id, { notes: notesDraft.trim() });
+  const [actionError, setActionError] = useState('');
+  const [busy, setBusy] = useState(false);
+  const failure = isAr ? 'تعذر إكمال العملية في Supabase. يرجى إعادة المحاولة.' : 'Supabase did not confirm the operation. Please retry.';
+
+  useEffect(() => {
+    void onRefresh().catch(() => setActionError(failure));
+  }, [onRefresh, failure]);
+
+  async function run(action: () => Promise<unknown>) {
+    if (busy) return;
+    setBusy(true);
+    setActionError('');
+    try {
+      await action();
+    } catch {
+      setActionError(failure);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const handleSaveNotes = (id: string) => void run(async () => {
+    await onUpdateSubscriber(id, { notes: notesDraft.trim() });
     setEditingNotesId(null);
-  };
+  });
 
   return (
     <div className="space-y-6 animate-in fade-in">
-      {/* 1. Top Metrics Cards */}
+      {actionError && <p role="alert">{actionError}</p>}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs flex items-center justify-between">
           <div>
@@ -169,12 +190,13 @@ export const CMSJoinList: React.FC<CMSJoinListProps> = ({
 
         <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
           <button
-            onClick={onResetToDefault}
+            disabled={busy}
+            onClick={() => void run(onRefresh)}
             className="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
-            title={isAr ? 'استعادة المشتركين الافتراضيين' : 'Reset to defaults'}
+            title={isAr ? 'تحديث المشتركين' : 'Refresh subscribers'}
           >
             <RefreshCw className="w-4 h-4" />
-            <span>{isAr ? 'استعادة الافتراضي' : 'Reset'}</span>
+            <span>{isAr ? 'تحديث القائمة' : 'Refresh'}</span>
           </button>
 
           <button
@@ -309,7 +331,7 @@ export const CMSJoinList: React.FC<CMSJoinListProps> = ({
                       {/* Status + Toggle */}
                       <td className="px-4 py-4">
                         <button
-                          onClick={() => onToggleStatus(sub.id)}
+                          onClick={() => void run(() => onToggleStatus(sub.id))}
                           className={`px-2.5 py-1 text-xs font-semibold rounded-full border flex items-center gap-1.5 transition-all cursor-pointer ${
                             isActive
                               ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
@@ -396,7 +418,7 @@ export const CMSJoinList: React.FC<CMSJoinListProps> = ({
                             <div className="flex items-center gap-1 bg-red-50 p-1 rounded-xl border border-red-200">
                               <button
                                 onClick={() => {
-                                  onDeleteSubscriber(sub.id);
+                                  void run(() => onDeleteSubscriber(sub.id));
                                   setDeleteConfirmId(null);
                                 }}
                                 className="px-2.5 py-1 bg-red-600 text-white text-[11px] font-bold rounded-lg hover:bg-red-700"

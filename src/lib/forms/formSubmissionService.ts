@@ -181,7 +181,7 @@ export async function submitCustomerForm(
 
   const localCache = getLocalIdempotencyCache();
   const cached = localCache[idempotencyKey];
-  if (cached && Date.now() - cached.timestamp < 60 * 60 * 1000) {
+  if (payload.formType !== 'newsletter_signup' && cached && Date.now() - cached.timestamp < 60 * 60 * 1000) {
     return {
       success: true,
       leadId: cached.leadId,
@@ -249,6 +249,6 @@ export async function submitCustomerForm(
     );
   }
 
-  saveLocalIdempotencyCache(idempotencyKey, { leadId, trackingCode });
+  if (payload.formType !== 'newsletter_signup') saveLocalIdempotencyCache(idempotencyKey, { leadId, trackingCode });
   return { success: true, leadId, trackingCode, isDuplicate: false };
 }

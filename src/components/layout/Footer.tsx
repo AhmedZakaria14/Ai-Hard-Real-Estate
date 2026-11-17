@@ -13,7 +13,6 @@ import {
 import { Language, PageId } from '../../types';
 import { translations as defaultTranslations } from '../../lib/translations';
 import { useTextOverride } from '../../context/TextOverrideContext';
-import { useData } from '../../context/DataContext';
 import { submitCustomerForm } from '../../lib/forms/formSubmissionService';
 import { Button } from '../ui/Button';
 import { BrandLogo } from '../ui/BrandLogo';
@@ -26,7 +25,6 @@ interface FooterProps {
 
 export function Footer({ onNavigate, language }: FooterProps) {
   const { translations } = useTextOverride();
-  const { addSubscriber } = useData();
   const t = translations[language] || defaultTranslations[language];
   const isAr = language === 'ar';
   const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -50,7 +48,6 @@ export function Footer({ onNavigate, language }: FooterProps) {
           source: 'Website Footer',
         },
       });
-      await addSubscriber(newsletterEmail.trim(), 'Website Footer', `Subscribed via ${language.toUpperCase()} site`);
       setSubscribed(true);
       setNewsletterEmail('');
     } catch (err: any) {

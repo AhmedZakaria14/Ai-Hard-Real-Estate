@@ -5,7 +5,7 @@ import { Language } from '../../types';
 interface CMSAddSubscriberModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (email: string, source: string, notes: string) => void;
+  onSave: (email: string, source: string, notes: string) => Promise<void>;
   language: Language;
 }
 
@@ -20,22 +20,31 @@ export const CMSAddSubscriberModal: React.FC<CMSAddSubscriberModalProps> = ({
   const [source, setSource] = useState('Manual CMS Entry');
   const [notes, setNotes] = useState('');
   const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (busy) return;
     const cleanEmail = email.trim();
     if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
       setError(isAr ? 'يرجى إدخال عنوان بريد إلكتروني صالح' : 'Please enter a valid email address');
       return;
     }
 
-    onSave(cleanEmail, source.trim(), notes.trim());
-    setEmail('');
-    setNotes('');
+    setBusy(true);
     setError('');
-    onClose();
+    try {
+      await onSave(cleanEmail, source.trim(), notes.trim());
+      setEmail('');
+      setNotes('');
+      onClose();
+    } catch {
+      setError(isAr ? 'تعذر تأكيد حفظ المشترك. يرجى إعادة المحاولة.' : 'Could not confirm the subscriber was saved. Please retry.');
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (

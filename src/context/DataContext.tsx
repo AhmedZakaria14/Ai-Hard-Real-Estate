@@ -1,3 +1,5 @@
+import { archiveSubscriber, changeSubscriber, findSubscriber, readSubscribers } from '../lib/db/hardNewsletter';
+import { submitCustomerForm } from '../lib/forms/formSubmissionService';
 import { hardAdminClient } from '../lib/db/hardAdminClient';
 import { readAdminCompanyContent, readCompanyContent, saveCompanyContent, deleteCompanyContent, resetCompanyContent } from '../lib/db/companyContent';
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
@@ -13,7 +15,6 @@ import {
 } from '../types/businessEntities';
 import {
   LeadsRepository,
-  JoinListRepository,
 } from '../lib/db/repository';
 import { mockFaqs, mockCertifications, mockEnhancedTestimonials } from '../data/entitiesMockData';
 import {
@@ -72,7 +73,7 @@ interface DataContextType {
   updateSubscriber: (id: string, updates: Partial<JoinListSubscriber>) => Promise<JoinListSubscriber | null>;
   deleteSubscriber: (id: string) => Promise<boolean>;
   toggleSubscriberStatus: (id: string) => Promise<JoinListSubscriber | null>;
-  resetSubscribersToDefault: () => void;
+  refreshSubscribers: () => Promise<void>;
 
   // --- REUSABLE BUSINESS ENTITIES CRUD ---
   // Team Members
@@ -205,6 +206,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       const isAdmin = session?.user.app_metadata.hard_role === 'superadmin';
       setFaqs([]); setCertifications([]); setEnhancedTestimonials([]);
       if (!isAdmin) {
+        setSubscribers([]);
         setTeamMembers([]); setOffices([]); setStatistics([]); setPartnerBrands([]); setTestimonials([]);
       }
       timer = setTimeout(() => {
@@ -237,18 +239,15 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         lds,
         projs,
         posts,
-        subs,
       ] = await Promise.all([
         LeadsRepository.getAll(),
         loadPublishedProjects().then((rows) => rows.map(({ content }) => content)),
         loadPublishedArticles().then((rows) => rows.map(({ content }) => content)),
-        JoinListRepository.getAll(),
       ]);
 
       setLeads(lds);
       setProjects(projs);
       setBlogPosts(posts);
-      setSubscribers(subs);
     } catch (err) {
       console.error('Failed to load data from repositories:', err);
     } finally {
@@ -361,7 +360,13 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   // Join List Subscribers CRUD
   const addSubscriber = async (email: string, source = 'Website Footer', notes = ''): Promise<JoinListSubscriber> => {
-    const subscriber = await JoinListRepository.create({ email, source, notes });
+    const normalizedEmail = email.trim().toLowerCase();
+    await submitCustomerForm({
+      formType: 'newsletter_signup', sector: 'group', name: normalizedEmail.split('@')[0],
+      email: normalizedEmail, language: 'ar', message: 'Newsletter subscription', details: { source },
+    });
+    const current = await findSubscriber(normalizedEmail);
+    const subscriber = notes ? await changeSubscriber(current.id, { notes }) : current;
     setSubscribers((prev) => {
       const exists = prev.some((s) => s.id === subscriber.id);
       if (exists) {
@@ -373,7 +378,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateSubscriber = async (id: string, updates: Partial<JoinListSubscriber>): Promise<JoinListSubscriber | null> => {
-    const updated = await JoinListRepository.update(id, updates);
+    const updated = await changeSubscriber(id, updates);
     if (updated) {
       setSubscribers((prev) => prev.map((s) => (s.id === id ? updated : s)));
     }
@@ -381,7 +386,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteSubscriber = async (id: string): Promise<boolean> => {
-    const success = await JoinListRepository.delete(id);
+    const success = await archiveSubscriber(id);
     if (success) {
       setSubscribers((prev) => prev.filter((s) => s.id !== id));
     }
@@ -395,10 +400,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     return updateSubscriber(id, { status: newStatus });
   };
 
-  const resetSubscribersToDefault = () => {
-    const defaultData = JoinListRepository.resetToDefaults();
-    setSubscribers(defaultData);
-  };
+  const refreshSubscribers = useCallback(async () => {
+    const { data, error } = await hardAdminClient.auth.getUser();
+    if (error || data.user?.app_metadata.hard_role !== 'superadmin') throw Error('Administrator required');
+    setSubscribers(await readSubscribers());
+  }, []);
 
   // --- REUSABLE BUSINESS ENTITIES CRUD METHODS ---
 
@@ -622,7 +628,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         updateSubscriber,
         deleteSubscriber,
         toggleSubscriberStatus,
-        resetSubscribersToDefault,
+        refreshSubscribers,
         addTeamMember,
         updateTeamMember,
         deleteTeamMember,
