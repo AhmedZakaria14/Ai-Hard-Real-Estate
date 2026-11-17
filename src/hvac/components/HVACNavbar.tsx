@@ -1,4 +1,3 @@
-import { SectorReturnActions } from '../../components/layout/SectorReturnActions';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import React, { useState, useEffect } from 'react';
 import {
@@ -84,7 +83,6 @@ export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
           : 'bg-white/90 backdrop-blur-md border-b border-slate-200/60'
       }`}
     >
-      <SectorReturnActions language={language} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
         {/* Brand Lockup & Logo */}
         <div className="flex items-center gap-4">

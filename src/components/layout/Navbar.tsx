@@ -1,4 +1,3 @@
-import { SectorReturnActions } from './SectorReturnActions';
 import { useEffect, useState } from 'react';
 import { Globe, Menu, MessageSquare, Phone, PlusCircle, X } from 'lucide-react';
 import type { Language, PageId } from '../../types';
@@ -70,7 +69,6 @@ export function Navbar({ currentPage, onNavigate, language, onLanguageChange, on
   }
 
   return <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white shadow-sm">
-    <SectorReturnActions language={language} />
     <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-3 sm:gap-3 sm:px-6">
       <a href="/realestate" onClick={(event) => handleSemanticClick(event, () => changePage('home'))}
         className="group min-w-0 shrink" aria-label={ar ? 'الرئيسية - هارد للعقارات' : 'HARD Real Estate Home'}>

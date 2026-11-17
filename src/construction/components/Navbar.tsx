@@ -1,4 +1,3 @@
-import { SectorReturnActions } from '../../components/layout/SectorReturnActions';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import { BrandLogo } from '../../components/ui/BrandLogo';
 import React, { useState, useEffect } from 'react';
@@ -14,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useConstruction } from '../context/ConstructionContext';
 import { handleSemanticClick } from '../../lib/navigation';
+import { HARD_GROUP_SECTORS } from '../../lib/sectors';
 
 interface NavbarProps {
   onNavigate?: (page: any) => void;
@@ -103,7 +103,6 @@ export function Navbar({
             : 'bg-white/95 backdrop-blur-sm border-b border-slate-100 py-3.5'
         }`}
       >
-        <SectorReturnActions language={language} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           {/* Logo Branding */}
           <div className="flex items-center gap-3">
@@ -195,6 +194,45 @@ export function Navbar({
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
           <div className="lg:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-4 animate-in slide-in-from-top-4 shadow-lg max-h-[85vh] overflow-y-auto">
+            {/* Dedicated HARD Group Sectors Switcher */}
+            <div className="bg-slate-900 rounded-2xl p-3 text-white space-y-2">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-1">
+                {isAr ? 'قطاعات مجموعة هارد' : 'HARD Group Sectors'}
+              </div>
+              <div className="space-y-1">
+                {HARD_GROUP_SECTORS.map((sector) => {
+                  const isCurrent = sector.id === 'construction';
+                  return (
+                    <a
+                      key={sector.id}
+                      href={sector.href}
+                      onClick={(e) =>
+                        handleSemanticClick(e, () => {
+                          if (!isCurrent && onNavigate) {
+                            onNavigate(sector.pageId);
+                          }
+                          setMobileMenuOpen(false);
+                        })
+                      }
+                      aria-current={isCurrent ? 'page' : undefined}
+                      className={`flex items-center justify-between p-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
+                        isCurrent
+                          ? 'bg-[#009ee2] text-white font-bold'
+                          : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                      }`}
+                    >
+                      <span>{sector.name[language]}</span>
+                      {isCurrent && (
+                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-black/30 text-sky-200 uppercase font-extrabold">
+                          {isAr ? 'القطاع الحالي' : 'Active'}
+                        </span>
+                      )}
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+
             <div className="flex flex-col space-y-1">
               <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-1">
                 {isAr ? 'أقسام الموقع' : 'Construction Navigation'}
