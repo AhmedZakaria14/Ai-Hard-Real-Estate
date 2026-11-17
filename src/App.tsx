@@ -604,10 +604,12 @@ function AppContent() {
       <SectorQuickActions language={language} whatsappHref={`https://wa.me/${SECTOR_CONTACT_DETAILS.realestate.whatsapp.replace(/\D/g, '')}`} />
 
       {/* Floating Developer Text Editor (Centered at Bottom) */}
-      <FloatingTextEditor
-        currentLanguage={language}
-        onLanguageChange={setLanguage}
-      />
+      {currentPage !== 'marketing' && (
+        <FloatingTextEditor
+          currentLanguage={language}
+          onLanguageChange={setLanguage}
+        />
+      )}
 
       {/* Global Dialog Modals */}
       <BookViewingModal
