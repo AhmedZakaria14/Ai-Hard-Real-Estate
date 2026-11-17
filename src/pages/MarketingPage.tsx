@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Megaphone,
   HousePlus,
@@ -12,6 +12,7 @@ import { Language, PageId } from '../types';
 import { useTextOverride } from '../context/TextOverrideContext';
 import { Button } from '../components/ui/Button';
 import { BrandLogo } from '../components/ui/BrandLogo';
+import { ValuationWizard } from '../components/forms/ValuationWizard';
 
 interface MarketingPageProps {
   onNavigate: (page: PageId) => void;
@@ -25,6 +26,7 @@ export function MarketingPage({
   onOpenListPropertyModal,
 }: MarketingPageProps) {
   const { translations } = useTextOverride();
+  const [showValuation, setShowValuation] = useState(false);
   const t = translations[language];
   const ArrowIcon = language === 'ar' ? ArrowLeft : ArrowRight;
 
@@ -84,7 +86,7 @@ export function MarketingPage({
             {t.marketing.listFormSubtitle}
           </p>
 
-          <div className="pt-4 flex flex-col sm:flex-row gap-3">
+          <div className="pt-4 flex flex-col sm:flex-row sm:flex-wrap gap-3">
             <Button
               variant="white"
               size="lg"
@@ -93,6 +95,15 @@ export function MarketingPage({
             >
               <span>{t.cta.listProperty}</span>
               <ArrowIcon className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="white"
+              size="lg"
+              onClick={() => setShowValuation(true)}
+              aria-controls="property-valuation"
+              aria-expanded={showValuation}
+            >
+              {language === 'ar' ? 'اطلب تقييم عقارك' : 'Request a property valuation'}
             </Button>
             <Button
               href="https://wa.me/966556125711?text=Hello%20HARD%20Real%20Estate,%20I%20would%20like%20a%20property%20valuation."
@@ -111,6 +122,9 @@ export function MarketingPage({
           <BrandLogo size="xl" language={language} variant="light" isIconOnly />
         </div>
       </div>
+      <section id="property-valuation" hidden={!showValuation} aria-label={language === 'ar' ? 'طلب تقييم عقار' : 'Property valuation request'}>
+        {showValuation && <ValuationWizard language={language} />}
+      </section>
     </div>
   );
 }
