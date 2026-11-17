@@ -9,30 +9,18 @@ export function HVACWorkGallery() {
 
   const activeItems = galleryItems.filter((i) => i.active);
 
-  const categories = [
-    { id: 'all', en: 'All Projects', ar: 'كافة الأعمال' },
-    { id: 'cleaning', en: 'Deep Cleaning', ar: 'الغسيل الكيميائي' },
-    { id: 'vrf', en: 'VRF & Commercial', ar: 'أنظمة تجارية وVRF' },
-    { id: 'residential', en: 'Residential Villas', ar: 'فلل وقصور' },
-  ];
-
-  const filteredItems = activeItems.filter((item) => {
-    if (activeFilter === 'all') return true;
-    if (activeFilter === 'cleaning') return item.id === 'gal-2';
-    if (activeFilter === 'vrf') return item.id === 'gal-1' || item.id === 'gal-3';
-    if (activeFilter === 'residential') return item.id === 'gal-4' || item.id === 'gal-6';
-    return true;
-  });
+  const categoryKey = (item: (typeof activeItems)[number]) => JSON.stringify([item.categoryAr, item.categoryEn]);
+  const categoryEntries = new Map(activeItems.filter((item) => item.categoryAr || item.categoryEn)
+    .map((item) => [categoryKey(item), { id: categoryKey(item), en: item.categoryEn || item.categoryAr, ar: item.categoryAr || item.categoryEn }]));
+  const categories = [{ id: 'all', en: 'All Projects', ar: 'كافة الأعمال' }, ...categoryEntries.values()];
+  const visibleFilter = categoryEntries.has(activeFilter) ? activeFilter : 'all';
+  const filteredItems = visibleFilter === 'all' ? activeItems : activeItems.filter((item) => categoryKey(item) === visibleFilter);
 
   return (
     <section id="work" className="py-16 sm:py-24 bg-[#F8FAFC]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-10 sm:mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0EA5E9]/10 text-[#0EA5E9] text-xs font-semibold">
-            <ImageIcon className="w-3.5 h-3.5" />
-            <span>{pick(T.gallery.eyebrow, language)}</span>
-          </div>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight">
             {pick(T.gallery.title, language)}
           </h2>
@@ -48,7 +36,7 @@ export function HVACWorkGallery() {
                 type="button"
                 onClick={() => setActiveFilter(cat.id)}
                 className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                  activeFilter === cat.id
+                  visibleFilter === cat.id
                     ? 'bg-[#0EA5E9] text-white shadow-xs'
                     : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
                 }`}
@@ -75,10 +63,10 @@ export function HVACWorkGallery() {
                   loading="lazy"
                 />
                 {/* Category & Location Badges */}
-                <div className="absolute top-3 start-3 px-2.5 py-1 rounded-lg bg-slate-900/80 backdrop-blur-sm text-white text-[11px] font-semibold">
+                <div className="absolute top-3 start-3 px-2.5 py-1 rounded-lg bg-[#034DA2] backdrop-blur-sm text-white text-[11px] font-semibold">
                   {isAr ? item.categoryAr : item.categoryEn}
                 </div>
-                <div className="absolute bottom-3 start-3 px-2.5 py-1 rounded-lg bg-slate-900/80 backdrop-blur-sm text-slate-200 text-[11px] font-medium flex items-center gap-1">
+                <div className="absolute bottom-3 start-3 px-2.5 py-1 rounded-lg bg-[#034DA2] backdrop-blur-sm text-slate-200 text-[11px] font-medium flex items-center gap-1">
                   <MapPin className="w-3 h-3 text-[#0EA5E9]" />
                   <span>{isAr ? item.locationAr : item.locationEn}</span>
                 </div>

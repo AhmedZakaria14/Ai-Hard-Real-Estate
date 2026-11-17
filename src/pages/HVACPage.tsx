@@ -5,7 +5,6 @@ import { HVACHero } from '../hvac/components/HVACHero';
 import { HVACServicesSection } from '../hvac/components/HVACServicesSection';
 import { HVACWhyChooseUs } from '../hvac/components/HVACWhyChooseUs';
 import { HVACWorkGallery } from '../hvac/components/HVACWorkGallery';
-import { HVACEfficiencyCalculator } from '../hvac/components/HVACEfficiencyCalculator';
 import { HVACSeasonalChecklist } from '../hvac/components/HVACSeasonalChecklist';
 import { HVACTestimonials } from '../hvac/components/HVACTestimonials';
 import { HVACFAQSection } from '../hvac/components/HVACFAQSection';
@@ -97,8 +96,6 @@ function HVACPageContent({ onNavigatePage }: HVACPageProps) {
         {/* 6. Work Gallery (real field photos with captions) */}
         <HVACWorkGallery />
 
-        {/* 7. Efficiency Incentives Calculator */}
-        <HVACEfficiencyCalculator />
 
         {/* 8. Seasonal Maintenance Checklist (Summer/Winter tabs) */}
         <HVACSeasonalChecklist />

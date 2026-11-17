@@ -412,6 +412,8 @@ export const winterChecklist: HVACChecklistItem[] = [
   },
 ];
 
+export const yearRoundChecklist = [...summerChecklist, winterChecklist[1], winterChecklist[2]];
+
 export const initialSampleLeads: HVACLead[] = [
   {
     id: 'lead-1',

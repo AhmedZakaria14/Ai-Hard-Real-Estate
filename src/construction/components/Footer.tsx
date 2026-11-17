@@ -52,65 +52,10 @@ export function Footer({ onNavigate }: FooterProps) {
 
         </div>
 
-        {/* Col 2: Quick Links & Group Sectors */}
+        {/* Col 2: Quick Links */}
         <div className="space-y-4">
-          <div className="space-y-2">
-            <h4 className="text-sm font-bold text-white font-display-serif">
-              {isAr ? 'قطاعات مجموعة هارد' : 'HARD Group Sectors'}
-            </h4>
-            <ul className="space-y-1.5 text-xs">
-              <li>
-                <a
-                  href="/"
-                  onClick={(e) => {
-                    handleSemanticClick(e, () => {
-                      if (onNavigate) onNavigate('portal');
-                    });
-                  }}
-                  className="hover:text-[#009ee2] transition-colors flex items-center gap-1.5"
-                >
-                  <span className="text-slate-500">›</span>
-                  <span>{isAr ? 'بوابة مجموعة هارد' : 'HARD Group Portal'}</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/realestate"
-                  onClick={(e) => {
-                    handleSemanticClick(e, () => {
-                      if (onNavigate) onNavigate('home');
-                    });
-                  }}
-                  className="hover:text-[#009ee2] transition-colors flex items-center gap-1.5"
-                >
-                  <span className="text-slate-500">›</span>
-                  <span>{isAr ? 'هارد للعقارات' : 'HARD Real Estate'}</span>
-                </a>
-              </li>
-              <li>
-                <span className="text-[#009ee2] font-bold flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#009ee2]" />
-                  <span>{isAr ? 'هارد للإنشاءات (القطاع الحالي)' : 'HARD Construction (Current)'}</span>
-                </span>
-              </li>
-              <li>
-                <a
-                  href="/hvac"
-                  onClick={(e) => {
-                    handleSemanticClick(e, () => {
-                      if (onNavigate) onNavigate('hvac');
-                    });
-                  }}
-                  className="hover:text-[#009ee2] transition-colors flex items-center gap-1.5 font-medium text-slate-300"
-                >
-                  <span className="text-slate-500">›</span>
-                  <span>{isAr ? 'هارد لصيانة التكييف' : 'HARD HVAC Maintenance'}</span>
-                </a>
-              </li>
-            </ul>
-          </div>
 
-          <div className="pt-2 border-t border-slate-800/80 space-y-2">
+          <div className="space-y-2">
             <h4 className="text-sm font-bold text-white font-display-serif">
               {isAr ? 'روابط سريعة' : 'Quick Navigation'}
             </h4>

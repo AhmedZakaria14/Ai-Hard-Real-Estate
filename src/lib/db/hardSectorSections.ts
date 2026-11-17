@@ -4,7 +4,7 @@ import { hardPublishableKey, hardSupabaseUrl } from './hardCatalog';
 export type SectorSection =
   | { sector: 'construction'; key: 'hero' | 'company' | 'stages' | 'offices' }
   | { sector: 'realestate'; key: 'hero' | 'service_media' }
-  | { sector: 'hvac'; key: 'hero' | 'hours_contact' | 'booking_copy' | 'service_areas' };
+  | { sector: 'hvac'; key: 'hero' | 'hours_contact' | 'booking_copy' | 'service_areas' | 'work_gallery' | 'maintenance_guide' | 'reviews' };
 
 const refreshEvent = 'hard-sector-section-saved';
 

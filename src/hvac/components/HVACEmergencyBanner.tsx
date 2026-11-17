@@ -15,10 +15,10 @@ export function HVACEmergencyBanner() {
   };
 
   return (
-    <section className="bg-[#1E293B] text-white py-12 sm:py-16 relative overflow-hidden">
+    <section className="bg-[#034DA2] text-white py-12 sm:py-16 relative overflow-hidden">
       {/* Subtle background glow effect without arbitrary gradients */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-8 sm:p-12 shadow-xl flex flex-col lg:flex-row items-center justify-between gap-8 text-center lg:text-start">
+        <div className="bg-[#034DA2] border border-white/25 rounded-2xl p-8 sm:p-12 shadow-xl flex flex-col lg:flex-row items-center justify-between gap-8 text-center lg:text-start">
           <div className="space-y-3 max-w-2xl">
             {/* Urgent Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F97316]/20 border border-[#F97316]/40 text-[#F97316] text-xs font-semibold">
@@ -43,7 +43,7 @@ export function HVACEmergencyBanner() {
             {/* Direct Call Button */}
             <a
               href="tel:+966550641000"
-              className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-[#F97316] hover:bg-[#ea580c] text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2.5 shadow-md cursor-pointer"
+              className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-[#007EBA] hover:bg-[#006A9A] text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2.5 shadow-md cursor-pointer"
             >
               <Phone className="w-4 h-4 animate-bounce" />
               <span>{pick(T.emergencyBanner.callBtn, language)}</span>
@@ -58,9 +58,9 @@ export function HVACEmergencyBanner() {
               )}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2.5 border border-slate-600 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0EA5E9]"
+              className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2.5 border border-emerald-600 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0EA5E9]"
             >
-              <MessageSquare className="w-4 h-4 text-[#25D366]" />
+              <MessageSquare className="w-4 h-4 text-white" />
               <span>{pick(T.emergencyBanner.whatsappBtn, language)}</span>
             </a>
           </div>

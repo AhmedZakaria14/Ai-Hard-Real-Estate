@@ -15,7 +15,7 @@ import {
   initialGallery,
   initialTestimonials,
   initialFaqs,
-  summerChecklist as initialChecklist,
+  yearRoundChecklist as initialChecklist,
   initialSampleLeads,
 } from '../data/initialData';
 import {
@@ -23,12 +23,6 @@ import {
   deleteHVACServiceDoc,
   subscribeHVACSectionContent,
   saveHVACSectionContent,
-  subscribeHVACGallery,
-  saveHVACGalleryDoc,
-  deleteHVACGalleryDoc,
-  subscribeHVACTestimonials,
-  saveHVACTestimonialDoc,
-  deleteHVACTestimonialDoc,
   subscribeHVACLeads,
   saveHVACLeadDoc,
   updateHVACLeadStatusDoc,
@@ -93,6 +87,8 @@ interface HVACContextType {
   maintenanceGuides: HVACChecklistItem[];
   updateMaintenanceGuides: (items: HVACChecklistItem[]) => void;
   resetAllToDefaults: () => void;
+  useEffect(() => subscribeHVACSectionContent<HVACChecklistItem[]>('maintenance_guide', initialChecklist, setMaintenanceGuides), []);
+
   // Booking Modal
   isBookingModalOpen: boolean;
   bookingInitialService: string;
@@ -255,54 +251,52 @@ export function HVACProvider({
   const [galleryItems, setGalleryItems] = useState<HVACGalleryItem[]>(initialGallery);
 
   useEffect(() => {
-    const unsub = subscribeHVACGallery((list) => setGalleryItems(list));
+    const unsub = subscribeHVACSectionContent<HVACGalleryItem[]>('work_gallery', initialGallery, setGalleryItems);
     return () => unsub();
   }, []);
 
-  const addGalleryItem = async (item: Omit<HVACGalleryItem, 'id'>) => {
-    const newItem: HVACGalleryItem = {
-      ...item,
-      id: `gal-${Date.now()}`,
-    };
-    await saveHVACGalleryDoc(newItem);
+  const addGallery = async (item: Omit<HVACGalleryItem, 'id'>) => {
+    const next = [...galleryItems, { ...item, id: crypto.randomUUID() }];
+    await saveHVACSectionContent('work_gallery', next);
+    setGalleryItems(next);
   };
 
-  const updateGalleryItem = async (id: string, updated: Partial<HVACGalleryItem>) => {
-    const existing = galleryItems.find((g) => g.id === id);
-    if (!existing) return;
-    const merged = { ...existing, ...updated };
-    await saveHVACGalleryDoc(merged);
+  const updateGallery = async (id: string, updated: Partial<HVACGalleryItem>) => {
+    const next = galleryItems.map((item) => item.id === id ? { ...item, ...updated } : item);
+    await saveHVACSectionContent('work_gallery', next);
+    setGalleryItems(next);
   };
 
-  const deleteGalleryItem = async (id: string) => {
-    await deleteHVACGalleryDoc(id);
+  const deleteGallery = async (id: string) => {
+    const next = galleryItems.filter((item) => item.id !== id);
+    await saveHVACSectionContent('work_gallery', next);
+    setGalleryItems(next);
   };
 
   // Testimonials
   const [testimonials, setTestimonials] = useState<HVACTestimonial[]>(initialTestimonials);
 
   useEffect(() => {
-    const unsub = subscribeHVACTestimonials((list) => setTestimonials(list));
+    const unsub = subscribeHVACSectionContent<HVACTestimonial[]>('reviews', initialTestimonials, setTestimonials);
     return () => unsub();
   }, []);
 
   const addTestimonial = async (item: Omit<HVACTestimonial, 'id'>) => {
-    const newItem: HVACTestimonial = {
-      ...item,
-      id: `rev-${Date.now()}`,
-    };
-    await saveHVACTestimonialDoc(newItem);
+    const next = [...testimonials, { ...item, id: crypto.randomUUID() }];
+    await saveHVACSectionContent('reviews', next);
+    setTestimonials(next);
   };
 
   const updateTestimonial = async (id: string, updated: Partial<HVACTestimonial>) => {
-    const existing = testimonials.find((t) => t.id === id);
-    if (!existing) return;
-    const merged = { ...existing, ...updated };
-    await saveHVACTestimonialDoc(merged);
+    const next = testimonials.map((item) => item.id === id ? { ...item, ...updated } : item);
+    await saveHVACSectionContent('reviews', next);
+    setTestimonials(next);
   };
 
   const deleteTestimonial = async (id: string) => {
-    await deleteHVACTestimonialDoc(id);
+    const next = testimonials.filter((item) => item.id !== id);
+    await saveHVACSectionContent('reviews', next);
+    setTestimonials(next);
   };
 
   // FAQs & Maintenance Guides

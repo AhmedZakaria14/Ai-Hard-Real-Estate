@@ -96,7 +96,7 @@ export async function deleteHVACServiceDoc(id: string): Promise<void> {
  * Subscribes to HVAC Section Content documents in Firestore.
  */
 export function subscribeHVACSectionContent<T>(
-  sectionKey: 'hero' | 'hours_contact' | 'booking_copy' | 'service_areas',
+  sectionKey: 'hero' | 'hours_contact' | 'booking_copy' | 'service_areas' | 'work_gallery' | 'maintenance_guide' | 'reviews',
   defaultFallback: T,
   callback: (data: T) => void
 ): Unsubscribe {
@@ -104,7 +104,7 @@ export function subscribeHVACSectionContent<T>(
 }
 
 export async function saveHVACSectionContent<T extends object>(
-  sectionKey: 'hero' | 'hours_contact' | 'booking_copy' | 'service_areas',
+  sectionKey: 'hero' | 'hours_contact' | 'booking_copy' | 'service_areas' | 'work_gallery' | 'maintenance_guide' | 'reviews',
   data: T
 ): Promise<void> {
   await saveSectorSection({ sector: 'hvac', key: sectionKey }, data);

@@ -72,10 +72,6 @@ export function HVACContactSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0EA5E9]/10 text-[#0EA5E9] text-xs font-semibold">
-            <Mail className="w-3.5 h-3.5" />
-            <span>{pick(T.contact.eyebrow, language)}</span>
-          </div>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight">
             {pick(T.contact.title, language)}
           </h2>
@@ -92,11 +88,11 @@ export function HVACContactSection() {
             </h3>
             <p className="text-xs text-slate-500 mb-6">
               {isAr
-                ? 'يتم إرسال كافة الاستفسارات فوراً إلى info@hardgp.com لمتابعتها من قبل الإدارة الفنية.'
-                : 'All submissions are immediately dispatched to info@hardgp.com and logged in our system.'}
+                ? 'يتم إرسال كافة الاستفسارات فورًا إلى الإدارة الفنية لمتابعتها والرد عليها.'
+                : 'All inquiries go directly to the technical team for follow-up and response.'}
             </p>
 
-            {formError && (
+            {!successStatus && formError && (
               <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
                 <p className="font-semibold">{formError}</p>
@@ -241,10 +237,10 @@ export function HVACContactSection() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[11px] font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
-                    26.373784° N, 50.103001° E
+                    26°22′25.3″N 50°06′10.8″E
                   </span>
                   <a
-                    href="https://www.google.com/maps/dir/?api=1&destination=26.373784,50.103001"
+                    href="https://www.google.com/maps/dir/?api=1&destination=26.373703,50.102998"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-white bg-[#0EA5E9] hover:bg-[#0284C7] rounded-lg transition-colors"
@@ -258,24 +254,16 @@ export function HVACContactSection() {
               {/* Google Maps Iframe */}
               <div className="h-60 sm:h-64 w-full bg-slate-100 relative">
                 <iframe
-                  title="HARD HVAC Maintenance Service Hub - Al Khobar"
+                  title="HARD HVAC Maintenance Service Hub - Dammam"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
                   loading="lazy"
                   allowFullScreen
                   referrerPolicy="no-referrer-when-downgrade"
-                  src="https://maps.google.com/maps?q=26.373784,50.103001&hl=en&z=15&output=embed"
+                  src="https://maps.google.com/maps?q=26.373703,50.102998&hl=en&z=15&output=embed"
                 />
               </div>
-            </div>
-
-            {/* Verification Notice Banner */}
-            <div className="p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200/80 text-amber-900 text-xs flex items-start gap-2.5">
-              <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-              <p className="leading-relaxed">
-                {pick(T.contact.verificationNotice, language)}
-              </p>
             </div>
 
             {/* Address, Coverage, Email, and Working Hours Grid */}
@@ -321,7 +309,7 @@ export function HVACContactSection() {
                   info@hardgp.com
                 </a>
                 <p className="text-[11px] text-slate-500">
-                  {isAr ? 'استجابة سريعة لكافة العقود' : 'Direct inbox for contracts & RFPs'}
+                  {isAr ? 'استجابة سريعة لكافة الاستفسارات والطلبات' : 'Prompt response to inquiries and requests'}
                 </p>
               </div>
 
@@ -337,10 +325,6 @@ export function HVACContactSection() {
                   <div className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                     <span>{pick(T.contact.hoursRegular, language)}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-amber-900 font-medium">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#F97316]" />
-                    <span>{pick(T.contact.hoursFriday, language)}</span>
                   </div>
                 </div>
               </div>

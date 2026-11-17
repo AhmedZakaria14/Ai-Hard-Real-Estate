@@ -273,8 +273,8 @@ export const T = {
       {
         id: 'dispatch',
         title: {
-          en: '24/7 Rapid Emergency Response',
-          ar: 'استجابة طوارئ على مدار الساعة',
+          en: 'Rapid Emergency Response',
+          ar: 'استجابة طوارئ سريعة',
         },
         desc: {
           en: 'Dedicated mobile service vans equipped with diagnostic pressure gauges, vacuum pumps, and genuine gas cylinders.',
@@ -304,8 +304,8 @@ export const T = {
       ar: 'معرض أعمالنا ومشاريع الصيانة المنفذة',
     },
     subtitle: {
-      en: 'Actual inspection, cleaning, coil decontamination, and VRF installation projects completed across the Kingdom.',
-      ar: 'صور حقيقية لعمليات الغسيل الكيميائي، معالجة مجاري الهواء، وتركيب وتشغيل وحدات التكييف المركزية.',
+      en: 'Our work in washing, cleaning, air duct treatment, and installing and commissioning all types of AC units.',
+      ar: 'معرض الأعمال لعمليات الغسيل، التنظيف، معالجة مجاري الهواء، وتركيب وتشغيل وحدات التكييف بمختلف أنواعها.',
     },
   },
   calculator: {
@@ -452,8 +452,8 @@ export const T = {
       ar: 'العناية الوقائية',
     },
     title: {
-      en: 'Seasonal HVAC Maintenance Checklist',
-      ar: 'دليل الصيانة الدورية حسب المواسم',
+      en: 'Year-Round HVAC Maintenance Guide',
+      ar: 'دليل الصيانة الدورية طوال العام',
     },
     subtitle: {
       en: 'Follow our certified engineers’ checklist to prevent sudden compressor burnouts and maintain crisp indoor air quality year-round.',
@@ -474,12 +474,12 @@ export const T = {
       ar: 'ثقة عملائنا',
     },
     title: {
-      en: 'What Our Clients Say in the Eastern Province',
-      ar: 'آراء وتقييمات العملاء في المنطقة الشرقية',
+      en: 'Customer Reviews and Ratings',
+      ar: 'آراء وتقييمات العملاء',
     },
     subtitle: {
       en: 'Real feedback from homeowners, compound managers, and commercial business operators.',
-      ar: 'تجارب حقيقية لملاك الفلل والقصور ومديري المجمعات والشركات في مدن الشرقية.',
+      ar: 'تجارب حقيقية لملاك الفلل والقصور ومديري المجمعات والشركات في مختلف المدن.',
     },
   },
   faq: {
@@ -502,8 +502,8 @@ export const T = {
       ar: 'تواصل معنا',
     },
     title: {
-      en: 'Book Your Service or Inquire About Maintenance Contracts',
-      ar: 'احجز موعد الصيانة أو استفسر عن العقود السنوية',
+      en: 'Book Maintenance or Ask a Question',
+      ar: 'احجز موعد الصيانة أو اطرح استفساراتك',
     },
     subtitle: {
       en: 'Our engineering dispatch team is on standby to assist you immediately.',
@@ -538,24 +538,24 @@ export const T = {
       ar: 'جاري الإرسال...',
     },
     formSuccess: {
-      en: 'Message dispatched to info@hardgp.com. We will contact you within minutes!',
-      ar: 'تم إرسال رسالتك بنجاح إلى info@hardgp.com. سنتواصل معك خلال دقائق!',
+      en: 'Your message was received. We will contact you within one business day!',
+      ar: 'تم استلام رسالتك بنجاح. سنتواصل معك خلال يوم عمل واحد!',
     },
     addressTitle: {
       en: 'Physical Office Location',
       ar: 'موقع المقر الميداني والتشغيلي',
     },
     addressDesc: {
-      en: 'King Fahd Road, Al Rakah Al Shamaliya District, Al Khobar 34224, Eastern Province, Kingdom of Saudi Arabia',
-      ar: 'طريق الملك فهد، حي الراكة الشمالية، الخبر 34224، المنطقة الشرقية، المملكة العربية السعودية',
+      en: 'Prince Mutaib bin Abdulaziz Road, Hajar District, Dammam, Saudi Arabia',
+      ar: 'طريق الأمير متعب بن عبد العزيز، حي هجر، الدمام، المملكة العربية السعودية',
     },
     coverageTitle: {
       en: 'Field Service Coverage Area',
       ar: 'نطاق التغطية الميدانية',
     },
     coverageDesc: {
-      en: 'On-site emergency maintenance & contract dispatch across Al Khobar, Dammam, Dhahran, Jubail, Qatif, and Riyadh.',
-      ar: 'فرق الصيانة الميدانية والطوارئ تغطي: الخبر، الدمام، الظهران، الجبيل، القطيف، والرياض.',
+      en: 'On-site emergency maintenance & contract dispatch across Al Khobar, Dammam, Dhahran, Jubail, Qatif, Saihat, Tarout, Safwa, and Ras Tanura.',
+      ar: 'فرق الصيانة الميدانية والطوارئ تغطي: الخبر، الدمام، الظهران، الجبيل، القطيف، سيهات، تاروت، صفوى، ورأس تنورة.',
     },
     verificationNotice: {
       en: 'GPS Destination Verified: 26.373784° N, 50.103001° E (Al Khobar). Exact Building/Unit # & National Address Code pending final municipal assignment.',
@@ -571,16 +571,16 @@ export const T = {
       ar: 'ساعات العمل',
     },
     hoursRegular: {
-      en: 'Sat–Thu: 7:00 AM – 9:00 PM',
-      ar: 'السبت إلى الخميس: ٧:٠٠ ص – ٩:٠٠ م',
+      en: 'Sat–Thu: 8:00 AM – 5:00 PM',
+      ar: 'السبت إلى الخميس: ٨:٠٠ ص – ٥:٠٠ م',
     },
     hoursFriday: {
       en: 'Friday: Emergency Service Only (24/7)',
       ar: 'الجمعة: خدمة الطوارئ الميدانية فقط (٢٤ ساعة)',
     },
     mapTitle: {
-      en: 'HARD HVAC Regional Hub (Al Khobar - 26.373784, 50.103001)',
-      ar: 'مقر هارد للتكييف (الخبر - الإحداثيات: 26.373784, 50.103001)',
+      en: 'HARD HVAC Regional Hub (Dammam - 26.373703, 50.102998)',
+      ar: 'مقر هارد للتكييف (الدمام - الإحداثيات: 26.373703, 50.102998)',
     },
     getDirections: {
       en: 'Get Driving Directions',
@@ -611,8 +611,8 @@ export const T = {
   },
   footer: {
     aboutText: {
-      en: 'HARD HVAC Maintenance is a specialized division of HARD Group, delivering premier cooling, heating, ventilation, and air quality engineering across the Kingdom of Saudi Arabia.',
-      ar: 'هارد لصيانة وتكييف الهواء هي الذراع التخصصي لمجموعة هارد، تقدم أرقى معايير التبريد والتهوية والتحكم المناخي الذكي في المملكة العربية السعودية.',
+      en: 'HARD HVAC Maintenance is a division of HARD Group, providing cooling and ventilation services to international standards.',
+      ar: 'هارد لصيانة التكييف هي أحد قطاعات مجموعة هارد، ريادة وطنية في خدمات التبريد والتهوية بأرقى المعايير العالمية.',
     },
     quickLinks: {
       en: 'Quick Navigation',
@@ -651,8 +651,8 @@ export const T = {
       ar: 'هارد للعقارات والتسويق',
     },
     followUs: {
-      en: 'Follow HARD Group',
-      ar: 'تابع مجموعة هارد',
+      en: 'Follow us:',
+      ar: 'تابعنا على:',
     },
     rights: {
       en: 'Copyright. HARD HVAC Maintenance@2026',

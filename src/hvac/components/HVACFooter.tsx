@@ -85,7 +85,7 @@ export function HVACFooter({ onNavigatePage, onOpenCMS }: HVACFooterProps) {
           </div>
 
           {/* Col 2 (3 cols): Quick Anchor Links */}
-          <div className="lg:col-span-3 space-y-3">
+          <div className="lg:col-span-4 space-y-3">
             <h4 className="font-semibold text-slate-900 text-sm">
               {pick(T.footer.quickLinks, language)}
             </h4>
@@ -103,11 +103,6 @@ export function HVACFooter({ onNavigatePage, onOpenCMS }: HVACFooterProps) {
               <li>
                 <a href="#work" className="hover:text-[#0EA5E9] transition-colors">
                   {pick(T.footer.galleryLink, language)}
-                </a>
-              </li>
-              <li>
-                <a href="#calculator" className="hover:text-[#0EA5E9] transition-colors">
-                  {pick(T.footer.calcLink, language)}
                 </a>
               </li>
               <li>
@@ -130,68 +125,6 @@ export function HVACFooter({ onNavigatePage, onOpenCMS }: HVACFooterProps) {
                   {pick(T.footer.contactLink, language)}
                 </a>
               </li>
-            </ul>
-          </div>
-
-          {/* Col 3 (3 cols): HARD Group Divisions */}
-          <div className="lg:col-span-2 space-y-3">
-            <h4 className="font-semibold text-slate-900 text-sm">
-              {isAr ? 'قطاعات مجموعة هارد' : 'HARD Group Sectors'}
-            </h4>
-            <ul className="space-y-2 text-xs text-slate-600">
-              {onNavigatePage && (
-                <>
-                  <li>
-                    <a
-                      href="/"
-                      onClick={(e) => handleSemanticClick(e, () => onNavigatePage('portal'))}
-                      className="hover:text-[#0EA5E9] transition-colors text-start cursor-pointer flex items-center gap-1.5 focus-visible:outline-none focus-visible:underline"
-                    >
-                      <Layers className="w-3.5 h-3.5 text-[#0EA5E9]" />
-                      <span>{isAr ? 'بوابة مجموعة هارد' : 'HARD Group Portal'}</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="/realestate"
-                      onClick={(e) => handleSemanticClick(e, () => onNavigatePage('home'))}
-                      className="hover:text-[#0EA5E9] transition-colors text-start cursor-pointer flex items-center gap-1.5 focus-visible:outline-none focus-visible:underline"
-                    >
-                      <Building className="w-3.5 h-3.5 text-[#0EA5E9]" />
-                      <span>{isAr ? 'هارد للعقارات' : 'HARD Real Estate'}</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="/construction"
-                      onClick={(e) => handleSemanticClick(e, () => onNavigatePage('construction'))}
-                      className="hover:text-[#0EA5E9] transition-colors text-start cursor-pointer flex items-center gap-1.5 focus-visible:outline-none focus-visible:underline"
-                    >
-                      <Building className="w-3.5 h-3.5 text-[#0EA5E9]" />
-                      <span>{isAr ? 'هارد للإنشاءات' : 'HARD Construction'}</span>
-                    </a>
-                  </li>
-                  <li>
-                    <span className="text-[#0EA5E9] font-bold flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#0EA5E9]" />
-                      <span>{isAr ? 'هارد لصيانة التكييف (القطاع الحالي)' : 'HARD HVAC Maintenance (Current)'}</span>
-                    </span>
-                  </li>
-                </>
-              )}
-
-              {isAdmin && onOpenCMS && (
-                <li className="pt-2">
-                  <button
-                    type="button"
-                    onClick={onOpenCMS}
-                    className="text-slate-500 hover:text-slate-900 transition-colors text-start cursor-pointer flex items-center gap-1.5"
-                  >
-                    <Lock className="w-3 h-3 text-slate-400" />
-                    <span>{pick(T.nav.adminPanel, language)}</span>
-                  </button>
-                </li>
-              )}
             </ul>
           </div>
 
@@ -230,45 +163,9 @@ export function HVACFooter({ onNavigatePage, onOpenCMS }: HVACFooterProps) {
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-8 border-t border-slate-200/80 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <div className="pt-8 border-t border-slate-200/80 text-center text-xs text-slate-500">
           <p>{pick(T.footer.rights, language)}</p>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 font-medium text-slate-600">
-            <span className="text-slate-400 font-semibold uppercase text-[10px] tracking-wider">
-              {isAr ? 'قطاعات هارد:' : 'Sectors:'}
-            </span>
-            {onNavigatePage && (
-              <>
-                <a
-                  href="/"
-                  onClick={(e) => handleSemanticClick(e, () => onNavigatePage('portal'))}
-                  className="hover:text-[#0EA5E9] transition-colors"
-                >
-                  {isAr ? 'بوابة مجموعة هارد' : 'HARD Group Portal'}
-                </a>
-                <span className="text-slate-300">•</span>
-                <a
-                  href="/realestate"
-                  onClick={(e) => handleSemanticClick(e, () => onNavigatePage('home'))}
-                  className="hover:text-[#0EA5E9] transition-colors"
-                >
-                  {isAr ? 'هارد للعقارات' : 'HARD Real Estate'}
-                </a>
-                <span className="text-slate-300">•</span>
-                <a
-                  href="/construction"
-                  onClick={(e) => handleSemanticClick(e, () => onNavigatePage('construction'))}
-                  className="hover:text-[#0EA5E9] transition-colors"
-                >
-                  {isAr ? 'هارد للإنشاءات' : 'HARD Construction'}
-                </a>
-                <span className="text-slate-300">•</span>
-                <span className="text-[#0EA5E9] font-bold">
-                  {isAr ? 'هارد لصيانة التكييف (القطاع الحالي)' : 'HARD HVAC Maintenance (Current)'}
-                </span>
-              </>
-            )}
-          </div>
         </div>
       </div>
     </footer>

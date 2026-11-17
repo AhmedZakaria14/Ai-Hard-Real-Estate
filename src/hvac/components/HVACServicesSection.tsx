@@ -38,7 +38,7 @@ export function HVACServicesSection() {
                     loading="lazy"
                   />
                   {(service.badgeAr || service.badgeEn) && (
-                    <div className="absolute top-3 start-3 px-2.5 py-1 rounded-lg bg-slate-900/80 backdrop-blur-sm text-white text-[11px] font-semibold">
+                    <div className="absolute top-3 start-3 px-2.5 py-1 rounded-lg bg-[#034DA2] backdrop-blur-sm text-white text-[11px] font-semibold">
                       {isAr ? service.badgeAr : service.badgeEn}
                     </div>
                   )}

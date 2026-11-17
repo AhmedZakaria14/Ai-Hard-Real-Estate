@@ -59,7 +59,6 @@ export function ContactSection() {
           <p><a href="tel:+966556125711" dir="ltr">+966 55 612 5711</a></p>
           <p><a href="mailto:info@hardgp.com">info@hardgp.com</a></p>
           <iframe title={ar ? 'خريطة عنوان المقر في الدمام' : 'Dammam office address map'} src={'https://maps.google.com/maps?q=' + mapQuery + '&output=embed'} className="h-64 w-full rounded-xl border-0" loading="lazy" />
-          <a href={'https://www.google.com/maps/search/?api=1&query=' + mapQuery} target="_blank" rel="noreferrer" className="text-blue-700 underline">{ar ? 'عرض العنوان على الخريطة' : 'View address on the map'}</a>
         </div>
         <form onSubmit={submit} className="space-y-4 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="text-xl font-bold">{ar ? 'اتصل بنا' : 'Contact us'}</h2>

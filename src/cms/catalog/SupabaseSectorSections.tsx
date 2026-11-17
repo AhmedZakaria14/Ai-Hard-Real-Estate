@@ -3,6 +3,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { DEFAULT_HERO_CONTENT, DEFAULT_COMPANY_CONTENT, DEFAULT_WORK_STAGES, DEFAULT_OFFICES } from '../../construction/services/sectionDefaults';
 import { DEFAULT_HVAC_HERO, DEFAULT_HVAC_HOURS_CONTACT, DEFAULT_HVAC_BOOKING_COPY, DEFAULT_HVAC_CITIES } from '../../hvac/services/sectionDefaults';
 import { readSectorSection, saveSectorSection, type SectorSection } from '../../lib/db/hardSectorSections';
+import { initialGallery, initialTestimonials, yearRoundChecklist } from '../../hvac/data/initialData';
 import { uploadMediaAsset } from '../../lib/cmsMediaLibrary';
 
 type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
@@ -17,6 +18,9 @@ const sections: { target: SectorSection; title: string; fallback: object }[] = [
   { target: { sector: 'hvac', key: 'hero' }, title: 'التكييف — الصفحة الرئيسية', fallback: DEFAULT_HVAC_HERO },
   { target: { sector: 'hvac', key: 'hours_contact' }, title: 'التكييف — الاتصال وساعات العمل', fallback: DEFAULT_HVAC_HOURS_CONTACT },
   { target: { sector: 'hvac', key: 'booking_copy' }, title: 'التكييف — نصوص الحجز', fallback: DEFAULT_HVAC_BOOKING_COPY },
+  { target: { sector: 'hvac', key: 'work_gallery' }, title: 'التكييف — معرض الأعمال والفئات', fallback: initialGallery },
+  { target: { sector: 'hvac', key: 'maintenance_guide' }, title: 'التكييف — دليل الصيانة الدورية', fallback: yearRoundChecklist },
+  { target: { sector: 'hvac', key: 'reviews' }, title: 'التكييف — آراء العملاء', fallback: initialTestimonials },
   { target: { sector: 'hvac', key: 'service_areas' }, title: 'التكييف — مناطق الخدمة', fallback: DEFAULT_HVAC_CITIES },
 ];
 const labels: Record<string, string> = {
@@ -34,7 +38,7 @@ const labels: Record<string, string> = {
 };
 const inputStyle = 'block w-full rounded border px-2 py-1';
 const fixedKeys = new Set(['id', 'isPublished']);
-const urlKey = /url$/i;
+const urlKey = /(?:url|^image)$/i;
 const publicAssetUrl = /^(https:\/\/|\/(?!\/))/i;
 
 function invalidLink(data: Json, key = ''): boolean {
@@ -52,6 +56,8 @@ export default function SupabaseSectorSections() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const section = sections[active];
+  const editingList = section.target.sector === 'hvac' && Array.isArray(section.fallback);
+  const itemLabel = section.target.key === 'work_gallery' ? 'عمل' : section.target.key === 'reviews' ? 'تقييم' : section.target.key === 'maintenance_guide' ? 'خطوة' : 'مدينة';
   const editingCities = section.target.sector === 'hvac' && section.target.key === 'service_areas';
 
   useEffect(() => {
@@ -113,7 +119,7 @@ export default function SupabaseSectorSections() {
           : typeof value === 'number' ? <input type="number" step="any" required className={inputStyle} value={value} onChange={(event) => edit(path, Number(event.target.value))} />
           : <textarea className={inputStyle} rows={value.length > 80 ? 3 : 1} dir="auto" required={editingCities && (key === 'cityNameAr' || key === 'cityNameEn')} value={value} onChange={(event) => edit(path, event.target.value)} />}
       </label>
-      {key === 'bgImageUrl' && <label className="text-sm">رفع صورة الغلاف <input type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif" onChange={(event) => {
+      {(key === 'bgImageUrl' || key === 'image') && <label className="text-sm">رفع الصورة <input type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif" onChange={(event) => {
         const file = event.target.files?.[0];
         if (file) void upload(file, path);
       }} /></label>}
@@ -156,19 +162,23 @@ export default function SupabaseSectorSections() {
     {loading && <p role="status">جارٍ تحميل القسم…</p>}
     {form !== undefined && <form key={active} onSubmit={save}>
       <fieldset disabled={busy} className="grid gap-4">
-        {editingCities && Array.isArray(form) ? <>
+        {editingList && Array.isArray(form) ? <>
           {form.map((city, index) => (
             <div key={city && typeof city === 'object' && !Array.isArray(city) ? String(city.id ?? index) : index} className="space-y-2">
               {renderField(city, [index])}
               <button type="button" className="rounded border px-3 py-1 text-rose-700" onClick={() =>
                 setForm((current) => Array.isArray(current) ? current.filter((_, i) => i !== index) : current)
-              }>حذف المدينة من القائمة</button>
+              }>حذف {itemLabel} من القائمة</button>
             </div>
           ))}
           <button type="button" className="w-fit rounded border px-3 py-1" onClick={() => {
-            const city = { id: 'city-' + crypto.randomUUID(), cityNameAr: '', cityNameEn: '', regionAr: '', regionEn: '', responseTimeMin: 0, isPrimaryArea: false, active: true };
-            setForm((current) => Array.isArray(current) ? [...current, city] : current);
-          }}>إضافة مدينة</button>
+            const template = (section.fallback as Json[])[0];
+            if (!template || typeof template !== 'object' || Array.isArray(template)) return;
+            const item = Object.fromEntries(Object.entries(template).map(([key, value]) =>
+              [key, key === 'id' ? crypto.randomUUID() : key === 'active' ? true : key === 'rating' ? 5 : typeof value === 'string' ? '' : typeof value === 'number' ? 0 : false]
+            ));
+            setForm((current) => Array.isArray(current) ? [...current, item] : current);
+          }}>إضافة {itemLabel}</button>
         </> : renderField(form)}
         <button type="submit" className="w-fit rounded bg-slate-900 px-4 py-2 text-white">حفظ ونشر</button>
       </fieldset>
