@@ -78,7 +78,7 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
     const field = (name: string) => String(fields.get(name) ?? '').trim();
     const imageFile = fields.get('image');
     if (creating && (!(imageFile instanceof File) || imageFile.size === 0)) {
-      setNotice('اختر صورة للخدمة الجديدة.');
+      setNotice(construction ? 'اختر صورة للمشروع الجديد.' : 'اختر صورة للخدمة الجديدة.');
       return;
     }
     const content = { ...selected.content };
@@ -110,7 +110,12 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
         setNotice('اختر تصنيف المشروع.');
         return;
       }
-      Object.assign(content, { category });
+      Object.assign(content, {
+        category, year: field('projectYear'), buaM2: Number(field('projectArea')),
+        durationMonths: Number(field('projectDuration')),
+        locationAr: field('locationAr'), locationEn: field('locationEn'),
+        cityAr: field('cityAr'), cityEn: field('cityEn'),
+      });
     }
     if (!title.ar || !title.en) {
       setNotice('أدخل العنوان بالعربية والإنجليزية.');
@@ -173,13 +178,18 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
     <h2 className="text-xl font-bold">{heading}</h2>
     <label className="block text-sm"><input type="checkbox" checked={showArchived} disabled={saving}
       onChange={(event) => { setShowArchived(event.target.checked); setCreating(false); setSelected(null); setNotice(''); }} /> عرض السجلات المؤرشفة</label>
-    {hvac && !showArchived && <button type="button" disabled={saving} className="rounded bg-blue-700 px-3 py-2 text-white" onClick={() => {
-      const id = 'svc-' + crypto.randomUUID();
+    {(hvac || construction) && !showArchived && <button type="button" disabled={saving} className="rounded bg-blue-700 px-3 py-2 text-white" onClick={() => {
+      const id = (construction ? 'project-' : 'svc-') + crypto.randomUUID();
       const sortOrder = Math.max(0, ...entries.map(({ content }) => 'sortOrder' in content ? Number(content.sortOrder) || 0 : 0)) + 1;
-      setSelected({ id, updated_at: '', content: { id, slug: id, titleAr: '', titleEn: '', descriptionAr: '', descriptionEn: '', image: '', active: true, sortOrder } });
+      const shared = { id, titleAr: '', titleEn: '', descriptionAr: '', descriptionEn: '', image: '' };
+      const content: PublishedConstructionProject | HVACService = construction
+        ? { ...shared, category: 'residential', status: 'in-progress', cityAr: '', cityEn: '',
+          locationAr: '', locationEn: '', buaM2: 0, galleryImages: [] }
+        : { ...shared, slug: id, active: true, sortOrder };
+      setSelected({ id, updated_at: '', content });
       setCreating(true);
       setNotice('');
-    }}>إضافة خدمة تكييف</button>}
+    }}>{construction ? 'إضافة مشروع مقاولات' : 'إضافة خدمة تكييف'}</button>}
     {notice && <p role="status">{notice}</p>}
     <ul className="space-y-2">{entries.map((article) => <li key={article.id} className="flex flex-wrap items-center gap-2">
       <button type="button" disabled={saving || showArchived} className="rounded border px-3 py-1"
@@ -203,17 +213,25 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
           </>}
         </div>;
       })}
-      {construction && <label>تصنيف المشروع<select name="projectCategory" required className={inputClass}
+      {construction && 'buaM2' in selected.content && <><label>تصنيف المشروع<select name="projectCategory" required className={inputClass}
         defaultValue={'category' in selected.content && isConstructionProjectCategory(selected.content.category) ? selected.content.category : 'residential'}>
         {Object.entries(constructionProjectCategories).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
-      </select></label>}
+      </select></label>
+        <label>سنة المشروع<input name="projectYear" inputMode="numeric" className={inputClass} defaultValue={selected.content.year ?? ''} /></label>
+        <label>المساحة المبنية (م²)<input name="projectArea" type="number" min="0" step="any" className={inputClass} defaultValue={selected.content.buaM2} /></label>
+        <label>مدة المشروع بالأشهر<input name="projectDuration" type="number" min="0" className={inputClass} defaultValue={selected.content.durationMonths ?? ''} /></label>
+        <label>الموقع بالعربية<input name="locationAr" className={inputClass} defaultValue={selected.content.locationAr} /></label>
+        <label>الموقع بالإنجليزية<input name="locationEn" className={inputClass} defaultValue={selected.content.locationEn} /></label>
+        <label>المدينة بالعربية<input name="cityAr" className={inputClass} defaultValue={selected.content.cityAr} /></label>
+        <label>المدينة بالإنجليزية<input name="cityEn" className={inputClass} defaultValue={selected.content.cityEn} /></label>
+      </>}
       {'price' in selected.content && <label>السعر بالريال<input name="price" type="number" min="0" step="0.01" required className={inputClass} defaultValue={selected.content.price.sar} /></label>}
       {'startingPriceSAR' in selected.content && <>
         <label>السعر الابتدائي<input name="price" className={inputClass} defaultValue={selected.content.startingPriceSAR} /></label>
         <label>نسبة الإنجاز<input name="progress" type="number" min="0" max="100" required className={inputClass} defaultValue={selected.content.progressPercentage ?? 0} /></label>
       </>}
       {('images' in selected.content ? selected.content.images[0] : selected.content.image) && <img src={'images' in selected.content ? selected.content.images[0] : selected.content.image} alt="الصورة الحالية" className="max-h-40 w-fit rounded" />}
-      <label>{creating ? 'صورة الخدمة' : 'استبدال الصورة المنشورة'}<input className={inputClass} type="file" name="image" accept={Object.keys(imageTypes).join(',')} /></label>
+      <label>{creating ? 'الصورة الرئيسية' : 'استبدال الصورة المنشورة'}<input className={inputClass} type="file" name="image" accept={Object.keys(imageTypes).join(',')} /></label>
       <button type="submit" disabled={saving} className="w-fit rounded bg-slate-900 px-4 py-2 text-white">{saving ? 'جارٍ الحفظ…' : 'حفظ ونشر'}</button>
     </form>}
   </section>;

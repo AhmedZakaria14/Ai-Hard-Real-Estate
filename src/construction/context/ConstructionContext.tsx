@@ -121,11 +121,11 @@ export const ConstructionProvider: React.FC<{
     loadPublishedConstructionProjects(controller.signal).then((entries) => {
       if (controller.signal.aborted) return;
       setProjects(entries.map(({ content }) => ({
-        ...content,
-        category: isConstructionProjectCategory(content.category) ? content.category : 'residential',
         year: '', durationMonths: 0, valueSAR: '', clientAr: '', clientEn: '',
         scopeAr: [], scopeEn: [], structuralSystemAr: '', structuralSystemEn: '',
         finishingLevelAr: '', finishingLevelEn: '', highlightsAr: [], highlightsEn: [],
+        ...content,
+        category: isConstructionProjectCategory(content.category) ? content.category : 'residential',
       })));
     }).catch((error) => {
       if (!controller.signal.aborted) console.error('Unable to load construction projects', error);

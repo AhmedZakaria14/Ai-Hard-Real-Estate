@@ -69,7 +69,7 @@ export function loadPublishedHvacServices(signal?: AbortSignal) {
 export type PublishedConstructionProject = Pick<ConstructionProject,
   'id' | 'titleAr' | 'titleEn' | 'descriptionAr' | 'descriptionEn' | 'locationAr' | 'locationEn' |
   'cityAr' | 'cityEn' | 'image' | 'galleryImages' | 'status' | 'featured' | 'buaM2'
-> & { category?: ConstructionProject['category']; categoryLabelAr?: string; categoryLabelEn?: string };
+> & Partial<Omit<ConstructionProject, 'id' | 'titleAr' | 'titleEn'>> & { categoryLabelAr?: string; categoryLabelEn?: string };
 
 export const constructionProjectCategories = {
   residential: 'سكني',
