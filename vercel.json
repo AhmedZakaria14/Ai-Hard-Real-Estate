@@ -22,9 +22,43 @@
     }
   },
   "redirects": [
-    { "source": "/admin/operations", "destination": "/admin", "permanent": true },
+    {
+      "source": "/admin/operations",
+      "destination": "/admin",
+      "permanent": true
+    },
     {
       "source": "/admin/supabase-inbox",
+      "destination": "/admin",
+      "permanent": true
+    },
+    {
+      "source": "/cms",
+      "destination": "/admin",
+      "permanent": true
+    },
+    {
+      "source": "/realestate/admin",
+      "destination": "/admin",
+      "permanent": true
+    },
+    {
+      "source": "/realestate/cms",
+      "destination": "/admin",
+      "permanent": true
+    },
+    {
+      "source": "/construction/cms",
+      "destination": "/admin",
+      "permanent": true
+    },
+    {
+      "source": "/hvac/cms",
+      "destination": "/admin",
+      "permanent": true
+    },
+    {
+      "source": "/admin/cms",
       "destination": "/admin",
       "permanent": true
     }

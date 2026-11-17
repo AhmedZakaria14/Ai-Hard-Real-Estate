@@ -59,7 +59,7 @@ function ConstructionPageInner({
 
       if (pathname.endsWith('/cms') || hash === 'cms' || hash === 'construction/cms') {
         // Redirect legacy construction CMS URL to canonical admin dashboard
-        onNavigate('admin');
+        window.location.replace('/admin');
       } else {
         // Clean duplicate route hash #construction if present
         if (hash === 'construction') {
@@ -90,16 +90,11 @@ function ConstructionPageInner({
     };
   }, [onNavigate]);
 
-  const handleOpenCMS = () => {
-    onNavigate('admin');
-  };
-
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-ui-sans selection:bg-[#009ee2] selection:text-white">
       {/* Sticky Top Header */}
       <Navbar
         onNavigate={onNavigate}
-        onOpenCMS={handleOpenCMS}
       />
 
       {/* Main Page Flow */}
@@ -112,7 +107,7 @@ function ConstructionPageInner({
       </main>
 
       {/* Detailed Corporate Footer */}
-      <Footer onNavigate={onNavigate} onOpenCMS={handleOpenCMS} />
+      <Footer onNavigate={onNavigate} />
 
       {/* Interactive Global Modals */}
       <CostEstimatorModal />

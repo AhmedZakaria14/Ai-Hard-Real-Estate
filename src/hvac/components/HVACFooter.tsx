@@ -8,35 +8,20 @@ import {
   Layers,
   ArrowUp,
   Building,
-  Lock,
 } from 'lucide-react';
 import { useHVAC } from '../context/HVACContext';
 import { HVACBrandLockup } from './HVACBrandLockup';
 import { pick } from '../translations';
 import { PageId } from '../../types';
 import { handleSemanticClick } from '../../lib/navigation';
-import { isAuthorizedAdmin } from '../../lib/adminAuth';
 
 interface HVACFooterProps {
   onNavigatePage?: (page: PageId) => void;
-  onOpenCMS?: () => void;
 }
 
-export function HVACFooter({ onNavigatePage, onOpenCMS }: HVACFooterProps) {
+export function HVACFooter({ onNavigatePage }: HVACFooterProps) {
   const { hvac: T } = useTextOverride();
   const { language, isAr } = useHVAC();
-  const [isAdmin, setIsAdmin] = React.useState<boolean>(() => isAuthorizedAdmin());
-
-  React.useEffect(() => {
-    const checkAuth = () => setIsAdmin(isAuthorizedAdmin());
-    checkAuth();
-    window.addEventListener('cms-auth-change', checkAuth);
-    window.addEventListener('storage', checkAuth);
-    return () => {
-      window.removeEventListener('cms-auth-change', checkAuth);
-      window.removeEventListener('storage', checkAuth);
-    };
-  }, []);
 
   return (
     <footer className="bg-white border-t border-slate-200/80 pt-16 pb-8 text-start">

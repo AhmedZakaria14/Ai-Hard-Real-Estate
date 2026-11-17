@@ -376,6 +376,8 @@ function AppContent() {
       newPath = '/construction';
     } else if (page === 'hvac') {
       newPath = '/hvac';
+    } else if (page === 'admin') {
+      newPath = '/admin';
     } else if (page === 'home') {
       newPath = '/realestate';
     } else if (page === 'not-found') {

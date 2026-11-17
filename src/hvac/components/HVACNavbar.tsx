@@ -12,7 +12,6 @@ import {
   HelpCircle,
   Mail,
   ListChecks,
-  Lock,
   ThermometerSnowflake,
 } from 'lucide-react';
 
@@ -21,14 +20,12 @@ import { BrandLogo } from '../../components/ui/BrandLogo';
 import { pick } from '../translations';
 import { PageId } from '../../types';
 import { handleSemanticClick } from '../../lib/navigation';
-import { isAuthorizedAdmin } from '../../lib/adminAuth';
 
 interface HVACNavbarProps {
   onNavigatePage?: (page: PageId) => void;
-  onOpenCMS?: () => void;
 }
 
-export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
+export function HVACNavbar({ onNavigatePage }: HVACNavbarProps) {
   const { hvac: T } = useTextOverride();
   const { language, isAr, toggleLanguage, openBookingModal } = useHVAC();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -42,18 +39,6 @@ export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
     return () => {
       window.removeEventListener('hashchange', syncSection);
       window.removeEventListener('popstate', syncSection);
-    };
-  }, []);
-  const [isAdmin, setIsAdmin] = useState<boolean>(() => isAuthorizedAdmin());
-
-  useEffect(() => {
-    const checkAuth = () => setIsAdmin(isAuthorizedAdmin());
-    checkAuth();
-    window.addEventListener('cms-auth-change', checkAuth);
-    window.addEventListener('storage', checkAuth);
-    return () => {
-      window.removeEventListener('cms-auth-change', checkAuth);
-      window.removeEventListener('storage', checkAuth);
     };
   }, []);
 
@@ -140,17 +125,6 @@ export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
             <Calendar className="w-4 h-4" />
             <span className="whitespace-nowrap">{pick(T.nav.bookServiceBtn, language)}</span>
           </button>
-
-          {isAdmin && onOpenCMS && (
-            <button
-              type="button"
-              onClick={onOpenCMS}
-              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold border border-slate-200 transition-colors cursor-pointer"
-              title={pick(T.nav.adminPanel, language)}
-            >
-              <Lock className="w-4 h-4 text-slate-700" />
-            </button>
-          )}
         </div>
 
         {/* Mobile Hamburger Button */}
@@ -226,20 +200,6 @@ export function HVACNavbar({ onNavigatePage, onOpenCMS }: HVACNavbarProps) {
                 <Layers className="w-3.5 h-3.5" />
                 <span>{pick(T.nav.portalBack, language)}</span>
               </a>
-            )}
-
-            {isAdmin && onOpenCMS && (
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenCMS();
-                }}
-                className="w-full py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-semibold flex items-center justify-center gap-2"
-              >
-                <Lock className="w-3.5 h-3.5" />
-                <span>{pick(T.nav.adminPanel, language)}</span>
-              </button>
             )}
           </div>
         </div>

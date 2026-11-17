@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AlertTriangle, RefreshCw, Home, ShieldCheck, Trash2 } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Home, Trash2 } from 'lucide-react';
 
 export interface ErrorBoundaryProps {
   children?: React.ReactNode;
@@ -110,13 +110,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                 <span>{isAr ? 'العودة للرئيسية' : 'Return to Portal'}</span>
               </a>
 
-              <a
-                href="/admin"
-                className="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer border border-slate-700"
-              >
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>{isAr ? 'لوحة التحكم CMS' : 'Open CMS Admin'}</span>
-              </a>
+
 
               <button
                 onClick={this.handleFullReset}

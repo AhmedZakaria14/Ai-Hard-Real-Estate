@@ -42,7 +42,7 @@ function HVACPageContent({ onNavigatePage }: HVACPageProps) {
       const hash = rawHash.replace(/^#\/?/, '');
 
       if (pathname.endsWith('/cms') || hash === 'cms' || hash === 'hvac/cms') {
-        onNavigatePage?.('admin');
+        window.location.replace('/admin');
       } else {
         // Clean duplicate route hash #hvac or #maintenance if present
         if (hash === 'hvac' || hash === 'maintenance') {
@@ -67,10 +67,6 @@ function HVACPageContent({ onNavigatePage }: HVACPageProps) {
     };
   }, [onNavigatePage]);
 
-  const handleOpenCMS = () => {
-    onNavigatePage?.('admin');
-  };
-
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col font-ui-sans selection:bg-[#0EA5E9] selection:text-white">
       {/* 0. Global Sector Utility Navigation Bar */}
@@ -79,7 +75,6 @@ function HVACPageContent({ onNavigatePage }: HVACPageProps) {
       {/* 2. Main HVAC Navbar (Sticky header with brand lockup & links) */}
       <HVACNavbar
         onNavigatePage={onNavigatePage}
-        onOpenCMS={handleOpenCMS}
       />
 
       {/* Main Single Page Sections */}
@@ -116,7 +111,6 @@ function HVACPageContent({ onNavigatePage }: HVACPageProps) {
       {/* 13. Footer */}
       <HVACFooter
         onNavigatePage={onNavigatePage}
-        onOpenCMS={handleOpenCMS}
       />
 
       {/* 14. Floating Widgets (WhatsApp + Blue Back to Top) */}

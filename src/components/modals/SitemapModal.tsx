@@ -11,7 +11,6 @@ import {
   Building,
   Layers,
   Phone,
-  ShieldCheck,
   ExternalLink,
   ChevronRight,
 } from 'lucide-react';
@@ -20,7 +19,6 @@ import { useTextOverride } from '../../context/TextOverrideContext';
 import { useData } from '../../context/DataContext';
 import { HARD_GROUP_SECTORS } from '../../lib/sectors';
 import { getPageHref } from '../../lib/navigation';
-import { isAuthorizedAdmin } from '../../lib/adminAuth';
 
 interface SitemapModalProps {
   isOpen: boolean;
@@ -42,18 +40,6 @@ export function SitemapModal({
   const t = translations[language];
   const { properties, projects } = useData();
 
-  const [isAdmin, setIsAdmin] = React.useState<boolean>(() => isAuthorizedAdmin());
-
-  React.useEffect(() => {
-    const checkAuth = () => setIsAdmin(isAuthorizedAdmin());
-    checkAuth();
-    window.addEventListener('cms-auth-change', checkAuth);
-    window.addEventListener('storage', checkAuth);
-    return () => {
-      window.removeEventListener('cms-auth-change', checkAuth);
-      window.removeEventListener('storage', checkAuth);
-    };
-  }, []);
 
   const handleLinkClick = (pageId: PageId) => {
     onClose();
@@ -213,28 +199,7 @@ export function SitemapModal({
             </div>
           </div>
 
-          {/* SECTION 5: Executive Admin & Verification Portals */}
-          {isAdmin && (
-            <div className="space-y-3 md:col-span-2">
-              <h3 className="font-bold text-slate-900 font-display-serif text-sm uppercase tracking-wider flex items-center gap-2 border-b border-slate-200 pb-2">
-                <ShieldCheck className="w-4 h-4 text-blue-600" />
-                <span>{isAr ? '5. البوابات الإدارية والاعتمادات' : '5. Admin Portals & Regulatory Audits'}</span>
-              </h3>
-              <div className="flex flex-wrap gap-3 text-xs">
-                <a
-                  href="/realestate/admin"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleLinkClick('admin');
-                  }}
-                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-colors"
-                >
-                  <ShieldCheck className="w-4 h-4 text-blue-400" />
-                  <span>{isAr ? 'بوابة إدارة المحتوى (CMS Portal)' : 'Executive CMS Admin Portal'}</span>
-                </a>
-              </div>
-            </div>
-          )}
+
         </div>
 
         <div className="pt-4 border-t border-slate-200 flex justify-end">

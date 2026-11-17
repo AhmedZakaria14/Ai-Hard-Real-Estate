@@ -22,7 +22,7 @@ export function getPageHref(page: PageId, queryParams?: string): string {
       base = '/hvac';
       break;
     case 'admin':
-      base = '/realestate/admin';
+      base = '/admin';
       break;
     case 'not-found':
       base = '/';
