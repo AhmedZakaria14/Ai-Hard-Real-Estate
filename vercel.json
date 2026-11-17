@@ -4,14 +4,17 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/qa-redirect-301-1711",
+      "destination": "/api/hard-redirect?__hard_path=qa-redirect-301-1711"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
-  "proxy": {
-    "entrypoint": "middleware.ts",
-    "matcher": [
-      "/qa-redirect-301-1711"
-    ]
+  "functions": {
+    "api/hard-redirect.ts": {
+      "includeFiles": "dist/index.html"
+    }
   }
 }
