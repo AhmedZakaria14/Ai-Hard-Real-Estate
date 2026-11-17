@@ -34,6 +34,7 @@ export function HVACContactSection() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
+    setSuccessStatus(null);
     if (!name.trim() || !phone.trim()) return;
 
     setIsSubmitting(true);
@@ -56,6 +57,7 @@ export function HVACContactSection() {
       setName('');
       setPhone('');
       setEmail('');
+      setService('');
       setMessage('');
     } catch (err: any) {
       console.error('HVAC contact section submission failed', err);
@@ -94,15 +96,15 @@ export function HVACContactSection() {
                 : 'All inquiries go directly to the technical team for follow-up and response.'}
             </p>
 
-            {!successStatus && formError && (
-              <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm flex items-start gap-3">
+            {formError && (
+              <div role="alert" className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
                 <p className="font-semibold">{formError}</p>
               </div>
             )}
 
             {successStatus && (
-              <div className="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm flex items-start gap-3 animate-in fade-in duration-200">
+              <div role="status" className="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm flex items-start gap-3 animate-in fade-in duration-200">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold">{pick(T.contact.formSuccess, language)}</p>
@@ -148,7 +150,7 @@ export function HVACContactSection() {
               {/* Email */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  {pick(T.contact.formEmail, language)}
+                  {pick(T.contact.formEmail, language)} *
                 </label>
                 <input
                   type="email"
@@ -163,7 +165,7 @@ export function HVACContactSection() {
               {/* Service */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  {pick(T.contact.formService, language)}
+                  {pick(T.contact.formService, language)} *
                 </label>
                 <select
                   required
