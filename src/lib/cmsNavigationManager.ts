@@ -156,8 +156,8 @@ export async function saveNavigationDoc(navDoc: NavigationDoc): Promise<void> {
 
 function redirectPath(path: string): string {
   const normalized = '/' + path.trim().toLowerCase().replace(/^\//, '').replace(/\/+$/, '');
-  if (!/^\/[a-z0-9][a-z0-9/-]*$/.test(normalized) || normalized.includes('//')
-    || isProtectedInfrastructureRoute(normalized) || /^\/(realestate|construction|hvac)\/(admin|cms)(\/|$)/.test(normalized)) {
+  if (!/^\/[a-z0-9][a-z0-9/-]*$/.test(normalized) || normalized.includes('//') || normalized.length > 500
+    || /^\/(assets|cms)(\/|$)/.test(normalized) || isProtectedInfrastructureRoute(normalized) || /^\/(realestate|construction|hvac)\/(admin|cms)(\/|$)/.test(normalized)) {
     throw new Error('اختر مسارًا داخليًا صالحًا خارج مسارات الإدارة والنظام.');
   }
   return normalized;
