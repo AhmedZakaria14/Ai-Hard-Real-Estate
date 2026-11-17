@@ -25,7 +25,6 @@ import { BookViewingModal } from './components/modals/BookViewingModal';
 import { ListPropertyModal } from './components/modals/ListPropertyModal';
 import { InquiryModal } from './components/modals/InquiryModal';
 import { ProjectInquiryModal } from './components/modals/ProjectInquiryModal';
-import { FloatingTextEditor } from './components/ui/FloatingTextEditor';
 import { DataProvider, useData } from './context/DataContext';
 import { PageMediaProvider } from './lib/pageMedia';
 import { TextOverrideProvider } from './context/TextOverrideContext';
@@ -602,14 +601,6 @@ function AppContent() {
       <Footer onNavigate={handleNavigate} language={language} />
 
       <SectorQuickActions language={language} whatsappHref={`https://wa.me/${SECTOR_CONTACT_DETAILS.realestate.whatsapp.replace(/\D/g, '')}`} />
-
-      {/* Floating Developer Text Editor (Centered at Bottom) */}
-      {currentPage !== 'marketing' && (
-        <FloatingTextEditor
-          currentLanguage={language}
-          onLanguageChange={setLanguage}
-        />
-      )}
 
       {/* Global Dialog Modals */}
       <BookViewingModal

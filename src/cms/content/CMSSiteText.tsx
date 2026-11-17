@@ -11,11 +11,17 @@ export function CMSSiteText({ language }: { language: Language }) {
   const [text, setText] = useState<SiteText | null>(null);
   const [path, setPath] = useState('');
   const [search, setSearch] = useState('');
+  const [sector, setSector] = useState('all');
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const needle = search.trim().toLowerCase();
-  const results = paths.filter((key) => [key, siteTextDefaults.ar[key], siteTextDefaults.en[key],
-    text?.ar?.[key], text?.en?.[key]].some((value) => value?.toLowerCase().includes(needle)));
+  const results = paths.filter((key) => {
+    const matchesSector = sector === 'all' || (sector === 'realestate'
+      ? !key.startsWith('construction.') && !key.startsWith('hvac.')
+      : key.startsWith(sector + '.'));
+    return matchesSector && [key, siteTextDefaults.ar[key], siteTextDefaults.en[key],
+    text?.ar?.[key], text?.en?.[key]].some((value) => value?.toLowerCase().includes(needle));
+  });
 
   useEffect(() => {
     const controller = new AbortController();
@@ -55,6 +61,14 @@ export function CMSSiteText({ language }: { language: Language }) {
   return <section className="space-y-4 rounded-xl border bg-white p-5">
     <h2 className="text-lg font-bold">{ar ? 'نصوص الواجهة والقطاعات' : 'Interface and sector copy'}</h2>
     {message && <p role="status">{message}</p>}
+    <label className="block">{ar ? 'القطاع' : 'Sector'}
+      <select className="block w-full rounded border p-2" value={sector} onChange={(event) => setSector(event.target.value)}>
+        <option value="all">{ar ? 'جميع القطاعات' : 'All sectors'}</option>
+        <option value="realestate">{ar ? 'العقارات' : 'Real estate'}</option>
+        <option value="construction">{ar ? 'المقاولات' : 'Construction'}</option>
+        <option value="hvac">{ar ? 'التكييف' : 'AC maintenance'}</option>
+      </select>
+    </label>
     <label className="block">{ar ? 'ابحث بالعربية أو الإنجليزية' : 'Search in Arabic or English'}
       <input className="block w-full rounded border p-2" value={search} onChange={(event) => setSearch(event.target.value)} />
     </label>
