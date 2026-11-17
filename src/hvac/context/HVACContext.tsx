@@ -87,8 +87,6 @@ interface HVACContextType {
   maintenanceGuides: HVACChecklistItem[];
   updateMaintenanceGuides: (items: HVACChecklistItem[]) => void;
   resetAllToDefaults: () => void;
-  useEffect(() => subscribeHVACSectionContent<HVACChecklistItem[]>('maintenance_guide', initialChecklist, setMaintenanceGuides), []);
-
   // Booking Modal
   isBookingModalOpen: boolean;
   bookingInitialService: string;
@@ -302,6 +300,8 @@ export function HVACProvider({
   // FAQs & Maintenance Guides
   const [faqItems, setFaqItems] = useState<HVACFaqItem[]>(initialFaqs);
   const [maintenanceGuides, setMaintenanceGuides] = useState<HVACChecklistItem[]>(initialChecklist);
+
+  useEffect(() => subscribeHVACSectionContent<HVACChecklistItem[]>('maintenance_guide', initialChecklist, setMaintenanceGuides), []);
 
   // Booking Modal
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
