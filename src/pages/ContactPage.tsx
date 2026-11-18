@@ -33,6 +33,12 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
   const { translations } = useTextOverride();
   const { getEffectiveSettings } = useSiteSettings();
   const brand = getEffectiveSettings('realestate');
+  const mapQuery = (() => {
+    try {
+      const location = new URL(brand.office.googleMapsUrl || '');
+      return location.searchParams.get('q') || location.searchParams.get('query') || brand.office.address[language];
+    } catch { return brand.office.address[language]; }
+  })();
   const t = translations[language];
 
   const [fullName, setFullName] = useState('');
@@ -370,7 +376,7 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
             <iframe title={ar ? 'خريطة مقر هارد للعقارات في حي هجر بالدمام' : 'Map of HARD Real Estate office, Hajr, Dammam'}
               className="h-60 w-full border-0 sm:h-64" loading="lazy" allowFullScreen
               referrerPolicy="no-referrer-when-downgrade"
-              src={`https://maps.google.com/maps?q=${encodeURIComponent(brand.office.address[language])}&hl=${language}&z=15&output=embed`} />
+              src={`https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&hl=${language}&z=15&output=embed`} />
           </section>
         </div>
       </div>

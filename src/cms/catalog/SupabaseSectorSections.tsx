@@ -118,7 +118,10 @@ export default function SupabaseSectorSections() {
   }
 
   async function upload(file: File, path: FieldPath) {
-    if (!file.type.startsWith('image/')) return;
+    if (!file.type.startsWith('image/') && !/\.(?:jpe?g|png|webp|avif|gif|svg)$/i.test(file.name)) {
+      setMessage('اختر صورة بصيغة JPG أو PNG أو WEBP أو AVIF أو GIF أو SVG.');
+      return;
+    }
     setBusy(true);
     setMessage('');
     try {

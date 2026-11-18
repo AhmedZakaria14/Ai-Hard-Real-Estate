@@ -368,7 +368,7 @@ export const translations = {
       preferredTime: 'Preferred Time Window',
       notes: 'Special Requests / Notes',
       confirmBooking: 'Confirm Viewing Request',
-      bookingSuccess: 'Your viewing request has been booked! Our listing agent will confirm your appointment within 2 hours.',
+      bookingSuccess: 'Your viewing request has been received. Our property advisor will contact you within one business day to confirm the appointment details.',
       
       listPropertyTitle: 'List Your Property with Us',
       listPropertySubtitle: 'Connect with qualified buyers and tenants across our global network.',
@@ -771,7 +771,7 @@ export const translations = {
       preferredTime: 'الفترة الزمنية المفضلة',
       notes: 'أي ملاحظات أو طلبات خاصة',
       confirmBooking: 'تأكيد طلب المعاينة',
-      bookingSuccess: 'تم حجز موعد المعاينة بنجاح! سيقوم وسيط العقار بالتواصل لتأكيد التفاصيل خلال ساعتين.',
+      bookingSuccess: 'تم استلام طلب المعاينة بنجاح. سيتواصل معك المستشار العقاري خلال يوم عمل واحد لتأكيد تفاصيل الموعد.',
 
       listPropertyTitle: 'أدرج عقارك للبيع أو الإيجار',
       listPropertySubtitle: 'اعرض عقارك على آلاف المشترين والمستأجرين الجادين عبر شبكتنا العالمية.',
