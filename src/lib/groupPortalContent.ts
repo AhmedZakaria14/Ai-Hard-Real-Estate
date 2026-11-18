@@ -17,7 +17,7 @@ export const defaultGroupPortal = {
     descriptionEn:
       'A leading HARD division in the Eastern Province, specializing in real estate marketing, brokerage licensed by the Real Estate General Authority (FAL), and management of major regional investment portfolios.',
     descriptionAr:
-      'من قطاعات هارد الرائدة في المنطقة الشرقية، ويختص بالتسويق العقاري والوساطة المعتمدة برخصة (فال) من الهيئة العامة للعقار، وإدارة المحافظ الاستثمارية الكبرى في المنطقة الشرقية.',
+      'أحد قطاعات هارد الرائدة في المنطقة الشرقية، متخصصة في التسويق العقاري والوساطة المعتمدة برخصة (فال) من الهيئة العامة للعقار، وإدارة المحافظ الاستثمارية الكبرى في المنطقة الشرقية.',
     image:
       'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80',
   },
@@ -25,9 +25,9 @@ export const defaultGroupPortal = {
     nameEn: 'HARD Construction Contracting',
     nameAr: 'هارد للمقاولات الإنشائية',
     descriptionEn:
-      'HARD Group’s main division delivers classified construction services for villas, apartments, residential and commercial complexes, and smart buildings in accordance with the Saudi Building Code.',
+      'HARD Group’s main division delivers classified construction services for villas, apartments, residential and commercial complexes, and smart buildings with the highest efficiency and Saudi Building Code standards.',
     descriptionAr:
-      'القطاع الرئيسي في مجموعة هارد، يقدم خدمات المقاولات الإنشائية المصنفة ومشاريع الفلل والشقق والمجمعات السكنية والتجارية والمنشآت الذكية، وفق معايير كود البناء السعودي.',
+      'القطاع الرئيسي في مجموعة هارد، يقدم خدمات المقاولات الإنشائية المصنفة، وخدمات المشاريع الإنشائية للفلل والشقق السكنية، والمجمعات السكنية والتجارية والمنشآت الذكية بأعلى كفاءة ومعايير كود البناء السعودي.',
     image:
       'https://images.unsplash.com/photo-1517581177682-a085bb7ffb15?auto=format&fit=crop&w=1200&q=80',
   },
