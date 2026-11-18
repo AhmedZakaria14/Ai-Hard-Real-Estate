@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import { hardAdminClient } from '../../lib/db/hardAdminClient';
 import { useEffect, useState, type FormEvent } from 'react';
 import { emptySiteText, siteTextDefaults, siteTextSection, type SiteText } from '../../context/TextOverrideContext';
@@ -17,8 +18,8 @@ export function CMSSiteText({ language }: { language: Language }) {
   const needle = search.trim().toLowerCase();
   const results = paths.filter((key) => {
     const matchesSector = sector === 'all' || (sector === 'realestate'
-      ? !key.startsWith('construction.') && !key.startsWith('hvac.')
-      : key.startsWith(sector + '.'));
+      ? !key.startsWith('construction.') && !key.startsWith('hvac.') && !key.startsWith('interface.construction.') && !key.startsWith('interface.hvac.') && !key.startsWith('interface.portal.')
+      : key.startsWith(sector + '.') || key.startsWith('interface.' + sector + '.'));
     return matchesSector && [key, siteTextDefaults.ar[key], siteTextDefaults.en[key],
     text?.ar?.[key], text?.en?.[key]].some((value) => value?.toLowerCase().includes(needle));
   });
@@ -62,21 +63,22 @@ export function CMSSiteText({ language }: { language: Language }) {
     <h2 className="text-lg font-bold">{ar ? 'نصوص الواجهة والقطاعات' : 'Interface and sector copy'}</h2>
     {message && <p role="status">{message}</p>}
     <label className="block">{ar ? 'القطاع' : 'Sector'}
-      <select className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 outline-none" value={sector} onChange={(event) => setSector(event.target.value)}>
+      <SearchableSelect className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 outline-none" value={sector} onChange={(event) => setSector(event.target.value)}>
         <option value="all">{ar ? 'جميع القطاعات' : 'All sectors'}</option>
         <option value="realestate">{ar ? 'العقارات' : 'Real estate'}</option>
         <option value="construction">{ar ? 'المقاولات' : 'Construction'}</option>
         <option value="hvac">{ar ? 'التكييف' : 'AC maintenance'}</option>
-      </select>
+        <option value="portal">{ar ? 'بوابة المجموعة' : 'Group portal'}</option>
+      </SearchableSelect>
     </label>
     <label className="block">{ar ? 'ابحث بالعربية أو الإنجليزية' : 'Search in Arabic or English'}
       <input className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 outline-none" value={search} onChange={(event) => setSearch(event.target.value)} />
     </label>
     <label className="block">{ar ? 'النص المطلوب' : 'Text to edit'}
-      <select className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 outline-none" value={path} disabled={!text || busy} onChange={(event) => setPath(event.target.value)}>
+      <SearchableSelect className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 outline-none" value={path} disabled={!text || busy} onChange={(event) => setPath(event.target.value)}>
         <option value="">{ar ? 'اختر نصًا' : 'Select a text'}</option>
         {results.map((key) => <option key={key} value={key}>{key} · {(text?.[language]?.[key] ?? siteTextDefaults[language][key] ?? '').slice(0, 90)}</option>)}
-      </select>
+      </SearchableSelect>
     </label>
     {text && path && <form key={path} onSubmit={save} className="grid gap-3">
       {(['ar', 'en'] as const).filter((lang) => Object.hasOwn(siteTextDefaults[lang], path)).map((lang) =>

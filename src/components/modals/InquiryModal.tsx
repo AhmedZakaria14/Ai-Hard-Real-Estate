@@ -1,8 +1,13 @@
+import { LocalizedValue } from '../ui/LocalizedValue';
+import { useCustomerFormConfig, ConfiguredFormFields } from '../forms/ConfiguredFormFields';
+import { SearchableSelect } from '../ui/SearchableSelect';
+import { InterfaceText } from '../ui/InterfaceText';
+import { ManagedInput, ManagedTextarea } from '../ui/ManagedElements';
 import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Language } from '../../types';
-import { FormAttachmentMeta } from '../../types/firestore-schema';
+import { FormAttachmentMeta } from '../../types/backend-schema';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import { CheckCircle2, MessageSquare, Sparkles } from 'lucide-react';
 import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSubmissionService';
@@ -21,6 +26,8 @@ export function InquiryModal({
   language,
   initialSubject = '',
 }: InquiryModalProps) {
+  const formConfig = useCustomerFormConfig('general_contact');
+
   const { translations } = useTextOverride();
   const t = translations[language];
 
@@ -71,7 +78,7 @@ export function InquiryModal({
 
     setIsLoading(true);
     try {
-      const result = await submitCustomerForm({
+      const result = await formConfig.submit({
         formType: 'general_contact',
         sector: 'realestate',
         name: fullName.trim(),
@@ -123,31 +130,32 @@ export function InquiryModal({
             <CheckCircle2 className="w-7 h-7" />
           </div>
           <h4 className="text-lg font-bold text-slate-900 font-display-serif">
-            {language === 'en' ? 'Inquiry Dispatched' : 'تم إرسال الاستفسار بنجاح'}
+            {language === 'en' ? <InterfaceText id="realestate.InquiryModal.k80btd1" source="Inquiry Dispatched" /> : <InterfaceText id="realestate.InquiryModal.k16r6367" source="تم إرسال الاستفسار بنجاح" />}
           </h4>
           <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-            {t.contact.submitSuccess}
+            <LocalizedValue value={t.contact.submitSuccess} />
           </p>
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 text-start text-xs space-y-1 text-slate-600">
-            <p><strong>{language === 'en' ? 'Reference Code:' : 'رقم المرجع:'}</strong> <span className="font-mono font-bold text-slate-900">{leadRef}</span></p>
+            <p><strong>{language === 'en' ? <InterfaceText id="realestate.InquiryModal.k1dodnt7" source="Reference Code:" /> : <InterfaceText id="realestate.InquiryModal.k1lt3bxh" source="رقم المرجع:" />}</strong> <span className="font-mono font-bold text-slate-900"><LocalizedValue value={leadRef} /></span></p>
             <p className="flex items-center gap-1 text-blue-600 font-semibold pt-1 border-t border-slate-200">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>CRM Hook: {crmRef || 'Synced to CRM'}</span>
+              <span><InterfaceText id="realestate.InquiryModal.k1qldqm8" source="CRM Hook: " />{crmRef || <InterfaceText id="realestate.InquiryModal.kelqq9w" source="Synced to CRM" />}</span>
             </p>
           </div>
           <div className="pt-2">
             <Button variant="secondary" onClick={handleReset} className="w-full">
-              {language === 'en' ? 'Close' : 'إغلاق'}
+              {language === 'en' ? <InterfaceText id="realestate.InquiryModal.k1l0xxoj" source="Close" /> : <InterfaceText id="realestate.InquiryModal.kysudiz" source="إغلاق" />}
             </Button>
           </div>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-3.5">
+            <ConfiguredFormFields form={formConfig} language={language} />
           <div>
             <label htmlFor="advisory-inquiry-fullname" className="block text-xs font-semibold text-slate-700 mb-1">
-              {t.contact.fullName} *
+              <LocalizedValue value={t.contact.fullName} /> <span className="text-red-600">*</span>
             </label>
-            <input
+            <ManagedInput copyScope="realestate.InquiryModal"
               id="advisory-inquiry-fullname"
               type="text"
               required
@@ -162,9 +170,9 @@ export function InquiryModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label htmlFor="advisory-inquiry-email" className="block text-xs font-semibold text-slate-700 mb-1">
-                {t.contact.email} <span className="text-slate-400 font-normal">({language === 'en' ? 'or Phone' : 'أو الهاتف'})</span>
+                <LocalizedValue value={t.contact.email} /> <span className="text-slate-400 font-normal">({language === 'en' ? <InterfaceText id="realestate.InquiryModal.k1rbri3s" source="or Phone" /> : <InterfaceText id="realestate.InquiryModal.kat4042" source="أو الهاتف" />})</span>
               </label>
-              <input
+              <ManagedInput copyScope="realestate.InquiryModal"
                 id="advisory-inquiry-email"
                 type="email"
                 placeholder="name@email.com"
@@ -178,9 +186,9 @@ export function InquiryModal({
             </div>
             <div>
               <label htmlFor="advisory-inquiry-phone" className="block text-xs font-semibold text-slate-700 mb-1">
-                {t.contact.phone} <span className="text-slate-400 font-normal">({language === 'en' ? 'or Email' : 'أو البريد'})</span>
+                <LocalizedValue value={t.contact.phone} /> <span className="text-slate-400 font-normal">({language === 'en' ? <InterfaceText id="realestate.InquiryModal.kwvmbms" source="or Email" /> : <InterfaceText id="realestate.InquiryModal.ku2c07l" source="أو البريد" />})</span>
               </label>
-              <input
+              <ManagedInput copyScope="realestate.InquiryModal"
                 id="advisory-inquiry-phone"
                 type="tel"
                 placeholder="+966 50 000 0000"
@@ -195,14 +203,14 @@ export function InquiryModal({
           </div>
 
           {contactError && (
-            <p className="text-xs text-rose-500 font-medium">{contactError}</p>
+            <p className="text-xs text-rose-500 font-medium"><LocalizedValue value={contactError} /></p>
           )}
 
           <div>
             <label htmlFor="advisory-inquiry-category" className="block text-xs font-semibold text-slate-700 mb-1">
-              {t.contact.inquiryType}
+              <LocalizedValue value={t.contact.inquiryType} />
             </label>
-            <select
+            <SearchableSelect
               id="advisory-inquiry-category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
@@ -213,14 +221,14 @@ export function InquiryModal({
               <option value="listing">{language === 'en' ? 'Selling / Listing My Property' : 'بيع أو إدراج عقاري'}</option>
               <option value="investment">{language === 'en' ? 'High-Yield Investment & Projects' : 'استثمار بعوائد مرتفعة ومشاريع'}</option>
               <option value="commercial">{language === 'en' ? 'Commercial Real Estate' : 'عقارات تجارية واستثمارية'}</option>
-            </select>
+            </SearchableSelect>
           </div>
 
           <div>
             <label htmlFor="advisory-inquiry-message" className="block text-xs font-semibold text-slate-700 mb-1">
-              {t.contact.message} <span className="text-slate-400 font-normal">({language === 'en' ? 'Optional' : 'اختياري'})</span>
+              <LocalizedValue value={t.contact.message} /> <span className="text-slate-400 font-normal">({language === 'en' ? <InterfaceText id="realestate.InquiryModal.k1yfbac9" source="Optional" /> : <InterfaceText id="realestate.InquiryModal.kvjfzt2" source="اختياري" />})</span>
             </label>
-            <textarea
+            <ManagedTextarea copyScope="realestate.InquiryModal"
               id="advisory-inquiry-message"
               rows={3}
               placeholder={language === 'en' ? 'Tell us about your budget, target areas, or timeline...' : 'اكتب تفاصيل ميزانيتك، المناطق المفضلة، أو الإطار الزمني...'}
@@ -240,7 +248,7 @@ export function InquiryModal({
           <div className="pt-2">
             <Button type="submit" isLoading={isLoading} className="w-full">
               <MessageSquare className="w-4 h-4" />
-              {t.cta.sendInquiry}
+              <LocalizedValue value={t.cta.sendInquiry} />
             </Button>
           </div>
         </form>

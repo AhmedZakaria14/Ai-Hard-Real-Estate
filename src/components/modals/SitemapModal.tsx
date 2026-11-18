@@ -1,3 +1,4 @@
+import { LocalizedValue } from '../ui/LocalizedValue';
 import React from 'react';
 import { Modal } from '../ui/Modal';
 import {
@@ -69,12 +70,12 @@ export function SitemapModal({
           <Map className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
           <div>
             <span className="font-bold block">
-              {isAr ? 'خريطة التنقل المباشر للمجموعة:' : 'Complete Sector & Route Navigation:'}
+              <LocalizedValue value={isAr ? 'خريطة التنقل المباشر للمجموعة:' : 'Complete Sector & Route Navigation:'} />
             </span>
             <p className="text-blue-800 text-xs">
-              {isAr
+              <LocalizedValue value={isAr
                 ? 'تتيح هذه الخريطة الوصول المباشر لكافة قطاعات مجموعة هارد، صفحات العقارات الرئيسية، أحدث المشاريع التطويرية، والعقارات الفاخرة المتاحة للبيع والإيجار.'
-                : 'This HTML sitemap provides direct, accessible links to all HARD Group corporate divisions, real estate search indexes, major developments, and featured active property listings.'}
+                : 'This HTML sitemap provides direct, accessible links to all HARD Group corporate divisions, real estate search indexes, major developments, and featured active property listings.'} />
             </p>
           </div>
         </div>
@@ -84,7 +85,7 @@ export function SitemapModal({
           <div className="space-y-3">
             <h3 className="font-bold text-slate-900 font-display-serif text-sm uppercase tracking-wider flex items-center gap-2 border-b border-slate-200 pb-2">
               <Building2 className="w-4 h-4 text-blue-600" />
-              <span>{isAr ? '1. قطاعات مجموعة هارد' : '1. HARD Group Corporate Sectors'}</span>
+              <span><LocalizedValue value={isAr ? '1. قطاعات مجموعة هارد' : '1. HARD Group Corporate Sectors'} /></span>
             </h3>
             <ul className="space-y-2">
               {HARD_GROUP_SECTORS.map((sector) => (
@@ -99,10 +100,10 @@ export function SitemapModal({
                   >
                     <div className="flex items-center gap-2.5 font-medium">
                       <span className="w-2 h-2 rounded-full bg-blue-500" />
-                      <span>{sector.name[language]}</span>
+                      <span><LocalizedValue value={sector.name[language]} /></span>
                     </div>
                     <span className="text-xs text-slate-400 group-hover:text-blue-600 font-mono">
-                      {sector.href}
+                      <LocalizedValue value={sector.href} />
                     </span>
                   </a>
                 </li>
@@ -114,7 +115,7 @@ export function SitemapModal({
           <div className="space-y-3">
             <h3 className="font-bold text-slate-900 font-display-serif text-sm uppercase tracking-wider flex items-center gap-2 border-b border-slate-200 pb-2">
               <Compass className="w-4 h-4 text-blue-600" />
-              <span>{isAr ? '2. الصفحات الرئيسية للعقارات' : '2. Real Estate Main Pages'}</span>
+              <span><LocalizedValue value={isAr ? '2. الصفحات الرئيسية للعقارات' : '2. Real Estate Main Pages'} /></span>
             </h3>
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {[
@@ -136,7 +137,7 @@ export function SitemapModal({
                     className="flex items-center gap-2 p-2 rounded-lg bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 text-slate-700 hover:text-blue-900 transition-colors"
                   >
                     <ChevronRight className={`w-3.5 h-3.5 text-blue-500 ${isAr ? 'rotate-180' : ''}`} />
-                    <span>{item.label}</span>
+                    <span><LocalizedValue value={item.label} /></span>
                   </a>
                 </li>
               ))}
@@ -148,7 +149,7 @@ export function SitemapModal({
             <h3 className="font-bold text-slate-900 font-display-serif text-sm uppercase tracking-wider flex items-center gap-2 border-b border-slate-200 pb-2">
               <Building className="w-4 h-4 text-blue-600" />
               <span>
-                {isAr ? `3. العقارات الفاخرة النشطة (${properties.length})` : `3. Featured Active Properties (${properties.length})`}
+                <LocalizedValue value={isAr ? `3. العقارات الفاخرة النشطة (${properties.length})` : `3. Featured Active Properties (${properties.length})`} />
               </span>
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
@@ -160,11 +161,11 @@ export function SitemapModal({
                   className="text-start p-2.5 rounded-xl bg-slate-50 hover:bg-blue-50/80 border border-slate-200 hover:border-blue-300 transition-all cursor-pointer group"
                 >
                   <div className="font-semibold text-slate-900 group-hover:text-blue-600 line-clamp-1 text-xs">
-                    {prop.title[language]}
+                    <LocalizedValue value={prop.title[language]} />
                   </div>
                   <div className="flex items-center justify-between text-[11px] text-slate-500 mt-1 font-mono">
-                    <span>{prop.location.city[language]}</span>
-                    <span className="font-bold text-blue-700">{prop.price.formattedSAR}</span>
+                    <span><LocalizedValue value={prop.location.city[language]} /></span>
+                    <span className="font-bold text-blue-700"><LocalizedValue value={prop.price.formattedSAR} /></span>
                   </div>
                 </button>
               ))}
@@ -176,7 +177,7 @@ export function SitemapModal({
             <h3 className="font-bold text-slate-900 font-display-serif text-sm uppercase tracking-wider flex items-center gap-2 border-b border-slate-200 pb-2">
               <Layers className="w-4 h-4 text-blue-600" />
               <span>
-                {isAr ? `4. المشاريع الكبرى والإطلاقات (${projects.length})` : `4. Major Master Developments (${projects.length})`}
+                <LocalizedValue value={isAr ? `4. المشاريع الكبرى والإطلاقات (${projects.length})` : `4. Major Master Developments (${projects.length})`} />
               </span>
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
@@ -188,11 +189,11 @@ export function SitemapModal({
                   className="text-start p-2.5 rounded-xl bg-slate-50 hover:bg-blue-50/80 border border-slate-200 hover:border-blue-300 transition-all cursor-pointer group"
                 >
                   <div className="font-semibold text-slate-900 group-hover:text-blue-600 line-clamp-1 text-xs">
-                    {proj.title[language]}
+                    <LocalizedValue value={proj.title[language]} />
                   </div>
                   <div className="flex items-center justify-between text-[11px] text-slate-500 mt-1">
-                    <span>{proj.location[language]}</span>
-                    <span className="text-emerald-700 font-bold">{proj.startingPriceSAR}</span>
+                    <span><LocalizedValue value={proj.location[language]} /></span>
+                    <span className="text-emerald-700 font-bold"><LocalizedValue value={proj.startingPriceSAR} /></span>
                   </div>
                 </button>
               ))}
@@ -208,7 +209,7 @@ export function SitemapModal({
             onClick={onClose}
             className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer"
           >
-            {isAr ? 'إغلاق الخريطة' : 'Close Sitemap'}
+            <LocalizedValue value={isAr ? 'إغلاق الخريطة' : 'Close Sitemap'} />
           </button>
         </div>
       </div>

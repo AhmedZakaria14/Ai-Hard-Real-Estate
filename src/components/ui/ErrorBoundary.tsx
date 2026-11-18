@@ -1,3 +1,4 @@
+import { InterfaceText } from './InterfaceText';
 import * as React from 'react';
 import { AlertTriangle, RefreshCw, Home, Trash2 } from 'lucide-react';
 
@@ -73,23 +74,23 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
               </div>
               <div>
                 <h2 className="text-xl font-bold text-white font-display-serif">
-                  {isAr ? 'تعذر تحميل هذه الصفحة مؤقتاً' : 'Application Recovered Gracefully'}
+                  {isAr ? <InterfaceText id="realestate.ErrorBoundary.koe7sq7" source="تعذر تحميل هذه الصفحة مؤقتاً" /> : <InterfaceText id="realestate.ErrorBoundary.k1j5y128" source="Application Recovered Gracefully" />}
                 </h2>
                 <p className="text-xs text-slate-400 mt-0.5">
                   {isAr
-                    ? 'تم اعتراض الاستثناء لمنع الشاشة البيضاء وإتاحة التعافي التلقائي'
-                    : 'An error was caught to prevent a blank page and enable instant recovery.'}
+                    ? <InterfaceText id="realestate.ErrorBoundary.k10w6nhu" source="تم اعتراض الاستثناء لمنع الشاشة البيضاء وإتاحة التعافي التلقائي" />
+                    : <InterfaceText id="realestate.ErrorBoundary.kj9j3rg" source="An error was caught to prevent a blank page and enable instant recovery." />}
                 </p>
               </div>
             </div>
 
             <div className="p-4 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-2 font-mono text-xs text-slate-300">
               <div className="flex items-center justify-between text-slate-500 text-[11px]">
-                <span>Diagnostic Error Code</span>
-                <span className="text-amber-400 font-bold">ERR_REACT_RUNTIME_CAUGHT</span>
+                <span><InterfaceText id="realestate.ErrorBoundary.k16yho0x" source="Diagnostic Error Code" /></span>
+                <span className="text-amber-400 font-bold"><InterfaceText id="realestate.ErrorBoundary.k1tr150o" source="ERR_REACT_RUNTIME_CAUGHT" /></span>
               </div>
               <p className="text-rose-300 break-words font-semibold">
-                {this.state.error?.message || 'Unknown runtime error occurred during component mount.'}
+                {this.state.error?.message || <InterfaceText id="realestate.ErrorBoundary.ketpzgp" source="Unknown runtime error occurred during component mount." />}
               </p>
             </div>
 
@@ -99,7 +100,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                 className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
               >
                 <RefreshCw className="w-4 h-4" />
-                <span>{isAr ? 'إعادة تحميل التطبيق' : 'Reload Application'}</span>
+                <span>{isAr ? <InterfaceText id="realestate.ErrorBoundary.k1u8dij2" source="إعادة تحميل التطبيق" /> : <InterfaceText id="realestate.ErrorBoundary.k1i1ube2" source="Reload Application" />}</span>
               </button>
 
               <a
@@ -107,7 +108,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                 className="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer border border-slate-700"
               >
                 <Home className="w-4 h-4 text-blue-400" />
-                <span>{isAr ? 'العودة للرئيسية' : 'Return to Portal'}</span>
+                <span>{isAr ? <InterfaceText id="realestate.ErrorBoundary.k9hw6hk" source="العودة للرئيسية" /> : <InterfaceText id="realestate.ErrorBoundary.k1bede5e" source="Return to Portal" />}</span>
               </a>
 
 
@@ -117,7 +118,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                 className="w-full py-3 px-4 bg-rose-950/60 hover:bg-rose-900/80 text-rose-200 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer border border-rose-800/60"
               >
                 <Trash2 className="w-4 h-4 text-rose-400" />
-                <span>{isAr ? 'مسح التخزين وإعادة الضبط' : 'Reset Local Storage'}</span>
+                <span>{isAr ? <InterfaceText id="realestate.ErrorBoundary.ka9hsu8" source="مسح التخزين وإعادة الضبط" /> : <InterfaceText id="realestate.ErrorBoundary.ks8icoa" source="Reset Local Storage" />}</span>
               </button>
             </div>
           </div>

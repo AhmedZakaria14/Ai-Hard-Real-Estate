@@ -1,3 +1,4 @@
+import { LocalizedValue } from '../../components/ui/LocalizedValue';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import React from 'react';
 import { Star, Quote, MessageSquare, MapPin } from 'lucide-react';
@@ -16,10 +17,10 @@ export function HVACTestimonials() {
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-12 sm:mb-16">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight">
-            {pick(T.reviews.title, language)}
+            <LocalizedValue value={pick(T.reviews.title, language)} />
           </h2>
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-            {pick(T.reviews.subtitle, language)}
+            <LocalizedValue value={pick(T.reviews.subtitle, language)} />
           </p>
         </div>
 
@@ -46,7 +47,7 @@ export function HVACTestimonials() {
 
                 {/* Quote Text */}
                 <p className="text-xs sm:text-sm text-slate-700 leading-relaxed italic">
-                  "{isAr ? rev.quoteAr : rev.quoteEn}"
+                  "<LocalizedValue value={isAr ? rev.quoteAr : rev.quoteEn} />"
                 </p>
               </div>
 
@@ -54,16 +55,16 @@ export function HVACTestimonials() {
               <div className="pt-4 border-t border-slate-200/60 flex items-center justify-between text-xs">
                 <div>
                   <h4 className="font-semibold text-slate-900 text-sm">
-                    {isAr ? rev.nameAr : rev.nameEn}
+                    <LocalizedValue value={isAr ? rev.nameAr : rev.nameEn} />
                   </h4>
                   <p className="text-slate-500 flex items-center gap-1 mt-0.5">
                     <MapPin className="w-3 h-3 text-[#0EA5E9]" />
-                    <span>{isAr ? rev.cityAr : rev.cityEn}</span>
+                    <span><LocalizedValue value={isAr ? rev.cityAr : rev.cityEn} /></span>
                   </p>
                 </div>
 
                 <div className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-[#0EA5E9] font-medium text-[11px]">
-                  {isAr ? rev.serviceAr : rev.serviceEn}
+                  <LocalizedValue value={isAr ? rev.serviceAr : rev.serviceEn} />
                 </div>
               </div>
             </div>

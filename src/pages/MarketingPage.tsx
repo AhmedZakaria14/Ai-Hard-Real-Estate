@@ -1,3 +1,5 @@
+import { LocalizedValue } from '../components/ui/LocalizedValue';
+import { InterfaceText } from '../components/ui/InterfaceText';
 import React, { useState } from 'react';
 import {
   Megaphone,
@@ -37,10 +39,10 @@ export function MarketingPage({
       {/* Header */}
       <div className="space-y-3 max-w-3xl">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 font-display-serif tracking-tight">
-          {t.marketing.pageTitle}
+          <LocalizedValue value={t.marketing.pageTitle} />
         </h1>
         <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-          {t.marketing.pageSubtitle}
+          <LocalizedValue value={t.marketing.pageSubtitle} />
         </p>
       </div>
 
@@ -58,16 +60,16 @@ export function MarketingPage({
                   <Icon className="w-6 h-6" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 font-display-serif">
-                  {service.title}
+                  <LocalizedValue value={service.title} />
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  {service.desc}
+                  <LocalizedValue value={service.desc} />
                 </p>
               </div>
 
               <div className="pt-2 flex items-center gap-2 text-xs font-semibold text-blue-600">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                <span>{language === 'en' ? 'Included in Standard Listing Plan' : 'مشمول في باقة التسويق القياسية'}</span>
+                <span>{language === 'en' ? <InterfaceText id="realestate.MarketingPage.k1c0vz3o" source="Included in Standard Listing Plan" /> : <InterfaceText id="realestate.MarketingPage.k1kf6gai" source="مشمول في باقة التسويق القياسية" />}</span>
               </div>
             </div>
           );
@@ -79,11 +81,11 @@ export function MarketingPage({
         <div className="relative z-10 max-w-2xl space-y-4">
 
           <h2 className="text-2xl sm:text-3xl font-extrabold font-display-serif">
-            {t.marketing.listFormTitle}
+            <LocalizedValue value={t.marketing.listFormTitle} />
           </h2>
 
           <p className="text-xs sm:text-base text-blue-100 leading-relaxed">
-            {t.marketing.listFormSubtitle}
+            <LocalizedValue value={t.marketing.listFormSubtitle} />
           </p>
 
           <div className="pt-4 flex flex-col sm:flex-row sm:flex-wrap gap-3">
@@ -93,7 +95,7 @@ export function MarketingPage({
               onClick={onOpenListPropertyModal}
               className="w-full min-w-48 whitespace-nowrap font-bold text-blue-900 sm:w-56"
             >
-              <span>{t.cta.listProperty}</span>
+              <span><LocalizedValue value={t.cta.listProperty} /></span>
               <ArrowIcon className="w-4 h-4" />
             </Button>
             <Button
@@ -103,7 +105,7 @@ export function MarketingPage({
               aria-controls="property-valuation"
               aria-expanded={showValuation}
             >
-              {language === 'ar' ? 'اطلب تقييم عقارك' : 'Request a property valuation'}
+              {language === 'ar' ? <InterfaceText id="realestate.MarketingPage.k1mzwjto" source="اطلب تقييم عقارك" /> : <InterfaceText id="realestate.MarketingPage.k1vro5kx" source="Request a property valuation" />}
             </Button>
             <Button
               href="https://wa.me/966556125711?text=Hello%20HARD%20Real%20Estate,%20I%20would%20like%20a%20property%20valuation."
@@ -113,7 +115,7 @@ export function MarketingPage({
               size="lg"
               className="w-full min-w-48 whitespace-nowrap sm:w-56"
             >
-              <span>{t.cta.chatOnWhatsApp}</span>
+              <span><LocalizedValue value={t.cta.chatOnWhatsApp} /></span>
             </Button>
           </div>
         </div>

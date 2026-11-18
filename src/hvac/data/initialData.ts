@@ -463,3 +463,5 @@ export const initialSampleLeads: HVACLead[] = [
     isUrgent: false,
   },
 ];
+
+export const initialGalleryCategories = [...new Map(initialGallery.map((item) => [JSON.stringify([item.categoryAr, item.categoryEn]), { id: JSON.stringify([item.categoryAr, item.categoryEn]), nameAr: item.categoryAr, nameEn: item.categoryEn, active: true }])).values()];

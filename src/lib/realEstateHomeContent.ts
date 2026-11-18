@@ -1,3 +1,4 @@
+import type { ServiceDetail } from '../types';
 import { mockServices } from '../data/mockData';
 
 export const realEstateHeroSection = { sector: 'realestate', key: 'hero' } as const;
@@ -7,12 +8,12 @@ export const defaultRealEstateHero = {
   bgImageUrl: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=2200&q=90',
 };
 
-export type ServiceMedia = Record<string, { bgImageUrl: string; stats: { value: string }[] }>;
+export type ServiceMedia = Record<string, Partial<ServiceDetail> & { bgImageUrl: string; stats: { value: string; label?: { ar: string; en: string } }[] }>;
 
 export const defaultRealEstateServiceMedia: ServiceMedia = Object.fromEntries(
   mockServices.map((service) => [
     service.id,
-    { bgImageUrl: service.image, stats: service.stats.map(({ value }) => ({ value })) },
+    { ...service, bgImageUrl: service.image, stats: service.stats },
   ]),
 );
 

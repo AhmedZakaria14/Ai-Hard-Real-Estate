@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import React, { useState, useEffect } from 'react';
 import {
   Menu,
@@ -24,7 +25,7 @@ import {
 } from 'lucide-react';
 import { Language } from '../../types';
 import { getLocalizedText } from '../../lib/utils';
-import { SectorId } from '../../types/firestore-schema';
+import { SectorId } from '../../types/backend-schema';
 import {
   NavItem,
   NavigationDoc,
@@ -350,20 +351,20 @@ export const CMSNavigationManager: React.FC<CMSNavigationManagerProps> = ({ lang
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">{isAr ? 'نوع الرابط' : 'Link Type'}</label>
-                <select
+                <SearchableSelect
                   value={newItemType}
                   onChange={(e) => setNewItemType(e.target.value as any)}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-semibold"
                 >
                   <option value="internal">{isAr ? 'داخلي (Internal Destination)' : 'Internal Destination'}</option>
                   <option value="external">{isAr ? 'خارجي (Validated External)' : 'Validated External'}</option>
-                </select>
+                </SearchableSelect>
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">{isAr ? 'الوجهة / المسار' : 'Destination Path'}</label>
                 {newItemType === 'internal' ? (
-                  <select
+                  <SearchableSelect
                     value={newItemPath}
                     onChange={(e) => setNewItemPath(e.target.value)}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-mono"
@@ -373,7 +374,7 @@ export const CMSNavigationManager: React.FC<CMSNavigationManagerProps> = ({ lang
                         {dest.path} ({isAr ? dest.labelAr : dest.labelEn})
                       </option>
                     ))}
-                  </select>
+                  </SearchableSelect>
                 ) : (
                   <input
                     type="text"

@@ -73,7 +73,7 @@ export async function getCMSDraft<T = any>(
       return { record: serverRecord, isFromOfflineBuffer: false };
     }
   } catch (err) {
-    console.warn(`[DraftService] Supabase fetch error for ${docId}, checking offline buffer:`, err);
+    console.warn(`[DraftService] the database fetch error for ${docId}, checking offline buffer:`, err);
   }
 
   const localBuffer = getLocalDraftBuffer<T>(entityType, entityId);
@@ -144,7 +144,7 @@ export async function saveCMSDraft<T = any>(params: {
     if (result?.conflict) {
       throw new RevisionConflictError(expectedRevision, result.revision, result.record);
     }
-    if (!result?.record) throw new Error('Supabase did not confirm the draft.');
+    if (!result?.record) throw new Error('the database did not confirm the draft.');
     clearLocalDraftBuffer(entityType, entityId);
     return result.record;
   } catch (err) {

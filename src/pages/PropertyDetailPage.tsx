@@ -1,3 +1,6 @@
+import { LocalizedValue } from '../components/ui/LocalizedValue';
+import { InterfaceText } from '../components/ui/InterfaceText';
+import { ManagedImg, ManagedButton } from '../components/ui/ManagedElements';
 import { usePropertyTypes } from '../lib/usePropertyTypes';
 import React, { useState } from 'react';
 import {
@@ -57,7 +60,7 @@ export function PropertyDetailPage({
           <RefreshCw className="w-5 h-5" />
         </div>
         <p className="text-xs font-bold text-slate-600">
-          {isLoading ? (language === 'ar' ? 'جاري تحميل تفاصيل العقار...' : 'Loading property details...') : (language === 'ar' ? 'العقار غير متاح.' : 'This property is unavailable.')}
+          <LocalizedValue value={isLoading ? (language === 'ar' ? 'جاري تحميل تفاصيل العقار...' : 'Loading property details...') : (language === 'ar' ? 'العقار غير متاح.' : 'This property is unavailable.')} />
         </p>
       </div>
     );
@@ -81,7 +84,7 @@ export function PropertyDetailPage({
         className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-blue-700 transition-colors cursor-pointer focus-visible:outline-none focus-visible:underline"
       >
         <ArrowIcon className="w-4 h-4" />
-        <span>{t.propertyDetails.backToListings}</span>
+        <span><LocalizedValue value={t.propertyDetails.backToListings} /></span>
       </a>
 
       {/* Main Header & Title Bar */}
@@ -89,23 +92,23 @@ export function PropertyDetailPage({
         <div className="space-y-3 max-w-3xl">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant={property.status === 'for-sale' ? 'gradient' : 'dark'}>
-              {property.status === 'for-sale'
+              <LocalizedValue value={property.status === 'for-sale'
                 ? t.properties.filters.forSale
                 : property.status === 'for-rent'
                 ? t.properties.filters.forRent
-                : t.properties.filters.offPlan}
+                : t.properties.filters.offPlan} />
             </Badge>
-            <Badge variant="outline">{getPropertyTypeLabel(property.type, language, propertyTypes)}</Badge>
-            <span className="text-xs text-slate-400">ID: {property.id}</span>
+            <Badge variant="outline"><LocalizedValue value={getPropertyTypeLabel(property.type, language, propertyTypes)} /></Badge>
+            <span className="text-xs text-slate-400"><InterfaceText id="realestate.PropertyDetailPage.k1f5vh56" source="ID: " /><LocalizedValue value={property.id} /></span>
           </div>
 
           <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 font-display-serif tracking-tight leading-tight">
-            {getLocalizedText(property.title, language)}
+            <LocalizedValue value={getLocalizedText(property.title, language)} />
           </h1>
 
           <div className="flex items-center gap-2 text-sm text-slate-600">
             <MapPin className="w-4 h-4 text-blue-600 shrink-0" />
-            <span>{getLocalizedText(property.location?.address || property.location?.city, language)}</span>
+            <span><LocalizedValue value={getLocalizedText(property.location?.address || property.location?.city, language)} /></span>
           </div>
         </div>
 
@@ -113,14 +116,14 @@ export function PropertyDetailPage({
         <div className="text-start lg:text-end space-y-3">
           <div>
             <span className="text-xs text-slate-500 uppercase tracking-wider block">
-              {t.propertyDetails.price}
+              <LocalizedValue value={t.propertyDetails.price} />
             </span>
             <div className="text-2xl sm:text-3xl font-extrabold text-blue-700 font-display-serif">
-              {formatCurrency(property.price.sar, 'SAR', language)}
+              <LocalizedValue value={formatCurrency(property.price.sar, 'SAR', language)} />
               {property.price.period && (
                 <span className="text-sm font-normal text-slate-500">
-                  {' '}
-                  {property.price.period === 'year' ? t.propertyDetails.perYear : t.propertyDetails.perMonth}
+                  <LocalizedValue value={' '} />
+                  <LocalizedValue value={property.price.period === 'year' ? t.propertyDetails.perYear : t.propertyDetails.perMonth} />
                 </span>
               )}
             </div>
@@ -132,7 +135,7 @@ export function PropertyDetailPage({
       <div className="space-y-3">
         {/* Main large image */}
         <div className="relative aspect-16/9 sm:aspect-21/9 rounded-3xl overflow-hidden bg-slate-900 shadow-lg">
-          <img
+          <ManagedImg copyScope="realestate.PropertyDetailPage"
             src={property.images[activeImageIndex] || property.images[0]}
             alt={
               language === 'ar'
@@ -161,7 +164,7 @@ export function PropertyDetailPage({
                 : (language === 'ar' ? 'انقر للرؤية' : 'click to select');
 
               return (
-                <button
+                <ManagedButton copyScope="realestate.PropertyDetailPage"
                   key={idx}
                   onClick={() => setActiveImageIndex(idx)}
                   aria-label={`${imagePositionLabel} - ${selectionStatus}`}
@@ -172,13 +175,13 @@ export function PropertyDetailPage({
                       : 'border-transparent opacity-70 hover:opacity-100'
                   }`}
                 >
-                  <img
+                  <ManagedImg copyScope="realestate.PropertyDetailPage"
                     src={img}
                     alt={imagePositionLabel}
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover"
                   />
-                </button>
+                </ManagedButton>
               );
             })}
           </div>
@@ -194,41 +197,41 @@ export function PropertyDetailPage({
             <div className="space-y-1">
               <span className="text-xs text-slate-500 flex items-center gap-1.5">
                 <Bed className="w-3.5 h-3.5 text-blue-600" />
-                {t.propertyDetails.quickFacts.bedrooms}
+                <LocalizedValue value={t.propertyDetails.quickFacts.bedrooms} />
               </span>
               <p className="text-base font-bold text-slate-900">
-                {property.bedrooms > 0 ? `${property.bedrooms.toLocaleString(numberLocale)} ${t.properties.beds}` : (language === 'ar' ? 'تجاري' : 'Commercial')}
+                <LocalizedValue value={property.bedrooms > 0 ? `${property.bedrooms.toLocaleString(numberLocale)} ${t.properties.beds}` : (language === 'ar' ? 'تجاري' : 'Commercial')} />
               </p>
             </div>
 
             <div className="space-y-1">
               <span className="text-xs text-slate-500 flex items-center gap-1.5">
                 <Bath className="w-3.5 h-3.5 text-blue-600" />
-                {t.propertyDetails.quickFacts.bathrooms}
+                <LocalizedValue value={t.propertyDetails.quickFacts.bathrooms} />
               </span>
-              <p className="text-base font-bold text-slate-900">{(property.bathrooms ?? 0).toLocaleString(numberLocale)} {t.properties.baths}</p>
+              <p className="text-base font-bold text-slate-900"><LocalizedValue value={(property.bathrooms ?? 0).toLocaleString(numberLocale)} /> <LocalizedValue value={t.properties.baths} /></p>
             </div>
 
             <div className="space-y-1">
               <span className="text-xs text-slate-500 flex items-center gap-1.5">
                 <Maximize className="w-3.5 h-3.5 text-blue-600" />
-                {t.propertyDetails.quickFacts.area}
+                <LocalizedValue value={t.propertyDetails.quickFacts.area} />
               </span>
               <p className="text-base font-bold text-slate-900">
-                {formatPropertyArea(property, language)}
+                <LocalizedValue value={formatPropertyArea(property, language)} />
               </p>
             </div>
 
             <div className="space-y-1">
               <span className="text-xs text-slate-500 flex items-center gap-1.5">
                 <Car className="w-3.5 h-3.5 text-blue-600" />
-                {t.propertyDetails.quickFacts.parking}
+                <LocalizedValue value={t.propertyDetails.quickFacts.parking} />
               </span>
               <p className="text-base font-bold text-slate-900">
-                {property.features.parkingSpaces}{' '}
-                {language === 'ar'
+                <LocalizedValue value={property.features.parkingSpaces} /><LocalizedValue value={' '} />
+                <LocalizedValue value={language === 'ar'
                   ? (property.features.parkingSpaces === 1 ? 'موقف' : 'مواقف')
-                  : (property.features.parkingSpaces === 1 ? 'Space' : 'Spaces')}
+                  : (property.features.parkingSpaces === 1 ? 'Space' : 'Spaces')} />
               </p>
             </div>
             {(property.features?.additionalSpecs ?? []).map((spec, index) => {
@@ -237,9 +240,9 @@ export function PropertyDetailPage({
                 <div key={index} className="space-y-1">
                   <span className="text-xs text-slate-500 flex items-center gap-1.5">
                     <Icon aria-hidden="true" className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                    {getLocalizedText(spec.label, language)}
+                    <LocalizedValue value={getLocalizedText(spec.label, language)} />
                   </span>
-                  <p className="text-base font-bold text-slate-900"><bdi>{getLocalizedText(spec.value, language)}</bdi></p>
+                  <p className="text-base font-bold text-slate-900"><bdi><LocalizedValue value={getLocalizedText(spec.value, language)} /></bdi></p>
                 </div>
               );
             })}
@@ -248,23 +251,23 @@ export function PropertyDetailPage({
           {/* Description / Overview */}
           <div className="space-y-4 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200">
             <h2 className="text-xl font-bold text-slate-900 font-display-serif">
-              {t.propertyDetails.overview}
+              <LocalizedValue value={t.propertyDetails.overview} />
             </h2>
             <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-              {getLocalizedText(property.description, language)}
+              <LocalizedValue value={getLocalizedText(property.description, language)} />
             </p>
           </div>
 
           {/* Detailed Specifications Matrix */}
           <div className="space-y-4 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200">
             <h2 className="text-xl font-bold text-slate-900 font-display-serif">
-              {t.propertyDetails.specifications}
+              <LocalizedValue value={t.propertyDetails.specifications} />
             </h2>
             <dl dir={language === 'ar' ? 'rtl' : 'ltr'} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
               {specificationRows.filter(({ value }) => Boolean(value)).map(({ label, value }) => (
                 <div key={label} className="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-2 py-2 border-b border-slate-100 text-start">
-                  <dt className="text-slate-500">{label}:</dt>
-                  <dd className="font-semibold text-slate-900 break-words"><bdi>{value}</bdi></dd>
+                  <dt className="text-slate-500"><LocalizedValue value={label} />:</dt>
+                  <dd className="font-semibold text-slate-900 break-words"><bdi><LocalizedValue value={value} /></bdi></dd>
                 </div>
               ))}
             </dl>
@@ -273,13 +276,13 @@ export function PropertyDetailPage({
           {/* Luxury Amenities */}
           <div className="space-y-4 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200">
             <h2 className="text-xl font-bold text-slate-900 font-display-serif">
-              {t.propertyDetails.amenities}
+              <LocalizedValue value={t.propertyDetails.amenities} />
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {getNormalizedAmenities(property, language).map((amenity, idx) => (
                 <div key={idx} className="flex items-center gap-2.5 text-xs sm:text-sm text-slate-700">
                   <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
-                  <span>{amenity}</span>
+                  <span><LocalizedValue value={amenity} /></span>
                 </div>
               ))}
             </div>
@@ -294,10 +297,10 @@ export function PropertyDetailPage({
           {/* Direct CTA Box */}
           <div className="sticky top-24 bg-white p-6 rounded-2xl border border-slate-200 shadow-md space-y-5">
             <h3 className="text-lg font-bold text-slate-900 font-display-serif">
-              {language === 'en' ? 'Inquire or Tour Property' : 'طلب معاينة أو استفسار'}
+              {language === 'en' ? <InterfaceText id="realestate.PropertyDetailPage.ktxu7tk" source="Inquire or Tour Property" /> : <InterfaceText id="realestate.PropertyDetailPage.k8x4e8b" source="طلب معاينة أو استفسار" />}
             </h3>
             <p className="text-xs text-slate-500 leading-relaxed">
-              {t.propertyDetails.bookViewingSubtitle}
+              <LocalizedValue value={t.propertyDetails.bookViewingSubtitle} />
             </p>
 
             {/* Mandatory "Book a Viewing" CTA */}
@@ -308,7 +311,7 @@ export function PropertyDetailPage({
               className="w-full shadow-md justify-center font-bold"
             >
               <Calendar className="w-4 h-4" />
-              <span>{t.cta.bookViewing}</span>
+              <span><LocalizedValue value={t.cta.bookViewing} /></span>
             </Button>
 
             {/* Mandatory "Chat on WhatsApp" Direct CTA */}
@@ -325,7 +328,7 @@ export function PropertyDetailPage({
               className="w-full justify-center"
             >
               <WhatsAppIcon />
-              <span>{t.cta.chatOnWhatsApp}</span>
+              <span><LocalizedValue value={t.cta.chatOnWhatsApp} /></span>
             </Button>
 
           </div>
@@ -335,7 +338,7 @@ export function PropertyDetailPage({
       {/* Similar Properties Section */}
       <div className="pt-12 border-t border-slate-200 space-y-6">
         <h3 className="text-xl sm:text-2xl font-bold text-slate-900 font-display-serif">
-          {t.propertyDetails.similarProperties}
+          <LocalizedValue value={t.propertyDetails.similarProperties} />
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -352,7 +355,7 @@ export function PropertyDetailPage({
               className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md cursor-pointer transition-all flex flex-col sm:flex-row group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
             >
               <div className="relative sm:w-48 aspect-16/10 sm:aspect-auto overflow-hidden bg-slate-100">
-                <img
+                <ManagedImg copyScope="realestate.PropertyDetailPage"
                   src={sim.images[0]}
                   alt={getLocalizedText(sim.title, language)}
                   referrerPolicy="no-referrer"
@@ -361,13 +364,13 @@ export function PropertyDetailPage({
               </div>
               <div className="p-4 flex-1 flex flex-col justify-between space-y-2">
                 <div>
-                  <span className="text-[11px] text-blue-600 font-semibold">{getLocalizedText(sim.location?.area || sim.location?.city, language)}</span>
+                  <span className="text-[11px] text-blue-600 font-semibold"><LocalizedValue value={getLocalizedText(sim.location?.area || sim.location?.city, language)} /></span>
                   <h4 className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1">
-                    {getLocalizedText(sim.title, language)}
+                    <LocalizedValue value={getLocalizedText(sim.title, language)} />
                   </h4>
                 </div>
                 <div className="text-sm font-bold text-slate-900 font-display-serif">
-                  {sim.price?.formattedSAR || (typeof (sim as any).price === 'number' ? `${(sim as any).price.toLocaleString()} SAR` : `${(sim.price?.sar ?? 0).toLocaleString()} SAR`)}
+                  <LocalizedValue value={sim.price?.formattedSAR || (typeof (sim as any).price === 'number' ? `${(sim as any).price.toLocaleString()} SAR` : `${(sim.price?.sar ?? 0).toLocaleString()} SAR`)} />
                 </div>
               </div>
             </a>

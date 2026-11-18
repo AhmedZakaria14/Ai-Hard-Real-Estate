@@ -1,3 +1,6 @@
+import { LocalizedValue } from '../../components/ui/LocalizedValue';
+import { InterfaceText } from '../../components/ui/InterfaceText';
+import { ManagedImg } from '../../components/ui/ManagedElements';
 import { formatConstructionDigits } from '../utils/constructionFormatters';
 import { usePageMedia } from '../../lib/pageMedia';
 import { useTextOverride } from '../../context/TextOverrideContext';
@@ -28,7 +31,7 @@ export function Hero() {
   const isAr = language === 'ar';
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
 
-  const badgeText = isAr ? 'هارد للمقاولات العامة والإنشائية' : 'HARD General & Construction Contracting';
+  const badgeText = isAr ? heroContent.badgeAr : heroContent.badgeEn;
   const headlineText = isAr ? heroContent.headlineAr : heroContent.headlineEn;
   const subtitleText = isAr
     ? heroContent.subtitleAr.replace('في المملكة العربية السعودية', 'في المنطقة الشرقية')
@@ -58,17 +61,17 @@ export function Hero() {
           <div className="lg:col-span-7 space-y-6 text-start">
             {/* Pill Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#e8f4fc] border border-[#cbe4f7] text-[#009ee2] text-xs font-bold shadow-2xs">
-              <span>{badgeText}</span>
+              <span><LocalizedValue value={badgeText} /></span>
             </div>
 
             {/* Main Display Headline */}
             <h1 className="text-3xl sm:text-5xl lg:text-[52px] font-black font-display-serif text-[#0f243e] tracking-tight leading-[1.32]">
-              {headlineText}
+              <LocalizedValue value={headlineText} />
             </h1>
 
             {/* Subtitle */}
             <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl font-medium">
-              {subtitleText}
+              <LocalizedValue value={subtitleText} />
             </p>
 
             {/* Interactive CTAs */}
@@ -79,7 +82,7 @@ export function Hero() {
                 onClick={() => handleScrollTo('#projects')}
                 className="px-6 py-3.5 rounded-xl bg-[#009ee2] hover:bg-[#008bc7] text-white text-xs sm:text-sm font-bold flex items-center gap-2 transition-all shadow-md shadow-[#009ee2]/25 hover:scale-[1.02] cursor-pointer"
               >
-                <span>{ctaPrimaryText}</span>
+                <span><LocalizedValue value={ctaPrimaryText} /></span>
                 <ArrowIcon className="w-4 h-4" />
               </button>
 
@@ -90,7 +93,7 @@ export function Hero() {
                 className="px-5 py-3.5 rounded-xl bg-white hover:bg-sky-50/80 border border-sky-200 text-[#009ee2] text-xs sm:text-sm font-bold flex items-center gap-2 transition-all shadow-2xs hover:scale-[1.02] cursor-pointer"
               >
                 <Calculator className="w-4 h-4" />
-                <span>{ctaSecondaryText}</span>
+                <span><LocalizedValue value={ctaSecondaryText} /></span>
               </button>
 
               {/* Services Link */}
@@ -100,7 +103,7 @@ export function Hero() {
                 className="px-3 py-3.5 text-slate-700 hover:text-[#009ee2] text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <Building className="w-4 h-4 text-[#009ee2]" />
-                <span>{isAr ? 'خدماتنا الإنشائية' : 'Our Services'}</span>
+                <span>{isAr ? <InterfaceText id="construction.Hero.k1xxdzhv" source="خدماتنا الإنشائية" /> : <InterfaceText id="construction.Hero.k1pftzp3" source="Our Services" />}</span>
               </button>
             </div>
 
@@ -108,15 +111,15 @@ export function Hero() {
             <div className="flex flex-wrap items-center gap-4 sm:gap-6 pt-3 text-xs font-semibold text-[#009ee2]">
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-[#009ee2]" />
-                <span className="text-slate-700">{isAr ? 'ضمان شامل حتى 10 سنوات' : 'Up to 10-Year Warranty'}</span>
+                <span className="text-slate-700">{isAr ? <InterfaceText id="construction.Hero.k10iu1e0" source="ضمان شامل حتى 10 سنوات" /> : <InterfaceText id="construction.Hero.kauzbtw" source="Up to 10-Year Warranty" />}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-[#009ee2]" />
-                <span className="text-slate-700">{isAr ? 'الالتزام صارم بالجداول الزمنية' : 'Strict Schedule Compliance'}</span>
+                <span className="text-slate-700">{isAr ? <InterfaceText id="construction.Hero.ks86jpd" source="الالتزام صارم بالجداول الزمنية" /> : <InterfaceText id="construction.Hero.kebgn0w" source="Strict Schedule Compliance" />}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-[#009ee2]" />
-                <span className="text-slate-700">{isAr ? 'مهندسون مقيمون معتمدون' : 'Certified Resident Engineers'}</span>
+                <span className="text-slate-700">{isAr ? <InterfaceText id="construction.Hero.ku4555x" source="مهندسون مقيمون معتمدون" /> : <InterfaceText id="construction.Hero.k4gloy0" source="Certified Resident Engineers" />}</span>
               </div>
             </div>
           </div>
@@ -126,8 +129,8 @@ export function Hero() {
             <div className="bg-white rounded-3xl p-3.5 sm:p-4 shadow-xl border border-sky-100 space-y-3">
               {/* Image with Tag */}
               <div className="relative aspect-4/3 rounded-2xl overflow-hidden bg-slate-900 shadow-inner group">
-                <img
-                  src={constructionHeroImage}
+                <ManagedImg copyScope="construction.Hero"
+                  src={heroContent.bgImageUrl || constructionHeroImage}
                   alt="HARD Business Center Towers"
                   loading="eager"
                   fetchPriority="high"
@@ -138,16 +141,16 @@ export function Hero() {
 
                 {/* Featured Badge */}
                 <div className="absolute top-3 end-3 px-3 py-1 rounded-full text-[10px] font-extrabold bg-[#0f243e] text-white shadow-md">
-                  {isAr ? 'مشروع مميز' : 'Featured Landmark'}
+                  {isAr ? <InterfaceText id="construction.Hero.kx9i70u" source="مشروع مميز" /> : <InterfaceText id="construction.Hero.k19m0tgh" source="Featured Landmark" />}
                 </div>
 
                 {/* Bottom Overlay Info */}
                 <div className="absolute bottom-3 start-3 end-3 text-start text-white">
                   <div className="font-bold text-base sm:text-lg font-display-serif">
-                    {isAr ? 'أبراج هارد بزنس سنتر' : 'HARD Business Center Towers'}
+                    {isAr ? <InterfaceText id="construction.Hero.kcxn4lj" source="أبراج هارد بزنس سنتر" /> : <InterfaceText id="construction.Hero.keq3ghv" source="HARD Business Center Towers" />}
                   </div>
                   <div className="text-[11px] text-sky-200">
-                    {isAr ? 'أبراج تجارية وإدارية' : 'Commercial & Corporate Towers'}
+                    {isAr ? <InterfaceText id="construction.Hero.k17k7yms" source="أبراج تجارية وإدارية" /> : <InterfaceText id="construction.Hero.k1h7a7l8" source="Commercial & Corporate Towers" />}
                   </div>
                 </div>
               </div>
@@ -156,16 +159,15 @@ export function Hero() {
               <div className="bg-[#e8f4fc] border border-[#d0e9fa] rounded-2xl p-3 flex items-center justify-between text-start gap-3">
                 <div className="space-y-0.5">
                   <div className="text-xs font-bold text-[#0f243e]">
-                    {isAr ? 'مطابقة لأعلى معايير الجودة' : 'Highest Quality Compliance'}
+                    {isAr ? <InterfaceText id="construction.Hero.k2njqp" source="مطابقة لأعلى معايير الجودة" /> : <InterfaceText id="construction.Hero.kfkond1" source="Highest Quality Compliance" />}
                   </div>
                   <div className="text-[11px] text-slate-500 font-medium">
-                    {isAr ? 'كود البناء السعودي SBC المعتمد' : 'Saudi Building Code (SBC) Certified'}
+                    {isAr ? <InterfaceText id="construction.Hero.kjii3qv" source="كود البناء السعودي SBC المعتمد" /> : <InterfaceText id="construction.Hero.k1pdm81y" source="Saudi Building Code (SBC) Certified" />}
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded-md bg-white text-[#009ee2] text-[10px] font-extrabold border border-[#cbe4f7]">
-                    100% {isAr ? 'معتمد' : 'Certified'}
+                  <span className="px-2 py-0.5 rounded-md bg-white text-[#009ee2] text-[10px] font-extrabold border border-[#cbe4f7]"><LocalizedValue value="100%" />{isAr ? <InterfaceText id="construction.Hero.k29nxlz" source="معتمد" /> : <InterfaceText id="construction.Hero.k1ug1sc2" source="Certified" />}
                   </span>
                   <div className="p-1.5 rounded-xl bg-[#009ee2] text-white">
                     <ShieldCheck className="w-4 h-4" />
@@ -177,10 +179,10 @@ export function Hero() {
               <div className="bg-[#009ee2] text-white rounded-2xl p-3 sm:p-3.5 flex items-center justify-between gap-3 shadow-md shadow-[#009ee2]/20">
                 <div className="text-start space-y-0.5">
                   <div className="text-[10px] text-sky-100">
-                    {isAr ? 'هل تخطط لمشروع جديد؟' : 'Planning a New Project?'}
+                    {isAr ? <InterfaceText id="construction.Hero.kqzl9sg" source="هل تخطط لمشروع جديد؟" /> : <InterfaceText id="construction.Hero.k12waqfx" source="Planning a New Project?" />}
                   </div>
                   <div className="text-xs sm:text-sm font-black">
-                    {isAr ? 'احصل على استشارة هندسية مجانية' : 'Get a Free Engineering Consultation'}
+                    {isAr ? <InterfaceText id="construction.Hero.k4hw9ag" source="احصل على استشارة هندسية مجانية" /> : <InterfaceText id="construction.Hero.k67pobq" source="Get a Free Engineering Consultation" />}
                   </div>
                 </div>
 
@@ -189,7 +191,7 @@ export function Hero() {
                   onClick={() => openQuoteModal()}
                   className="px-3.5 py-1.5 rounded-lg bg-white hover:bg-sky-50 text-[#009ee2] text-xs font-extrabold transition-colors cursor-pointer shrink-0 shadow-2xs"
                 >
-                  {isAr ? 'تواصل معنا' : 'Contact Us'}
+                  {isAr ? <InterfaceText id="construction.Hero.k16mv5ri" source="تواصل معنا" /> : <InterfaceText id="construction.Hero.k14gzmid" source="Contact Us" />}
                 </button>
               </div>
             </div>
@@ -202,53 +204,51 @@ export function Hero() {
           <div className="p-5 rounded-2xl bg-white border border-sky-100 shadow-sm text-start space-y-1 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <span className="text-2xl sm:text-4xl font-black font-display-serif text-[#0f243e] tracking-tight">
-                {formatConstructionDigits(t.hero.stats.yearsCount, language)}
+                <LocalizedValue value={formatConstructionDigits(t.hero.stats.yearsCount, language)} />
               </span>
               <div className="p-2.5 rounded-xl bg-[#eef7ff] text-[#009ee2] border border-sky-100">
                 <Award className="w-5 h-5" />
               </div>
             </div>
-            <div className="text-xs font-semibold text-slate-500">{t.hero.stats.yearsLabel}</div>
+            <div className="text-xs font-semibold text-slate-500"><LocalizedValue value={t.hero.stats.yearsLabel} /></div>
           </div>
 
           {/* Stat 2: 140+ Projects */}
           <div className="p-5 rounded-2xl bg-white border border-sky-100 shadow-sm text-start space-y-1 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <span className="text-2xl sm:text-4xl font-black font-display-serif text-[#0f243e] tracking-tight">
-                {formatConstructionDigits(t.hero.stats.projectsCount, language)}
+                <LocalizedValue value={formatConstructionDigits(t.hero.stats.projectsCount, language)} />
               </span>
               <div className="p-2.5 rounded-xl bg-[#eef7ff] text-[#009ee2] border border-sky-100">
                 <Building className="w-5 h-5" />
               </div>
             </div>
-            <div className="text-xs font-semibold text-slate-500">{t.hero.stats.projectsLabel}</div>
+            <div className="text-xs font-semibold text-slate-500"><LocalizedValue value={t.hero.stats.projectsLabel} /></div>
           </div>
 
           {/* Stat 3: 100% SBC Satisfaction */}
           <div className="p-5 rounded-2xl bg-white border border-sky-100 shadow-sm text-start space-y-1 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <span className="text-2xl sm:text-4xl font-black font-display-serif text-[#0f243e] tracking-tight">
-                {formatConstructionDigits(t.hero.stats.satisfactionCount, language)}
+                <LocalizedValue value={formatConstructionDigits(t.hero.stats.satisfactionCount, language)} />
               </span>
               <div className="p-2.5 rounded-xl bg-[#eef7ff] text-[#009ee2] border border-sky-100">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
             </div>
-            <div className="text-xs font-semibold text-slate-500">{t.hero.stats.satisfactionLabel}</div>
+            <div className="text-xs font-semibold text-slate-500"><LocalizedValue value={t.hero.stats.satisfactionLabel} /></div>
           </div>
 
           {/* Stat 4: 350,000+ m2 */}
           <div className="p-5 rounded-2xl bg-white border border-sky-100 shadow-sm text-start space-y-1 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
-              <span className="text-2xl sm:text-4xl font-black font-display-serif text-[#0f243e] tracking-tight">
-                350,000+
-              </span>
+              <span className="text-2xl sm:text-4xl font-black font-display-serif text-[#0f243e] tracking-tight"><LocalizedValue value="350,000+" /></span>
               <div className="p-2.5 rounded-xl bg-[#eef7ff] text-[#009ee2] border border-sky-100">
                 <Maximize2 className="w-5 h-5" />
               </div>
             </div>
             <div className="text-xs font-semibold text-slate-500">
-              {isAr ? 'م² مسطحات بناء مشيدة' : 'm² Constructed BUA Area'}
+              {isAr ? <InterfaceText id="construction.Hero.k16zdske" source="م² مسطحات بناء مشيدة" /> : <InterfaceText id="construction.Hero.k11g1xzj" source="m² Constructed BUA Area" />}
             </div>
           </div>
         </div>

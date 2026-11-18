@@ -1,4 +1,4 @@
-import type { LocalizedText, SectorId } from '../types/firestore-schema';
+import type { LocalizedText, SectorId } from '../types/backend-schema';
 import { hardAdminClient } from './db/hardAdminClient';
 import { hardPublishableKey, hardSupabaseUrl } from './db/hardCatalog';
 
@@ -122,7 +122,7 @@ export function subscribeNavigationDoc(id: string, callback: (nav: NavigationDoc
       const menu = rows[0]?.menu;
       callback(menu ? { ...menu, items: (menu.items ?? []).filter(validItem) } : null);
     } catch (error) {
-      if (!controller.signal.aborted) console.warn('Could not read Supabase navigation', error);
+      if (!controller.signal.aborted) console.warn('Could not read the database navigation', error);
     }
   }
   window.addEventListener(menuChange, refresh);

@@ -38,7 +38,15 @@ export interface HVACService {
   sortOrder: number;
 }
 
+export interface HVACGalleryCategory {
+  id: string;
+  nameAr: string;
+  nameEn: string;
+  active: boolean;
+}
+
 export interface HVACGalleryItem {
+  categoryId?: string;
   id: string;
   image: string;
   titleEn: string;

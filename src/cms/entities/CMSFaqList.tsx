@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import React, { useState } from 'react';
 import { FaqEntity, SectorScope } from '../../types/businessEntities';
 import { Language } from '../../types';
@@ -99,7 +100,7 @@ export const CMSFaqList: React.FC<CMSFaqListProps> = ({
         </div>
 
         <div>
-          <select
+          <SearchableSelect
             value={selectedSector}
             onChange={(e) => setSelectedSector(e.target.value as any)}
             className="w-full px-3.5 py-2.5 text-xs rounded-2xl border border-slate-200 bg-white font-semibold focus:ring-2 focus:ring-blue-500"
@@ -109,7 +110,7 @@ export const CMSFaqList: React.FC<CMSFaqListProps> = ({
             <option value="construction">{isAr ? 'قطاع المقاولات' : 'Construction'}</option>
             <option value="hvac">{isAr ? 'قطاع التكييف' : 'HVAC'}</option>
             <option value="group">{isAr ? 'إدارة المجموعة' : 'Group Holding'}</option>
-          </select>
+          </SearchableSelect>
         </div>
       </div>
 

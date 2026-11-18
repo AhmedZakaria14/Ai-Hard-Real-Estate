@@ -1,3 +1,8 @@
+import { LocalizedValue } from '../../components/ui/LocalizedValue';
+import { useCustomerFormConfig, ConfiguredFormFields } from '../../components/forms/ConfiguredFormFields';
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
+import { InterfaceText } from '../../components/ui/InterfaceText';
+import { ManagedInput, ManagedTextarea } from '../../components/ui/ManagedElements';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import React, { useState } from 'react';
 import {
@@ -18,8 +23,11 @@ import { pick } from '../translations';
 import { submitCustomerForm } from '../../lib/forms/formSubmissionService';
 
 export function HVACContactSection() {
+  const formConfig = useCustomerFormConfig('general_contact');
+
   const { hvac: T } = useTextOverride();
-  const { language, isAr, services } = useHVAC();
+  const { language, isAr, services, operatingHours, serviceAreas } = useHVAC();
+  const mapPoint = `${operatingHours.lat},${operatingHours.lng}`;
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -39,7 +47,7 @@ export function HVACContactSection() {
 
     setIsSubmitting(true);
     try {
-      const result = await submitCustomerForm({
+      const result = await formConfig.submit({
         formType: 'general_contact',
         sector: 'hvac',
         name: name.trim(),
@@ -49,7 +57,7 @@ export function HVACContactSection() {
         message: `Service: ${service || 'General'}\n\n${message}`,
         details: {
           service: service || 'General Contact Inquiry',
-          recipientEmail: 'info@hardgp.com',
+          recipientEmail: operatingHours.officeEmail,
         },
       });
 
@@ -77,10 +85,10 @@ export function HVACContactSection() {
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-12 sm:mb-16">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight">
-            {pick(T.contact.title, language)}
+            <LocalizedValue value={pick(T.contact.title, language)} />
           </h2>
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-            {pick(T.contact.subtitle, language)}
+            <LocalizedValue value={pick(T.contact.subtitle, language)} />
           </p>
         </div>
 
@@ -88,18 +96,18 @@ export function HVACContactSection() {
           {/* Left Column (6 cols): Lead Form sending to info@hardgp.com */}
           <div className="lg:col-span-6 bg-[#F8FAFC] border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-xs text-start">
             <h3 className="text-lg font-semibold text-slate-900 mb-2">
-              {isAr ? 'نموذج طلب الخدمة والتواصل المباشر' : 'Service Request & Inquiry Form'}
+              {isAr ? <InterfaceText id="hvac.HVACContactSection.k1e6aj4c" source="نموذج طلب الخدمة والتواصل المباشر" /> : <InterfaceText id="hvac.HVACContactSection.k1ybk5s0" source="Service Request & Inquiry Form" />}
             </h3>
             <p className="text-xs text-slate-500 mb-6">
               {isAr
-                ? 'يتم إرسال كافة الاستفسارات فورًا إلى الإدارة الفنية لمتابعتها والرد عليها.'
-                : 'All inquiries go directly to the technical team for follow-up and response.'}
+                ? <InterfaceText id="hvac.HVACContactSection.k2ql8y2" source="يتم إرسال كافة الاستفسارات فورًا إلى الإدارة الفنية لمتابعتها والرد عليها." />
+                : <InterfaceText id="hvac.HVACContactSection.k2g47xb" source="All inquiries go directly to the technical team for follow-up and response." />}
             </p>
 
             {formError && (
               <div role="alert" className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
-                <p className="font-semibold">{formError}</p>
+                <p className="font-semibold"><LocalizedValue value={formError} /></p>
               </div>
             )}
 
@@ -107,21 +115,22 @@ export function HVACContactSection() {
               <div role="status" className="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm flex items-start gap-3 animate-in fade-in duration-200">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-semibold">{pick(T.contact.formSuccess, language)}</p>
+                  <p className="font-semibold"><LocalizedValue value={pick(T.contact.formSuccess, language)} /></p>
                   <p className="font-mono text-xs text-emerald-700 mt-1">
-                    {isAr ? 'الرقم المرجعي:' : 'Reference:'} <bdi dir="ltr">{successStatus}</bdi>
+                    {isAr ? <InterfaceText id="hvac.HVACContactSection.k1dilezq" source="الرقم المرجعي:" /> : <InterfaceText id="hvac.HVACContactSection.k14srq4g" source="Reference:" />} <bdi dir="ltr"><LocalizedValue value={successStatus} /></bdi>
                   </p>
                 </div>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
+            <ConfiguredFormFields form={formConfig} language={language} />
               {/* Name */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  {pick(T.contact.formName, language)} *
+                  <LocalizedValue value={pick(T.contact.formName, language)} /> <span className="text-red-600">*</span>
                 </label>
-                <input
+                <ManagedInput copyScope="hvac.HVACContactSection"
                   type="text"
                   required
                   value={name}
@@ -134,9 +143,9 @@ export function HVACContactSection() {
               {/* Phone */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  {pick(T.contact.formPhone, language)} *
+                  <LocalizedValue value={pick(T.contact.formPhone, language)} /> <span className="text-red-600">*</span>
                 </label>
-                <input
+                <ManagedInput copyScope="hvac.HVACContactSection"
                   type="tel"
                   required
                   dir="ltr"
@@ -150,9 +159,9 @@ export function HVACContactSection() {
               {/* Email */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  {pick(T.contact.formEmail, language)} *
+                  <LocalizedValue value={pick(T.contact.formEmail, language)} /> <span className="text-red-600">*</span>
                 </label>
-                <input
+                <ManagedInput copyScope="hvac.HVACContactSection"
                   type="email"
                   required
                   value={email}
@@ -165,9 +174,9 @@ export function HVACContactSection() {
               {/* Service */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  {pick(T.contact.formService, language)} *
+                  <LocalizedValue value={pick(T.contact.formService, language)} /> <span className="text-red-600">*</span>
                 </label>
-                <select
+                <SearchableSelect
                   required
                   value={service}
                   onChange={(e) => setService(e.target.value)}
@@ -176,30 +185,16 @@ export function HVACContactSection() {
                   <option value="" disabled>
                     {isAr ? '-- اختر الخدمة المطلوب الاستفسار عنها --' : '-- Select Requested Service --'}
                   </option>
-                  <option value="AC Maintenance Contract">
-                    {isAr ? 'عقد صيانة سنوي (AMC)' : 'Annual Maintenance Contract (AMC)'}
-                  </option>
-                  <option value="Emergency Repair">
-                    {isAr ? 'صيانة طوارئ فورية' : 'Emergency Rapid Repair'}
-                  </option>
-                  <option value="Deep Chemical Cleaning">
-                    {isAr ? 'غسيل كيميائي شامل' : 'Deep Coil Chemical Cleaning'}
-                  </option>
-                  <option value="VRF / Chiller Overhaul">
-                    {isAr ? 'صيانة أنظمة مركزية وشيلرات' : 'VRF & Chiller Overhaul'}
-                  </option>
-                  <option value="Inspection & Leak Testing">
-                    {isAr ? 'فحص تسريب الغاز والفريون' : 'Inspection & Gas Leak Testing'}
-                  </option>
-                </select>
+                  {services.filter((item) => item.active).map((item) => <option key={item.id} value={item.id}>{isAr ? item.titleAr : item.titleEn}</option>)}
+                </SearchableSelect>
               </div>
 
               {/* Message */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  {pick(T.contact.formMessage, language)}
+                  <LocalizedValue value={pick(T.contact.formMessage, language)} />
                 </label>
-                <textarea
+                <ManagedTextarea copyScope="hvac.HVACContactSection"
                   rows={3}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
@@ -220,9 +215,9 @@ export function HVACContactSection() {
               >
                 <Send className="w-4 h-4" />
                 <span>
-                  {isSubmitting
+                  <LocalizedValue value={isSubmitting
                     ? pick(T.contact.formSending, language)
-                    : pick(T.contact.formSubmit, language)}
+                    : pick(T.contact.formSubmit, language)} />
                 </span>
               </button>
             </form>
@@ -236,20 +231,18 @@ export function HVACContactSection() {
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-[#0EA5E9]" />
                   <span className="font-semibold text-xs sm:text-sm text-slate-800">
-                    {pick(T.contact.mapTitle, language)}
+                    <LocalizedValue value={(isAr ? operatingHours.cityAr + ' – الإحداثيات: ' : operatingHours.cityEn + ' – Coordinates: ') + mapPoint} />
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
-                    26°22′25.3″N 50°06′10.8″E
-                  </span>
+                  <span className="text-[11px] font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md"><InterfaceText id="hvac.HVACContactSection.k1kurira" source="26°22′25.3″N 50°06′10.8″E " /></span>
                   <a
-                    href="https://www.google.com/maps/dir/?api=1&destination=26.373703,50.102998"
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${mapPoint}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-white bg-[#0EA5E9] hover:bg-[#0284C7] rounded-lg transition-colors"
                   >
-                    <span>{pick(T.contact.getDirections, language)}</span>
+                    <span><LocalizedValue value={pick(T.contact.getDirections, language)} /></span>
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
@@ -265,7 +258,7 @@ export function HVACContactSection() {
                   loading="lazy"
                   allowFullScreen
                   referrerPolicy="no-referrer-when-downgrade"
-                  src="https://maps.google.com/maps?q=26.373703,50.102998&hl=en&z=15&output=embed"
+                  src={`https://maps.google.com/maps?q=${mapPoint}&hl=${language}&z=16&output=embed`}
                 />
               </div>
             </div>
@@ -278,10 +271,10 @@ export function HVACContactSection() {
                   <Building2 className="w-4 h-4" />
                 </div>
                 <h4 className="font-semibold text-xs text-slate-900">
-                  {pick(T.contact.addressTitle, language)}
+                  <LocalizedValue value={pick(T.contact.addressTitle, language)} />
                 </h4>
                 <p className="text-xs text-slate-700 leading-relaxed font-medium">
-                  {pick(T.contact.addressDesc, language)}
+                  <LocalizedValue value={isAr ? operatingHours.officeAddressAr : operatingHours.officeAddressEn} />
                 </p>
               </div>
 
@@ -291,10 +284,10 @@ export function HVACContactSection() {
                   <Compass className="w-4 h-4" />
                 </div>
                 <h4 className="font-semibold text-xs text-slate-900">
-                  {pick(T.contact.coverageTitle, language)}
+                  <LocalizedValue value={pick(T.contact.coverageTitle, language)} />
                 </h4>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  {pick(T.contact.coverageDesc, language)}
+                  {serviceAreas.filter((area) => area.active && area.id !== 'other').map((area) => isAr ? area.cityNameAr : area.cityNameEn).join(isAr ? '، ' : ', ')}
                 </p>
               </div>
 
@@ -304,16 +297,16 @@ export function HVACContactSection() {
                   <Mail className="w-4 h-4" />
                 </div>
                 <h4 className="font-semibold text-xs text-slate-900">
-                  {pick(T.contact.emailTitle, language)}
+                  <LocalizedValue value={pick(T.contact.emailTitle, language)} />
                 </h4>
                 <a
-                  href="mailto:info@hardgp.com"
+                  href={`mailto:${operatingHours.officeEmail}`}
                   className="text-xs text-[#0EA5E9] hover:underline font-semibold block"
                 >
-                  info@hardgp.com
+                  <LocalizedValue value={operatingHours.officeEmail} />
                 </a>
                 <p className="text-[11px] text-slate-500">
-                  {isAr ? 'استجابة سريعة لكافة الاستفسارات والطلبات' : 'Prompt response to inquiries and requests'}
+                  {isAr ? <InterfaceText id="hvac.HVACContactSection.k1s8ghqi" source="استجابة سريعة لكافة الاستفسارات والطلبات" /> : <InterfaceText id="hvac.HVACContactSection.k1aqfymb" source="Prompt response to inquiries and requests" />}
                 </p>
               </div>
 
@@ -323,12 +316,12 @@ export function HVACContactSection() {
                   <Clock className="w-4 h-4" />
                 </div>
                 <h4 className="font-semibold text-xs text-slate-900">
-                  {pick(T.contact.hoursTitle, language)}
+                  <LocalizedValue value={pick(T.contact.hoursTitle, language)} />
                 </h4>
                 <div className="space-y-1 text-xs text-slate-700">
                   <div className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    <span>{pick(T.contact.hoursRegular, language)}</span>
+                    <span><LocalizedValue value={isAr ? operatingHours.hoursWeekdayAr : operatingHours.hoursWeekdayEn} /></span>
                   </div>
                 </div>
               </div>

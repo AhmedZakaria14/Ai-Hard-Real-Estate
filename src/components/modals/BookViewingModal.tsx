@@ -1,3 +1,8 @@
+import { LocalizedValue } from '../ui/LocalizedValue';
+import { useCustomerFormConfig, ConfiguredFormFields } from '../forms/ConfiguredFormFields';
+import { SearchableSelect } from '../ui/SearchableSelect';
+import { InterfaceText } from '../ui/InterfaceText';
+import { ManagedInput, ManagedTextarea } from '../ui/ManagedElements';
 import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
@@ -19,6 +24,8 @@ export function BookViewingModal({
   property,
   language,
 }: BookViewingModalProps) {
+  const formConfig = useCustomerFormConfig('book_viewing');
+
   const { translations } = useTextOverride();
   const t = translations[language];
 
@@ -52,7 +59,7 @@ export function BookViewingModal({
 
     setIsLoading(true);
     try {
-      const result = await submitCustomerForm({
+      const result = await formConfig.submit({
         formType: 'book_viewing',
         sector: 'realestate',
         name: fullName.trim(),
@@ -109,18 +116,18 @@ export function BookViewingModal({
             <CheckCircle2 className="w-8 h-8" />
           </div>
           <h4 className="text-xl font-bold text-slate-900 font-display-serif">
-            {language === 'en' ? 'Appointment Requested!' : 'تم تقديم طلب الموعد بنجاح!'}
+            {language === 'en' ? <InterfaceText id="realestate.BookViewingModal.kkrz8e1" source="Appointment Requested!" /> : <InterfaceText id="realestate.BookViewingModal.klns7p6" source="تم تقديم طلب الموعد بنجاح!" />}
           </h4>
           <p className="text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
-            {t.modals.bookingSuccess}
+            <LocalizedValue value={t.modals.bookingSuccess} />
           </p>
           <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 text-start text-xs space-y-1.5 text-slate-600">
-            <p><strong>{language === 'en' ? 'Reference Code:' : 'رقم المرجع:'}</strong> <span className="font-mono font-bold text-slate-900">{leadRef}</span></p>
-            <p><strong>{language === 'en' ? 'Property:' : 'العقار:'}</strong> {property?.title?.[language] || ''}</p>
-            <p><strong>{language === 'en' ? 'Format:' : 'النوع:'}</strong> {t.modals.inPerson}</p>
+            <p><strong>{language === 'en' ? <InterfaceText id="realestate.BookViewingModal.k1dodnt7" source="Reference Code:" /> : <InterfaceText id="realestate.BookViewingModal.k1lt3bxh" source="رقم المرجع:" />}</strong> <span className="font-mono font-bold text-slate-900"><LocalizedValue value={leadRef} /></span></p>
+            <p><strong>{language === 'en' ? <InterfaceText id="realestate.BookViewingModal.k86is9i" source="Property:" /> : <InterfaceText id="realestate.BookViewingModal.k176wl4l" source="العقار:" />}</strong> <LocalizedValue value={property?.title?.[language] || ''} /></p>
+            <p><strong>{language === 'en' ? <InterfaceText id="realestate.BookViewingModal.k1ki0y1k" source="Format:" /> : <InterfaceText id="realestate.BookViewingModal.k1bx1lvv" source="النوع:" />}</strong> <LocalizedValue value={t.modals.inPerson} /></p>
             <p className="flex items-center gap-1.5 text-blue-600 font-semibold pt-1 border-t border-slate-200">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>CRM Hook: {crmRef || 'Synced to Real Estate CRM'}</span>
+              <span><InterfaceText id="realestate.BookViewingModal.k1qldqm8" source="CRM Hook: " />{crmRef || <InterfaceText id="realestate.BookViewingModal.k1v0cssw" source="Synced to Real Estate CRM" />}</span>
             </p>
           </div>
           <div className="pt-2 flex flex-col sm:flex-row gap-2 justify-center">
@@ -136,20 +143,21 @@ export function BookViewingModal({
               className="w-full sm:w-auto"
             >
               <MessageSquare className="w-4 h-4" />
-              {t.cta.chatOnWhatsApp}
+              <LocalizedValue value={t.cta.chatOnWhatsApp} />
             </Button>
             <Button variant="secondary" onClick={handleReset}>
-              {language === 'en' ? 'Close Window' : 'إغلاق النافذة'}
+              {language === 'en' ? <InterfaceText id="realestate.BookViewingModal.k1jos4bt" source="Close Window" /> : <InterfaceText id="realestate.BookViewingModal.kd1pq17" source="إغلاق النافذة" />}
             </Button>
           </div>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
+            <ConfiguredFormFields form={formConfig} language={language} />
           {/* Date & Time */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label htmlFor="book-viewing-date" className="block text-xs font-semibold text-slate-700 mb-1">
-                {t.modals.preferredDate} *
+                <LocalizedValue value={t.modals.preferredDate} /> <span className="text-red-600">*</span>
               </label>
               <div className="relative group">
                 {/* Visual custom presentation avoiding browser reversed Arabic placeholders */}
@@ -175,7 +183,7 @@ export function BookViewingModal({
                 </div>
 
                 {/* Overlaid native HTML5 date input */}
-                <input
+                <ManagedInput copyScope="realestate.BookViewingModal"
                   id="book-viewing-date"
                   type="date"
                   required
@@ -190,9 +198,9 @@ export function BookViewingModal({
             </div>
             <div>
               <label htmlFor="book-viewing-time" className="block text-xs font-semibold text-slate-700 mb-1">
-                {t.modals.preferredTime} *
+                <LocalizedValue value={t.modals.preferredTime} /> <span className="text-red-600">*</span>
               </label>
-              <select
+              <SearchableSelect
                 id="book-viewing-time"
                 required
                 aria-required="true"
@@ -203,16 +211,16 @@ export function BookViewingModal({
                 <option value="morning">{language === 'en' ? 'Morning (9:00 AM - 12:00 PM)' : 'الصباح (9:00 ص - 12:00 م)'}</option>
                 <option value="afternoon">{language === 'en' ? 'Afternoon (1:00 PM - 5:00 PM)' : 'الظهيرة (1:00 م - 5:00 م)'}</option>
                 <option value="evening">{language === 'en' ? 'Evening (5:00 PM - 7:30 PM)' : 'المساء (5:00 م - 7:30 م)'}</option>
-              </select>
+              </SearchableSelect>
             </div>
           </div>
 
           {/* Contact Fields */}
           <div>
             <label htmlFor="book-viewing-fullname" className="block text-xs font-semibold text-slate-700 mb-1">
-              {t.contact.fullName} *
+              <LocalizedValue value={t.contact.fullName} /> <span className="text-red-600">*</span>
             </label>
-            <input
+            <ManagedInput copyScope="realestate.BookViewingModal"
               id="book-viewing-fullname"
               type="text"
               required
@@ -227,9 +235,9 @@ export function BookViewingModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label htmlFor="book-viewing-email" className="block text-xs font-semibold text-slate-700 mb-1">
-                {t.contact.email} <span className="text-slate-400 font-normal">({language === 'en' ? 'Optional' : 'اختياري'})</span>
+                <LocalizedValue value={t.contact.email} /> <span className="text-slate-400 font-normal">({language === 'en' ? <InterfaceText id="realestate.BookViewingModal.k1yfbac9" source="Optional" /> : <InterfaceText id="realestate.BookViewingModal.kvjfzt2" source="اختياري" />})</span>
               </label>
-              <input
+              <ManagedInput copyScope="realestate.BookViewingModal"
                 id="book-viewing-email"
                 type="email"
                 onInvalid={() => setContactError(t.propertyDetails.validation.emailInvalid)}
@@ -244,9 +252,9 @@ export function BookViewingModal({
             </div>
             <div>
               <label htmlFor="book-viewing-phone" className="block text-xs font-semibold text-slate-700 mb-1">
-                {t.contact.phone} <span className="text-rose-500" aria-hidden="true">*</span>
+                <LocalizedValue value={t.contact.phone} /> <span className="text-rose-500" aria-hidden="true">*</span>
               </label>
-              <input
+              <ManagedInput copyScope="realestate.BookViewingModal"
                 id="book-viewing-phone"
                 type="tel"
                 required
@@ -263,14 +271,14 @@ export function BookViewingModal({
           </div>
 
           {contactError && (
-            <p role="alert" className="text-xs text-rose-500 font-medium">{contactError}</p>
+            <p role="alert" className="text-xs text-rose-500 font-medium"><LocalizedValue value={contactError} /></p>
           )}
 
           <div>
             <label htmlFor="book-viewing-notes" className="block text-xs font-semibold text-slate-700 mb-1">
-              {t.modals.notes} <span className="text-slate-400 font-normal">({language === 'en' ? 'Optional' : 'اختياري'})</span>
+              <LocalizedValue value={t.modals.notes} /> <span className="text-slate-400 font-normal">({language === 'en' ? <InterfaceText id="realestate.BookViewingModal.k1yfbac9" source="Optional" /> : <InterfaceText id="realestate.BookViewingModal.kvjfzt2" source="اختياري" />})</span>
             </label>
-            <textarea
+            <ManagedTextarea copyScope="realestate.BookViewingModal"
               id="book-viewing-notes"
               rows={2}
               placeholder={language === 'en' ? 'Any questions or special requirements...' : 'أي استفسارات أو متطلبات خاصة...'}
@@ -282,7 +290,7 @@ export function BookViewingModal({
 
           <div className="pt-2">
             <Button type="submit" isLoading={isLoading} className="w-full">
-              {t.modals.confirmBooking}
+              <LocalizedValue value={t.modals.confirmBooking} />
             </Button>
           </div>
         </form>

@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import React, { useState, useEffect } from 'react';
 import { FaqEntity, SectorScope, PublicationStatus } from '../../types/businessEntities';
 import { Language } from '../../types';
@@ -116,7 +117,7 @@ export const CMSFaqFormModal: React.FC<CMSFaqFormModalProps> = ({
             <label className="block text-xs font-bold text-slate-700 mb-1">
               {isAr ? 'القطاع المخصص' : 'Assigned Sector'}
             </label>
-            <select
+            <SearchableSelect
               value={sector}
               onChange={(e) => setSector(e.target.value as SectorScope)}
               className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-white font-semibold focus:ring-2 focus:ring-blue-500"
@@ -126,7 +127,7 @@ export const CMSFaqFormModal: React.FC<CMSFaqFormModalProps> = ({
               <option value="hvac">{isAr ? 'أنظمة التكييف' : 'HVAC Division'}</option>
               <option value="group">{isAr ? 'إدارة المجموعة' : 'Group Holding'}</option>
               <option value="all">{isAr ? 'كافة القطاعات' : 'All Sectors'}</option>
-            </select>
+            </SearchableSelect>
           </div>
 
           <div>
@@ -146,7 +147,7 @@ export const CMSFaqFormModal: React.FC<CMSFaqFormModalProps> = ({
             <label className="block text-xs font-bold text-slate-700 mb-1">
               {isAr ? 'حالة النشر' : 'Publication Status'}
             </label>
-            <select
+            <SearchableSelect
               value={status}
               onChange={(e) => setStatus(e.target.value as PublicationStatus)}
               className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-white font-semibold focus:ring-2 focus:ring-blue-500"
@@ -154,7 +155,7 @@ export const CMSFaqFormModal: React.FC<CMSFaqFormModalProps> = ({
               <option value="published">{isAr ? 'منشور (Published)' : 'Published'}</option>
               <option value="draft">{isAr ? 'مسودة (Draft)' : 'Draft'}</option>
               <option value="archived">{isAr ? 'مؤرشف (Archived)' : 'Archived'}</option>
-            </select>
+            </SearchableSelect>
           </div>
         </div>
 

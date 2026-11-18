@@ -1,3 +1,8 @@
+import { LocalizedValue } from '../ui/LocalizedValue';
+import { useCustomerFormConfig, ConfiguredFormFields } from './ConfiguredFormFields';
+import { SearchableSelect } from '../ui/SearchableSelect';
+import { InterfaceText } from '../ui/InterfaceText';
+import { ManagedInput, ManagedTextarea } from '../ui/ManagedElements';
 import React, { useState } from 'react';
 import {
   User,
@@ -13,7 +18,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { Language, Property } from '../../types';
-import { FormAttachmentMeta } from '../../types/firestore-schema';
+import { FormAttachmentMeta } from '../../types/backend-schema';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import { Button } from '../ui/Button';
 import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSubmissionService';
@@ -30,6 +35,8 @@ export function PropertyInquiryForm({
   language,
   onSuccess,
 }: PropertyInquiryFormProps) {
+  const formConfig = useCustomerFormConfig('property_inquiry');
+
   const { translations } = useTextOverride();
   const t = translations[language];
   const isAr = language === 'ar';
@@ -96,7 +103,7 @@ export function PropertyInquiryForm({
     setIsSubmitting(true);
     setSubmitError('');
     try {
-      const result = await submitCustomerForm({
+      const result = await formConfig.submit({
         formType: 'property_inquiry',
         sector: 'realestate',
         name: fullName,
@@ -153,10 +160,10 @@ export function PropertyInquiryForm({
       {/* Header */}
       <div className="space-y-1">
         <h3 className="text-xl sm:text-2xl font-bold text-slate-900 font-display-serif">
-          {t.propertyDetails.inquiryFormTitle}
+          <LocalizedValue value={t.propertyDetails.inquiryFormTitle} />
         </h3>
         <p className="text-xs sm:text-sm text-slate-600">
-          {t.propertyDetails.inquiryFormSubtitle}
+          <LocalizedValue value={t.propertyDetails.inquiryFormSubtitle} />
         </p>
       </div>
 
@@ -171,14 +178,14 @@ export function PropertyInquiryForm({
             <div className="space-y-1 flex-1">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider">
-                  {t.propertyDetails.inquirySuccess.title}
+                  <LocalizedValue value={t.propertyDetails.inquirySuccess.title} />
                 </span>
                 <span className="text-xs text-emerald-700 font-mono bg-emerald-100/80 px-2 py-0.5 rounded-md font-semibold">
-                  {referenceNumber}
+                  <LocalizedValue value={referenceNumber} />
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-emerald-900 leading-relaxed">
-                {t.propertyDetails.inquirySuccess.message}
+                <LocalizedValue value={t.propertyDetails.inquirySuccess.message} />
               </p>
             </div>
           </div>
@@ -186,24 +193,24 @@ export function PropertyInquiryForm({
           {/* Submission Details & CRM Sync Recap Box */}
           <div className="bg-white p-4 rounded-xl border border-emerald-200/80 text-xs space-y-2 text-slate-700">
             <div className="flex justify-between border-b border-slate-100 pb-1.5">
-              <span className="text-slate-500">{isAr ? 'المرسل:' : 'Inquirer:'}</span>
-              <span className="font-semibold text-slate-900">{fullName}</span>
+              <span className="text-slate-500">{isAr ? <InterfaceText id="realestate.PropertyInquiryForm.kk8l6nj" source="المرسل:" /> : <InterfaceText id="realestate.PropertyInquiryForm.k180718u" source="Inquirer:" />}</span>
+              <span className="font-semibold text-slate-900"><LocalizedValue value={fullName} /></span>
             </div>
             <div className="flex justify-between border-b border-slate-100 pb-1.5">
-              <span className="text-slate-500">{isAr ? 'مزامنة الـ CRM:' : 'CRM Sync Hook:'}</span>
+              <span className="text-slate-500">{isAr ? <InterfaceText id="realestate.PropertyInquiryForm.kpx2rxg" source="مزامنة الـ CRM:" /> : <InterfaceText id="realestate.PropertyInquiryForm.ki2efyx" source="CRM Sync Hook:" />}</span>
               <span className="font-mono font-bold text-blue-600 flex items-center gap-1">
                 <Sparkles className="w-3 h-3" />
-                {crmRefNumber || 'Synced to CRM'}
+                {crmRefNumber || <InterfaceText id="realestate.PropertyInquiryForm.kelqq9w" source="Synced to CRM" />}
               </span>
             </div>
             <div className="flex justify-between border-b border-slate-100 pb-1.5">
-              <span className="text-slate-500">{isAr ? 'وقت الإرسال:' : 'Submitted At:'}</span>
-              <span className="font-medium text-slate-700">{submittedTime}</span>
+              <span className="text-slate-500">{isAr ? <InterfaceText id="realestate.PropertyInquiryForm.k1it8pbk" source="وقت الإرسال:" /> : <InterfaceText id="realestate.PropertyInquiryForm.kra6vej" source="Submitted At:" />}</span>
+              <span className="font-medium text-slate-700"><LocalizedValue value={submittedTime} /></span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500">{isAr ? 'متوسط وقت الرد:' : 'Expected Callback:'}</span>
+              <span className="text-slate-500">{isAr ? <InterfaceText id="realestate.PropertyInquiryForm.kytuzzv" source="متوسط وقت الرد:" /> : <InterfaceText id="realestate.PropertyInquiryForm.k2urv5m" source="Expected Callback:" />}</span>
               <span className="font-bold text-emerald-700">
-                {isAr ? 'أقل من 15 دقيقة' : '< 15 minutes'}
+                {isAr ? <InterfaceText id="realestate.PropertyInquiryForm.knuxpvb" source="أقل من 15 دقيقة" /> : <InterfaceText id="realestate.PropertyInquiryForm.k972pqu" source="< 15 minutes" />}
               </span>
             </div>
           </div>
@@ -223,7 +230,7 @@ export function PropertyInquiryForm({
               className="w-full sm:w-auto flex-1 justify-center"
             >
               <MessageSquare className="w-4 h-4" />
-              <span>{t.cta.chatOnWhatsApp}</span>
+              <span><LocalizedValue value={t.cta.chatOnWhatsApp} /></span>
             </Button>
 
             <Button
@@ -233,19 +240,20 @@ export function PropertyInquiryForm({
               className="text-slate-700 border-slate-300"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>{t.propertyDetails.inquirySuccess.sendAnother}</span>
+              <span><LocalizedValue value={t.propertyDetails.inquirySuccess.sendAnother} /></span>
             </Button>
           </div>
         </div>
       ) : (
         <form noValidate onSubmit={handleSubmit} className="space-y-4">
+            <ConfiguredFormFields form={formConfig} language={language} />
           {submitError && (
             <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-xs space-y-2 text-rose-900 animate-in fade-in">
               <div className="flex items-center gap-2 font-bold text-rose-700">
                 <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{isAr ? 'فشل إرسال الاستفسار' : 'Inquiry Submission Failed'}</span>
+                <span>{isAr ? <InterfaceText id="realestate.PropertyInquiryForm.kf87fjt" source="فشل إرسال الاستفسار" /> : <InterfaceText id="realestate.PropertyInquiryForm.k12cp71f" source="Inquiry Submission Failed" />}</span>
               </div>
-              <p className="leading-relaxed">{submitError}</p>
+              <p className="leading-relaxed"><LocalizedValue value={submitError} /></p>
               <Button
                 type="submit"
                 variant="primary"
@@ -254,7 +262,7 @@ export function PropertyInquiryForm({
                 className="mt-1 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs py-1.5 px-3"
               >
                 <RotateCcw className="w-3.5 h-3.5 me-1" />
-                <span>{isAr ? 'إعادة المحاولة الان' : 'Retry Submission Now'}</span>
+                <span>{isAr ? <InterfaceText id="realestate.PropertyInquiryForm.k13ia9mh" source="إعادة المحاولة الان" /> : <InterfaceText id="realestate.PropertyInquiryForm.k1a8ryf3" source="Retry Submission Now" />}</span>
               </Button>
             </div>
           )}
@@ -262,9 +270,9 @@ export function PropertyInquiryForm({
           {/* Inquiry Topic Dropdown */}
           <div>
             <label htmlFor="prop-inquiry-topic" className="block text-xs font-bold text-slate-700 mb-1.5">
-              {t.propertyDetails.inquiryTopic}
+              <LocalizedValue value={t.propertyDetails.inquiryTopic} />
             </label>
-            <select
+            <SearchableSelect
               id="prop-inquiry-topic"
               value={inquiryTopic}
               onChange={(e) => setInquiryTopic(e.target.value)}
@@ -275,17 +283,17 @@ export function PropertyInquiryForm({
               <option value="pricingTerms">{t.propertyDetails.inquiryTopics.pricingTerms}</option>
               <option value="investmentAdvisory">{t.propertyDetails.inquiryTopics.investmentAdvisory}</option>
               <option value="general">{t.propertyDetails.inquiryTopics.general}</option>
-            </select>
+            </SearchableSelect>
           </div>
 
           {/* Full Name Field */}
           <div>
             <label htmlFor="prop-inquiry-fullname" className="block text-xs font-bold text-slate-700 mb-1">
-              {t.propertyDetails.fullName} <span className="text-rose-500">*</span>
+              <LocalizedValue value={t.propertyDetails.fullName} /> <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
               <User className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5" />
-              <input
+              <ManagedInput copyScope="realestate.PropertyInquiryForm"
                 id="prop-inquiry-fullname"
                 type="text"
                 required
@@ -306,7 +314,7 @@ export function PropertyInquiryForm({
             {touched.fullName && errors.fullName && (
               <p id="prop-inquiry-fullname-error" className="text-[11px] text-rose-500 mt-1 flex items-center gap-1">
                 <AlertCircle className="w-3 h-3 shrink-0" />
-                <span>{errors.fullName}</span>
+                <span><LocalizedValue value={errors.fullName} /></span>
               </p>
             )}
           </div>
@@ -316,11 +324,11 @@ export function PropertyInquiryForm({
             {/* Email Field */}
             <div>
               <label htmlFor="prop-inquiry-email" className="block text-xs font-bold text-slate-700 mb-1">
-                {t.propertyDetails.email} <span className="text-slate-400 font-normal">({isAr ? 'اختياري' : 'Optional'})</span>
+                <LocalizedValue value={t.propertyDetails.email} /> <span className="text-slate-400 font-normal">({isAr ? <InterfaceText id="realestate.PropertyInquiryForm.kvjfzt2" source="اختياري" /> : <InterfaceText id="realestate.PropertyInquiryForm.k1yfbac9" source="Optional" />})</span>
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5" />
-                <input
+                <ManagedInput copyScope="realestate.PropertyInquiryForm"
                   id="prop-inquiry-email"
                   type="email"
                   aria-invalid={Boolean(touched.email && errors.email)}
@@ -339,7 +347,7 @@ export function PropertyInquiryForm({
               {touched.email && errors.email && (
                 <p id="prop-inquiry-email-error" className="text-[11px] text-rose-500 mt-1 flex items-center gap-1">
                   <AlertCircle className="w-3 h-3 shrink-0" />
-                  <span>{errors.email}</span>
+                  <span><LocalizedValue value={errors.email} /></span>
                 </p>
               )}
             </div>
@@ -347,11 +355,11 @@ export function PropertyInquiryForm({
             {/* Phone Field */}
             <div>
               <label htmlFor="prop-inquiry-phone" className="block text-xs font-bold text-slate-700 mb-1">
-                {t.propertyDetails.phone} <span className="text-rose-500" aria-hidden="true">*</span>
+                <LocalizedValue value={t.propertyDetails.phone} /> <span className="text-rose-500" aria-hidden="true">*</span>
               </label>
               <div className="relative">
                 <Phone className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5" />
-                <input
+                <ManagedInput copyScope="realestate.PropertyInquiryForm"
                   id="prop-inquiry-phone"
                   type="tel"
                   required
@@ -371,7 +379,7 @@ export function PropertyInquiryForm({
               {touched.phone && errors.phone && (
                 <p id="prop-inquiry-phone-error" className="text-[11px] text-rose-500 mt-1 flex items-center gap-1">
                   <AlertCircle className="w-3 h-3 shrink-0" />
-                  <span>{errors.phone}</span>
+                  <span><LocalizedValue value={errors.phone} /></span>
                 </p>
               )}
             </div>
@@ -380,9 +388,9 @@ export function PropertyInquiryForm({
           {/* Message Textarea */}
           <div>
             <label htmlFor="prop-inquiry-message" className="block text-xs font-bold text-slate-700 mb-1">
-              {t.propertyDetails.message} <span className="text-slate-400 font-normal">({isAr ? 'اختياري' : 'Optional'})</span>
+              <LocalizedValue value={t.propertyDetails.message} /> <span className="text-slate-400 font-normal">({isAr ? <InterfaceText id="realestate.PropertyInquiryForm.kvjfzt2" source="اختياري" /> : <InterfaceText id="realestate.PropertyInquiryForm.k1yfbac9" source="Optional" />})</span>
             </label>
-            <textarea
+            <ManagedTextarea copyScope="realestate.PropertyInquiryForm"
               id="prop-inquiry-message"
               rows={3}
               aria-invalid={Boolean(touched.message && errors.message)}
@@ -396,11 +404,11 @@ export function PropertyInquiryForm({
                   ? 'border-rose-500 focus:ring-rose-500 bg-rose-50/30'
                   : 'border-slate-300 hover:border-slate-400 focus:border-blue-500 focus:ring-blue-500'
               }`}
-            ></textarea>
+            ></ManagedTextarea>
             {touched.message && errors.message && (
               <p id="prop-inquiry-message-error" className="text-[11px] text-rose-500 mt-1 flex items-center gap-1">
                 <AlertCircle className="w-3 h-3 shrink-0" />
-                <span>{errors.message}</span>
+                <span><LocalizedValue value={errors.message} /></span>
               </p>
             )}
           </div>
@@ -418,8 +426,8 @@ export function PropertyInquiryForm({
             <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>
               {isAr
-                ? 'استفسارك مباشر وخاص. نضمن عدم إرسال أي رسائل غير مرغوب فيها.'
-                : 'Direct broker dispatch. Zero spam guarantee under strict NDA guidelines.'}
+                ? <InterfaceText id="realestate.PropertyInquiryForm.kbpc2o9" source="استفسارك مباشر وخاص. نضمن عدم إرسال أي رسائل غير مرغوب فيها." />
+                : <InterfaceText id="realestate.PropertyInquiryForm.ks9vswh" source="Direct broker dispatch. Zero spam guarantee under strict NDA guidelines." />}
             </span>
           </div>
 
@@ -433,11 +441,11 @@ export function PropertyInquiryForm({
               className="w-full justify-center font-bold shadow-md"
             >
               {isSubmitting ? (
-                <span>{t.propertyDetails.submitting}</span>
+                <span><LocalizedValue value={t.propertyDetails.submitting} /></span>
               ) : (
                 <>
                   <Send className="w-4 h-4" />
-                  <span>{t.propertyDetails.submitInquiry}</span>
+                  <span><LocalizedValue value={t.propertyDetails.submitInquiry} /></span>
                 </>
               )}
             </Button>

@@ -1,3 +1,5 @@
+import { LocalizedValue } from '../ui/LocalizedValue';
+import { InterfaceText } from '../ui/InterfaceText';
 import React, { useState, useEffect } from 'react';
 import { Modal } from '../ui/Modal';
 import { Shield, FileText, Lock, CheckCircle2, AlertCircle, Mail, Phone, ExternalLink } from 'lucide-react';
@@ -57,7 +59,7 @@ export function PrivacyTermsModal({
             }`}
           >
             <Lock className="w-4 h-4" />
-            <span>{isAr ? 'سياسة الخصوصية' : 'Privacy Policy'}</span>
+            <span>{isAr ? <InterfaceText id="realestate.PrivacyTermsModal.kftve3z" source="سياسة الخصوصية" /> : <InterfaceText id="realestate.PrivacyTermsModal.kab2tcv" source="Privacy Policy" />}</span>
           </button>
 
           <button
@@ -70,7 +72,7 @@ export function PrivacyTermsModal({
             }`}
           >
             <FileText className="w-4 h-4" />
-            <span>{isAr ? 'الشروط والأحكام' : 'Terms of Service'}</span>
+            <span>{isAr ? <InterfaceText id="realestate.PrivacyTermsModal.k10byugk" source="الشروط والأحكام" /> : <InterfaceText id="realestate.PrivacyTermsModal.k1b09hn6" source="Terms of Service" />}</span>
           </button>
         </div>
 
@@ -78,10 +80,10 @@ export function PrivacyTermsModal({
         <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs leading-relaxed flex flex-wrap items-center justify-between gap-3 font-mono text-slate-800">
           <div className="flex items-center gap-2">
             <Shield className="w-4 h-4 text-blue-600" />
-            <span>{isAr ? 'ترخيص الهيئة العامة للعقار (REGA):' : 'REGA License:'} <strong>#{policy.complianceFlags.regaLicenseId}</strong></span>
+            <span>{isAr ? <InterfaceText id="realestate.PrivacyTermsModal.k1uhzya8" source="ترخيص الهيئة العامة للعقار (REGA):" /> : <InterfaceText id="realestate.PrivacyTermsModal.k10b2by7" source="REGA License:" />} <strong>#<LocalizedValue value={policy.complianceFlags.regaLicenseId} /></strong></span>
           </div>
           <div className="flex items-center gap-2">
-            <span>{isAr ? 'السجل التجاري:' : 'CR:'} <strong>#{policy.complianceFlags.commercialRegNum}</strong></span>
+            <span>{isAr ? <InterfaceText id="realestate.PrivacyTermsModal.k1hrtke8" source="السجل التجاري:" /> : <InterfaceText id="realestate.PrivacyTermsModal.k17lgmy6" source="CR:" />} <strong>#<LocalizedValue value={policy.complianceFlags.commercialRegNum} /></strong></span>
           </div>
         </div>
 
@@ -91,12 +93,12 @@ export function PrivacyTermsModal({
             <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
             <div className="space-y-1">
               <span className="font-bold block">
-                {isAr ? 'تنبيه النقص التشغيلي للبنود:' : 'Legal Compliance Completeness Notice:'}
+                {isAr ? <InterfaceText id="realestate.PrivacyTermsModal.k42wjui" source="تنبيه النقص التشغيلي للبنود:" /> : <InterfaceText id="realestate.PrivacyTermsModal.klnldet" source="Legal Compliance Completeness Notice:" />}
               </span>
               <p className="text-amber-800 text-[11px]">
                 {isAr
-                  ? 'يتم عرض البنود المعتمدة المكتملة فقط. خضعت الوثيقة لتدقيق النواقص لتفادي نشر أي شروط غير موثقة رسمياً.'
-                  : 'Only fully approved policy text is presented below. Required missing terms are flagged in the admin console for verified legal review rather than fabricating unverified policy details.'}
+                  ? <InterfaceText id="realestate.PrivacyTermsModal.k1qlm7b7" source="يتم عرض البنود المعتمدة المكتملة فقط. خضعت الوثيقة لتدقيق النواقص لتفادي نشر أي شروط غير موثقة رسمياً." />
+                  : <InterfaceText id="realestate.PrivacyTermsModal.k13z31pi" source="Only fully approved policy text is presented below. Required missing terms are flagged in the admin console for verified legal review rather than fabricating unverified policy details." />}
               </p>
             </div>
           </div>
@@ -109,17 +111,17 @@ export function PrivacyTermsModal({
               <div key={sec.id} className="space-y-2">
                 <h3 className="font-bold text-slate-900 text-base font-display-serif flex items-center gap-2">
                   <Shield className="w-4 h-4 text-blue-600" />
-                  <span>{isAr ? sec.heading.ar : sec.heading.en}</span>
+                  <span><LocalizedValue value={isAr ? sec.heading.ar : sec.heading.en} /></span>
                 </h3>
                 <p className="whitespace-pre-line text-slate-600 leading-relaxed">
-                  {isAr ? sec.body.ar : sec.body.en}
+                  <LocalizedValue value={isAr ? sec.body.ar : sec.body.en} />
                 </p>
               </div>
             ))}
 
             <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-4 font-mono text-xs text-slate-800">
-              <span>✉ Data Controller: {policy.complianceFlags.dataControllerEmail}</span>
-              <span>📞 Phone: +966 13 800 4273</span>
+              <span><InterfaceText id="realestate.PrivacyTermsModal.k1l6d6zq" source="✉ Data Controller: " /><LocalizedValue value={policy.complianceFlags.dataControllerEmail} /></span>
+              <span><InterfaceText id="realestate.PrivacyTermsModal.kykqjyi" source="📞 Phone: +966 13 800 4273" /></span>
             </div>
           </div>
         )}
@@ -131,10 +133,10 @@ export function PrivacyTermsModal({
               <div key={sec.id} className="space-y-2">
                 <h3 className="font-bold text-slate-900 text-base font-display-serif flex items-center gap-2">
                   <FileText className="w-4 h-4 text-blue-600" />
-                  <span>{isAr ? sec.heading.ar : sec.heading.en}</span>
+                  <span><LocalizedValue value={isAr ? sec.heading.ar : sec.heading.en} /></span>
                 </h3>
                 <p className="whitespace-pre-line text-slate-600 leading-relaxed">
-                  {isAr ? sec.body.ar : sec.body.en}
+                  <LocalizedValue value={isAr ? sec.body.ar : sec.body.en} />
                 </p>
               </div>
             ))}
@@ -147,7 +149,7 @@ export function PrivacyTermsModal({
             onClick={onClose}
             className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer"
           >
-            {isAr ? 'إغلاق المستند' : 'Close Document'}
+            {isAr ? <InterfaceText id="realestate.PrivacyTermsModal.k14yt4b3" source="إغلاق المستند" /> : <InterfaceText id="realestate.PrivacyTermsModal.k1a8feo0" source="Close Document" />}
           </button>
         </div>
       </div>

@@ -2,7 +2,7 @@
  * HARD GROUP - CMS DRAFT-PREVIEW-PUBLISH WORKFLOW TYPES
  */
 
-import { AdminRole, SectorId } from '../../types/firestore-schema';
+import { AdminRole, SectorId } from '../../types/backend-schema';
 
 export type PolicyCategory = 'required_fields' | 'translations' | 'references' | 'media';
 

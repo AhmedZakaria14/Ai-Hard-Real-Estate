@@ -1,4 +1,4 @@
-import { LocalizedText, SectorId } from '../types/firestore-schema';
+import { LocalizedText, SectorId } from '../types/backend-schema';
 import { SectorScope } from '../types/businessEntities';
 
 export type RegisteredSectionType =

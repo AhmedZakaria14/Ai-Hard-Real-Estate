@@ -76,16 +76,16 @@ export interface ConstructionOfficeLocation {
 
 // Default Seed Content for Hero & Company
 export const DEFAULT_HERO_CONTENT: ConstructionHeroContent = {
-  badgeAr: 'شركة هارد للمقاولات العامة والتطوير الإنشائي',
+  badgeAr: 'هارد للمقاولات العامة والإنشائية',
   badgeEn: 'HARD General Contracting & Construction Development',
   headlineAr: 'نبني صروح المستقبل بأعلى معايير الهندسة والإتقان',
   headlineEn: 'Building the Future with Supreme Engineering Standards & Mastery',
   subtitleAr:
-    'المقاولات العامة والإنشاءات الكبرى والتشطيبات الفاخرة وإدارة المشاريع المتكاملة للمشاريع السكنية والتجارية في المملكة العربية السعودية.',
+    'المقاولات العامة والإنشاءات الكبرى والتشطيبات الفاخرة وإدارة المشاريع المتكاملة للمشاريع السكنية والتجارية في المنطقة الشرقية.',
   subtitleEn:
-    'General contracting, landmark construction, ultra-luxury fit-out, and turnkey project governance across the Kingdom of Saudi Arabia.',
+    'General contracting, landmark construction, ultra-luxury fit-out, and turnkey project governance across the Eastern Province.',
   bgImageUrl:
-    'https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=1600&q=80',
+    'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1600&q=80',
   stats: {
     projectsCount: '٤٥+',
     buaM2Total: '١٨٠,٠٠٠+ م²',
@@ -113,9 +113,9 @@ export const DEFAULT_COMPANY_CONTENT: ConstructionCompanyContent = {
   aboutTitleAr: 'شريكك الهندسي الموثوق في البناء والتشييد المتكامل',
   aboutTitleEn: 'Your Trusted Engineering Partner in Integrated Construction',
   aboutTextAr:
-    'تأسست شركة هارد للمقاولات لتكون ركيزة أساسية في قطاع المقاولات والإنشاءات بالمملكة، حيث نجمع بين الخبرة الهندسية المتعمقة وأحدث المعدات والتقنيات الإنشائية لتقديم مشاريع متكاملة من التخطيط والتصميم وحتى تسليم المفتاح بأعلى معايير كود البناء السعودي.',
+    'تأسست مؤسسة عبد المحسن الدوسري (هارد) للمقاولات لتكون ركيزة أساسية في قطاع المقاولات والإنشاءات بالمنطقة الشرقية، حيث نجمع بين الخبرة الهندسية المتعمقة وأحدث المعدات والتقنيات الإنشائية لتقديم مشاريع متكاملة من التخطيط والتصميم وحتى تسليم المفتاح بأعلى معايير كود البناء السعودي.',
   aboutTextEn:
-    'HARD Contracting was founded as a cornerstone in the Kingdom’s contracting and construction sector, combining deep engineering expertise with state-of-the-art machinery to deliver turnkey projects adhering strictly to the Saudi Building Code (SBC).',
+    'Abdul Mohsen Al Dosari Establishment (HARD) was founded as a cornerstone in the Eastern Province’s contracting and construction sector, combining deep engineering expertise with state-of-the-art machinery to deliver turnkey projects adhering strictly to the Saudi Building Code (SBC).',
   visionAr:
     'أن نكون الخيار الأول في قطاع المقاولات العامة والإنشاءات الكبرى عبر تقديم حلول هندسية مبتكرة ومستدامة تلبي تطلعات رؤية السعودية ٢٠٣٠.',
   visionEn:

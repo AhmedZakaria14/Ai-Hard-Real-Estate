@@ -1,6 +1,7 @@
 import { hardPublishableKey, hardSupabaseUrl } from '../db/hardCatalog';
 import type { Language } from '../../types';
-import type { FormAttachmentMeta } from '../../types/firestore-schema';
+import type { FormAttachmentMeta } from '../../types/backend-schema';
+import { assertMediaReady } from '../mediaSaveGuard';
 
 export type CustomerFormType =
   | 'general_contact'
@@ -29,6 +30,7 @@ export interface FormSubmissionPayload {
   details?: Record<string, any>;
   attachments?: FormAttachmentMeta[];
   idempotencyKey?: string;
+  schemaVersion?: string;
 }
 
 export interface FormSubmissionResult {
@@ -95,7 +97,7 @@ export function validateFormPayload(
       : 'Full name is required (at least 2 characters).';
   }
 
-  const phoneTrimmed = payload.phone ? payload.phone.trim().replace(/\s+/g, '') : '';
+  const phoneTrimmed = payload.phone ? normalizePhone(payload.phone).trim().replace(/\s+/g, '') : '';
   const phoneDigits = phoneTrimmed.replace(/\D/g, '');
   if (!phoneTrimmed) {
     if (!isProjectContact || (!isBrochure && !emailTrimmed)) {
@@ -106,13 +108,16 @@ export function validateFormPayload(
       ? 'رقم الهاتف يجب أن يحتوي على 7 أرقام على الأقل.'
       : 'Phone number must contain at least 7 digits.';
   } else if (
-    ((isPropertyContact || isProjectContact || (emailOptional && !emailTrimmed)) && phoneDigits.length > 20)
-    || ((isPropertyContact || isProjectContact) && /[^\d()+.-]/.test(phoneTrimmed))
+    phoneDigits.length > 20 || /[^\d()+.-]/.test(phoneTrimmed)
   ) {
     errors.phone = isAr ? 'يرجى إدخال رقم هاتف صحيح.' : 'Please enter a valid phone number.';
   }
 
   return errors;
+}
+
+function normalizePhone(value: string) {
+  return value.replace(/[٠-٩]/g, (char) => String(char.charCodeAt(0) - 1632)).replace(/[۰-۹]/g, (char) => String(char.charCodeAt(0) - 1776));
 }
 
 /**
@@ -139,6 +144,7 @@ async function retryOperation<T>(operation: () => Promise<T>, retries = 3, delay
 export async function submitCustomerForm(
   payload: FormSubmissionPayload
 ): Promise<FormSubmissionResult> {
+  assertMediaReady();
   const lang = payload.language || 'ar';
   const isAr = lang === 'ar';
 
@@ -151,7 +157,10 @@ export async function submitCustomerForm(
     );
   }
 
-  const normalizedPayload = { ...payload, email: payload.email.trim().toLowerCase() };
+  const normalizedPayload = { ...payload, email: payload.email.trim().toLowerCase(), phone: payload.phone ? normalizePhone(payload.phone) : undefined };
+  if (new TextEncoder().encode(JSON.stringify({...normalizedPayload, schemaVersion: payload.schemaVersion ?? '1.0.0'})).length > 60000) {
+    throw new FormValidationError(isAr ? 'بيانات الطلب تتجاوز الحجم المسموح. اختصر التفاصيل قليلًا ثم أعد الإرسال؛ لم تُحذف بياناتك.' : 'The request exceeds the allowed size. Shorten the details and retry; your entries are preserved.', {message: isAr ? 'الطلب طويل جدًا.' : 'Request is too long.'});
+  }
   const key = submissionKey(normalizedPayload);
   const pending = pendingSubmissions.get(key);
   if (pending) return pending;
@@ -166,7 +175,7 @@ export async function submitCustomerForm(
 }
 
 async function saveSubmission(payload: FormSubmissionPayload, isAr: boolean): Promise<FormSubmissionResult> {
-  const activeSchemaVersion = '1.0.0';
+  const activeSchemaVersion = payload.schemaVersion ?? '1.0.0';
 
   const prefixMap: Record<CustomerFormType, string> = {
     general_contact: 'CNT',

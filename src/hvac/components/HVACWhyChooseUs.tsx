@@ -1,3 +1,4 @@
+import { LocalizedValue } from '../../components/ui/LocalizedValue';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import React from 'react';
 import {
@@ -28,10 +29,10 @@ export function HVACWhyChooseUs() {
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-12 sm:mb-16">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight">
-            {pick(T.whyUs.title, language)}
+            <LocalizedValue value={pick(T.whyUs.title, language)} />
           </h2>
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-            {pick(T.whyUs.subtitle, language)}
+            <LocalizedValue value={pick(T.whyUs.subtitle, language)} />
           </p>
         </div>
 
@@ -51,11 +52,11 @@ export function HVACWhyChooseUs() {
                 </div>
 
                 <h3 className="text-lg font-semibold text-slate-900">
-                  {pick(badge.title, language)}
+                  <LocalizedValue value={pick(badge.title, language)} />
                 </h3>
 
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  {pick(badge.desc, language)}
+                  <LocalizedValue value={pick(badge.desc, language)} />
                 </p>
               </div>
             );

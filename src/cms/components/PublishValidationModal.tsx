@@ -22,7 +22,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { Language } from '../../types';
-import { canPublish, AdminRole } from '../../types/firestore-schema';
+import { canPublish, AdminRole } from '../../types/backend-schema';
 import { validateEntityForPublish } from '../../lib/cms/publicationValidation';
 import { publishEntityWithAtomicBatch } from '../../lib/cms/publicationService';
 import { PublisherUser } from '../../lib/cms/publicationTypes';

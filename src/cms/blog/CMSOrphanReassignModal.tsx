@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import React, { useState } from 'react';
 import { AlertTriangle, ArrowRight, ArrowLeft, CheckCircle2, X, RefreshCw } from 'lucide-react';
 import { Language, BlogCategory, BlogAuthor } from '../../types';
@@ -125,7 +126,7 @@ export const CMSOrphanReassignModal: React.FC<CMSOrphanReassignModalProps> = ({
             </label>
 
             {entityType === 'category' ? (
-              <select
+              <SearchableSelect
                 value={selectedTargetId}
                 onChange={(e) => setSelectedTargetId(e.target.value)}
                 className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-500"
@@ -136,9 +137,9 @@ export const CMSOrphanReassignModal: React.FC<CMSOrphanReassignModalProps> = ({
                     {isAr ? c.name.ar : c.name.en}
                   </option>
                 ))}
-              </select>
+              </SearchableSelect>
             ) : (
-              <select
+              <SearchableSelect
                 value={selectedTargetId}
                 onChange={(e) => setSelectedTargetId(e.target.value)}
                 className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-500"
@@ -149,7 +150,7 @@ export const CMSOrphanReassignModal: React.FC<CMSOrphanReassignModalProps> = ({
                     {isAr ? a.name.ar : a.name.en} ({isAr ? a.role.ar : a.role.en})
                   </option>
                 ))}
-              </select>
+              </SearchableSelect>
             )}
           </div>
 

@@ -1,3 +1,5 @@
+import { LocalizedValue } from './LocalizedValue';
+import { InterfaceText } from './InterfaceText';
 import React from 'react';
 import { cn } from '../../lib/utils';
 
@@ -48,7 +50,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           className={cn(baseStyles, variants[variant], sizes[size], className)}
           {...(props as unknown as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
         >
-          {children}
+          <LocalizedValue value={children} />
         </a>
       );
     }
@@ -82,7 +84,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 d="M4 12a8 8 0 018-8v8H4z"
               ></path>
             </svg>
-            <span>Loading...</span>
+            <span><InterfaceText id="realestate.Button.k6kndir" source="Loading..." /></span>
           </span>
         ) : (
           children

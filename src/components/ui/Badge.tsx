@@ -1,3 +1,4 @@
+import { LocalizedValue } from './LocalizedValue';
 import React from 'react';
 import { cn } from '../../lib/utils';
 
@@ -23,7 +24,7 @@ export function Badge({ className, variant = 'primary', children, ...props }: Ba
 
   return (
     <div className={cn(base, variants[variant], className)} {...props}>
-      {children}
+      <LocalizedValue value={children} />
     </div>
   );
 }

@@ -1,3 +1,6 @@
+import { LocalizedValue } from '../../components/ui/LocalizedValue';
+import { InterfaceText } from '../../components/ui/InterfaceText';
+import { ManagedInput, ManagedA, ManagedImg, ManagedButton } from '../../components/ui/ManagedElements';
 import { usePageMedia } from '../../lib/pageMedia';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import React, { useState } from 'react';
@@ -88,20 +91,20 @@ export function ProjectsSection() {
           <div className="space-y-3 max-w-3xl text-start">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#e8f4fc] border border-[#d0e9fa] text-[#0072b8] text-xs font-bold shadow-2xs">
               <Building2 className="w-3.5 h-3.5 text-[#0072b8]" />
-              <span>{t.projects.badge}</span>
+              <span><LocalizedValue value={t.projects.badge} /></span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-black font-display-serif text-[#0f243e] tracking-tight">
-              {t.projects.title}
+              <LocalizedValue value={t.projects.title} />
             </h2>
             <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-medium">
-              {t.projects.subtitle}
+              <LocalizedValue value={t.projects.subtitle} />
             </p>
           </div>
 
           {/* Search Input */}
           <div className="relative w-full sm:w-72">
             <Search className="w-4 h-4 text-slate-500 absolute top-1/2 -translate-y-1/2 start-3.5 pointer-events-none" />
-            <input
+            <ManagedInput copyScope="construction.ProjectsSection"
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -124,7 +127,7 @@ export function ProjectsSection() {
                   : 'bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200 border border-slate-200'
               }`}
             >
-              {tab.label}
+              <LocalizedValue value={tab.label} />
             </button>
           ))}
         </div>
@@ -134,14 +137,14 @@ export function ProjectsSection() {
           <div className="p-12 rounded-3xl bg-[#f8fafc] border border-slate-200 text-center space-y-3">
             <Building2 className="w-10 h-10 text-slate-400 mx-auto" />
             <div className="text-base font-bold text-slate-700">
-              {isAr ? 'لا توجد مشاريع تطابق البحث الحالي' : 'No projects match your filter criteria'}
+              {isAr ? <InterfaceText id="construction.ProjectsSection.k1wg683z" source="لا توجد مشاريع تطابق البحث الحالي" /> : <InterfaceText id="construction.ProjectsSection.k1ntf577" source="No projects match your filter criteria" />}
             </div>
             <button
               type="button"
               onClick={resetProjectFilters}
               className="px-4 py-2 text-xs font-bold text-[#009ee2] hover:underline cursor-pointer"
             >
-              {isAr ? 'إعادة ضبط التصفية' : 'Reset Filters'}
+              {isAr ? <InterfaceText id="construction.ProjectsSection.kxz7uy3" source="إعادة ضبط التصفية" /> : <InterfaceText id="construction.ProjectsSection.k1ljj5w3" source="Reset Filters" />}
             </button>
           </div>
         ) : (
@@ -164,7 +167,7 @@ export function ProjectsSection() {
                   className="bg-[#f8fafc] border border-sky-100 rounded-2xl overflow-hidden hover:border-[#009ee2] hover:shadow-lg transition-all duration-300 flex flex-col justify-between group shadow-sm"
                 >
                   {/* Project Image & Status Badge (Clickable) */}
-                  <a
+                  <ManagedA copyScope="construction.ProjectsSection"
                     href={projectUrl}
                     onClick={(e) => {
                       e.preventDefault();
@@ -173,7 +176,7 @@ export function ProjectsSection() {
                     className="relative aspect-16/10 overflow-hidden bg-slate-900 block cursor-pointer"
                     aria-label={isAr ? proj.titleAr || '' : proj.titleEn || ''}
                   >
-                    <img
+                    <ManagedImg copyScope="construction.ProjectsSection"
                       src={proj.image || projectPlaceholderImage}
                       alt={isAr ? proj.titleAr || '' : proj.titleEn || ''}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -186,26 +189,26 @@ export function ProjectsSection() {
                       className={`absolute top-3 end-3 px-3 py-1 rounded-lg text-[11px] font-bold border backdrop-blur-md flex items-center gap-1.5 shadow-2xs ${statusInfo.classes || ''}`}
                     >
                       <StatusIcon className="w-3.5 h-3.5" />
-                      <span>{statusInfo.label || ''}</span>
+                      <span><LocalizedValue value={statusInfo.label || ''} /></span>
                     </div>
 
                     {/* Category & City Label */}
                     <div className="absolute bottom-3 start-3 flex items-center gap-2">
                       <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#0f243e]/85 text-sky-200 border border-sky-400/30 backdrop-blur-xs">
-                        {getLocalizedCategoryLabel(proj.category, language)}
+                        <LocalizedValue value={getLocalizedCategoryLabel(proj.category, language)} />
                       </span>
                       <span className="text-xs font-semibold text-slate-200">
-                        {isAr ? proj.cityAr : proj.cityEn}
+                        <LocalizedValue value={isAr ? proj.cityAr : proj.cityEn} />
                       </span>
                     </div>
-                  </a>
+                  </ManagedA>
 
                   {/* Body Content */}
                   <div className="p-6 space-y-4 flex-1 flex flex-col justify-between text-start">
                     <div className="space-y-2">
                       <div className="flex items-center gap-1.5 text-xs text-slate-500">
                         <MapPin className="w-3.5 h-3.5 text-[#009ee2] shrink-0" />
-                        <span>{isAr ? proj.locationAr : proj.locationEn}</span>
+                        <span><LocalizedValue value={isAr ? proj.locationAr : proj.locationEn} /></span>
                       </div>
 
                       <a
@@ -217,12 +220,12 @@ export function ProjectsSection() {
                         className="block focus:outline-none"
                       >
                         <h3 className="text-lg font-bold text-[#0f243e] font-display-serif group-hover:text-[#009ee2] transition-colors cursor-pointer">
-                          {isAr ? proj.titleAr : proj.titleEn}
+                          <LocalizedValue value={isAr ? proj.titleAr : proj.titleEn} />
                         </h3>
                       </a>
 
                       <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
-                        {formatConstructionDigits(isAr ? proj.descriptionAr : proj.descriptionEn, language)}
+                        <LocalizedValue value={formatConstructionDigits(isAr ? proj.descriptionAr : proj.descriptionEn, language)} />
                       </p>
                     </div>
 
@@ -230,11 +233,11 @@ export function ProjectsSection() {
                     <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200 text-[11px] text-slate-600 font-medium">
                       <div className="flex items-center gap-1.5 min-w-0">
                         <Layers className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                        <span className="truncate">{formatAreaBUA(proj.buaM2, language)}</span>
+                        <span className="truncate"><LocalizedValue value={formatAreaBUA(proj.buaM2, language)} /></span>
                       </div>
                       <div className="flex items-center gap-1.5 min-w-0">
                         <Calendar className="w-3.5 h-3.5 text-[#0072b8] shrink-0" />
-                        <span className="truncate">{formatConstructionDigits(proj.year, language)}</span>
+                        <span className="truncate"><LocalizedValue value={formatConstructionDigits(proj.year, language)} /></span>
                       </div>
                     </div>
 
@@ -249,10 +252,10 @@ export function ProjectsSection() {
                         className="flex-1 py-2.5 px-3 rounded-xl bg-white hover:bg-sky-50 text-xs font-bold text-slate-800 hover:text-[#009ee2] border border-slate-200 flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
                       >
                         <Eye className="w-3.5 h-3.5 text-[#009ee2]" />
-                        <span>{t.projects.viewSpecs}</span>
+                        <span><LocalizedValue value={t.projects.viewSpecs} /></span>
                       </a>
 
-                      <button
+                      <ManagedButton copyScope="construction.ProjectsSection"
                         type="button"
                         onClick={() =>
                           openQuoteModal({
@@ -274,7 +277,7 @@ export function ProjectsSection() {
                         title={t.projects.inquireSimilar}
                       >
                         <ArrowIcon className="w-4 h-4" />
-                      </button>
+                      </ManagedButton>
                     </div>
                   </div>
                 </div>

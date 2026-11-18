@@ -1,3 +1,6 @@
+import { LocalizedValue } from '../../components/ui/LocalizedValue';
+import { InterfaceText } from '../../components/ui/InterfaceText';
+import { ManagedButton } from '../../components/ui/ManagedElements';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import React, { useState, useEffect } from 'react';
 import {
@@ -98,7 +101,7 @@ export function HVACNavbar({ onNavigatePage }: HVACNavbarProps) {
                 activeSection === link.href ? 'border-[#034DA2] text-[#034DA2] font-semibold' : 'border-transparent'
               }`}
             >
-              {link.label}
+              <LocalizedValue value={link.label} />
             </a>
           ))}
         </nav>
@@ -106,15 +109,15 @@ export function HVACNavbar({ onNavigatePage }: HVACNavbarProps) {
         {/* Right CTA Actions */}
         <div className="hidden sm:flex items-center gap-3">
           {/* Language toggle: globe icon showing the other language */}
-          <button
+          <ManagedButton copyScope="hvac.HVACNavbar"
             type="button"
             onClick={toggleLanguage}
             className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer"
             title={language === 'ar' ? 'Switch to English' : 'التحويل للعربية'}
           >
             <Globe className="w-4 h-4 text-[#0EA5E9]" />
-            <span className="font-semibold">{language === 'en' ? 'العربية' : 'EN'}</span>
-          </button>
+            <span className="font-semibold">{language === 'en' ? <InterfaceText id="hvac.HVACNavbar.k1agd4ix" source="العربية" /> : <InterfaceText id="hvac.HVACNavbar.k93lo3u" source="EN" />}</span>
+          </ManagedButton>
 
           {/* Cyan "Book Service Now" button */}
           <button
@@ -123,7 +126,7 @@ export function HVACNavbar({ onNavigatePage }: HVACNavbarProps) {
             className="px-4 py-2.5 rounded-xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white font-semibold text-xs sm:text-sm transition-all flex items-center gap-2 shadow-xs cursor-pointer"
           >
             <Calendar className="w-4 h-4" />
-            <span className="whitespace-nowrap">{pick(T.nav.bookServiceBtn, language)}</span>
+            <span className="whitespace-nowrap"><LocalizedValue value={pick(T.nav.bookServiceBtn, language)} /></span>
           </button>
         </div>
 
@@ -135,17 +138,17 @@ export function HVACNavbar({ onNavigatePage }: HVACNavbarProps) {
             className="p-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200 flex items-center gap-1"
           >
             <Globe className="w-4 h-4 text-[#0EA5E9]" />
-            <span>{language === 'en' ? 'AR' : 'EN'}</span>
+            <span>{language === 'en' ? <InterfaceText id="hvac.HVACNavbar.kgvn5iy" source="AR" /> : <InterfaceText id="hvac.HVACNavbar.k93lo3u" source="EN" />}</span>
           </button>
 
-          <button
+          <ManagedButton copyScope="hvac.HVACNavbar"
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 rounded-xl bg-slate-100 text-slate-800 border border-slate-200"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          </ManagedButton>
         </div>
       </div>
 
@@ -166,7 +169,7 @@ export function HVACNavbar({ onNavigatePage }: HVACNavbarProps) {
                   }`}
                 >
                   <Icon className="w-4 h-4 text-[#0EA5E9]" />
-                  <span>{link.label}</span>
+                  <span><LocalizedValue value={link.label} /></span>
                 </a>
               );
             })}
@@ -183,7 +186,7 @@ export function HVACNavbar({ onNavigatePage }: HVACNavbarProps) {
               className="w-full py-2.5 rounded-xl bg-[#0EA5E9] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-xs"
             >
               <Calendar className="w-4 h-4" />
-              <span className="whitespace-nowrap">{pick(T.nav.bookServiceBtn, language)}</span>
+              <span className="whitespace-nowrap"><LocalizedValue value={pick(T.nav.bookServiceBtn, language)} /></span>
             </button>
 
             {onNavigatePage && (
@@ -198,7 +201,7 @@ export function HVACNavbar({ onNavigatePage }: HVACNavbarProps) {
                 className="w-full py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
               >
                 <Layers className="w-3.5 h-3.5" />
-                <span>{pick(T.nav.portalBack, language)}</span>
+                <span><LocalizedValue value={pick(T.nav.portalBack, language)} /></span>
               </a>
             )}
           </div>

@@ -1,3 +1,5 @@
+import { LocalizedValue } from '../../components/ui/LocalizedValue';
+import { InterfaceText } from '../../components/ui/InterfaceText';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import React from 'react';
 import { Phone, AlertCircle } from 'lucide-react';
@@ -19,11 +21,11 @@ export function EmergencyTopBar() {
           </span>
 
           <span className="font-semibold text-white tracking-wide shrink-0">
-            {pick(T.emergencyBar.badge, language)}
+            <LocalizedValue value={pick(T.emergencyBar.badge, language)} />
           </span>
 
           <span className="text-slate-400 hidden md:inline text-xs truncate">
-            • {pick(T.emergencyBar.coverage, language)}
+            • <LocalizedValue value={pick(T.emergencyBar.coverage, language)} />
           </span>
         </div>
 
@@ -37,11 +39,9 @@ export function EmergencyTopBar() {
               <Phone className="w-3 h-3" />
             </div>
             <span className="hidden sm:inline text-xs text-slate-300">
-              {isAr ? 'طوارئ التكييف:' : 'Emergency:'}
+              {isAr ? <InterfaceText id="hvac.EmergencyTopBar.k1p8exbn" source="طوارئ التكييف:" /> : <InterfaceText id="hvac.EmergencyTopBar.k1470ao8" source="Emergency:" />}
             </span>
-            <bdi dir="ltr" className="font-bold text-xs sm:text-sm tracking-wider text-white group-hover:text-[#F97316]">
-              +966 55 064 1000
-            </bdi>
+            <bdi dir="ltr" className="font-bold text-xs sm:text-sm tracking-wider text-white group-hover:text-[#F97316]"><LocalizedValue value="+966 55 064 1000" /></bdi>
           </a>
         </div>
       </div>

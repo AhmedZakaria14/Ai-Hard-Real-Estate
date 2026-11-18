@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import { Inbox, CalendarDays, RefreshCw, Archive, ArchiveRestore, Paperclip } from 'lucide-react';
 import { downloadCsv } from '../../lib/csv';
 import SupabaseDataExport from '../catalog/SupabaseDataExport';
@@ -244,9 +245,9 @@ export default function OperationsWorkspace({ initialSection, adminEmail, langua
             onClick={() => void downloadAttachment(attachment)}><Paperclip className="h-3.5 w-3.5" />تنزيل {attachment.fileName}</button>
         ))}
         <label className="block">الحالة{' '}
-          <select value={row.status} disabled={busy} onChange={(event) => void updateStatus(row.id, event.target.value as Submission['status'])} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 outline-none">
+          <SearchableSelect value={row.status} disabled={busy} onChange={(event) => void updateStatus(row.id, event.target.value as Submission['status'])} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 outline-none">
             {Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-          </select>
+          </SearchableSelect>
         </label>
         <button type="button" disabled={busy} className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100 disabled:opacity-40"
           onClick={() => void archiveRequest(row.id, !isArchive)}>{isArchive ? <ArchiveRestore className="h-3.5 w-3.5" /> : <Archive className="h-3.5 w-3.5" />}{isArchive ? 'استعادة إلى الطلبات' : 'نقل إلى الأرشيف'}</button>

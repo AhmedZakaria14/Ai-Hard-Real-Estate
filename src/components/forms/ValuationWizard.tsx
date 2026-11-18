@@ -1,3 +1,8 @@
+import { LocalizedValue } from '../ui/LocalizedValue';
+import { useCustomerFormConfig, ConfiguredFormFields } from './ConfiguredFormFields';
+import { SearchableSelect } from '../ui/SearchableSelect';
+import { InterfaceText } from '../ui/InterfaceText';
+import { ManagedInput, ManagedTextarea } from '../ui/ManagedElements';
 import React, { useState } from 'react';
 import {
   Building2,
@@ -21,7 +26,7 @@ import {
   Award,
 } from 'lucide-react';
 import { Language, PropertyType } from '../../types';
-import { FormAttachmentMeta } from '../../types/firestore-schema';
+import { FormAttachmentMeta } from '../../types/backend-schema';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -39,6 +44,8 @@ interface ValuationWizardProps {
 }
 
 export function ValuationWizard({ language, onSuccess, isModal = false }: ValuationWizardProps) {
+  const formConfig = useCustomerFormConfig('valuation_request');
+
   const { translations } = useTextOverride();
   const t = translations[language];
   const isAr = language === 'ar';
@@ -171,7 +178,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
 
     setIsSubmitting(true);
     try {
-      const result = await submitCustomerForm({
+      const result = await formConfig.submit({
         formType: 'valuation_request',
         sector: 'realestate',
         name: fullName,
@@ -237,21 +244,21 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
       <div className="space-y-4 border-b border-slate-100 pb-6">
         <div className="flex items-center justify-between">
           <Badge variant="primary">
-            {isAr ? 'حاسبة التقييم العقاري التقريبي' : 'Indicative Property Valuation'}
+            {isAr ? <InterfaceText id="realestate.ValuationWizard.k1duforp" source="حاسبة التقييم العقاري التقريبي" /> : <InterfaceText id="realestate.ValuationWizard.kqn4t9f" source="Indicative Property Valuation" />}
           </Badge>
           <span className="text-xs font-semibold text-slate-500">
-            {isAr ? `الخطوة ${currentStep} من ${totalSteps}` : `Step ${currentStep} of ${totalSteps}`}
+            <LocalizedValue value={isAr ? `الخطوة ${currentStep} من ${totalSteps}` : `Step ${currentStep} of ${totalSteps}`} />
           </span>
         </div>
 
         <div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-display-serif">
-            {isAr ? 'تقييم عقاري فوري وخطة تسويق شاملة' : 'Complimentary Property Valuation & CMA'}
+            {isAr ? <InterfaceText id="realestate.ValuationWizard.kq4euq9" source="تقييم عقاري فوري وخطة تسويق شاملة" /> : <InterfaceText id="realestate.ValuationWizard.k1mcqzw" source="Complimentary Property Valuation & CMA" />}
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 mt-1">
             {isAr
-              ? 'أدخل مواصفات عقارك للحصول على تقدير أولي وإرسال طلب متابعة.'
-              : 'Provide your property specifications for an instant algorithmic benchmark and a tailored brokerage listing proposal.'}
+              ? <InterfaceText id="realestate.ValuationWizard.kcaav0o" source="أدخل مواصفات عقارك للحصول على تقدير أولي وإرسال طلب متابعة." />
+              : <InterfaceText id="realestate.ValuationWizard.k4v5y4b" source="Provide your property specifications for an instant algorithmic benchmark and a tailored brokerage listing proposal." />}
           </p>
         </div>
 
@@ -265,16 +272,16 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
           </div>
           <div className="grid grid-cols-4 text-[11px] font-medium text-slate-500">
             <span className={currentStep >= 1 ? 'text-blue-600 font-bold' : ''}>
-              {isAr ? '1. المواصفات' : '1. Architecture'}
+              {isAr ? <InterfaceText id="realestate.ValuationWizard.ku38cdq" source="1. المواصفات" /> : <InterfaceText id="realestate.ValuationWizard.k1w6axe5" source="1. Architecture" />}
             </span>
             <span className={`text-center ${currentStep >= 2 ? 'text-blue-600 font-bold' : ''}`}>
-              {isAr ? '2. الحالة والمزايا' : '2. Features'}
+              {isAr ? <InterfaceText id="realestate.ValuationWizard.k1czyxpj" source="2. الحالة والمزايا" /> : <InterfaceText id="realestate.ValuationWizard.kbzkxt8" source="2. Features" />}
             </span>
             <span className={`text-center ${currentStep >= 3 ? 'text-blue-600 font-bold' : ''}`}>
-              {isAr ? '3. الأهداف' : '3. Goals'}
+              {isAr ? <InterfaceText id="realestate.ValuationWizard.k16xlyd6" source="3. الأهداف" /> : <InterfaceText id="realestate.ValuationWizard.k1v1m6y4" source="3. Goals" />}
             </span>
             <span className={`text-end ${currentStep >= 4 ? 'text-blue-600 font-bold' : ''}`}>
-              {isAr ? '4. التقرير والتواصل' : '4. Lead Report'}
+              {isAr ? <InterfaceText id="realestate.ValuationWizard.k1y92bcb" source="4. التقرير والتواصل" /> : <InterfaceText id="realestate.ValuationWizard.kv98p1f" source="4. Lead Report" />}
             </span>
           </div>
         </div>
@@ -291,15 +298,15 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
 
             <div className="space-y-2 max-w-lg mx-auto">
               <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
-                {referenceId}
+                <LocalizedValue value={referenceId} />
               </Badge>
               <h3 className="text-2xl font-extrabold text-slate-900 font-display-serif">
-                {isAr ? 'تم استلام طلب التقييم بنجاح!' : 'Valuation Request Received!'}
+                {isAr ? <InterfaceText id="realestate.ValuationWizard.k1czfmx0" source="تم استلام طلب التقييم بنجاح!" /> : <InterfaceText id="realestate.ValuationWizard.kb0192v" source="Valuation Request Received!" />}
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                {isAr
+                <LocalizedValue value={isAr
                   ? `شكراً لك ${fullName}! قام فريق الاستشارات بإعداد تقرير التقييم المقارن (CMA) المكون من 12 صفحة، وسيتم إرساله إليك عبر ${preferredContact === 'whatsapp' ? 'واتساب' : preferredContact === 'call' ? 'اتصال هاتفي' : 'البريد الإلكتروني'}.`
-                  : `Thank you, ${fullName}! A dedicated Senior Brokerage Director has been assigned to prepare your custom 12-page Comparative Market Analysis (CMA) report via ${preferredContact}.`}
+                  : `Thank you, ${fullName}! A dedicated Senior Brokerage Director has been assigned to prepare your custom 12-page Comparative Market Analysis (CMA) report via ${preferredContact}.`} />
               </p>
             </div>
 
@@ -309,18 +316,18 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-blue-400" />
                   <span className="text-xs uppercase tracking-wider text-slate-400 font-semibold">
-                    {isAr ? 'المؤشر التقديري الأولي' : 'Preliminary Valuation Benchmark'}
+                    {isAr ? <InterfaceText id="realestate.ValuationWizard.k1xtgbzp" source="المؤشر التقديري الأولي" /> : <InterfaceText id="realestate.ValuationWizard.ktldxob" source="Preliminary Valuation Benchmark" />}
                   </span>
                 </div>
-                <span className="text-xs text-blue-400 font-medium">{cityArea}</span>
+                <span className="text-xs text-blue-400 font-medium"><LocalizedValue value={cityArea} /></span>
               </div>
 
               <div>
-                <span className="text-xs text-slate-400 block mb-1">{isAr ? 'النطاق التقديري بالريال السعودي' : 'SAR Benchmark Valuation Range'}:</span>
+                <span className="text-xs text-slate-400 block mb-1">{isAr ? <InterfaceText id="realestate.ValuationWizard.kwzvakm" source="النطاق التقديري بالريال السعودي" /> : <InterfaceText id="realestate.ValuationWizard.k1hgs3f8" source="SAR Benchmark Valuation Range" />}:</span>
                 <p className="text-2xl sm:text-3xl font-extrabold text-blue-400 font-display-serif">
-                  {isAr
+                  <LocalizedValue value={isAr
                     ? `${(calculatedEstimate.minSar / 1000000).toFixed(2)} - ${(calculatedEstimate.maxSar / 1000000).toFixed(2)} مليون ر.س`
-                    : `${(calculatedEstimate.minSar / 1000000).toFixed(2)}M - ${(calculatedEstimate.maxSar / 1000000).toFixed(2)}M SAR`}
+                    : `${(calculatedEstimate.minSar / 1000000).toFixed(2)}M - ${(calculatedEstimate.maxSar / 1000000).toFixed(2)}M SAR`} />
                 </p>
               </div>
 
@@ -328,8 +335,8 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                 <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span>
                   {isAr
-                    ? 'تقدير إرشادي يحسبه الموقع باستخدام معاملات ثابتة.'
-                    : 'This indicative estimate uses fixed assumptions.'}
+                    ? <InterfaceText id="realestate.ValuationWizard.k1bmqrx8" source="تقدير إرشادي يحسبه الموقع باستخدام معاملات ثابتة." />
+                    : <InterfaceText id="realestate.ValuationWizard.k1bde7rx" source="This indicative estimate uses fixed assumptions." />}
                 </span>
               </div>
             </div>
@@ -349,27 +356,28 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                 className="w-full sm:w-auto justify-center"
               >
                 <MessageSquare className="w-4 h-4" />
-                <span>{isAr ? 'محادثة المدير عبر واتساب' : 'Connect on WhatsApp'}</span>
+                <span>{isAr ? <InterfaceText id="realestate.ValuationWizard.k1opqzr6" source="محادثة المدير عبر واتساب" /> : <InterfaceText id="realestate.ValuationWizard.k1e0tza8" source="Connect on WhatsApp" />}</span>
               </Button>
 
               <Button variant="outline" size="lg" onClick={handleReset} className="w-full sm:w-auto">
-                <span>{isAr ? 'تقييم عقار آخر' : 'Evaluate Another Property'}</span>
+                <span>{isAr ? <InterfaceText id="realestate.ValuationWizard.k1ojpwcg" source="تقييم عقار آخر" /> : <InterfaceText id="realestate.ValuationWizard.k1rdomqa" source="Evaluate Another Property" />}</span>
               </Button>
             </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
+            <ConfiguredFormFields form={formConfig} language={language} />
             {/* STEP 1: Property Location & Architecture */}
             {currentStep === 1 && (
               <div className="space-y-5 animate-in fade-in duration-200">
                 <div className="space-y-1">
                   <h3 className="text-lg font-bold text-slate-900">
-                    {isAr ? 'الخطوة 1: الموقع ونوع العقار' : 'Step 1: Property Location & Type'}
+                    {isAr ? <InterfaceText id="realestate.ValuationWizard.kso47zf" source="الخطوة 1: الموقع ونوع العقار" /> : <InterfaceText id="realestate.ValuationWizard.k1auvybk" source="Step 1: Property Location & Type" />}
                   </h3>
                   <p className="text-xs text-slate-500">
                     {isAr
-                      ? 'حدد موقع العقار ونوعه لحساب التقدير الأولي.'
-                      : 'Specify the physical classification and prime community location.'}
+                      ? <InterfaceText id="realestate.ValuationWizard.k1r4sw92" source="حدد موقع العقار ونوعه لحساب التقدير الأولي." />
+                      : <InterfaceText id="realestate.ValuationWizard.k15mbux0" source="Specify the physical classification and prime community location." />}
                   </p>
                 </div>
 
@@ -390,7 +398,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                         }`}
                       >
                         <Icon className={`w-5 h-5 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
-                        <span className="text-xs">{isAr ? item.nameAr : item.nameEn}</span>
+                        <span className="text-xs"><LocalizedValue value={isAr ? item.nameAr : item.nameEn} /></span>
                       </button>
                     );
                   })}
@@ -400,7 +408,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="valuation-city-search" className="block text-xs font-bold text-slate-700 mb-1">
-                      {isAr ? 'المدينة' : 'City'} *
+                      {isAr ? <InterfaceText id="realestate.ValuationWizard.k18a6a7d" source="المدينة" /> : <InterfaceText id="realestate.ValuationWizard.k142k4ma" source="City" />} <span className="text-red-600">*</span>
                     </label>
                     <CitySearchDropdown
                       value={cityArea}
@@ -414,9 +422,9 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
 
                   <div>
                     <label htmlFor="val-custom-address" className="block text-xs font-bold text-slate-700 mb-1">
-                      {isAr ? 'اسم المبنى أو المجمع (اختياري)' : 'Building / Project / Sub-community'}
+                      {isAr ? <InterfaceText id="realestate.ValuationWizard.k15i2lu8" source="اسم المبنى أو المجمع (اختياري)" /> : <InterfaceText id="realestate.ValuationWizard.kl1qp2" source="Building / Project / Sub-community" />}
                     </label>
-                    <input
+                    <ManagedInput copyScope="realestate.ValuationWizard"
                       id="val-custom-address"
                       type="text"
                       placeholder={isAr ? 'مثال: برج أرماني، فيلا رقم 14' : 'e.g. Armani Residences, Villa 24'}
@@ -431,9 +439,9 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label htmlFor="val-bedrooms" className="block text-xs font-bold text-slate-700 mb-1">
-                      {isAr ? 'عدد غرف النوم' : 'Bedrooms'}
+                      {isAr ? <InterfaceText id="realestate.ValuationWizard.k17xefci" source="عدد غرف النوم" /> : <InterfaceText id="realestate.ValuationWizard.kbw2lik" source="Bedrooms" />}
                     </label>
-                    <select
+                    <SearchableSelect
                       id="val-bedrooms"
                       value={bedrooms}
                       onChange={(e) => setBedrooms(e.target.value)}
@@ -445,14 +453,14 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                       <option value="4">4 {isAr ? 'غرف' : 'Beds'}</option>
                       <option value="5">5 {isAr ? 'غرف' : 'Beds'}</option>
                       <option value="6+">6+ {isAr ? 'غرف فاخرة' : 'Beds Mansion'}</option>
-                    </select>
+                    </SearchableSelect>
                   </div>
 
                   <div>
                     <label htmlFor="val-bathrooms" className="block text-xs font-bold text-slate-700 mb-1">
-                      {isAr ? 'دورات المياه' : 'Bathrooms'}
+                      {isAr ? <InterfaceText id="realestate.ValuationWizard.k1ae528u" source="دورات المياه" /> : <InterfaceText id="realestate.ValuationWizard.k1oorec0" source="Bathrooms" />}
                     </label>
-                    <select
+                    <SearchableSelect
                       id="val-bathrooms"
                       value={bathrooms}
                       onChange={(e) => setBathrooms(e.target.value)}
@@ -464,14 +472,14 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                       <option value="4">4</option>
                       <option value="5">5</option>
                       <option value="6+">6+</option>
-                    </select>
+                    </SearchableSelect>
                   </div>
 
                   <div>
                     <label htmlFor="val-area-sqft" className="block text-xs font-bold text-slate-700 mb-1">
-                      {isAr ? 'المساحة المبنية (قدم²)' : 'Built Area (Sq Ft)'} *
+                      {isAr ? <InterfaceText id="realestate.ValuationWizard.kzgwypv" source="المساحة المبنية (قدم²)" /> : <InterfaceText id="realestate.ValuationWizard.k3g4j7l" source="Built Area (Sq Ft)" />} <span className="text-red-600">*</span>
                     </label>
-                    <input
+                    <ManagedInput copyScope="realestate.ValuationWizard"
                       id="val-area-sqft"
                       type="number"
                       required
@@ -485,7 +493,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                         errors.area ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 hover:border-slate-400 focus:border-blue-500 focus:ring-blue-500'
                       }`}
                     />
-                    {errors.area && <p id="val-area-sqft-error" className="text-[11px] text-rose-500 mt-1">{errors.area}</p>}
+                    {errors.area && <p id="val-area-sqft-error" className="text-[11px] text-rose-500 mt-1"><LocalizedValue value={errors.area} /></p>}
                   </div>
                 </div>
               </div>
@@ -496,19 +504,19 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
               <div className="space-y-5 animate-in fade-in duration-200">
                 <div className="space-y-1">
                   <h3 className="text-lg font-bold text-slate-900">
-                    {isAr ? 'الخطوة 2: حالة العقار والمزايا التنافسية' : 'Step 2: Property Condition & Features'}
+                    {isAr ? <InterfaceText id="realestate.ValuationWizard.k1k0ptgy" source="الخطوة 2: حالة العقار والمزايا التنافسية" /> : <InterfaceText id="realestate.ValuationWizard.klwrlto" source="Step 2: Property Condition & Features" />}
                   </h3>
                   <p className="text-xs text-slate-500">
                     {isAr
-                      ? 'التشطيبات الراقية والإطلالات تزيد من القيمة السوقية بنسبة تصل إلى 35%.'
-                      : 'Premium upgrades, designer furnishings, and panoramic views significantly enhance pricing power.'}
+                      ? <InterfaceText id="realestate.ValuationWizard.k1el7mvt" source="التشطيبات الراقية والإطلالات تزيد من القيمة السوقية بنسبة تصل إلى 35%." />
+                      : <InterfaceText id="realestate.ValuationWizard.k1330gzo" source="Premium upgrades, designer furnishings, and panoramic views significantly enhance pricing power." />}
                   </p>
                 </div>
 
                 {/* Condition Selector */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-2">
-                    {isAr ? 'الحالة الإنشائية والمعمارية' : 'Architectural & Interior Condition'}
+                    {isAr ? <InterfaceText id="realestate.ValuationWizard.k2y360e" source="الحالة الإنشائية والمعمارية" /> : <InterfaceText id="realestate.ValuationWizard.krqo54x" source="Architectural & Interior Condition" />}
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     {[
@@ -544,10 +552,10 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                         }`}
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold">{item.label}</span>
+                          <span className="text-xs font-bold"><LocalizedValue value={item.label} /></span>
                           {condition === item.id && <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />}
                         </div>
-                        <p className="text-[11px] text-slate-500 mt-1">{item.desc}</p>
+                        <p className="text-[11px] text-slate-500 mt-1"><LocalizedValue value={item.desc} /></p>
                       </button>
                     ))}
                   </div>
@@ -556,7 +564,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                 {/* Furnishing Status */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-2">
-                    {isAr ? 'حالة الأثاث والفرش' : 'Furnishing Status'}
+                    {isAr ? <InterfaceText id="realestate.ValuationWizard.kadusd0" source="حالة الأثاث والفرش" /> : <InterfaceText id="realestate.ValuationWizard.k1hctxny" source="Furnishing Status" />}
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     {[
@@ -574,7 +582,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                             : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
                         }`}
                       >
-                        {item.label}
+                        <LocalizedValue value={item.label} />
                       </button>
                     ))}
                   </div>
@@ -583,7 +591,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                 {/* Key Features Checkboxes */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-2">
-                    {isAr ? 'المزايا الإضافية الفريدة (اختر ما ينطبق)' : 'Unique Property Assets (Select all that apply)'}
+                    {isAr ? <InterfaceText id="realestate.ValuationWizard.kjusm6t" source="المزايا الإضافية الفريدة (اختر ما ينطبق)" /> : <InterfaceText id="realestate.ValuationWizard.k1ntf1lb" source="Unique Property Assets (Select all that apply)" />}
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {featuresList.map((feat) => {
@@ -599,7 +607,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                               : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
                           }`}
                         >
-                          <span>{feat.label}</span>
+                          <span><LocalizedValue value={feat.label} /></span>
                           <span
                             className={`w-4 h-4 rounded-md border flex items-center justify-center ${
                               isChecked ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-300 bg-white'
@@ -620,19 +628,19 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
               <div className="space-y-5 animate-in fade-in duration-200">
                 <div className="space-y-1">
                   <h3 className="text-lg font-bold text-slate-900">
-                    {isAr ? 'الخطوة 3: أهداف العرض والجدول الزمني' : 'Step 3: Owner Goals & Timeline'}
+                    {isAr ? <InterfaceText id="realestate.ValuationWizard.k6wtxd3" source="الخطوة 3: أهداف العرض والجدول الزمني" /> : <InterfaceText id="realestate.ValuationWizard.k1d6tk7c" source="Step 3: Owner Goals & Timeline" />}
                   </h3>
                   <p className="text-xs text-slate-500">
                     {isAr
-                      ? 'حدد هدفك لمطابقة استراتيجيتنا التسويقية مع متطلباتك الاستثمارية.'
-                      : 'Help us tailor the brokerage marketing launch to your financial goals.'}
+                      ? <InterfaceText id="realestate.ValuationWizard.kapma0a" source="حدد هدفك لمطابقة استراتيجيتنا التسويقية مع متطلباتك الاستثمارية." />
+                      : <InterfaceText id="realestate.ValuationWizard.kwky3l0" source="Help us tailor the brokerage marketing launch to your financial goals." />}
                   </p>
                 </div>
 
                 {/* Owner Role */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-2">
-                    {isAr ? 'صفتك بالنسبة للعقار' : 'Your Relationship to the Asset'}
+                    {isAr ? <InterfaceText id="realestate.ValuationWizard.ko9lmpm" source="صفتك بالنسبة للعقار" /> : <InterfaceText id="realestate.ValuationWizard.k1rbofxe" source="Your Relationship to the Asset" />}
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {[
@@ -651,7 +659,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                             : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
                         }`}
                       >
-                        {item.label}
+                        <LocalizedValue value={item.label} />
                       </button>
                     ))}
                   </div>
@@ -687,10 +695,10 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold">{item.label}</span>
+                        <span className="text-xs font-bold"><LocalizedValue value={item.label} /></span>
                         {goal === item.id && <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />}
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-1">{item.desc}</p>
+                      <p className="text-[11px] text-slate-500 mt-1"><LocalizedValue value={item.desc} /></p>
                     </button>
                   ))}
                 </div>
@@ -698,7 +706,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                 {/* Timeline */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-2">
-                    {isAr ? 'الجدول الزمني المستهدف للإتمام' : 'Desired Transaction Timeline'}
+                    {isAr ? <InterfaceText id="realestate.ValuationWizard.kzewizb" source="الجدول الزمني المستهدف للإتمام" /> : <InterfaceText id="realestate.ValuationWizard.k3ymge0" source="Desired Transaction Timeline" />}
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {[
@@ -717,7 +725,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                             : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
                         }`}
                       >
-                        {item.label}
+                        <LocalizedValue value={item.label} />
                       </button>
                     ))}
                   </div>
@@ -730,16 +738,16 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                       <TrendingUp className="w-5 h-5" />
                     </div>
                     <div>
-                      <span className="text-xs text-slate-400 block">{isAr ? 'القيمة التقديرية الحالية' : 'Live Benchmark Calculation'}</span>
+                      <span className="text-xs text-slate-400 block">{isAr ? <InterfaceText id="realestate.ValuationWizard.k1w8l3lw" source="القيمة التقديرية الحالية" /> : <InterfaceText id="realestate.ValuationWizard.k1yzwlb1" source="Live Benchmark Calculation" />}</span>
                       <p className="text-base sm:text-lg font-bold font-display-serif text-blue-400">
-                        {isAr
+                        <LocalizedValue value={isAr
                           ? `${(calculatedEstimate.minSar / 1000000).toFixed(2)} - ${(calculatedEstimate.maxSar / 1000000).toFixed(2)} مليون ر.س`
-                          : `${(calculatedEstimate.minSar / 1000000).toFixed(2)}M - ${(calculatedEstimate.maxSar / 1000000).toFixed(2)}M SAR`}
+                          : `${(calculatedEstimate.minSar / 1000000).toFixed(2)}M - ${(calculatedEstimate.maxSar / 1000000).toFixed(2)}M SAR`} />
                       </p>
                     </div>
                   </div>
                   <span className="text-[11px] text-slate-400 text-end">
-                    {isAr ? 'التقرير النهائي يتضمن دراسة 12 صفحة' : '12-page comprehensive CMA dossier'}
+                    {isAr ? <InterfaceText id="realestate.ValuationWizard.kj89l58" source="التقرير النهائي يتضمن دراسة 12 صفحة" /> : <InterfaceText id="realestate.ValuationWizard.k5bja3s" source="12-page comprehensive CMA dossier" />}
                   </span>
                 </div>
               </div>
@@ -750,12 +758,12 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
               <div className="space-y-5 animate-in fade-in duration-200">
                 <div className="space-y-1">
                   <h3 className="text-lg font-bold text-slate-900">
-                    {isAr ? 'الخطوة 4: بيانات التواصل واستلام التقرير' : 'Step 4: Contact & Report Delivery'}
+                    {isAr ? <InterfaceText id="realestate.ValuationWizard.ktvjrpe" source="الخطوة 4: بيانات التواصل واستلام التقرير" /> : <InterfaceText id="realestate.ValuationWizard.k1dmta87" source="Step 4: Contact & Report Delivery" />}
                   </h3>
                   <p className="text-xs text-slate-500">
                     {isAr
-                      ? 'أين ترغب باستلام دراسة التقييم الشاملة وتقرير الصفقات المقارنة؟'
-                      : 'Where should our senior marketing director deliver your full valuation package?'}
+                      ? <InterfaceText id="realestate.ValuationWizard.kgaa6d8" source="أين ترغب باستلام دراسة التقييم الشاملة وتقرير الصفقات المقارنة؟" />
+                      : <InterfaceText id="realestate.ValuationWizard.kp440v8" source="Where should our senior marketing director deliver your full valuation package?" />}
                   </p>
                 </div>
 
@@ -763,11 +771,11 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                   {/* Full Name */}
                   <div>
                     <label htmlFor="val-fullname" className="block text-xs font-bold text-slate-700 mb-1">
-                      {isAr ? 'الاسم الكامل' : 'Full Name'} *
+                      {isAr ? <InterfaceText id="realestate.ValuationWizard.k16duk29" source="الاسم الكامل" /> : <InterfaceText id="realestate.ValuationWizard.k4eocnj" source="Full Name" />} <span className="text-red-600">*</span>
                     </label>
                     <div className="relative">
                       <User className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5" />
-                      <input
+                      <ManagedInput copyScope="realestate.ValuationWizard"
                         id="val-fullname"
                         type="text"
                         required
@@ -782,17 +790,17 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                         }`}
                       />
                     </div>
-                    {errors.fullName && <p id="val-fullname-error" className="text-[11px] text-rose-500 mt-1">{errors.fullName}</p>}
+                    {errors.fullName && <p id="val-fullname-error" className="text-[11px] text-rose-500 mt-1"><LocalizedValue value={errors.fullName} /></p>}
                   </div>
 
                   {/* Email */}
                   <div>
                     <label htmlFor="val-email" className="block text-xs font-bold text-slate-700 mb-1">
-                      {isAr ? 'البريد الإلكتروني' : 'Email Address'} *
+                      {isAr ? <InterfaceText id="realestate.ValuationWizard.kz14tgk" source="البريد الإلكتروني" /> : <InterfaceText id="realestate.ValuationWizard.k1v4tmnn" source="Email Address" />} <span className="text-red-600">*</span>
                     </label>
                     <div className="relative">
                       <Mail className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5" />
-                      <input
+                      <ManagedInput copyScope="realestate.ValuationWizard"
                         id="val-email"
                         type="email"
                         required
@@ -807,7 +815,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                         }`}
                       />
                     </div>
-                    {errors.email && <p id="val-email-error" className="text-[11px] text-rose-500 mt-1">{errors.email}</p>}
+                    {errors.email && <p id="val-email-error" className="text-[11px] text-rose-500 mt-1"><LocalizedValue value={errors.email} /></p>}
                   </div>
                 </div>
 
@@ -815,11 +823,11 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                   {/* Phone */}
                   <div>
                     <label htmlFor="val-phone" className="block text-xs font-bold text-slate-700 mb-1">
-                      {isAr ? 'رقم الهاتف / واتساب' : 'Phone / WhatsApp Number'} *
+                      {isAr ? <InterfaceText id="realestate.ValuationWizard.ky70fj7" source="رقم الهاتف / واتساب" /> : <InterfaceText id="realestate.ValuationWizard.k1mlkc6p" source="Phone / WhatsApp Number" />} <span className="text-red-600">*</span>
                     </label>
                     <div className="relative">
                       <Phone className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5" />
-                      <input
+                      <ManagedInput copyScope="realestate.ValuationWizard"
                         id="val-phone"
                         type="tel"
                         required
@@ -834,13 +842,13 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                         }`}
                       />
                     </div>
-                    {errors.phone && <p id="val-phone-error" className="text-[11px] text-rose-500 mt-1">{errors.phone}</p>}
+                    {errors.phone && <p id="val-phone-error" className="text-[11px] text-rose-500 mt-1"><LocalizedValue value={errors.phone} /></p>}
                   </div>
 
                   {/* Preferred Delivery Channel */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                      {isAr ? 'طريقة التواصل المفضلة' : 'Preferred Delivery Method'}
+                      {isAr ? <InterfaceText id="realestate.ValuationWizard.k1y60d29" source="طريقة التواصل المفضلة" /> : <InterfaceText id="realestate.ValuationWizard.kff6mmz" source="Preferred Delivery Method" />}
                     </label>
                     <div className="grid grid-cols-3 gap-2">
                       {[
@@ -858,7 +866,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                               : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
                           }`}
                         >
-                          {item.label}
+                          <LocalizedValue value={item.label} />
                         </button>
                       ))}
                     </div>
@@ -880,9 +888,9 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                 {/* Additional Notes */}
                 <div>
                   <label htmlFor="val-notes" className="block text-xs font-bold text-slate-700 mb-1">
-                    {isAr ? 'ملاحظات إضافية (أوقات المعاينة، تفاصيل المستأجر، إلخ)' : 'Additional Notes / Special Instructions'}
+                    {isAr ? <InterfaceText id="realestate.ValuationWizard.kpd3b14" source="ملاحظات إضافية (أوقات المعاينة، تفاصيل المستأجر، إلخ)" /> : <InterfaceText id="realestate.ValuationWizard.k1n9kaes" source="Additional Notes / Special Instructions" />}
                   </label>
-                  <textarea
+                  <ManagedTextarea copyScope="realestate.ValuationWizard"
                     id="val-notes"
                     rows={3}
                     placeholder={
@@ -893,15 +901,15 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-2xl text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
-                  ></textarea>
+                  ></ManagedTextarea>
                 </div>
 
                 <div className="p-3 bg-blue-50/60 rounded-2xl border border-blue-100 flex items-center gap-2 text-xs text-blue-800">
                   <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
                   <span>
                     {isAr
-                      ? 'بياناتك محمية بالكامل ومعتمدة وفق اشتراطات الهيئة العامة للعقار (REGA).'
-                      : 'Your property data is strictly confidential and protected under REGA brokerage escrow standards.'}
+                      ? <InterfaceText id="realestate.ValuationWizard.k1i09lie" source="بياناتك محمية بالكامل ومعتمدة وفق اشتراطات الهيئة العامة للعقار (REGA)." />
+                      : <InterfaceText id="realestate.ValuationWizard.k1mebx32" source="Your property data is strictly confidential and protected under REGA brokerage escrow standards." />}
                   </span>
                 </div>
               </div>
@@ -918,7 +926,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                   className="font-semibold"
                 >
                   <ArrowPrev className="w-4 h-4" />
-                  <span>{isAr ? 'الخطوة السابقة' : 'Previous Step'}</span>
+                  <span>{isAr ? <InterfaceText id="realestate.ValuationWizard.k1gvdbv8" source="الخطوة السابقة" /> : <InterfaceText id="realestate.ValuationWizard.ku58l96" source="Previous Step" />}</span>
                 </Button>
               ) : (
                 <div></div>
@@ -932,7 +940,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                   onClick={handleNext}
                   className="font-bold shadow-md"
                 >
-                  <span>{isAr ? 'الخطوة التالية' : 'Continue to Next Step'}</span>
+                  <span>{isAr ? <InterfaceText id="realestate.ValuationWizard.km2zsf" source="الخطوة التالية" /> : <InterfaceText id="realestate.ValuationWizard.k2hwfug" source="Continue to Next Step" />}</span>
                   <ArrowNext className="w-4 h-4" />
                 </Button>
               ) : (
@@ -944,11 +952,11 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                   className="font-bold shadow-lg"
                 >
                   {isSubmitting ? (
-                    <span>{isAr ? 'جاري إصدار التقرير...' : 'Generating Valuation Dossier...'}</span>
+                    <span>{isAr ? <InterfaceText id="realestate.ValuationWizard.kds13zr" source="جاري إصدار التقرير..." /> : <InterfaceText id="realestate.ValuationWizard.kz4kwpn" source="Generating Valuation Dossier..." />}</span>
                   ) : (
                     <>
                       <FileText className="w-4 h-4" />
-                      <span>{isAr ? 'إرسال طلب التقييم' : 'Submit Valuation Request'}</span>
+                      <span>{isAr ? <InterfaceText id="realestate.ValuationWizard.k1nw6w9g" source="إرسال طلب التقييم" /> : <InterfaceText id="realestate.ValuationWizard.k1tmc3yj" source="Submit Valuation Request" />}</span>
                     </>
                   )}
                 </Button>

@@ -5,6 +5,7 @@ import {
   Language,
   HVACService,
   HVACGalleryItem,
+  HVACGalleryCategory,
   HVACTestimonial,
   HVACFaqItem,
   HVACChecklistItem,
@@ -12,6 +13,7 @@ import {
 import {
   initialServices,
   initialGallery,
+  initialGalleryCategories,
   initialTestimonials,
   initialFaqs,
   yearRoundChecklist as initialChecklist,
@@ -54,6 +56,7 @@ interface HVACContextType {
   updateBookingCopy: (data: Partial<HVACBookingCopy>) => Promise<void>;
   // Portfolio Gallery
   galleryItems: HVACGalleryItem[];
+  galleryCategories: HVACGalleryCategory[];
   addGalleryItem: (item: Omit<HVACGalleryItem, 'id'>) => Promise<void>;
   updateGalleryItem: (id: string, item: Partial<HVACGalleryItem>) => Promise<void>;
   deleteGalleryItem: (id: string) => Promise<void>;
@@ -195,6 +198,9 @@ export function HVACProvider({
     setBookingCopy(merged);
   };
 
+  const [galleryCategories, setGalleryCategories] = useState<HVACGalleryCategory[]>(initialGalleryCategories);
+  useEffect(() => subscribeSectorSection({ sector: 'hvac', key: 'gallery_categories' }, initialGalleryCategories, setGalleryCategories), []);
+
   // Gallery Items
   const [galleryItems, setGalleryItems] = useState<HVACGalleryItem[]>(initialGallery);
 
@@ -324,6 +330,7 @@ export function HVACProvider({
         bookingCopy,
         updateBookingCopy,
         galleryItems,
+        galleryCategories,
         addGalleryItem,
         updateGalleryItem,
         deleteGalleryItem,

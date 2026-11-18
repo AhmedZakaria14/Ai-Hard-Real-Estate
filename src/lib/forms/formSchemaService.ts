@@ -524,7 +524,7 @@ export async function getFormSchemaConfig(formType: CustomerFormType): Promise<F
       return sanitizedSchema;
     }
   } catch (e) {
-    console.warn(`[formSchemaService] Supabase read failed for form '${formType}', using default:`, e);
+    console.warn(`[formSchemaService] the database read failed for form '${formType}', using default:`, e);
   }
 
   const defaultSchema = DEFAULT_FORM_SCHEMAS[formType] || DEFAULT_FORM_SCHEMAS.general_contact;

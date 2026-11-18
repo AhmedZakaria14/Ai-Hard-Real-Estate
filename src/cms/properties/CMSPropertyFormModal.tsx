@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import { usePropertyTypes } from '../../lib/usePropertyTypes';
 import React, { useState, useEffect } from 'react';
 import {
@@ -454,7 +455,7 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
                   <label className="block text-xs font-bold text-slate-700 mb-1 text-start">
                     {isAr ? 'نوع العقار' : 'Property Type'}
                   </label>
-                  <select
+                  <SearchableSelect
                     value={type}
                     required
                     onChange={(e) => setType(e.target.value as PropertyType)}
@@ -465,14 +466,14 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
                     {propertyTypes.filter((item) => item.active || item.id === initialData?.type).map((item) => (
                       <option key={item.id} value={item.id}>{isAr ? item.nameAr : item.nameEn}</option>
                     ))}
-                  </select>
+                  </SearchableSelect>
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1 text-start">
                     {isAr ? 'حالة العرض' : 'Listing Status'}
                   </label>
-                  <select
+                  <SearchableSelect
                     value={status}
                     onChange={(e) => setStatus(e.target.value as ListingStatus)}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
@@ -482,7 +483,7 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
                     <option value="off-plan">{isAr ? 'على الخارطة (Off-Plan)' : 'Off-Plan'}</option>
                     <option value="exclusive">{isAr ? 'حصري (Exclusive)' : 'Exclusive'}</option>
                     <option value="new-launch">{isAr ? 'إطلاق جديد (New Launch)' : 'New Launch'}</option>
-                  </select>
+                  </SearchableSelect>
                 </div>
 
                 <div className="flex flex-col justify-end">
@@ -539,7 +540,7 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
                 <label className="block text-xs font-bold text-slate-700 mb-1 text-start">
                   {isAr ? 'اختر المدينة من القائمة' : 'Select City from list'}
                 </label>
-                <select
+                <SearchableSelect
                   value={cityAr}
                   onChange={(e) => {
                     const match = SAUDI_CITIES.find((c) => c.ar === e.target.value || c.en === e.target.value);
@@ -558,7 +559,7 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
                       {c.ar} - {c.en}
                     </option>
                   ))}
-                </select>
+                </SearchableSelect>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -692,7 +693,7 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
                   <label className="block text-xs font-bold text-slate-700 mb-1 text-start">
                     {isAr ? 'فترة الدفع (للإيجار فقط)' : 'Rental Period (If applicable)'}
                   </label>
-                  <select
+                  <SearchableSelect
                     value={period || ''}
                     onChange={(e) => setPeriod(e.target.value ? (e.target.value as 'year' | 'month') : undefined)}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
@@ -700,7 +701,7 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
                     <option value="">{isAr ? 'سعر إجمالي (بيع)' : 'Total Sale Price'}</option>
                     <option value="year">{isAr ? 'سنوياً (/ year)' : 'Per Year'}</option>
                     <option value="month">{isAr ? 'شهرياً (/ month)' : 'Per Month'}</option>
-                  </select>
+                  </SearchableSelect>
                 </div>
               </div>
 
@@ -785,7 +786,7 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
                     ))}
                     <label className="text-xs">
                       {isAr ? 'الأيقونة' : 'Icon'}
-                      <select
+                      <SearchableSelect
                         className="mt-1 block w-full rounded-xl border border-slate-300 px-3 py-2"
                         value={spec.icon}
                         onChange={(event) => {
@@ -796,7 +797,7 @@ export const CMSPropertyFormModal: React.FC<CMSPropertyFormModalProps> = ({
                         {Object.entries(propertySpecificationIcons).map(([key, option]) => (
                           <option key={key} value={key}>{option[language]}</option>
                         ))}
-                      </select>
+                      </SearchableSelect>
                     </label>
                     <button type="button" className="self-end justify-self-start rounded-lg px-3 py-2 text-xs text-red-700"
                       onClick={() => setAdditionalSpecs((items) => items.filter((_, i) => i !== index))}>

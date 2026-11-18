@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 /**
  * HARD GROUP - CMS CALCULATOR CONFIGURATION & VERSIONING MANAGEMENT
  * 
@@ -725,7 +726,7 @@ export const CMSCalculatorConfig: React.FC<CMSCalculatorConfigProps> = ({
                   </div>
                   <div>
                     <label className="text-slate-400 block mb-1">Project Type</label>
-                    <select
+                    <SearchableSelect
                       value={testProjectType}
                       onChange={(e) => setTestProjectType(e.target.value as any)}
                       className="w-full px-2.5 py-1.5 rounded bg-slate-900 border border-slate-800 text-white"
@@ -734,7 +735,7 @@ export const CMSCalculatorConfig: React.FC<CMSCalculatorConfigProps> = ({
                       <option value="commercial-building">Commercial Building (🏢)</option>
                       <option value="duplex">Duplex (🏘️)</option>
                       <option value="warehouse">Warehouse (🏭)</option>
-                    </select>
+                    </SearchableSelect>
                   </div>
                   <div className="flex items-center justify-between text-slate-300 pt-1">
                     <label className="flex items-center gap-2 cursor-pointer">

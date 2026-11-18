@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Language } from '../../types';
-import type { SectorId } from '../../types/firestore-schema';
+import type { SectorId } from '../../types/backend-schema';
 import { uploadMediaAsset } from '../../lib/cmsMediaLibrary';
 
 export function CMSSectionImage({ label, url, onChange, sector, language }: {
@@ -13,7 +13,7 @@ export function CMSSectionImage({ label, url, onChange, sector, language }: {
   const ar = language === 'ar';
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
-  return <div className="space-y-2 rounded-xl border p-3">
+  return <div data-upload-pending={busy} className="space-y-2 rounded-xl border p-3">
     <label className="block">{label}
       <input dir="ltr" type="text" className="block w-full rounded border p-2" value={url}
         disabled={busy} onChange={(event) => onChange(event.target.value)} />

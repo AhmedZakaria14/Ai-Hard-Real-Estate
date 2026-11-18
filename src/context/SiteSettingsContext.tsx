@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { LocalizedText, SectorId } from '../types/firestore-schema';
+import { LocalizedText, SectorId } from '../types/backend-schema';
 import { hardAdminClient, toHardAdmin } from '../lib/db/hardAdminClient';
 import { hardPublishableKey, hardSupabaseUrl } from '../lib/db/hardCatalog';
 
@@ -82,8 +82,8 @@ export const DEFAULT_PORTAL_SETTINGS: PublicBrandingSettings = {
   },
 
   contactEmail: 'info@hardgp.com',
-  supportPhone: '+966 9200 00000',
-  whatsappNumber: '+966 50 000 0000',
+  supportPhone: '+966 55 612 5711',
+  whatsappNumber: '+966 55 612 5711',
   tollFreeNumber: '800 123 4567',
   workingHours: {
     ar: 'الأحد - الخميس: 8:00 صباحاً - 5:00 مساءً',
@@ -134,8 +134,8 @@ export const DEFAULT_SECTOR_SETTINGS: Record<SectorId, Partial<PublicBrandingSet
   portal: {},
   realestate: {
     sector: 'realestate',
-    siteName: { ar: 'هارد للعقارات', en: 'HARD Real Estate' },
-    tagline: { ar: 'تسويق ووساطة عقارية فاخرة بالمملكة', en: 'Luxury Real Estate Marketing & Brokerage' },
+    siteName: { ar: 'هارد للعقارات', en: 'HARD Realestate' },
+    tagline: { ar: 'تسويق ووساطة فاخرة', en: 'Luxury Marketing & Brokerage' },
     designTokens: {
       primaryAccent: '#0284c7', // Sky Blue
       secondaryAccent: '#0369a1',
@@ -145,8 +145,8 @@ export const DEFAULT_SECTOR_SETTINGS: Record<SectorId, Partial<PublicBrandingSet
   },
   construction: {
     sector: 'construction',
-    siteName: { ar: 'هارد للمقاولات والإنشاءات', en: 'HARD Contracting & Construction' },
-    tagline: { ar: 'بناء وتطوير المشاريع الكبرى والتطوير العمراني', en: 'Master Contracting & Urban Infrastructure' },
+    siteName: { ar: 'هارد للمقاولات', en: 'HARD Contracting' },
+    tagline: { ar: 'مقاولات عامة وإنشائية', en: 'Contracting & Construction' },
     designTokens: {
       primaryAccent: '#d97706', // Amber Gold
       secondaryAccent: '#b45309',
@@ -156,8 +156,8 @@ export const DEFAULT_SECTOR_SETTINGS: Record<SectorId, Partial<PublicBrandingSet
   },
   hvac: {
     sector: 'hvac',
-    siteName: { ar: 'هارد لأنظمة التكييف HVAC', en: 'HARD HVAC & Engineering' },
-    tagline: { ar: 'حلول التكييف والتبريد الهندسي للمنشآت الكبرى', en: 'Enterprise HVAC Engineering & Cooling Solutions' },
+    siteName: { ar: 'هارد لصيانة التكييف', en: 'HARD HVAC Maintenance' },
+    tagline: { ar: 'صيانة احترافية', en: 'Professional Maintenance' },
     designTokens: {
       primaryAccent: '#0d9488', // Teal Cyan
       secondaryAccent: '#0f766e',
@@ -243,7 +243,7 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
           return result;
         });
       } catch (error) {
-        if (!controller.signal.aborted) console.warn('Could not load Supabase branding', error);
+        if (!controller.signal.aborted) console.warn('Could not load the database branding', error);
       } finally {
         if (!controller.signal.aborted) setIsLoading(false);
       }

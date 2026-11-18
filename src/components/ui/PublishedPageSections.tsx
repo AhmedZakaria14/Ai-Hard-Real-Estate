@@ -41,7 +41,7 @@ export default function PublishedPageSections({ page, language }: { page: PageKe
         });
         setResult({ page, sections });
       } catch (error) {
-        if (!controller.signal.aborted) console.warn('Could not load approved Supabase page sections', error);
+        if (!controller.signal.aborted) console.warn('Could not load approved the database page sections', error);
       }
     }
     void load();

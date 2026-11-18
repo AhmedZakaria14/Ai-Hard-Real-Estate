@@ -210,7 +210,7 @@ const DEFAULT_SEO_CONFIGS: Record<string, PageSeoConfig> = {
       en: 'Class-1 certified general contractor delivering commercial towers and residential communities with SBC compliance.',
       ar: 'الذراع الهندسي لمجموعة هارد - مقاولات عامة مصنفة فئة أولى لتنفيذ المباني والأبراج التجارية بكود البناء السعودي.',
     },
-    ogImage: 'https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=1200&q=80',
+    ogImage: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=80',
     indexable: true,
     canonicalPath: '/construction',
   },

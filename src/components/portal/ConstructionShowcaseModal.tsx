@@ -1,3 +1,7 @@
+import { LocalizedValue } from '../ui/LocalizedValue';
+import { SearchableSelect } from '../ui/SearchableSelect';
+import { InterfaceText } from '../ui/InterfaceText';
+import { ManagedImg, ManagedInput, ManagedTextarea } from '../ui/ManagedElements';
 import React, { useState } from 'react';
 import {
   X,
@@ -77,7 +81,7 @@ export function ConstructionShowcaseModal({
       <div className="relative w-full max-w-4xl bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden text-slate-900 my-8">
         {/* Header Banner */}
         <div className="relative h-48 sm:h-56 bg-slate-900 overflow-hidden">
-          <img
+          <ManagedImg copyScope="realestate.ConstructionShowcaseModal"
             src="https://images.unsplash.com/photo-1517581177682-a085bb7ffb15?auto=format&fit=crop&w=1200&q=80"
             alt="HARD Construction"
             className="w-full h-full object-cover opacity-40 scale-105"
@@ -98,17 +102,17 @@ export function ConstructionShowcaseModal({
             <div className="space-y-1.5 text-start">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 text-xs font-bold tracking-wide">
                 <HardHat className="w-3.5 h-3.5 text-sky-400" />
-                <span>{isAr ? 'قطاع المقاولات والإنشاءات' : 'Construction & Contracting Division'}</span>
+                <span>{isAr ? <InterfaceText id="realestate.ConstructionShowcaseModal.klclzcr" source="قطاع المقاولات والإنشاءات" /> : <InterfaceText id="realestate.ConstructionShowcaseModal.kij0y4z" source="Construction & Contracting Division" />}</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold font-display-serif text-white">
-                {isAr ? 'هارد للإنشاءات والمقاولات العامة' : 'HARD General Contracting & Construction'}
+                {isAr ? <InterfaceText id="realestate.ConstructionShowcaseModal.k1vqs9uu" source="هارد للإنشاءات والمقاولات العامة" /> : <InterfaceText id="realestate.ConstructionShowcaseModal.knikof9" source="HARD General Contracting & Construction" />}
               </h2>
             </div>
 
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-bold flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5" />
-                <span>{isAr ? 'مصنف فئة أولى' : 'Class A Contractor'}</span>
+                <span>{isAr ? <InterfaceText id="realestate.ConstructionShowcaseModal.k1170xc8" source="مصنف فئة أولى" /> : <InterfaceText id="realestate.ConstructionShowcaseModal.kaiec77" source="Class A Contractor" />}</span>
               </span>
             </div>
           </div>
@@ -120,12 +124,12 @@ export function ConstructionShowcaseModal({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2 space-y-4 text-start">
               <h3 className="text-lg font-bold text-slate-900 font-display-serif">
-                {isAr ? 'رؤيتنا في التشييد والبناء الهندسي' : 'Building Saudi Arabia’s Modern Horizon'}
+                {isAr ? <InterfaceText id="realestate.ConstructionShowcaseModal.k4a0fiv" source="رؤيتنا في التشييد والبناء الهندسي" /> : <InterfaceText id="realestate.ConstructionShowcaseModal.k18nz44j" source="Building Saudi Arabia’s Modern Horizon" />}
               </h3>
               <p className="text-sm text-slate-600 leading-relaxed">
                 {isAr
-                  ? 'تمثل شركة هارد للإنشاءات الذراع التنفيذي لمجموعة هارد، حيث نقدم حلول المقاولات العامة الشاملة للمشاريع السكنية والتجارية والصناعية الكبرى في المملكة العربية السعودية. نعتمد أعلى معايير السلامة المهنية، والتقنيات الإنشائية الحديثة لضمان التسليم ضمن الميزانية والجدول الزمني المحدد.'
-                  : 'HARD Construction is the flagship engineering and contracting arm of HARD Group, delivering premier turnkey construction solutions across the Kingdom of Saudi Arabia. With Class-A certifications and cutting-edge engineering methodologies, we build enduring landmarks with rigorous quality and structural integrity.'}
+                  ? <InterfaceText id="realestate.ConstructionShowcaseModal.k1ttdkn5" source="تمثل شركة هارد للإنشاءات الذراع التنفيذي لمجموعة هارد، حيث نقدم حلول المقاولات العامة الشاملة للمشاريع السكنية والتجارية والصناعية الكبرى في المملكة العربية السعودية. نعتمد أعلى معايير السلامة المهنية، والتقنيات الإنشائية الحديثة لضمان التسليم ضمن الميزانية والجدول الزمني المحدد." />
+                  : <InterfaceText id="realestate.ConstructionShowcaseModal.k1ihsnzw" source="HARD Construction is the flagship engineering and contracting arm of HARD Group, delivering premier turnkey construction solutions across the Kingdom of Saudi Arabia. With Class-A certifications and cutting-edge engineering methodologies, we build enduring landmarks with rigorous quality and structural integrity." />}
               </p>
 
               {/* Capabilities Grid */}
@@ -137,9 +141,9 @@ export function ConstructionShowcaseModal({
                   >
                     <div className="flex items-center gap-2 text-sky-600">
                       <CheckCircle2 className="w-4 h-4 shrink-0" />
-                      <h4 className="text-xs font-bold text-slate-900">{cap.title}</h4>
+                      <h4 className="text-xs font-bold text-slate-900"><LocalizedValue value={cap.title} /></h4>
                     </div>
-                    <p className="text-[11px] text-slate-600 leading-normal">{cap.desc}</p>
+                    <p className="text-[11px] text-slate-600 leading-normal"><LocalizedValue value={cap.desc} /></p>
                   </div>
                 ))}
               </div>
@@ -149,32 +153,32 @@ export function ConstructionShowcaseModal({
             <div className="space-y-4">
               <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3 text-start">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  {isAr ? 'مؤشرات قطاع الإنشاءات' : 'Division Key Metrics'}
+                  {isAr ? <InterfaceText id="realestate.ConstructionShowcaseModal.k1rv5n0" source="مؤشرات قطاع الإنشاءات" /> : <InterfaceText id="realestate.ConstructionShowcaseModal.kmbp5ks" source="Division Key Metrics" />}
                 </h4>
                 <div className="space-y-2">
                   <div>
-                    <div className="text-2xl font-bold text-slate-900 font-display-serif">45+</div>
-                    <div className="text-[11px] text-slate-500">{isAr ? 'مشروع وبرج منجز' : 'Completed Landmarks'}</div>
+                    <div className="text-2xl font-bold text-slate-900 font-display-serif"><LocalizedValue value="45+" /></div>
+                    <div className="text-[11px] text-slate-500">{isAr ? <InterfaceText id="realestate.ConstructionShowcaseModal.k18dw2bi" source="مشروع وبرج منجز" /> : <InterfaceText id="realestate.ConstructionShowcaseModal.k17l82ub" source="Completed Landmarks" />}</div>
                   </div>
                   <div className="border-t border-slate-200 pt-2">
-                    <div className="text-2xl font-bold text-sky-600 font-display-serif">100%</div>
-                    <div className="text-[11px] text-slate-500">{isAr ? 'الالتزام بكود البناء السعودي' : 'SBC Compliance'}</div>
+                    <div className="text-2xl font-bold text-sky-600 font-display-serif"><LocalizedValue value="100%" /></div>
+                    <div className="text-[11px] text-slate-500">{isAr ? <InterfaceText id="realestate.ConstructionShowcaseModal.kjlxeeg" source="الالتزام بكود البناء السعودي" /> : <InterfaceText id="realestate.ConstructionShowcaseModal.k4syi08" source="SBC Compliance" />}</div>
                   </div>
                 </div>
               </div>
 
               <div className="p-4 rounded-xl bg-sky-50 border border-sky-100 space-y-2 text-xs text-start">
-                <span className="font-bold text-sky-900 block">{isAr ? 'التواصل المباشر مع إدارة المشاريع:' : 'Direct Project Management Desk:'}</span>
+                <span className="font-bold text-sky-900 block">{isAr ? <InterfaceText id="realestate.ConstructionShowcaseModal.kcw2v36" source="التواصل المباشر مع إدارة المشاريع:" /> : <InterfaceText id="realestate.ConstructionShowcaseModal.ks09ert" source="Direct Project Management Desk:" />}</span>
                 <div className="flex items-center gap-2 text-slate-700 dir-ltr">
                   <Phone className="w-3.5 h-3.5 text-sky-600" />
                   <a href={`tel:${COMPANY_CREDENTIALS.phone.replace(/\s+/g, '')}`} className="hover:text-sky-600 font-semibold">
-                    {COMPANY_CREDENTIALS.phone}
+                    <LocalizedValue value={COMPANY_CREDENTIALS.phone} />
                   </a>
                 </div>
                 <div className="flex items-center gap-2 text-slate-700 dir-ltr">
                   <Mail className="w-3.5 h-3.5 text-sky-600" />
                   <a href={`mailto:${COMPANY_CREDENTIALS.email}`} className="hover:text-sky-600 font-semibold">
-                    {COMPANY_CREDENTIALS.email}
+                    <LocalizedValue value={COMPANY_CREDENTIALS.email} />
                   </a>
                 </div>
               </div>
@@ -186,21 +190,21 @@ export function ConstructionShowcaseModal({
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <FileText className="w-4 h-4 text-sky-600" />
-                <span>{isAr ? 'طلب تسعير مناقصة أو استشارة هندسية' : 'Request Construction Tender or Consultation'}</span>
+                <span>{isAr ? <InterfaceText id="realestate.ConstructionShowcaseModal.k1v8y2p1" source="طلب تسعير مناقصة أو استشارة هندسية" /> : <InterfaceText id="realestate.ConstructionShowcaseModal.kvgx0hh" source="Request Construction Tender or Consultation" />}</span>
               </h3>
-              <span className="text-xs text-slate-500">{isAr ? 'استجابة خلال 24 ساعة' : '24h Response Time'}</span>
+              <span className="text-xs text-slate-500">{isAr ? <InterfaceText id="realestate.ConstructionShowcaseModal.krne6ck" source="استجابة خلال 24 ساعة" /> : <InterfaceText id="realestate.ConstructionShowcaseModal.kgs7qah" source="24h Response Time" />}</span>
             </div>
 
             {submitted ? (
               <div className="p-6 rounded-xl bg-sky-50 border border-sky-200 text-center space-y-2 animate-in zoom-in-95">
                 <CheckCircle2 className="w-8 h-8 text-sky-600 mx-auto" />
                 <h4 className="text-sm font-bold text-sky-900">
-                  {isAr ? 'تم استلام طلب المشروع بنجاح!' : 'Tender Request Received!'}
+                  {isAr ? <InterfaceText id="realestate.ConstructionShowcaseModal.k1kuovfs" source="تم استلام طلب المشروع بنجاح!" /> : <InterfaceText id="realestate.ConstructionShowcaseModal.kxl76x8" source="Tender Request Received!" />}
                 </h4>
                 <p className="text-xs text-slate-600">
                   {isAr
-                    ? 'سيقوم فريق إدارة المشاريع والعطاءات بدراسة التفاصيل والتواصل معك في أقرب وقت.'
-                    : 'Our project estimation and tendering team will review your specifications and get in touch promptly.'}
+                    ? <InterfaceText id="realestate.ConstructionShowcaseModal.kl68h45" source="سيقوم فريق إدارة المشاريع والعطاءات بدراسة التفاصيل والتواصل معك في أقرب وقت." />
+                    : <InterfaceText id="realestate.ConstructionShowcaseModal.k18v1m48" source="Our project estimation and tendering team will review your specifications and get in touch promptly." />}
                 </p>
               </div>
             ) : (
@@ -208,9 +212,9 @@ export function ConstructionShowcaseModal({
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <label className="block text-xs font-medium text-slate-700 mb-1 text-start">
-                      {isAr ? 'اسم الجهة / العميل' : 'Client / Company Name'} *
+                      {isAr ? <InterfaceText id="realestate.ConstructionShowcaseModal.k1tvq1rh" source="اسم الجهة / العميل" /> : <InterfaceText id="realestate.ConstructionShowcaseModal.k1mltgyv" source="Client / Company Name" />} <span className="text-red-600">*</span>
                     </label>
-                    <input
+                    <ManagedInput copyScope="realestate.ConstructionShowcaseModal"
                       type="text"
                       required
                       value={formData.name}
@@ -222,9 +226,9 @@ export function ConstructionShowcaseModal({
 
                   <div>
                     <label className="block text-xs font-medium text-slate-700 mb-1 text-start">
-                      {isAr ? 'رقم الجوال' : 'Phone Number'} *
+                      {isAr ? <InterfaceText id="realestate.ConstructionShowcaseModal.khf873v" source="رقم الجوال" /> : <InterfaceText id="realestate.ConstructionShowcaseModal.k1v8ev2w" source="Phone Number" />} <span className="text-red-600">*</span>
                     </label>
-                    <input
+                    <ManagedInput copyScope="realestate.ConstructionShowcaseModal"
                       type="tel"
                       required
                       value={formData.phone}
@@ -236,9 +240,9 @@ export function ConstructionShowcaseModal({
 
                   <div>
                     <label className="block text-xs font-medium text-slate-700 mb-1 text-start">
-                      {isAr ? 'نوع المشروع' : 'Project Type'}
+                      {isAr ? <InterfaceText id="realestate.ConstructionShowcaseModal.kqyk6h4" source="نوع المشروع" /> : <InterfaceText id="realestate.ConstructionShowcaseModal.kitubsq" source="Project Type" />}
                     </label>
-                    <select
+                    <SearchableSelect
                       value={formData.projectType}
                       onChange={(e) => setFormData({ ...formData, projectType: e.target.value })}
                       className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 focus:outline-none"
@@ -247,15 +251,15 @@ export function ConstructionShowcaseModal({
                       <option value="residential">{isAr ? 'مجمع سكني أو فلل' : 'Residential Community / Villas'}</option>
                       <option value="industrial">{isAr ? 'منشأة صناعية / لوجستية' : 'Industrial / Warehouse Facility'}</option>
                       <option value="fitout">{isAr ? 'تشطيبات وتصميم داخلي' : 'Luxury Interior Fit-Out'}</option>
-                    </select>
+                    </SearchableSelect>
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-xs font-medium text-slate-700 mb-1 text-start">
-                    {isAr ? 'ملاحظات وتفاصيل إضافية عن المشروع' : 'Project Scope & Location Details'}
+                    {isAr ? <InterfaceText id="realestate.ConstructionShowcaseModal.k1w65c4d" source="ملاحظات وتفاصيل إضافية عن المشروع" /> : <InterfaceText id="realestate.ConstructionShowcaseModal.k1yhw6a1" source="Project Scope & Location Details" />}
                   </label>
-                  <textarea
+                  <ManagedTextarea copyScope="realestate.ConstructionShowcaseModal"
                     rows={2}
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -270,13 +274,13 @@ export function ConstructionShowcaseModal({
                     onClick={onClose}
                     className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer"
                   >
-                    {isAr ? 'إغلاق' : 'Close'}
+                    {isAr ? <InterfaceText id="realestate.ConstructionShowcaseModal.kysudiz" source="إغلاق" /> : <InterfaceText id="realestate.ConstructionShowcaseModal.k1l0xxoj" source="Close" />}
                   </button>
                   <button
                     type="submit"
                     className="px-6 py-2.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-500 text-white flex items-center gap-2 shadow-xs cursor-pointer transition-colors"
                   >
-                    <span>{isAr ? 'إرسال طلب المناقصة' : 'Submit Tender Request'}</span>
+                    <span>{isAr ? <InterfaceText id="realestate.ConstructionShowcaseModal.kfttmy1" source="إرسال طلب المناقصة" /> : <InterfaceText id="realestate.ConstructionShowcaseModal.kg11d8s" source="Submit Tender Request" />}</span>
                     <ArrowIcon className="w-3.5 h-3.5" />
                   </button>
                 </div>

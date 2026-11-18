@@ -1,3 +1,5 @@
+import { InterfaceText } from '../../components/ui/InterfaceText';
+import { ManagedImg } from '../../components/ui/ManagedElements';
 import { usePublishedBrandEmblem } from '../../components/ui/BrandLogo';
 import React from 'react';
 import { useHVAC } from '../context/HVACContext';
@@ -42,7 +44,7 @@ export function HVACBrandLockup({
       } ${className}`}
     >
       {showLogo && (
-        <img
+        <ManagedImg copyScope="hvac.HVACBrandLockup"
           src={emblem} onError={({ currentTarget }) => { if (!currentTarget.src.endsWith('/logo.svg')) currentTarget.src = '/logo.svg'; }}
           alt="HARD HVAC Maintenance"
           className={`${logoSizes[size]} object-contain shrink-0`}
@@ -53,14 +55,10 @@ export function HVACBrandLockup({
         <span
           className={`font-cormorant font-bold tracking-tight text-[#1E293B] ${hardSizes[size]}`}
           style={{ letterSpacing: '0.02em' }}
-        >
-          HARD
-        </span>
+        ><InterfaceText id="hvac.HVACBrandLockup.k19hnhdg" source="HARD " /></span>
         <span
           className={`font-ui-sans font-semibold tracking-normal text-[#0EA5E9] ${suffixSizes[size]}`}
-        >
-          HVAC Maintenance
-        </span>
+        ><InterfaceText id="hvac.HVACBrandLockup.k1mrv92g" source="HVAC Maintenance " /></span>
       </div>
     </div>
   );

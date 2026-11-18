@@ -6,12 +6,14 @@
  */
 
 import { hardAdminClient } from '../db/hardAdminClient';
-import { canPublish } from '../../types/firestore-schema';
+import { assertMediaReady } from '../mediaSaveGuard';
+import { canPublish } from '../../types/backend-schema';
 import { PublicationParams, PublicationResult } from './publicationTypes';
 import { validateEntityForPublish } from './publicationValidation';
 import { generateCorrelationId, logProductionEvent } from '../monitoring/productionLogger';
 
 export async function publishEntityWithAtomicBatch(params: PublicationParams): Promise<PublicationResult> {
+  assertMediaReady();
   const { entityType, entityId, sector = 'portal', draftData, publisherUser } = params;
   const correlationId = generateCorrelationId('pub');
 
@@ -61,13 +63,13 @@ export async function publishEntityWithAtomicBatch(params: PublicationParams): P
     p_type: entityType, p_id: entityId, p_sector: sector, p_body: draftData,
   });
   if (error) throw error;
-  if (!release?.version || !release?.eventId) throw new Error('Supabase did not confirm the release.');
+  if (!release?.version || !release?.eventId) throw new Error('the database did not confirm the release.');
   return {
     success: true,
     publishedVersion: release.version,
     publishedAt: release.publishedAt,
     auditEventId: release.eventId,
-    messageAr: `حُفظ إصدار المحتوى رقم ${release.version} في Supabase.`,
-    messageEn: `Content release v${release.version} saved in Supabase.`,
+    messageAr: `حُفظ إصدار المحتوى رقم ${release.version} في قاعدة البيانات.`,
+    messageEn: `Content release v${release.version} saved in the database.`,
   };
 }

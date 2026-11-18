@@ -1,4 +1,4 @@
-import type { FormAttachmentMeta } from '../../types/firestore-schema';
+import type { FormAttachmentMeta } from '../../types/backend-schema';
 import { hardPublishableKey, hardSupabaseUrl } from '../db/hardCatalog';
 
 const endpoint = hardSupabaseUrl + '/functions/v1/hard-form-attachments';

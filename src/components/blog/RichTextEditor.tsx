@@ -1,3 +1,4 @@
+import { LocalizedValue } from '../ui/LocalizedValue';
 import React, { useState, useRef } from 'react';
 import {
   Bold,
@@ -118,9 +119,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       {/* Label and Toolbar Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-          <span>{label}</span>
+          <span><LocalizedValue value={label} /></span>
           <span className="text-[10px] font-normal text-slate-400">
-            ({isAr ? 'يدعم التنسيق الغني والعناوين والقوائم' : 'Rich text & Markdown supported'})
+            (<LocalizedValue value={isAr ? 'يدعم التنسيق الغني والعناوين والقوائم' : 'Rich text & Markdown supported'} />)
           </span>
         </label>
 
@@ -136,7 +137,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             }`}
           >
             <PenTool className="w-3 h-3" />
-            <span>{isAr ? 'المحرر' : 'Editor'}</span>
+            <span><LocalizedValue value={isAr ? 'المحرر' : 'Editor'} /></span>
           </button>
           <button
             type="button"
@@ -147,7 +148,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <span>{isAr ? 'عرض مزدوج' : 'Side-by-Side'}</span>
+            <span><LocalizedValue value={isAr ? 'عرض مزدوج' : 'Side-by-Side'} /></span>
           </button>
           <button
             type="button"
@@ -159,7 +160,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             }`}
           >
             <Eye className="w-3 h-3" />
-            <span>{isAr ? 'معاينة القراءة' : 'Preview'}</span>
+            <span><LocalizedValue value={isAr ? 'معاينة القراءة' : 'Preview'} /></span>
           </button>
         </div>
       </div>
@@ -300,7 +301,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 <SafeRichContent content={value} dir={isAr ? 'rtl' : 'ltr'} />
               ) : (
                 <div className="text-center py-12 text-slate-400 text-xs italic">
-                  {isAr ? 'لا يوجد محتوى للمعاينة حتى الآن' : 'No content to preview yet'}
+                  <LocalizedValue value={isAr ? 'لا يوجد محتوى للمعاينة حتى الآن' : 'No content to preview yet'} />
                 </div>
               )}
             </div>
@@ -325,7 +326,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   <SafeRichContent content={value} dir={isAr ? 'rtl' : 'ltr'} />
                 ) : (
                   <div className="text-center py-12 text-slate-400 text-xs italic">
-                    {isAr ? 'ستظهر المعاينة المباشرة هنا' : 'Live sanitized preview will appear here'}
+                    <LocalizedValue value={isAr ? 'ستظهر المعاينة المباشرة هنا' : 'Live sanitized preview will appear here'} />
                   </div>
                 )}
               </div>
@@ -337,20 +338,20 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         <div className="px-4 py-2 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-medium">
           <div className="flex items-center gap-3">
             <span>
-              {isAr ? `${wordCount} كلمة` : `${wordCount} words`}
+              <LocalizedValue value={isAr ? `${wordCount} كلمة` : `${wordCount} words`} />
             </span>
             <span>•</span>
             <span className="flex items-center gap-1 text-blue-600 font-bold">
               <Clock className="w-3 h-3" />
-              {isAr
+              <LocalizedValue value={isAr
                 ? `قراءة مقدرة: ${readingMinutes} ${readingMinutes <= 10 ? 'دقائق' : 'دقيقة'}`
-                : `Est. reading time: ${readingMinutes} min read`}
+                : `Est. reading time: ${readingMinutes} min read`} />
             </span>
           </div>
 
           <div className="flex items-center gap-1 text-emerald-600 font-semibold">
             <Sparkles className="w-3 h-3" />
-            <span>{isAr ? 'عرض آمن ومعقم (Sanitized XSS-Safe)' : 'Safe Rich-Text Rendering'}</span>
+            <span><LocalizedValue value={isAr ? 'عرض آمن ومعقم (Sanitized XSS-Safe)' : 'Safe Rich-Text Rendering'} /></span>
           </div>
         </div>
       </div>
@@ -363,12 +364,12 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xl max-w-sm w-full space-y-4"
           >
             <h4 className="text-sm font-bold text-slate-900 font-display-serif">
-              {isAr ? 'إدراج رابط خارجي أو داخلي' : 'Insert Link'}
+              <LocalizedValue value={isAr ? 'إدراج رابط خارجي أو داخلي' : 'Insert Link'} />
             </h4>
 
             <div className="space-y-1">
               <label className="text-[11px] font-bold text-slate-700">
-                {isAr ? 'عنوان الرابط (النص الظاهر)' : 'Link Text'}
+                <LocalizedValue value={isAr ? 'عنوان الرابط (النص الظاهر)' : 'Link Text'} />
               </label>
               <input
                 type="text"
@@ -381,7 +382,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
             <div className="space-y-1">
               <label className="text-[11px] font-bold text-slate-700">
-                {isAr ? 'عنوان URL' : 'Target URL'} *
+                <LocalizedValue value={isAr ? 'عنوان URL' : 'Target URL'} /> <span className="text-red-600">*</span>
               </label>
               <input
                 type="url"
@@ -399,13 +400,13 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 onClick={() => setShowLinkModal(false)}
                 className="px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer"
               >
-                {isAr ? 'إلغاء' : 'Cancel'}
+                <LocalizedValue value={isAr ? 'إلغاء' : 'Cancel'} />
               </button>
               <button
                 type="submit"
                 className="px-4 py-1.5 text-xs font-bold bg-blue-600 text-white hover:bg-blue-700 rounded-lg cursor-pointer"
               >
-                {isAr ? 'إدراج' : 'Insert'}
+                <LocalizedValue value={isAr ? 'إدراج' : 'Insert'} />
               </button>
             </div>
           </form>

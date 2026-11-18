@@ -157,7 +157,7 @@ export function subscribeToProductionLogs(
 
       onLogsUpdated(logs, metrics);
     } catch (error) {
-      if (!controller.signal.aborted) console.warn('Could not refresh Supabase monitoring logs:', error);
+      if (!controller.signal.aborted) console.warn('Could not refresh the database monitoring logs:', error);
     }
   }
 

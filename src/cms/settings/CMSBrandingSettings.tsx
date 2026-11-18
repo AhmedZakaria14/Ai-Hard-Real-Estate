@@ -24,7 +24,7 @@ import {
   Copy,
 } from 'lucide-react';
 import { Language } from '../../types';
-import { SectorId } from '../../types/firestore-schema';
+import { SectorId } from '../../types/backend-schema';
 import {
   useSiteSettings,
   PublicBrandingSettings,

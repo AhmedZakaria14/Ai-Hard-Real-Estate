@@ -1,3 +1,4 @@
+import { LocalizedValue } from '../../components/ui/LocalizedValue';
 import { formatConstructionDigits } from '../utils/constructionFormatters';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import React from 'react';
@@ -46,13 +47,13 @@ export function ServicesSection() {
         <div className="space-y-3 max-w-3xl text-start">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#e8f4fc] border border-[#d0e9fa] text-[#009ee2] text-xs font-bold shadow-2xs">
             <Wrench className="w-3.5 h-3.5 text-[#009ee2]" />
-            <span>{t.services.badge}</span>
+            <span><LocalizedValue value={t.services.badge} /></span>
           </div>
           <h2 className="text-2xl sm:text-4xl font-black font-display-serif text-[#0f243e] tracking-tight">
-            {t.services.title}
+            <LocalizedValue value={t.services.title} />
           </h2>
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-medium">
-            {t.services.subtitle}
+            <LocalizedValue value={t.services.subtitle} />
           </p>
         </div>
 
@@ -77,7 +78,7 @@ export function ServicesSection() {
 
                     {badge && (
                       <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                        {badge}
+                        <LocalizedValue value={badge} />
                       </span>
                     )}
                   </div>
@@ -85,28 +86,28 @@ export function ServicesSection() {
                   {/* Title & Subtitle */}
                   <div className="space-y-1">
                     <h3 className="text-lg font-bold text-[#0f243e] font-display-serif group-hover:text-[#009ee2] transition-colors">
-                      {isAr ? srv.titleAr : srv.titleEn}
+                      <LocalizedValue value={isAr ? srv.titleAr : srv.titleEn} />
                     </h3>
                     <p className="text-xs text-[#009ee2] font-semibold">
-                      {isAr ? srv.subtitleAr : srv.subtitleEn}
+                      <LocalizedValue value={isAr ? srv.subtitleAr : srv.subtitleEn} />
                     </p>
                   </div>
 
                   {/* Description */}
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    {isAr ? srv.descriptionAr : srv.descriptionEn}
+                    <LocalizedValue value={isAr ? srv.descriptionAr : srv.descriptionEn} />
                   </p>
 
                   {/* Deliverables List */}
                   <div className="space-y-2 pt-2 border-t border-slate-100">
                     <div className="text-[11px] font-bold text-slate-500">
-                      {t.services.deliverablesTitle}
+                      <LocalizedValue value={t.services.deliverablesTitle} />
                     </div>
                     <ul className="space-y-2 text-xs text-slate-600">
                       {deliverables.slice(0, 3).map((item, idx) => (
                         <li key={idx} className="flex items-start gap-2">
                           <CheckCircle2 className="w-3.5 h-3.5 text-[#009ee2] shrink-0 mt-0.5" />
-                          <span className="leading-tight">{item}</span>
+                          <span className="leading-tight"><LocalizedValue value={item} /></span>
                         </li>
                       ))}
                     </ul>
@@ -118,7 +119,7 @@ export function ServicesSection() {
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
                     <ShieldCheck className="w-4 h-4" />
                     <span>
-                      {formatConstructionDigits(srv.warrantyYears, language)} {t.services.warrantyLabel}
+                      <LocalizedValue value={formatConstructionDigits(srv.warrantyYears, language)} /> <LocalizedValue value={t.services.warrantyLabel} />
                     </span>
                   </div>
 

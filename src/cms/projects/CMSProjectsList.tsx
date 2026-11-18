@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import React, { useState, useMemo } from 'react';
 import {
   Layers,
@@ -250,7 +251,7 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
 
         {/* Filters and View Mode */}
         <div className="flex items-center gap-2.5 flex-wrap">
-          <select
+          <SearchableSelect
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
@@ -261,7 +262,7 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
                 {isAr ? opt.labelAr : opt.labelEn}
               </option>
             ))}
-          </select>
+          </SearchableSelect>
 
           {/* View Mode Toggle */}
           <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
@@ -399,7 +400,7 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
 
                       {/* Status */}
                       <td className="py-3.5 px-4">
-                        <select
+                        <SearchableSelect
                           value={currentStatus}
                           onChange={(e) => onQuickStatusChange(project, e.target.value as ProjectStatus)}
                           className={`text-[10px] font-bold px-2 py-1 rounded-lg border focus:outline-none cursor-pointer ${statusInfo.color}`}
@@ -409,7 +410,7 @@ export const CMSProjectsList: React.FC<CMSProjectsListProps> = ({
                               {isAr ? opt.labelAr : opt.labelEn}
                             </option>
                           ))}
-                        </select>
+                        </SearchableSelect>
                       </td>
 
                       {/* Actions */}

@@ -1,3 +1,5 @@
+import { LocalizedValue } from './LocalizedValue';
+import { ManagedButton } from './ManagedElements';
 import React, { useEffect, useRef, useId } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '../../lib/utils';
@@ -153,28 +155,28 @@ export function Modal({
           <div className="pe-6 space-y-1 flex-1">
             {title && (
               <h3 id={titleId} className="text-xl sm:text-2xl font-bold text-slate-900 font-display-serif tracking-tight">
-                {title}
+                <LocalizedValue value={title} />
               </h3>
             )}
             {subtitle && (
               <p id={subtitleId} className="text-xs sm:text-sm text-slate-500 leading-relaxed">
-                {subtitle}
+                <LocalizedValue value={subtitle} />
               </p>
             )}
-            {headerExtra && <div className="pt-2">{headerExtra}</div>}
+            {headerExtra && <div className="pt-2"><LocalizedValue value={headerExtra} /></div>}
           </div>
-          <button
+          <ManagedButton copyScope="realestate.Modal"
             type="button"
             onClick={onClose}
             aria-label="Close modal"
             className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer shrink-0"
           >
             <X className="w-5 h-5" />
-          </button>
+          </ManagedButton>
         </div>
 
         {/* Content body with internal scrolling */}
-        <div className="p-5 sm:p-6 max-h-[78vh] sm:max-h-[80vh] overflow-y-auto">{children}</div>
+        <div className="p-5 sm:p-6 max-h-[78vh] sm:max-h-[80vh] overflow-y-auto"><LocalizedValue value={children} /></div>
       </div>
     </div>
   );

@@ -1,11 +1,12 @@
 import { hardAdminClient } from './hardAdminClient';
 import { hardPublishableKey, hardSupabaseUrl } from './hardCatalog';
+import { assertMediaReady } from '../mediaSaveGuard';
 
 export type SectorSection =
   | { sector: 'portal'; key: 'landing' }
   | { sector: 'construction'; key: 'hero' | 'company' | 'stages' | 'offices' | 'services' }
   | { sector: 'realestate'; key: 'hero' | 'service_media' | 'property_types' | 'site_text' | 'page_media' }
-  | { sector: 'hvac'; key: 'hero' | 'hours_contact' | 'booking_copy' | 'service_areas' | 'work_gallery' | 'maintenance_guide' | 'reviews' | 'faq' };
+  | { sector: 'hvac'; key: 'hero' | 'hours_contact' | 'booking_copy' | 'service_areas' | 'work_gallery' | 'gallery_categories' | 'maintenance_guide' | 'reviews' | 'faq' };
 
 const refreshEvent = 'hard-sector-section-saved';
 
@@ -28,24 +29,28 @@ export function subscribeSectorSection<T>(section: SectorSection, fallback: T, c
       const data = await readSectorSection<T>(section, controller.signal);
       if (!controller.signal.aborted && request === generation) callback(data ?? fallback);
     } catch (error) {
-      if (!controller.signal.aborted) console.warn('Could not load Supabase sector section', error);
+      if (!controller.signal.aborted) console.warn('Could not load the database sector section', error);
     }
   }
   function onSaved(event: Event) {
     const changed = (event as CustomEvent<SectorSection>).detail;
     if (changed?.sector === section.sector && changed.key === section.key) void refresh();
   }
+  function onStorage(event: StorageEvent) { if (event.key === refreshEvent) void refresh(); }
   window.addEventListener(refreshEvent, onSaved);
   window.addEventListener('focus', refresh);
+  window.addEventListener('storage', onStorage);
   void refresh();
   return () => {
     controller.abort();
     window.removeEventListener(refreshEvent, onSaved);
     window.removeEventListener('focus', refresh);
+    window.removeEventListener('storage', onStorage);
   };
 }
 
 export async function saveSectorSection({ sector, key }: SectorSection, body: object) {
+  assertMediaReady();
   const { error } = await hardAdminClient.from('hard_sector_sections').upsert({
     sector, section_key: key, body, updated_at: new Date().toISOString(),
   }, { onConflict: 'sector,section_key' });
@@ -55,4 +60,5 @@ export async function saveSectorSection({ sector, key }: SectorSection, body: ob
 
 export function notifySectorSectionSaved(section: SectorSection) {
   window.dispatchEvent(new CustomEvent(refreshEvent, { detail: section }));
+  try { localStorage.setItem(refreshEvent, JSON.stringify({ ...section, at: Date.now() })); } catch { /* Refresh on focus remains available. */ }
 }

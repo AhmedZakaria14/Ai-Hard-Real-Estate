@@ -1,3 +1,5 @@
+import { LocalizedValue } from '../../components/ui/LocalizedValue';
+import { InterfaceText } from '../../components/ui/InterfaceText';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import React from 'react';
 import {
@@ -36,10 +38,10 @@ export function HVACSeasonalChecklist() {
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-10 sm:mb-12">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight">
-            {pick(T.checklist.title, language)}
+            <LocalizedValue value={pick(T.checklist.title, language)} />
           </h2>
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-            {pick(T.checklist.subtitle, language)}
+            <LocalizedValue value={pick(T.checklist.subtitle, language)} />
           </p>
 
         </div>
@@ -62,17 +64,17 @@ export function HVACSeasonalChecklist() {
                 <div className="space-y-1.5 flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="text-base font-semibold text-slate-900">
-                      {isAr ? item.titleAr : item.titleEn}
+                      <LocalizedValue value={isAr ? item.titleAr : item.titleEn} />
                     </h3>
                     <span
                       className={`text-[10px] px-2 py-0.5 rounded-full font-semibold shrink-0 bg-sky-50 text-[#034DA2]`}
                     >
-                      {isAr ? item.importanceAr : item.importanceEn}
+                      <LocalizedValue value={isAr ? item.importanceAr : item.importanceEn} />
                     </span>
                   </div>
 
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                    {isAr ? item.descAr : item.descEn}
+                    <LocalizedValue value={isAr ? item.descAr : item.descEn} />
                   </p>
                 </div>
               </div>
@@ -90,8 +92,8 @@ export function HVACSeasonalChecklist() {
             <CheckCircle2 className="w-4 h-4 text-white" />
             <span>
               {isAr
-                ? 'احجز خدمة الفحص الدوري الكامل الآن'
-                : 'Book a Full Periodic Inspection'}
+                ? <InterfaceText id="hvac.HVACSeasonalChecklist.khptmw8" source="احجز خدمة الفحص الدوري الكامل الآن" />
+                : <InterfaceText id="hvac.HVACSeasonalChecklist.k1cjbs9p" source="Book a Full Periodic Inspection" />}
             </span>
           </button>
         </div>

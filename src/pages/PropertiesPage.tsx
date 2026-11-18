@@ -1,3 +1,7 @@
+import { LocalizedValue } from '../components/ui/LocalizedValue';
+import { SearchableSelect } from '../components/ui/SearchableSelect';
+import { InterfaceText } from '../components/ui/InterfaceText';
+import { ManagedInput, ManagedButton } from '../components/ui/ManagedElements';
 import { usePropertyTypes } from '../lib/usePropertyTypes';
 import React, { useState, useMemo, useEffect } from 'react';
 import {
@@ -385,10 +389,10 @@ export function PropertiesPage({
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div className="space-y-2">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 font-display-serif tracking-tight">
-            {t.properties.pageTitle}
+            <LocalizedValue value={t.properties.pageTitle} />
           </h1>
           <p className="text-sm sm:text-base text-slate-600 max-w-2xl">
-            {t.properties.pageSubtitle}
+            <LocalizedValue value={t.properties.pageSubtitle} />
           </p>
         </div>
 
@@ -397,7 +401,7 @@ export function PropertiesPage({
           <div className="px-4 py-2 bg-blue-50 border border-blue-200 text-blue-800 rounded-2xl text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-xs">
             <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
             <span>
-              {filteredProperties.length.toLocaleString(numberLocale)} {language === 'en' ? 'Units Available' : 'عقار متاح'}
+              <LocalizedValue value={filteredProperties.length.toLocaleString(numberLocale)} /> {language === 'en' ? <InterfaceText id="realestate.PropertiesPage.km84q53" source="Units Available" /> : <InterfaceText id="realestate.PropertiesPage.k1cijo2l" source="عقار متاح" />}
             </span>
           </div>
         </div>
@@ -408,10 +412,10 @@ export function PropertiesPage({
           {/* Keyword Search (4 cols) */}
           <div className="lg:col-span-4 relative">
             <label htmlFor="properties-search-query" className="sr-only">
-              {t.properties.filters.search}
+              <LocalizedValue value={t.properties.filters.search} />
             </label>
             <Search className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5" />
-            <input
+            <ManagedInput copyScope="realestate.PropertiesPage"
               id="properties-search-query"
               type="text"
               aria-label={t.properties.filters.search}
@@ -474,7 +478,7 @@ export function PropertiesPage({
             )}
           </div>
 
-          <select
+          <SearchableSelect
             aria-label={t.properties.filters.allTypes}
             value={typeFilter}
             onChange={(event) => {
@@ -486,7 +490,7 @@ export function PropertiesPage({
             {propertyTypeTabs.map(({ id, label }) => (
               <option key={id} value={id}>{label} ({(typeCounts[id] ?? 0).toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')})</option>
             ))}
-          </select>
+          </SearchableSelect>
 
           {/* Location / City Dropdown (3 cols) */}
           <div className="lg:col-span-3">
@@ -507,9 +511,9 @@ export function PropertiesPage({
           {/* Status Tabs / Selector (2 cols) */}
           <div className="lg:col-span-2">
             <label htmlFor="properties-status-filter" className="sr-only">
-              {t.properties.filters.allStatus}
+              <LocalizedValue value={t.properties.filters.allStatus} />
             </label>
-            <select
+            <SearchableSelect
               id="properties-status-filter"
               aria-label={t.properties.filters.allStatus}
               value={statusFilter}
@@ -521,16 +525,16 @@ export function PropertiesPage({
               <option value="all">{t.properties.filters.allStatus}</option>
               <option value="for-sale">{t.properties.filters.forSale}</option>
               <option value="for-rent">{t.properties.filters.forRent}</option>
-            </select>
+            </SearchableSelect>
           </div>
 
           {/* Sort By (3 cols) */}
           <div className="lg:col-span-3 relative">
             <label htmlFor="properties-sort-by" className="sr-only">
-              {t.properties.filters.sortBy || (language === 'en' ? 'Sort By' : 'ترتيب حسب')}
+              <LocalizedValue value={t.properties.filters.sortBy || (language === 'en' ? 'Sort By' : 'ترتيب حسب')} />
             </label>
             <ArrowUpDown className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5 pointer-events-none" />
-            <select
+            <SearchableSelect
               id="properties-sort-by"
               aria-label={t.properties.filters.sortBy || (language === 'en' ? 'Sort By' : 'ترتيب حسب')}
               value={sortBy}
@@ -545,7 +549,7 @@ export function PropertiesPage({
               <option value="price-desc">{t.properties.filters.priceHighToLow}</option>
               <option value="area-desc">{language === 'en' ? 'Area: Largest First' : 'المساحة: الأكبر أولاً'}</option>
               <option value="beds-desc">{language === 'en' ? 'Bedrooms: Most First' : 'غرف النوم: الأكثر أولاً'}</option>
-            </select>
+            </SearchableSelect>
           </div>
 
           <div className="space-y-3 border-t border-slate-100 pt-3">
@@ -553,7 +557,7 @@ export function PropertiesPage({
             <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
               <span className="font-semibold text-slate-700 flex items-center gap-1.5">
                 <DollarSign className="w-3.5 h-3.5 text-blue-600" />
-                {t.properties.filters.priceRange}:
+                <LocalizedValue value={t.properties.filters.priceRange} />:
               </span>
 
               {/* Explicit Payment Period Selector for Rental */}
@@ -568,7 +572,7 @@ export function PropertiesPage({
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
-                    {t.properties.filters.annualRent || (language === 'en' ? 'Annual Rent' : 'سنوياً')}
+                    <LocalizedValue value={t.properties.filters.annualRent || (language === 'en' ? 'Annual Rent' : 'سنوياً')} />
                   </button>
                   <button
                     type="button"
@@ -579,7 +583,7 @@ export function PropertiesPage({
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
-                    {t.properties.filters.monthlyRent || (language === 'en' ? 'Monthly Rent' : 'شهرياً')}
+                    <LocalizedValue value={t.properties.filters.monthlyRent || (language === 'en' ? 'Monthly Rent' : 'شهرياً')} />
                   </button>
                 </div>
               )}
@@ -589,14 +593,14 @@ export function PropertiesPage({
               {maxPrice >= currentMaxCap && minPrice === 0
                 ? t.properties.filters.anyPrice
                 : <>
-                    {minPrice > 0 ? <>{minPrice.toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')} – </> : (language === 'ar' ? 'حتى ' : 'Up to ')}
-                    {maxPrice.toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')} {language === 'ar' ? 'ر.س' : 'SAR'}
+                    {minPrice > 0 ? <><LocalizedValue value={minPrice.toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')} /> – </> : (language === 'ar' ? 'حتى ' : 'Up to ')}
+                    <LocalizedValue value={maxPrice.toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')} /> {language === 'ar' ? <InterfaceText id="realestate.PropertiesPage.k80m8v3" source="ر.س" /> : <InterfaceText id="realestate.PropertiesPage.k6ddj2p" source="SAR" />}
                   </>}
             </p>
 
             <div className="space-y-2">
               {/* Range Slider */}
-              <input
+              <ManagedInput copyScope="realestate.PropertiesPage"
                 type="range"
                 aria-label={t.properties.filters.priceSlider || (language === 'en' ? 'Price range filter' : 'تصفية نطاق السعر')}
                 min={0}
@@ -656,8 +660,8 @@ export function PropertiesPage({
           </div>
 
           <label className="block space-y-1 text-xs font-semibold">
-            <span>{t.properties.filters.bedrooms}</span>
-            <select
+            <span><LocalizedValue value={t.properties.filters.bedrooms} /></span>
+            <SearchableSelect
               value={bedroomFilter}
               onChange={(event) => {
                 isDraggingSliderRef.current = false;
@@ -670,7 +674,7 @@ export function PropertiesPage({
               {['1', '2', '3', '4', '5+'].map((count) => (
                 <option key={count} value={count}>{Number.parseInt(count).toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')}{count.endsWith('+') ? '+' : ''}</option>
               ))}
-            </select>
+            </SearchableSelect>
           </label>
 
         {/* Active Filter Chips & Reset All Bar */}
@@ -678,12 +682,12 @@ export function PropertiesPage({
           <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-1.5 text-xs">
               <span className="text-slate-400 font-medium me-1">
-                {t.properties.filters.activeFilters} ({activeFiltersCount}):
+                <LocalizedValue value={t.properties.filters.activeFilters} /> (<LocalizedValue value={activeFiltersCount} />):
               </span>
 
               {searchQuery && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 font-medium">
-                  "{searchQuery}"
+                  "<LocalizedValue value={searchQuery} />"
                   <button onClick={() => setSearchQuery('')} className="cursor-pointer hover:text-blue-900">
                     <X className="w-3 h-3" />
                   </button>
@@ -692,7 +696,7 @@ export function PropertiesPage({
 
               {typeFilter !== 'all' && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 font-medium capitalize">
-                  {getPropertyTypeLabel(typeFilter, language, propertyTypes)}
+                  <LocalizedValue value={getPropertyTypeLabel(typeFilter, language, propertyTypes)} />
                   <button onClick={() => setTypeFilter('all')} className="cursor-pointer hover:text-blue-900">
                     <X className="w-3 h-3" />
                   </button>
@@ -701,7 +705,7 @@ export function PropertiesPage({
 
               {locationFilter !== 'all' && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 font-medium">
-                  {locationFilter}
+                  <LocalizedValue value={locationFilter} />
                   <button onClick={() => setLocationFilter('all')} className="cursor-pointer hover:text-blue-900">
                     <X className="w-3 h-3" />
                   </button>
@@ -710,11 +714,11 @@ export function PropertiesPage({
 
               {statusFilter !== 'all' && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 font-medium">
-                  {statusFilter === 'for-sale'
+                  <LocalizedValue value={statusFilter === 'for-sale'
                     ? t.properties.filters.forSale
                     : statusFilter === 'for-rent'
                     ? t.properties.filters.forRent
-                    : t.properties.filters.offPlan}
+                    : t.properties.filters.offPlan} />
                   <button onClick={() => handleStatusFilterChange('all')} className="cursor-pointer hover:text-blue-900">
                     <X className="w-3 h-3" />
                   </button>
@@ -723,7 +727,7 @@ export function PropertiesPage({
 
               {bedroomFilter !== 'all' && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 font-medium">
-                  {bedroomFilter} {t.properties.beds}
+                  <LocalizedValue value={bedroomFilter} /> <LocalizedValue value={t.properties.beds} />
                   <button onClick={() => setBedroomFilter('all')} className="cursor-pointer hover:text-blue-900">
                     <X className="w-3 h-3" />
                   </button>
@@ -732,7 +736,7 @@ export function PropertiesPage({
 
               {(maxPrice < currentMaxCap || minPrice > 0) && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 font-medium">
-                  {statusFilter === 'for-rent' ? (
+                  <LocalizedValue value={statusFilter === 'for-rent' ? (
                     rentalPeriod === 'month' ? (
                       minPrice > 0
                         ? `${(minPrice || 0).toLocaleString()} - ${(maxPrice || 0).toLocaleString()} SAR / mo`
@@ -748,8 +752,8 @@ export function PropertiesPage({
                       : minPrice > 0
                       ? `≥ ${(minPrice / 1000000).toFixed(1)}M SAR`
                       : `≤ ${(maxPrice / 1000000).toFixed(1)}M SAR`
-                  )}
-                  <button
+                  )} />
+                  <ManagedButton copyScope="realestate.PropertiesPage"
                     onClick={() => {
                       setMinPrice(0);
                       setMaxPrice(currentMaxCap);
@@ -758,7 +762,7 @@ export function PropertiesPage({
                     aria-label="Clear price filter"
                   >
                     <X className="w-3 h-3" />
-                  </button>
+                  </ManagedButton>
                 </span>
               )}
             </div>
@@ -768,7 +772,7 @@ export function PropertiesPage({
               className="text-xs font-semibold text-rose-600 hover:text-rose-700 flex items-center gap-1 cursor-pointer transition-colors px-2 py-1"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>{t.properties.filters.clearAll}</span>
+              <span><LocalizedValue value={t.properties.filters.clearAll} /></span>
             </button>
           </div>
         )}
@@ -777,14 +781,14 @@ export function PropertiesPage({
       {/* Results Controls Bar: Results Count & View Mode Switcher */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <p className="text-xs sm:text-sm font-medium text-slate-600">
-          {t.properties.filters.showing}{' '}
-          <strong className="text-slate-900 font-bold text-base">{filteredProperties.length.toLocaleString(numberLocale)}</strong>{' '}
-          {t.properties.filters.of} <strong className="text-slate-900">{liveProperties.length.toLocaleString(numberLocale)}</strong>{' '}
-          {t.properties.filters.propertiesFound}
+          <LocalizedValue value={t.properties.filters.showing} /><LocalizedValue value={' '} />
+          <strong className="text-slate-900 font-bold text-base"><LocalizedValue value={filteredProperties.length.toLocaleString(numberLocale)} /></strong><LocalizedValue value={' '} />
+          <LocalizedValue value={t.properties.filters.of} /> <strong className="text-slate-900"><LocalizedValue value={liveProperties.length.toLocaleString(numberLocale)} /></strong><LocalizedValue value={' '} />
+          <LocalizedValue value={t.properties.filters.propertiesFound} />
         </p>
 
         <div className="flex items-center gap-1 border border-slate-200 rounded-2xl p-1 bg-white shadow-xs self-start sm:self-auto">
-          <button
+          <ManagedButton copyScope="realestate.PropertiesPage"
             onClick={() => setViewMode('grid')}
             className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold ${
               viewMode === 'grid'
@@ -794,9 +798,9 @@ export function PropertiesPage({
             title="Grid View (3 Columns)"
           >
             <LayoutGrid className="w-3.5 h-3.5" />
-            <span>{language === 'ar' ? 'شبكة' : 'Grid'}</span>
-          </button>
-          <button
+            <span>{language === 'ar' ? <InterfaceText id="realestate.PropertiesPage.k1mcorot" source="شبكة" /> : <InterfaceText id="realestate.PropertiesPage.kd8gwxd" source="Grid" />}</span>
+          </ManagedButton>
+          <ManagedButton copyScope="realestate.PropertiesPage"
             onClick={() => setViewMode('list')}
             className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold ${
               viewMode === 'list'
@@ -806,8 +810,8 @@ export function PropertiesPage({
             title="List View"
           >
             <List className="w-3.5 h-3.5" />
-            <span>{language === 'ar' ? 'قائمة' : 'List'}</span>
-          </button>
+            <span>{language === 'ar' ? <InterfaceText id="realestate.PropertiesPage.khdth2a" source="قائمة" /> : <InterfaceText id="realestate.PropertiesPage.k1360n8h" source="List" />}</span>
+          </ManagedButton>
         </div>
       </div>
 
@@ -815,8 +819,8 @@ export function PropertiesPage({
       {propertyLoadStatus !== 'ready' && liveProperties.length === 0 ? (
         <div role="status" className="rounded-2xl border border-slate-200 p-6 text-center">
           {propertyLoadStatus === 'loading' ? (language === 'ar' ? 'جاري تحميل العقارات…' : 'Loading properties…') : <>
-            <p>{language === 'ar' ? 'تعذّر تحميل العقارات.' : 'Could not load the property catalog.'}</p>
-            <Button onClick={() => void refreshProperties()}>{language === 'ar' ? 'إعادة المحاولة' : 'Try again'}</Button>
+            <p>{language === 'ar' ? <InterfaceText id="realestate.PropertiesPage.k1hf6el" source="تعذّر تحميل العقارات." /> : <InterfaceText id="realestate.PropertiesPage.kqh1ifu" source="Could not load the property catalog." />}</p>
+            <Button onClick={() => void refreshProperties()}>{language === 'ar' ? <InterfaceText id="realestate.PropertiesPage.k1tratnt" source="إعادة المحاولة" /> : <InterfaceText id="realestate.PropertiesPage.k982hh6" source="Try again" />}</Button>
           </>}
         </div>
       ) : filteredProperties.length === 0 ? (
@@ -825,15 +829,15 @@ export function PropertiesPage({
             <Search className="w-7 h-7" />
           </div>
           <h3 className="text-lg font-bold text-slate-900 font-display-serif">
-            {t.properties.noResultsTitle}
+            <LocalizedValue value={t.properties.noResultsTitle} />
           </h3>
           <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-            {t.properties.noResultsDesc}
+            <LocalizedValue value={t.properties.noResultsDesc} />
           </p>
           <div className="pt-2">
             <Button variant="primary" onClick={handleResetFilters}>
               <RotateCcw className="w-4 h-4" />
-              <span>{t.properties.filters.clearAll}</span>
+              <span><LocalizedValue value={t.properties.filters.clearAll} /></span>
             </Button>
           </div>
         </div>

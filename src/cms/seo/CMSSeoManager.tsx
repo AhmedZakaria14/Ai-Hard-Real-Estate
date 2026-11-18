@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import React, { useState, useEffect } from 'react';
 import { Language, PageId } from '../../types';
 import { getLocalizedText } from '../../lib/utils';
@@ -283,14 +284,14 @@ export const CMSSeoManager: React.FC<CMSSeoManagerProps> = ({ language }) => {
                   <label className="block text-xs font-bold text-slate-700 mb-1">
                     {isAr ? 'حالة الفهرسة (Search Engine Robots)' : 'Search Indexability (Robots)'}
                   </label>
-                  <select
+                  <SearchableSelect
                     value={currentSeo.indexable ? 'index' : 'noindex'}
                     onChange={(e) => handleUpdateCurrentSeo('indexable', e.target.value === 'index')}
                     className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-white font-semibold focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="index">{isAr ? 'سماح بالفهرسة (index, follow)' : 'Allow Indexing (index, follow)'}</option>
                     <option value="noindex">{isAr ? 'منع الفهرسة (noindex, nofollow)' : 'Block Indexing (noindex, nofollow)'}</option>
-                  </select>
+                  </SearchableSelect>
                 </div>
 
                 <div>

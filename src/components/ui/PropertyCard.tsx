@@ -1,3 +1,6 @@
+import { LocalizedValue } from './LocalizedValue';
+import { InterfaceText } from './InterfaceText';
+import { ManagedA, ManagedImg, ManagedButton } from './ManagedElements';
 import { usePageMedia } from '../../lib/pageMedia';
 import React, { useState } from 'react';
 import {
@@ -91,13 +94,13 @@ export function PropertyCard({
       >
         {/* Image Container with Semantic Link */}
         <div className="relative w-full md:w-80 h-56 sm:h-64 rounded-2xl overflow-hidden bg-slate-100 shrink-0">
-          <a
+          <ManagedA copyScope="realestate.PropertyCard"
             href={detailsHref}
             onClick={(e) => handleSemanticClick(e, () => onSelectProperty(property))}
             className="block w-full h-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded-2xl overflow-hidden"
             aria-label={property?.title?.[language] || (language === 'ar' ? 'عقار' : 'Property')}
           >
-            <img
+            <ManagedImg copyScope="realestate.PropertyCard"
               src={property?.images?.[activeImageIdx] || property?.images?.[0] || propertyPlaceholderImage}
               alt={property?.title?.[language] || (language === 'ar' ? 'عقار' : 'Property')}
               loading="lazy"
@@ -106,29 +109,29 @@ export function PropertyCard({
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 pointer-events-none" />
-          </a>
+          </ManagedA>
 
           {/* Badges Overlay */}
           <div className="absolute top-3 start-3 flex flex-wrap gap-1.5 z-10 pointer-events-none">
             {displayBadge && (
               <Badge variant={displayBadge.variant} className="shadow-sm">
-                {displayBadge.text}
+                <LocalizedValue value={displayBadge.text} />
               </Badge>
             )}
             <Badge variant="dark" className="shadow-sm">
-              {statusLabel}
+              <LocalizedValue value={statusLabel} />
             </Badge>
           </div>
 
           {/* Share button */}
-          <button
+          <ManagedButton copyScope="realestate.PropertyCard"
             type="button"
             onClick={handleShare}
             aria-label="Share property"
             className="absolute top-3 end-3 w-8 h-8 rounded-full bg-slate-900/60 backdrop-blur-md text-white hover:bg-slate-900 flex items-center justify-center transition-all cursor-pointer z-10"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
-          </button>
+          </ManagedButton>
 
         </div>
 
@@ -138,12 +141,12 @@ export function PropertyCard({
             <div className="flex items-center gap-1.5 text-xs text-slate-500">
               <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
               <span>
-                {property?.location?.area?.[language] || ''}, {property?.location?.city?.[language] || ''}
+                <LocalizedValue value={property?.location?.area?.[language] || ''} />, <LocalizedValue value={property?.location?.city?.[language] || ''} />
               </span>
               <span className="text-slate-300">•</span>
               <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md font-medium text-[11px]">
                 <ShieldCheck className="w-3 h-3" />
-                {language === 'en' ? 'Verified Title' : 'صك معتمد'}
+                {language === 'en' ? <InterfaceText id="realestate.PropertyCard.kjpf4af" source="Verified Title" /> : <InterfaceText id="realestate.PropertyCard.k1589ddt" source="صك معتمد" />}
               </span>
             </div>
 
@@ -153,29 +156,29 @@ export function PropertyCard({
                 onClick={(e) => handleSemanticClick(e, () => onSelectProperty(property))}
                 className="hover:text-blue-600 transition-colors cursor-pointer focus-visible:outline-none focus-visible:underline"
               >
-                {property?.title?.[language] || ''}
+                <LocalizedValue value={property?.title?.[language] || ''} />
               </a>
             </h3>
 
             <p className="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed">
-              {property?.description?.[language] || ''}
+              <LocalizedValue value={property?.description?.[language] || ''} />
             </p>
 
             {/* Key Specs */}
             <div className="flex flex-wrap items-center gap-3 py-2 px-3 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-100 max-w-fit">
               <div className="flex items-center gap-1.5 font-medium">
                 <Bed className="w-4 h-4 text-blue-600" />
-                <span>{property.bedrooms > 0 ? `${property.bedrooms.toLocaleString(numberLocale)} ${t.properties.beds}` : (language === 'en' ? 'Commercial' : 'تجاري')}</span>
+                <span><LocalizedValue value={property.bedrooms > 0 ? `${property.bedrooms.toLocaleString(numberLocale)} ${t.properties.beds}` : (language === 'en' ? 'Commercial' : 'تجاري')} /></span>
               </div>
               <span className="text-slate-300">•</span>
               <div className="flex items-center gap-1.5 font-medium">
                 <Bath className="w-4 h-4 text-blue-600" />
-                <span>{(property.bathrooms ?? 0).toLocaleString(numberLocale)} {t.properties.baths}</span>
+                <span><LocalizedValue value={(property.bathrooms ?? 0).toLocaleString(numberLocale)} /> <LocalizedValue value={t.properties.baths} /></span>
               </div>
               <span className="text-slate-300">•</span>
               <div className="flex items-center gap-1.5 font-medium">
                 <Maximize className="w-4 h-4 text-blue-600" />
-                <span>{formatPropertyArea(property, language)}</span>
+                <span><LocalizedValue value={formatPropertyArea(property, language)} /></span>
               </div>
             </div>
           </div>
@@ -183,11 +186,11 @@ export function PropertyCard({
           {/* Action Row */}
           <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
             <div className="text-blue-700 font-extrabold text-xl font-display-serif">
-              {formatCurrency(property.price.sar, 'SAR', language)}
+              <LocalizedValue value={formatCurrency(property.price.sar, 'SAR', language)} />
               {property.price.period && (
                 <span className="text-xs font-normal text-slate-500">
-                  {' '}
-                  {property.price.period === 'year' ? t.propertyDetails.perYear : t.propertyDetails.perMonth}
+                  <LocalizedValue value={' '} />
+                  <LocalizedValue value={property.price.period === 'year' ? t.propertyDetails.perYear : t.propertyDetails.perMonth} />
                 </span>
               )}
             </div>
@@ -199,7 +202,7 @@ export function PropertyCard({
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 hover:bg-slate-100 text-xs font-bold flex-1 sm:flex-none justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 min-h-[40px] shadow-xs cursor-pointer"
               >
                 <Eye className="w-3.5 h-3.5" />
-                <span>{t.cta.viewDetails}</span>
+                <span><LocalizedValue value={t.cta.viewDetails} /></span>
                 <ArrowIcon className="w-3.5 h-3.5" />
               </a>
 
@@ -213,7 +216,7 @@ export function PropertyCard({
                   className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-hard-gradient text-white hover:brightness-105 border border-blue-700 text-xs font-semibold flex-1 sm:flex-none justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 min-h-[40px] cursor-pointer"
                 >
                   <Calendar className="w-3.5 h-3.5 text-white" />
-                  <span>{t.cta.bookViewing}</span>
+                  <span><LocalizedValue value={t.cta.bookViewing} /></span>
                 </button>
               )}
 
@@ -229,7 +232,7 @@ export function PropertyCard({
                 className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white border border-emerald-700 text-xs font-semibold flex-1 sm:flex-none justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 min-h-[40px] cursor-pointer"
               >
                 <WhatsAppIcon />
-                <span>{t.nav.whatsapp}</span>
+                <span><LocalizedValue value={t.nav.whatsapp} /></span>
               </a>
             </div>
           </div>
@@ -247,13 +250,13 @@ export function PropertyCard({
       <div>
         {/* High-Resolution Image Container with Semantic Link */}
         <div className="relative aspect-16/10 overflow-hidden bg-slate-950">
-          <a
+          <ManagedA copyScope="realestate.PropertyCard"
             href={detailsHref}
             onClick={(e) => handleSemanticClick(e, () => onSelectProperty(property))}
             className="block w-full h-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
             aria-label={property?.title?.[language] || (language === 'ar' ? 'عقار' : 'Property')}
           >
-            <img
+            <ManagedImg copyScope="realestate.PropertyCard"
               src={property?.images?.[activeImageIdx] || property?.images?.[0] || propertyPlaceholderImage}
               alt={property?.title?.[language] || (language === 'ar' ? 'عقار' : 'Property')}
               loading="lazy"
@@ -262,42 +265,42 @@ export function PropertyCard({
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-70 pointer-events-none" />
-          </a>
+          </ManagedA>
 
           {/* Badges on Top */}
           <div className="absolute top-3 start-3 flex flex-wrap items-center gap-1.5 z-10 pointer-events-none">
             {displayBadge && (
               <Badge variant={displayBadge.variant} className="shadow-md">
-                {displayBadge.text}
+                <LocalizedValue value={displayBadge.text} />
               </Badge>
             )}
             <Badge variant="dark" className="shadow-md">
-              {statusLabel}
+              <LocalizedValue value={statusLabel} />
             </Badge>
           </div>
 
           {/* Share Button on Top Right */}
-          <button
+          <ManagedButton copyScope="realestate.PropertyCard"
             type="button"
             onClick={handleShare}
             aria-label="Share property"
             className="absolute top-3 end-3 w-8 h-8 rounded-full bg-slate-900/60 backdrop-blur-md text-white hover:bg-slate-900 flex items-center justify-center transition-all cursor-pointer z-10"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
-          </button>
+          </ManagedButton>
 
           {/* Prominent Price Tag Badge on Bottom of Image */}
           <div className="absolute bottom-3 start-3 text-white font-extrabold text-lg sm:text-xl font-display-serif drop-shadow-lg flex flex-wrap items-baseline gap-1.5 pointer-events-none">
-            <span>{formatCurrency(property.price.sar, 'SAR', language)}</span>
+            <span><LocalizedValue value={formatCurrency(property.price.sar, 'SAR', language)} /></span>
             {property.price.period && (
               <span className="text-xs font-medium text-slate-200 me-1">
-                {property.price.period === 'year' ? t.propertyDetails.perYear : t.propertyDetails.perMonth}
+                <LocalizedValue value={property.price.period === 'year' ? t.propertyDetails.perYear : t.propertyDetails.perMonth} />
               </span>
             )}
             {activeRentalPeriod && property.status === 'for-rent' && property.price.period && property.price.period !== activeRentalPeriod && (
               <span className="text-[11px] font-semibold text-blue-200 bg-slate-900/80 px-2 py-0.5 rounded-md backdrop-blur-xs">
-                (~{formatCurrency(getNormalizedPropertyPrice(property, activeRentalPeriod), 'SAR', language)}{' '}
-                {activeRentalPeriod === 'month' ? t.propertyDetails.perMonth : t.propertyDetails.perYear})
+                (~<LocalizedValue value={formatCurrency(getNormalizedPropertyPrice(property, activeRentalPeriod), 'SAR', language)} /><LocalizedValue value={' '} />
+                <LocalizedValue value={activeRentalPeriod === 'month' ? t.propertyDetails.perMonth : t.propertyDetails.perYear} />)
               </span>
             )}
           </div>
@@ -309,7 +312,7 @@ export function PropertyCard({
           <div className="flex items-center gap-1.5 text-xs text-slate-500">
             <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
             <span className="truncate font-medium">
-              {property?.location?.area?.[language] || ''}, {property?.location?.city?.[language] || ''}
+              <LocalizedValue value={property?.location?.area?.[language] || ''} />, <LocalizedValue value={property?.location?.city?.[language] || ''} />
             </span>
           </div>
 
@@ -323,7 +326,7 @@ export function PropertyCard({
               onClick={(e) => handleSemanticClick(e, () => onSelectProperty(property))}
               className="hover:text-blue-600 transition-colors cursor-pointer focus-visible:outline-none focus-visible:underline"
             >
-              {property?.title?.[language] || ''}
+              <LocalizedValue value={property?.title?.[language] || ''} />
             </a>
           </h3>
 
@@ -332,16 +335,16 @@ export function PropertyCard({
             <div className="flex items-center gap-1">
               <Bed className="w-3.5 h-3.5 text-blue-600 shrink-0" />
               <span className="truncate font-medium">
-                {property.bedrooms > 0 ? `${property.bedrooms.toLocaleString(numberLocale)} ${t.properties.beds}` : (language === 'ar' ? 'تجاري' : 'Comm.')}
+                <LocalizedValue value={property.bedrooms > 0 ? `${property.bedrooms.toLocaleString(numberLocale)} ${t.properties.beds}` : (language === 'ar' ? 'تجاري' : 'Comm.')} />
               </span>
             </div>
             <div className="flex items-center gap-1">
               <Bath className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-              <span className="truncate font-medium">{(property.bathrooms ?? 0).toLocaleString(numberLocale)} {t.properties.baths}</span>
+              <span className="truncate font-medium"><LocalizedValue value={(property.bathrooms ?? 0).toLocaleString(numberLocale)} /> <LocalizedValue value={t.properties.baths} /></span>
             </div>
             <div className="flex items-center gap-1">
               <Maximize className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-              <span className="truncate font-medium">{formatPropertyArea(property, language)}</span>
+              <span className="truncate font-medium"><LocalizedValue value={formatPropertyArea(property, language)} /></span>
             </div>
           </div>
         </div>
@@ -355,7 +358,7 @@ export function PropertyCard({
           onClick={(e) => handleSemanticClick(e, () => onSelectProperty(property))}
           className="w-full inline-flex items-center gap-2 justify-center px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 hover:bg-slate-100 text-xs sm:text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 min-h-[40px] shadow-xs cursor-pointer group/btn"
         >
-          <span>{t.cta.viewDetails}</span>
+          <span><LocalizedValue value={t.cta.viewDetails} /></span>
           <ArrowIcon className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
         </a>
 
@@ -371,7 +374,7 @@ export function PropertyCard({
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-hard-gradient text-white hover:brightness-105 border border-blue-700 text-xs font-semibold justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 min-h-[40px] cursor-pointer w-full"
             >
               <Calendar className="w-3.5 h-3.5 text-white shrink-0" />
-              <span className="truncate">{t.cta.bookViewing}</span>
+              <span className="truncate"><LocalizedValue value={t.cta.bookViewing} /></span>
             </button>
           )}
 
@@ -387,7 +390,7 @@ export function PropertyCard({
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white border border-emerald-700 text-xs font-semibold justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 min-h-[40px] cursor-pointer w-full"
           >
             <WhatsAppIcon />
-            <span className="truncate">{t.nav.whatsapp}</span>
+            <span className="truncate"><LocalizedValue value={t.nav.whatsapp} /></span>
           </a>
         </div>
       </div>

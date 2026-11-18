@@ -1,3 +1,6 @@
+import { LocalizedValue } from '../ui/LocalizedValue';
+import { InterfaceText } from '../ui/InterfaceText';
+import { ManagedA } from '../ui/ManagedElements';
 import React from 'react';
 import {
   Building2,
@@ -61,12 +64,12 @@ export function SectorNav({
           <div className="flex items-center gap-2 shrink-0">
             <span className="hidden md:inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-blue-100">
               <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse" />
-              <span>{isAr ? 'قطاعات مجموعة هارد' : 'HARD Group Sectors'}</span>
+              <span>{isAr ? <InterfaceText id="realestate.SectorNav.kldopoj" source="قطاعات مجموعة هارد" /> : <InterfaceText id="realestate.SectorNav.k1vok2qc" source="HARD Group Sectors" />}</span>
               <span className="text-blue-100">:</span>
             </span>
             <span className="md:hidden inline-flex items-center gap-1 text-[11px] font-bold text-white">
               <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
-              <span>{isAr ? 'المجموعة' : 'HARD'}</span>
+              <span>{isAr ? <InterfaceText id="realestate.SectorNav.krz8cqg" source="المجموعة" /> : <InterfaceText id="realestate.SectorNav.k9gghjw" source="HARD" />}</span>
             </span>
           </div>
 
@@ -79,7 +82,7 @@ export function SectorNav({
               const shortName = sector.shortName[language];
 
               return (
-                <a
+                <ManagedA copyScope="realestate.SectorNav"
                   key={sector.id}
                   href={sector.href}
                   onClick={(e) =>
@@ -102,10 +105,10 @@ export function SectorNav({
                     }`}
                   />
                   {/* Full name on lg+, short name on small */}
-                  <span className="hidden sm:inline">{sectorName}</span>
-                  <span className="sm:hidden">{shortName}</span>
+                  <span className="hidden sm:inline"><LocalizedValue value={sectorName} /></span>
+                  <span className="sm:hidden"><LocalizedValue value={shortName} /></span>
 
-                </a>
+                </ManagedA>
               );
             })}
           </div>

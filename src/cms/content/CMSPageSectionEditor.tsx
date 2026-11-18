@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import { CMSSectionImage } from './CMSSectionImage';
 import React, { useState, useEffect } from 'react';
 import {
@@ -271,7 +272,7 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
 
           <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
             <Globe className="w-4 h-4 text-sky-600 shrink-0 ml-1" />
-            <select
+            <SearchableSelect
               value={selectedPageId}
               onChange={(e) => setSelectedPageId(e.target.value)}
               className="bg-white font-bold text-xs text-slate-800 rounded-xl px-3 py-2 border border-slate-200 cursor-pointer w-full"
@@ -281,7 +282,7 @@ export const CMSPageSectionEditor: React.FC<CMSPageSectionEditorProps> = ({
                   {isAr ? p.nameAr : p.nameEn} ({p.slug})
                 </option>
               ))}
-            </select>
+            </SearchableSelect>
           </div>
 
           <div className="flex items-center gap-2">

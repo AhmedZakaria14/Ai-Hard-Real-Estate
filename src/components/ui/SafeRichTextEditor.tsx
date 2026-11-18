@@ -1,3 +1,4 @@
+import { LocalizedValue } from './LocalizedValue';
 import React, { useState, useRef, useEffect } from 'react';
 import {
   Heading2,
@@ -113,16 +114,16 @@ export const SafeRichTextEditor: React.FC<SafeRichTextEditorProps> = ({
         <div className="flex items-center justify-between">
           <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
             <FileText className="w-3.5 h-3.5 text-blue-600" />
-            <span>{label}</span>
+            <span><LocalizedValue value={label} /></span>
           </label>
           <div className="flex items-center gap-2 text-[11px] text-slate-500 font-medium">
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3 text-slate-400" />
-              <span>{activeReadTime}</span>
+              <span><LocalizedValue value={activeReadTime} /></span>
             </span>
             <span>•</span>
             <span>
-              {wordCount} {isAr ? 'كلمة' : 'words'}
+              <LocalizedValue value={wordCount} /> <LocalizedValue value={isAr ? 'كلمة' : 'words'} />
             </span>
           </div>
         </div>
@@ -236,7 +237,7 @@ export const SafeRichTextEditor: React.FC<SafeRichTextEditorProps> = ({
               }`}
             >
               <Edit3 className="w-3.5 h-3.5" />
-              <span>{isAr ? 'المحرر' : 'Editor'}</span>
+              <span><LocalizedValue value={isAr ? 'المحرر' : 'Editor'} /></span>
             </button>
             <button
               type="button"
@@ -248,7 +249,7 @@ export const SafeRichTextEditor: React.FC<SafeRichTextEditorProps> = ({
               }`}
             >
               <Eye className="w-3.5 h-3.5" />
-              <span>{isAr ? 'معاينة آمنة' : 'Preview'}</span>
+              <span><LocalizedValue value={isAr ? 'معاينة آمنة' : 'Preview'} /></span>
             </button>
           </div>
         </div>
@@ -272,16 +273,16 @@ export const SafeRichTextEditor: React.FC<SafeRichTextEditorProps> = ({
         <div className="bg-slate-50 border-t border-slate-100 px-4 py-1.5 flex items-center justify-between text-[11px] text-slate-500">
           <div className="flex items-center gap-3">
             <span>
-              {isAr ? 'دعم التنسيق الآمن والعناوين' : 'Markdown & Rich Formatting Enabled'}
+              <LocalizedValue value={isAr ? 'دعم التنسيق الآمن والعناوين' : 'Markdown & Rich Formatting Enabled'} />
             </span>
             <span>•</span>
             <span className="text-emerald-600 font-semibold flex items-center gap-1">
-              ✓ {isAr ? 'حماية ضد الثغرات وتطهير المحتوى' : 'Sanitized & XSS-Protected'}
+              ✓ <LocalizedValue value={isAr ? 'حماية ضد الثغرات وتطهير المحتوى' : 'Sanitized & XSS-Protected'} />
             </span>
           </div>
 
           <div className="font-semibold text-slate-700">
-            {activeReadTime}
+            <LocalizedValue value={activeReadTime} />
           </div>
         </div>
       </div>
@@ -290,7 +291,7 @@ export const SafeRichTextEditor: React.FC<SafeRichTextEditorProps> = ({
       {linkModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
           <div className="bg-white rounded-2xl p-5 w-full max-w-sm space-y-4 shadow-xl border border-slate-200" dir={isAr ? 'rtl' : 'ltr'}>
-            <h4 className="text-sm font-bold text-slate-900">{isAr ? 'إدراج رابط تشعبي' : 'Insert Hyperlink'}</h4>
+            <h4 className="text-sm font-bold text-slate-900"><LocalizedValue value={isAr ? 'إدراج رابط تشعبي' : 'Insert Hyperlink'} /></h4>
             <div className="space-y-2">
               <input
                 type="text"
@@ -313,14 +314,14 @@ export const SafeRichTextEditor: React.FC<SafeRichTextEditorProps> = ({
                 onClick={() => setLinkModalOpen(false)}
                 className="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-xl"
               >
-                {isAr ? 'إلغاء' : 'Cancel'}
+                <LocalizedValue value={isAr ? 'إلغاء' : 'Cancel'} />
               </button>
               <button
                 type="button"
                 onClick={handleInsertLink}
                 className="px-4 py-1.5 text-xs bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700"
               >
-                {isAr ? 'إدراج' : 'Insert'}
+                <LocalizedValue value={isAr ? 'إدراج' : 'Insert'} />
               </button>
             </div>
           </div>
@@ -353,7 +354,7 @@ export const SafeParsedContent: React.FC<{ content: string; language: Language }
       blocks.push(
         <ul key={`ul-${blocks.length}`} className="list-disc list-inside space-y-1 my-3 text-slate-700 leading-relaxed ps-2">
           {listItems.map((item, i) => (
-            <li key={i}>{formatInline(item)}</li>
+            <li key={i}><LocalizedValue value={formatInline(item)} /></li>
           ))}
         </ul>
       );
@@ -364,7 +365,7 @@ export const SafeParsedContent: React.FC<{ content: string; language: Language }
       blocks.push(
         <ol key={`ol-${blocks.length}`} className="list-decimal list-inside space-y-1 my-3 text-slate-700 leading-relaxed ps-2">
           {numberedListItems.map((item, i) => (
-            <li key={i}>{formatInline(item)}</li>
+            <li key={i}><LocalizedValue value={formatInline(item)} /></li>
           ))}
         </ol>
       );
@@ -384,7 +385,7 @@ export const SafeParsedContent: React.FC<{ content: string; language: Language }
                 <tr>
                   {headerRow.map((h, i) => (
                     <th key={i} className="p-2.5 font-bold text-slate-800 text-start">
-                      {formatInline(h)}
+                      <LocalizedValue value={formatInline(h)} />
                     </th>
                   ))}
                 </tr>
@@ -395,7 +396,7 @@ export const SafeParsedContent: React.FC<{ content: string; language: Language }
                 <tr key={rIdx} className="hover:bg-slate-50/50">
                   {r.map((c, cIdx) => (
                     <td key={cIdx} className="p-2.5 text-slate-700 text-start">
-                      {formatInline(c)}
+                      <LocalizedValue value={formatInline(c)} />
                     </td>
                   ))}
                 </tr>
@@ -439,7 +440,7 @@ export const SafeParsedContent: React.FC<{ content: string; language: Language }
       flushList();
       blocks.push(
         <h4 key={`h4-${idx}`} className="text-base sm:text-lg font-bold text-slate-900 font-display-serif mt-5 mb-2">
-          {formatInline(line.replace('### ', ''))}
+          <LocalizedValue value={formatInline(line.replace('### ', ''))} />
         </h4>
       );
       continue;
@@ -449,7 +450,7 @@ export const SafeParsedContent: React.FC<{ content: string; language: Language }
       flushList();
       blocks.push(
         <h3 key={`h3-${idx}`} className="text-lg sm:text-xl font-extrabold text-slate-900 font-display-serif mt-6 mb-3 border-b border-slate-100 pb-2">
-          {formatInline(line.replace('## ', ''))}
+          <LocalizedValue value={formatInline(line.replace('## ', ''))} />
         </h3>
       );
       continue;
@@ -459,7 +460,7 @@ export const SafeParsedContent: React.FC<{ content: string; language: Language }
       flushList();
       blocks.push(
         <h2 key={`h2-${idx}`} className="text-xl sm:text-2xl font-black text-slate-900 font-display-serif mt-7 mb-4">
-          {formatInline(line.replace('# ', ''))}
+          <LocalizedValue value={formatInline(line.replace('# ', ''))} />
         </h2>
       );
       continue;
@@ -480,7 +481,7 @@ export const SafeParsedContent: React.FC<{ content: string; language: Language }
           key={`quote-${idx}`}
           className="my-4 ps-4 pe-2 py-2 border-s-4 border-blue-600 bg-blue-50/50 rounded-e-xl text-slate-800 text-xs sm:text-sm italic font-medium"
         >
-          {formatInline(line.replace('> ', ''))}
+          <LocalizedValue value={formatInline(line.replace('> ', ''))} />
         </blockquote>
       );
       continue;
@@ -504,7 +505,7 @@ export const SafeParsedContent: React.FC<{ content: string; language: Language }
     flushList();
     blocks.push(
       <p key={`p-${idx}`} className="my-2.5 text-xs sm:text-sm text-slate-700 leading-relaxed font-sans">
-        {formatInline(line)}
+        <LocalizedValue value={formatInline(line)} />
       </p>
     );
   }
@@ -512,7 +513,7 @@ export const SafeParsedContent: React.FC<{ content: string; language: Language }
   flushList();
   flushTable();
 
-  return <div className="space-y-1 font-sans text-slate-800">{blocks}</div>;
+  return <div className="space-y-1 font-sans text-slate-800"><LocalizedValue value={blocks} /></div>;
 };
 
 /**
@@ -542,7 +543,7 @@ function formatInline(text: string): React.ReactNode {
         rel="noopener noreferrer"
         className="text-blue-600 underline font-semibold hover:text-blue-700"
       >
-        {label}
+        <LocalizedValue value={label} />
       </a>
     );
     lastIndex = match.index + match[0].length;
@@ -552,7 +553,7 @@ function formatInline(text: string): React.ReactNode {
     parts.push(renderBoldItalic(text.substring(lastIndex)));
   }
 
-  return <>{parts}</>;
+  return <><LocalizedValue value={parts} /></>;
 }
 
 function renderBoldItalic(text: string): React.ReactNode {
@@ -562,13 +563,13 @@ function renderBoldItalic(text: string): React.ReactNode {
     <>
       {boldParts.map((part, i) => {
         if (i % 2 === 1) {
-          return <strong key={i} className="font-bold text-slate-900">{part}</strong>;
+          return <strong key={i} className="font-bold text-slate-900"><LocalizedValue value={part} /></strong>;
         }
         // Italic *text*
         const italicParts = part.split(/\*([^*]+)\*/g);
         return italicParts.map((it, j) => {
           if (j % 2 === 1) {
-            return <em key={j} className="italic">{it}</em>;
+            return <em key={j} className="italic"><LocalizedValue value={it} /></em>;
           }
           return it;
         });

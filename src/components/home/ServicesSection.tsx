@@ -1,3 +1,5 @@
+import { LocalizedValue } from '../ui/LocalizedValue';
+import { ManagedImg } from '../ui/ManagedElements';
 import React from 'react';
 import {
   CheckCircle2,
@@ -50,18 +52,19 @@ export function ServicesSection({
       {/* Section Header */}
       <div className="text-center max-w-3xl mx-auto space-y-4 px-4">
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 font-display-serif tracking-tight leading-tight">
-          {t.home.servicesSectionTitle}
+          <LocalizedValue value={t.home.servicesSectionTitle} />
         </h2>
         <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-          {t.home.servicesSectionSubtitle}
+          <LocalizedValue value={t.home.servicesSectionSubtitle} />
         </p>
       </div>
 
       {/* Alternating Rows */}
       <div className="space-y-16 sm:space-y-24">
-        {mockServices.map((service, index) => {
+        {mockServices.map((original, index) => {
           const isEven = index % 2 === 1; // Alternating layout
-          const serviceMedia = media?.[service.id];
+          const serviceMedia = media?.[original.id];
+          const service = { ...original, ...serviceMedia, stats: original.stats.map((stat, index) => ({ ...stat, ...serviceMedia?.stats?.[index] })) };
 
           return (
             <div
@@ -77,7 +80,7 @@ export function ServicesSection({
                 }`}
               >
                 <div className="relative rounded-3xl overflow-hidden shadow-xl aspect-16/11 bg-slate-950 group">
-                  <img
+                  <ManagedImg copyScope="realestate.ServicesSection"
                     src={publicRealEstateImage(serviceMedia?.bgImageUrl, service.image)}
                     alt={service.title[language]}
                     referrerPolicy="no-referrer"
@@ -91,10 +94,10 @@ export function ServicesSection({
                       {service.stats.map((stat, sIdx) => (
                         <div key={sIdx} className="px-1">
                           <div dir="ltr" className="text-base sm:text-xl font-extrabold text-blue-600 font-display-serif inline-block">
-                            {typeof serviceMedia?.stats?.[sIdx]?.value === 'string' ? serviceMedia.stats[sIdx].value : stat.value}
+                            <LocalizedValue value={typeof serviceMedia?.stats?.[sIdx]?.value === 'string' ? serviceMedia.stats[sIdx].value : stat.value} />
                           </div>
                           <div className="text-[10px] sm:text-xs text-slate-500 font-medium leading-tight mt-0.5">
-                            {stat.label[language]}
+                            <LocalizedValue value={stat.label[language]} />
                           </div>
                         </div>
                       ))}
@@ -111,13 +114,13 @@ export function ServicesSection({
               >
                 <div className="space-y-3">
                   <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 font-display-serif leading-tight">
-                    {service.title[language]}
+                    <LocalizedValue value={service.title[language]} />
                   </h3>
                   <p className="text-xs sm:text-sm font-semibold text-slate-700">
-                    {service.subtitle[language]}
+                    <LocalizedValue value={service.subtitle[language]} />
                   </p>
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                    {service.description[language]}
+                    <LocalizedValue value={service.description[language]} />
                   </p>
                 </div>
 
@@ -133,10 +136,10 @@ export function ServicesSection({
                       </div>
                       <div className="space-y-0.5">
                         <h4 className="text-xs sm:text-sm font-bold text-slate-900">
-                          {feat.title[language]}
+                          <LocalizedValue value={feat.title[language]} />
                         </h4>
                         <p className="text-xs text-slate-500 leading-relaxed">
-                          {feat.desc[language]}
+                          <LocalizedValue value={feat.desc[language]} />
                         </p>
                       </div>
                     </div>
@@ -152,7 +155,7 @@ export function ServicesSection({
                       onClick={() => handleAction(service.actionType)}
                       className="font-bold shadow-md"
                     >
-                      <span>{service.actionText[language]}</span>
+                      <span><LocalizedValue value={service.actionText[language]} /></span>
                       <ArrowIcon className="w-4 h-4" />
                     </Button>
                   ) : (
@@ -161,7 +164,7 @@ export function ServicesSection({
                       onClick={(e) => handleSemanticClick(e, () => handleAction(service.actionType))}
                       className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
                     >
-                      <span>{service.actionText[language]}</span>
+                      <span><LocalizedValue value={service.actionText[language]} /></span>
                       <ArrowIcon className="w-4 h-4" />
                     </a>
                   )}

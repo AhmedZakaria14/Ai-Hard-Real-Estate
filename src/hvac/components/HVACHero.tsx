@@ -1,3 +1,7 @@
+import { LocalizedValue } from '../../components/ui/LocalizedValue';
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
+import { InterfaceText } from '../../components/ui/InterfaceText';
+import { ManagedImg, ManagedInput } from '../../components/ui/ManagedElements';
 import { usePageMedia } from '../../lib/pageMedia';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import React, { useState } from 'react';
@@ -15,7 +19,7 @@ import { pick } from '../translations';
 export function HVACHero() {
   const { hvacHeroImage } = usePageMedia();
   const { hvac: T } = useTextOverride();
-  const { language, isAr, services, serviceAreas, openQuoteDialog, openBookingModal } = useHVAC();
+  const { language, isAr, services, heroContent, serviceAreas, openQuoteDialog, openBookingModal } = useHVAC();
 
   const [selectedCity, setSelectedCity] = useState('');
   const [customCity, setCustomCity] = useState('');
@@ -40,8 +44,8 @@ export function HVACHero() {
     <section id="hero" className="relative min-h-[640px] flex items-center overflow-hidden bg-slate-900">
       {/* Background HVAC Field Photo with darkened overlay bg-[#0F172A]/35 */}
       <div className="absolute inset-0 z-0">
-        <img
-          src={hvacHeroImage}
+        <ManagedImg copyScope="hvac.HVACHero"
+          src={heroContent.bgImageUrl || hvacHeroImage}
           alt="HARD HVAC Maintenance Engineer at Work"
           loading="eager"
           fetchPriority="high"
@@ -49,7 +53,7 @@ export function HVACHero() {
           className="w-full h-full object-cover object-center"
         />
         {/* Darkened overlay strictly compliant with prompt */}
-        <div className="absolute inset-0 bg-[#0F172A]/60" />
+        <div className="absolute inset-0 bg-[#034DA2]/35" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 w-full">
@@ -58,23 +62,23 @@ export function HVACHero() {
           <div className="lg:col-span-7 space-y-6 text-start">
             {/* Headline (semibold 600, never extrabold) */}
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-white tracking-tight leading-[1.25]">
-              {pick(T.hero.headline, language)}
+              <LocalizedValue value={isAr ? heroContent.headlineAr : heroContent.headlineEn} />
             </h1>
 
             {/* Supporting paragraph */}
             <p className="text-sm sm:text-base text-slate-200 leading-relaxed max-w-2xl">
-              {pick(T.hero.subheadline, language)}
+              <LocalizedValue value={isAr ? heroContent.subtitleAr : heroContent.subtitleEn} />
             </p>
 
             {/* 3 Value Badges */}
             <div className="pt-2 flex flex-wrap gap-4 text-xs sm:text-sm text-slate-200 font-medium">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-[#0EA5E9]" />
-                <span>{pick(T.hero.badge1, language)}</span>
+                <span><LocalizedValue value={pick(T.hero.badge1, language)} /></span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-[#0EA5E9]" />
-                <span>{pick(T.hero.badge3, language)}</span>
+                <span><LocalizedValue value={pick(T.hero.badge3, language)} /></span>
               </div>
             </div>
           </div>
@@ -84,10 +88,10 @@ export function HVACHero() {
             <div className="bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-xl space-y-5 text-start">
               <div className="space-y-1">
                 <h2 className="text-xl font-semibold text-slate-900 leading-tight">
-                  {pick(T.quoteForm.title, language)}
+                  <LocalizedValue value={pick(T.quoteForm.title, language)} />
                 </h2>
                 <p className="text-xs text-slate-600 font-medium">
-                  {pick(T.quoteForm.subtitle, language)}
+                  <LocalizedValue value={pick(T.quoteForm.subtitle, language)} />
                 </p>
               </div>
 
@@ -95,11 +99,11 @@ export function HVACHero() {
                 {/* 1. City Dropdown */}
                 <div>
                   <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                    {pick(T.quoteForm.cityLabel, language)}
+                    <LocalizedValue value={pick(T.quoteForm.cityLabel, language)} />
                   </label>
                   <div className="relative">
                     <MapPin className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    <select
+                    <SearchableSelect
                       value={cityId}
                       onChange={(e) => setSelectedCity(e.target.value)}
                       className="w-full ps-9 pe-8 py-2.5 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 cursor-pointer"
@@ -109,7 +113,7 @@ export function HVACHero() {
                           {isAr ? city.cityNameAr : city.cityNameEn}
                         </option>
                       ))}
-                    </select>
+                    </SearchableSelect>
                   </div>
                 </div>
 
@@ -117,9 +121,9 @@ export function HVACHero() {
                 {cityId === 'other' && (
                   <div className="animate-in fade-in slide-in-from-top-2 duration-200">
                     <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                      {pick(T.quoteForm.otherCityLabel, language)} *
+                      <LocalizedValue value={pick(T.quoteForm.otherCityLabel, language)} /> <span className="text-red-600">*</span>
                     </label>
-                    <input
+                    <ManagedInput copyScope="hvac.HVACHero"
                       type="text"
                       required
                       value={customCity}
@@ -133,11 +137,11 @@ export function HVACHero() {
                 {/* 2. Service Select */}
                 <div>
                   <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                    {pick(T.quoteForm.serviceLabel, language)}
+                    <LocalizedValue value={pick(T.quoteForm.serviceLabel, language)} />
                   </label>
                   <div className="relative">
                     <Wrench className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    <select
+                    <SearchableSelect
                       required
                       value={selectedService}
                       onChange={(e) => setSelectedService(e.target.value)}
@@ -156,7 +160,7 @@ export function HVACHero() {
                             {isAr ? s.titleAr : s.titleEn}
                           </option>
                         ))}
-                    </select>
+                    </SearchableSelect>
                   </div>
                 </div>
 
@@ -166,7 +170,7 @@ export function HVACHero() {
                   disabled={!cityId}
                   className="w-full py-3 rounded-xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white font-semibold text-sm transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer group"
                 >
-                  <span>{pick(T.quoteForm.btnInstantQuote, language)}</span>
+                  <span><LocalizedValue value={pick(T.quoteForm.btnInstantQuote, language)} /></span>
                   <ArrowIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </button>
               </form>
@@ -179,7 +183,7 @@ export function HVACHero() {
                   onClick={() => openBookingModal(selectedService)}
                   className="text-[#0284C7] hover:underline font-bold cursor-pointer"
                 >
-                  {isAr ? 'أو احجز موعد تقويم' : 'Or Schedule Date'}
+                  {isAr ? <InterfaceText id="hvac.HVACHero.k1xa21kg" source="أو احجز موعد تقويم" /> : <InterfaceText id="hvac.HVACHero.kb0arkn" source="Or Schedule Date" />}
                 </button>
               </div>
             </div>

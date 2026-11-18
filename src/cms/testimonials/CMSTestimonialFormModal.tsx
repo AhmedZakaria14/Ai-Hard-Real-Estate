@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import React, { useState, useEffect } from 'react';
 import { X, Award, Sparkles, Star, Image, MapPin, User, Save, Check } from 'lucide-react';
 import { Language, Testimonial } from '../../types';
@@ -186,7 +187,7 @@ export const CMSTestimonialFormModal: React.FC<CMSTestimonialFormModalProps> = (
                 <label className="block text-xs font-bold text-slate-700 mb-1">
                   {isAr ? 'فئة العميل' : 'Client Category'}
                 </label>
-                <select
+                <SearchableSelect
                   value={formData.category || 'buyer'}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
                   className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"
@@ -195,7 +196,7 @@ export const CMSTestimonialFormModal: React.FC<CMSTestimonialFormModalProps> = (
                   <option value="seller">{isAr ? 'بائع / مالك عقار (Seller)' : 'Seller'}</option>
                   <option value="investor">{isAr ? 'مستثمر ومحفظة (Investor)' : 'Investor'}</option>
                   <option value="tenant">{isAr ? 'مستأجر تنفيذي (Executive Tenant)' : 'Executive Tenant'}</option>
-                </select>
+                </SearchableSelect>
               </div>
 
               <div>

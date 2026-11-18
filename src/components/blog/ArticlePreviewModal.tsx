@@ -1,3 +1,4 @@
+import { LocalizedValue } from '../ui/LocalizedValue';
 import React from 'react';
 import {
   X,
@@ -50,11 +51,11 @@ export const ArticlePreviewModal: React.FC<ArticlePreviewModalProps> = ({
           <div className="flex items-center gap-2 text-xs">
             <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-bold border border-blue-500/30">
               <Eye className="w-3.5 h-3.5" />
-              <span>{isAr ? 'معاينة القارئ (Live Preview)' : 'Live Reader Preview'}</span>
+              <span><LocalizedValue value={isAr ? 'معاينة القارئ (Live Preview)' : 'Live Reader Preview'} /></span>
             </span>
             <span className="text-slate-400 hidden sm:inline">•</span>
             <span className="text-slate-400 text-[11px] font-mono hidden sm:inline">
-              /blog/{slug}
+              /blog/<LocalizedValue value={slug} />
             </span>
           </div>
 
@@ -73,21 +74,21 @@ export const ArticlePreviewModal: React.FC<ArticlePreviewModalProps> = ({
             <div className="flex items-center gap-2.5 flex-wrap">
               <span className={`px-3 py-1 rounded-full border text-xs font-bold flex items-center gap-1.5 ${badgeStyle.badge}`}>
                 <span className={`w-2 h-2 rounded-full ${badgeStyle.dot}`} />
-                <span>{post.category?.[language] || 'Market Intelligence'}</span>
+                <span><LocalizedValue value={post.category?.[language] || 'Market Intelligence'} /></span>
               </span>
 
               <span className="text-slate-300">•</span>
 
               <div className="flex items-center gap-1.5 text-xs text-slate-500">
                 <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                <span>{post.date}</span>
+                <span><LocalizedValue value={post.date} /></span>
               </div>
 
               <span className="text-slate-300">•</span>
 
               <div className="flex items-center gap-1.5 text-xs text-slate-500">
                 <Clock className="w-3.5 h-3.5 text-slate-400" />
-                <span>{post.readTime?.[language] || '5 min read'}</span>
+                <span><LocalizedValue value={post.readTime?.[language] || '5 min read'} /></span>
               </div>
 
               {post.status && (
@@ -100,20 +101,20 @@ export const ArticlePreviewModal: React.FC<ArticlePreviewModalProps> = ({
                       : 'bg-slate-200 text-slate-700'
                   }`}
                 >
-                  {post.status}
+                  <LocalizedValue value={post.status} />
                 </span>
               )}
             </div>
 
             {/* Title */}
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 font-display-serif leading-tight tracking-tight">
-              {post.title?.[language]}
+              <LocalizedValue value={post.title?.[language]} />
             </h1>
 
             {/* Summary / Excerpt */}
             {post.excerpt?.[language] && (
               <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-medium border-s-2 border-blue-500 ps-4 py-1 italic">
-                {post.excerpt[language]}
+                <LocalizedValue value={post.excerpt[language]} />
               </p>
             )}
 
@@ -127,10 +128,10 @@ export const ArticlePreviewModal: React.FC<ArticlePreviewModalProps> = ({
                 />
                 <div>
                   <h4 className="text-sm font-bold text-slate-900">
-                    {post.author?.[language]}
+                    <LocalizedValue value={post.author?.[language]} />
                   </h4>
                   <p className="text-xs text-slate-500">
-                    {post.authorRole?.[language] || (isAr ? 'مستشار استثماري أول' : 'Senior Market Strategist')}
+                    <LocalizedValue value={post.authorRole?.[language] || (isAr ? 'مستشار استثماري أول' : 'Senior Market Strategist')} />
                   </p>
                 </div>
               </div>
@@ -160,14 +161,14 @@ export const ArticlePreviewModal: React.FC<ArticlePreviewModalProps> = ({
               <div className="mt-8 pt-6 border-t border-slate-100 flex items-center gap-2 flex-wrap">
                 <span className="text-xs font-bold text-slate-500 flex items-center gap-1">
                   <Tag className="w-3.5 h-3.5 text-slate-400" />
-                  <span>{isAr ? 'الوسوم:' : 'Tags:'}</span>
+                  <span><LocalizedValue value={isAr ? 'الوسوم:' : 'Tags:'} /></span>
                 </span>
                 {post.tags.map((tag) => (
                   <span
                     key={tag}
                     className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition-colors"
                   >
-                    #{tag}
+                    #<LocalizedValue value={tag} />
                   </span>
                 ))}
               </div>
@@ -178,16 +179,16 @@ export const ArticlePreviewModal: React.FC<ArticlePreviewModalProps> = ({
         {/* Footer */}
         <div className="px-6 py-3.5 bg-white border-t border-slate-200 flex items-center justify-between">
           <div className="text-xs text-slate-500">
-            {isAr
+            <LocalizedValue value={isAr
               ? 'المعاينة مطابقة تماماً لواجهة المقال على الموقع المباشر'
-              : 'Rendered in full compliance with live reader viewport and sanitize rules'}
+              : 'Rendered in full compliance with live reader viewport and sanitize rules'} />
           </div>
 
           <button
             onClick={onClose}
             className="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl hover:bg-slate-800 transition-colors"
           >
-            {isAr ? 'إغلاق المعاينة' : 'Close Preview'}
+            <LocalizedValue value={isAr ? 'إغلاق المعاينة' : 'Close Preview'} />
           </button>
         </div>
       </div>

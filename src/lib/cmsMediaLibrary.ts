@@ -1,5 +1,6 @@
 import { hardAdminClient } from './db/hardAdminClient';
-import type { LocalizedText, SectorId } from '../types/firestore-schema';
+import { hardPublishableKey, hardSupabaseUrl } from './db/hardCatalog';
+import type { LocalizedText, SectorId } from '../types/backend-schema';
 
 export type AllowedMimeType =
   | 'image/jpeg'
@@ -74,23 +75,58 @@ export function validateMediaUpload(file: File): { isValid: boolean; error?: str
 /**
  * Extracts image dimensions (width & height) from a file.
  */
-export function getImageDimensions(file: File): Promise<{ width: number; height: number } | undefined> {
-  return new Promise((resolve) => {
-    if (!file.type.startsWith('image/')) {
-      resolve(undefined);
-      return;
-    }
-    const img = new Image();
-    const objectUrl = URL.createObjectURL(file);
-    img.onload = () => {
-      resolve({ width: img.naturalWidth, height: img.naturalHeight });
-      URL.revokeObjectURL(objectUrl);
-    };
-    img.onerror = () => {
-      resolve(undefined);
-      URL.revokeObjectURL(objectUrl);
-    };
-    img.src = objectUrl;
+async function loadImageFile(file: File): Promise<HTMLImageElement> {
+  const url = URL.createObjectURL(file);
+  try {
+    return await new Promise((resolve, reject) => {
+      const img = new Image();
+      const timer = window.setTimeout(() => reject(new Error('تعذرت قراءة الصورة. اختر صورة أخرى.')), 15000);
+      img.onload = () => { window.clearTimeout(timer); resolve(img); };
+      img.onerror = () => { window.clearTimeout(timer); reject(new Error('الملف ليس صورة سليمة.')); };
+      img.src = url;
+    });
+  } finally { URL.revokeObjectURL(url); }
+}
+
+export async function getImageDimensions(file: File): Promise<{ width: number; height: number } | undefined> {
+  if (!file.type.startsWith('image/')) return undefined;
+  const image = await loadImageFile(file);
+  return { width: image.naturalWidth, height: image.naturalHeight };
+}
+
+export async function prepareMediaFile(file: File): Promise<File> {
+  if (!file.size || file.size > 15 * 1024 * 1024) throw new Error('حجم الملف يجب أن يكون بين 1 بايت و15 ميجابايت.');
+  const extensions: Record<string, string> = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', gif: 'image/gif', avif: 'image/avif', svg: 'image/svg+xml', pdf: 'application/pdf' };
+  if (!file.type) file = new File([file], file.name, { type: extensions[file.name.split('.').pop()?.toLowerCase() || ''] || '' });
+  if (file.type !== 'image/svg+xml') return file;
+  // Rasterize vector logos before public upload; active SVG content is never hosted.
+  const image = await loadImageFile(file);
+  const canvas = document.createElement('canvas');
+  const ratio = Math.min(1, 2048 / Math.max(image.naturalWidth, image.naturalHeight));
+  canvas.width = Math.max(1, Math.round(image.naturalWidth * ratio));
+  canvas.height = Math.max(1, Math.round(image.naturalHeight * ratio));
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('تعذرت معالجة الشعار.');
+  ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+  const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob((result) => result ? resolve(result) : reject(new Error('تعذرت معالجة الشعار.')), 'image/png'));
+  return new File([blob], file.name.replace(/\.svg$/i, '') + '.png', { type: 'image/png' });
+}
+
+function uploadStorageFile(file: File, bucket: string, path: string, token: string, progress?: (value: number) => void): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open('POST', hardSupabaseUrl + '/storage/v1/object/' + bucket + '/' + path.split('/').map(encodeURIComponent).join('/'));
+    request.timeout = 45000;
+    request.setRequestHeader('Authorization', 'Bearer ' + token);
+    request.setRequestHeader('apikey', hardPublishableKey);
+    request.setRequestHeader('Content-Type', file.type);
+    request.setRequestHeader('x-upsert', 'false');
+    request.upload.onprogress = (event) => { if (event.lengthComputable) progress?.(Math.min(95, Math.round(event.loaded / event.total * 95))); };
+    request.onload = () => request.status >= 200 && request.status < 300 ? resolve() : reject(new Error(request.status === 401 || request.status === 403 ? 'انتهت صلاحية الرفع. سجّل الدخول مرة أخرى.' : 'تعذر تخزين الصورة. أعد المحاولة.'));
+    request.onerror = () => reject(new Error('تعذر الاتصال بخدمة الملفات. تحقق من الاتصال وأعد المحاولة.'));
+    request.ontimeout = () => reject(new Error('انتهت مهلة رفع الصورة. أعد المحاولة.'));
+    request.onabort = () => reject(new Error('أُلغي رفع الصورة.'));
+    request.send(file);
   });
 }
 
@@ -105,7 +141,7 @@ async function resolveMedia(asset: MediaAssetDoc, bucket: string, path: string):
     return { ...asset, downloadUrl: data.signedUrl, thumbnailUrl: data.signedUrl };
   }
   const encodedPath = path.split('/').map(encodeURIComponent).join('/');
-  const url = new URL('/media/catalog/' + encodedPath, window.location.origin).href;
+  const url = '/media/catalog/' + encodedPath;
   return { ...asset, downloadUrl: url, thumbnailUrl: url };
 }
 
@@ -127,6 +163,7 @@ export async function uploadMediaAsset({
   uploadedBy?: string;
   onProgress?: (progressPercent: number) => void;
 }): Promise<MediaAssetDoc> {
+  file = await prepareMediaFile(file);
   const validation = validateMediaUpload(file);
   if (!validation.isValid) throw new Error(validation.error);
   if (!isPrivate && !file.type.startsWith('image/')) throw new Error('ارفع المستندات في قسم الملفات الخاصة.');
@@ -144,10 +181,11 @@ export async function uploadMediaAsset({
     sector, tags, isPrivate, references: [], uploadedBy: user.id, createdAt: now, updatedAt: now,
   };
   onProgress?.(0);
-  const { error } = await storage.upload(storagePath, file, { contentType: file.type, upsert: false });
-  if (error) throw error;
+  const { data: { session } } = await hardAdminClient.auth.getSession();
+  if (!session?.access_token) throw new Error('انتهت جلسة الإدارة. سجّل الدخول مرة أخرى.');
+  await uploadStorageFile(file, bucket, storagePath, session.access_token, onProgress);
   const { error: dbError } = await hardAdminClient.from('hard_media_assets')
-    .insert({ id, bucket, path: storagePath, asset });
+    .insert({ id, bucket, path: storagePath, asset }).abortSignal(AbortSignal.timeout(20000));
   if (dbError) {
     await storage.remove([storagePath]);
     throw dbError;

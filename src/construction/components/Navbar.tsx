@@ -1,3 +1,6 @@
+import { LocalizedValue } from '../../components/ui/LocalizedValue';
+import { InterfaceText } from '../../components/ui/InterfaceText';
+import { ManagedButton } from '../../components/ui/ManagedElements';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import { BrandLogo } from '../../components/ui/BrandLogo';
 import React, { useState, useEffect } from 'react';
@@ -139,7 +142,7 @@ export function Navbar({
                   }`}
                 >
                   {link.isCalc && <Calculator className="w-3.5 h-3.5" />}
-                  <span>{link.label}</span>
+                  <span><LocalizedValue value={link.label} /></span>
                 </a>
               );
             })}
@@ -148,15 +151,15 @@ export function Navbar({
           {/* Right Action CTAs */}
           <div className="hidden sm:flex items-center gap-2.5">
             {/* Language Switcher */}
-            <button
+            <ManagedButton copyScope="construction.Navbar"
               type="button"
               onClick={toggleLanguage}
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-700 border border-slate-200 transition-colors cursor-pointer"
               aria-label="Toggle language"
             >
               <Globe className="w-3.5 h-3.5 text-[#009ee2]" />
-              <span>{language === 'en' ? 'العربية' : 'English'}</span>
-            </button>
+              <span>{language === 'en' ? <InterfaceText id="construction.Navbar.k1agd4ix" source="العربية" /> : <InterfaceText id="construction.Navbar.k7nql6j" source="English" />}</span>
+            </ManagedButton>
 
             {/* Instant Quote CTA */}
             <button
@@ -165,7 +168,7 @@ export function Navbar({
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#009ee2] hover:bg-[#008bc7] text-white text-xs font-bold transition-all shadow-sm shadow-[#009ee2]/20 cursor-pointer"
             >
               <FileText className="w-3.5 h-3.5" />
-              <span>{t.nav.requestQuote}</span>
+              <span><LocalizedValue value={t.nav.requestQuote} /></span>
               <ArrowIcon className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -180,14 +183,14 @@ export function Navbar({
               <Globe className="w-4 h-4 text-[#009ee2]" />
             </button>
 
-            <button
+            <ManagedButton copyScope="construction.Navbar"
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-xl bg-slate-50 text-slate-700 border border-slate-200 focus:outline-none"
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
+            </ManagedButton>
           </div>
         </div>
 
@@ -197,7 +200,7 @@ export function Navbar({
             {/* Dedicated HARD Group Sectors Switcher */}
             <div className="bg-slate-900 rounded-2xl p-3 text-white space-y-2">
               <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-1">
-                {isAr ? 'قطاعات مجموعة هارد' : 'HARD Group Sectors'}
+                {isAr ? <InterfaceText id="construction.Navbar.kldopoj" source="قطاعات مجموعة هارد" /> : <InterfaceText id="construction.Navbar.k1vok2qc" source="HARD Group Sectors" />}
               </div>
               <div className="space-y-1">
                 {HARD_GROUP_SECTORS.map((sector) => {
@@ -221,10 +224,10 @@ export function Navbar({
                           : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                       }`}
                     >
-                      <span>{sector.name[language]}</span>
+                      <span><LocalizedValue value={sector.name[language]} /></span>
                       {isCurrent && (
                         <span className="text-[9px] px-1.5 py-0.2 rounded bg-black/30 text-sky-200 uppercase font-extrabold">
-                          {isAr ? 'القطاع الحالي' : 'Active'}
+                          {isAr ? <InterfaceText id="construction.Navbar.k1du1dcq" source="القطاع الحالي" /> : <InterfaceText id="construction.Navbar.k8qzyhb" source="Active" />}
                         </span>
                       )}
                     </a>
@@ -235,7 +238,7 @@ export function Navbar({
 
             <div className="flex flex-col space-y-1">
               <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-1">
-                {isAr ? 'أقسام الموقع' : 'Construction Navigation'}
+                {isAr ? <InterfaceText id="construction.Navbar.k1wro2hk" source="أقسام الموقع" /> : <InterfaceText id="construction.Navbar.korzbq" source="Construction Navigation" />}
               </div>
               {navLinks.map((link) => (
                 <a
@@ -247,7 +250,7 @@ export function Navbar({
                     activeSection === link.href ? 'bg-blue-50 !text-blue-700 font-bold' : link.isCalc ? 'text-amber-600 font-bold' : ''
                   }`}
                 >
-                  {link.label}
+                  <LocalizedValue value={link.label} />
                 </a>
               ))}
             </div>
@@ -262,7 +265,7 @@ export function Navbar({
                 className="w-full py-2.5 px-4 rounded-xl bg-[#009ee2] hover:bg-[#008bc7] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-sm cursor-pointer"
               >
                 <FileText className="w-4 h-4" />
-                <span>{t.nav.requestQuote}</span>
+                <span><LocalizedValue value={t.nav.requestQuote} /></span>
               </button>
 
               <button
@@ -274,7 +277,7 @@ export function Navbar({
                 className="w-full py-2.5 px-4 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-bold border border-amber-200 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Calculator className="w-4 h-4" />
-                <span>{t.hero.ctaEstimate}</span>
+                <span><LocalizedValue value={t.hero.ctaEstimate} /></span>
               </button>
 
             </div>

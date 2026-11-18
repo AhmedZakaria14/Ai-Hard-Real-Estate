@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import { defaultPageMedia, pageMediaSection } from '../../lib/pageMedia';
 import { defaultGroupPortal, groupPortalSection } from '../../lib/groupPortalContent';
 import { defaultPropertyTypes, propertyTypesSection, validPropertyTypes } from '../../lib/propertyTaxonomy';
@@ -7,14 +8,14 @@ import { DEFAULT_HERO_CONTENT, DEFAULT_COMPANY_CONTENT, DEFAULT_WORK_STAGES, DEF
 import { DEFAULT_HVAC_HERO, DEFAULT_HVAC_HOURS_CONTACT, DEFAULT_HVAC_BOOKING_COPY, DEFAULT_HVAC_CITIES } from '../../hvac/services/sectionDefaults';
 import { readSectorSection, saveSectorSection, type SectorSection } from '../../lib/db/hardSectorSections';
 import { INITIAL_SERVICES } from '../../construction/data/seedData';
-import { initialFaqs, initialGallery, initialTestimonials, yearRoundChecklist } from '../../hvac/data/initialData';
+import { initialFaqs, initialGallery, initialGalleryCategories, initialTestimonials, yearRoundChecklist } from '../../hvac/data/initialData';
 import { uploadMediaAsset } from '../../lib/cmsMediaLibrary';
 
 type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
 type FieldPath = (string | number)[];
 const sections: { target: SectorSection; title: string; fallback: object }[] = [
   { target: realEstateHeroSection, title: 'العقارات — صورة الهيرو', fallback: defaultRealEstateHero },
-  { target: realEstateServiceMediaSection, title: 'العقارات — صور وأرقام الخدمات', fallback: defaultRealEstateServiceMedia },
+  { target: realEstateServiceMediaSection, title: 'العقارات — نصوص وصور وأرقام الخدمات', fallback: defaultRealEstateServiceMedia },
   { target: pageMediaSection, title: 'صور صفحات القطاعات والصور الافتراضية', fallback: defaultPageMedia },
   { target: propertyTypesSection, title: 'العقارات — أنواع العقارات', fallback: defaultPropertyTypes },
   { target: groupPortalSection, title: 'المجموعة — نصوص وصور البوابة', fallback: defaultGroupPortal },
@@ -27,6 +28,7 @@ const sections: { target: SectorSection; title: string; fallback: object }[] = [
   { target: { sector: 'hvac', key: 'hero' }, title: 'التكييف — الصفحة الرئيسية', fallback: DEFAULT_HVAC_HERO },
   { target: { sector: 'hvac', key: 'hours_contact' }, title: 'التكييف — الاتصال وساعات العمل', fallback: DEFAULT_HVAC_HOURS_CONTACT },
   { target: { sector: 'hvac', key: 'booking_copy' }, title: 'التكييف — نصوص الحجز', fallback: DEFAULT_HVAC_BOOKING_COPY },
+  { target: { sector: 'hvac', key: 'gallery_categories' }, title: 'التكييف — فئات معرض الأعمال', fallback: initialGalleryCategories },
   { target: { sector: 'hvac', key: 'work_gallery' }, title: 'التكييف — معرض الأعمال والفئات', fallback: initialGallery },
   { target: { sector: 'hvac', key: 'maintenance_guide' }, title: 'التكييف — دليل الصيانة الدورية', fallback: yearRoundChecklist },
   { target: { sector: 'hvac', key: 'reviews' }, title: 'التكييف — آراء العملاء', fallback: initialTestimonials },
@@ -38,6 +40,10 @@ const labels: Record<string, string> = {
   questionAr: 'السؤال بالعربية', questionEn: 'السؤال بالإنجليزية', answerAr: 'الإجابة بالعربية', answerEn: 'الإجابة بالإنجليزية',
   aboutImage: 'صورة صفحة من نحن', projectPlaceholderImage: 'الصورة الافتراضية للمشاريع',
   realestate: 'قطاع العقارات', construction: 'قطاع المقاولات', hvac: 'قطاع التكييف',
+  captionAr: 'تعليق الصورة بالعربية', captionEn: 'تعليق الصورة بالإنجليزية', categoryAr: 'الفئة القديمة بالعربية', categoryEn: 'الفئة القديمة بالإنجليزية',
+  descAr: 'النص بالعربية', descEn: 'النص بالإنجليزية', iconName: 'الأيقونة',
+  officeAddressAr: 'عنوان المكتب بالعربية', officeAddressEn: 'عنوان المكتب بالإنجليزية', hoursWeekdayAr: 'ساعات العمل بالعربية', hoursWeekdayEn: 'ساعات العمل بالإنجليزية',
+  ar: 'العربية', en: 'الإنجليزية', title: 'العنوان', subtitle: 'العنوان الفرعي', description: 'الوصف', features: 'المزايا', desc: 'التفاصيل', label: 'التسمية', actionText: 'نص الزر',
   titleAr: 'العنوان بالعربية', titleEn: 'العنوان بالإنجليزية',
   introAr: 'المقدمة بالعربية', introEn: 'المقدمة بالإنجليزية',
   footerAr: 'التذييل بالعربية', footerEn: 'التذييل بالإنجليزية',
@@ -57,7 +63,7 @@ const labels: Record<string, string> = {
   whatsappNumber: 'رقم واتساب', active: 'مفعّل',
 };
 const inputStyle = 'block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 outline-none';
-const fixedKeys = new Set(['id', 'isPublished']);
+const fixedKeys = new Set(['id', 'slug', 'tag', 'actionType', 'isPublished', 'categoryId']);
 const imageKey = /(?:image(?:url)?|avatar(?:url)?|logo(?:url)?)$/i;
 const urlKey = /url$/i;
 const publicAssetUrl = /^(https:\/\/|\/(?!\/))/i;
@@ -76,11 +82,13 @@ export default function SupabaseSectorSections() {
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
+  const [categories, setCategories] = useState(initialGalleryCategories);
+  useEffect(() => { const c = new AbortController(); readSectorSection<typeof initialGalleryCategories>({sector: 'hvac', key: 'gallery_categories'}, c.signal).then((data) => { if (data) setCategories(data); }).catch(() => {}); return () => c.abort(); }, [active]);
   const section = sections[active];
   const editingTypes = section.target.key === 'property_types';
   const editingPortal = section.target.sector === 'portal';
-  const editingList = (editingTypes || section.target.sector === 'hvac') && Array.isArray(section.fallback);
-  const itemLabel = editingTypes ? 'نوع عقار' : section.target.key === 'faq' ? 'سؤال' : section.target.key === 'work_gallery' ? 'عمل' : section.target.key === 'reviews' ? 'تقييم' : section.target.key === 'maintenance_guide' ? 'خطوة' : 'مدينة';
+  const editingList = Array.isArray(section.fallback);
+  const itemLabel = editingTypes ? 'نوع عقار' : section.target.key === 'gallery_categories' ? 'فئة' : section.target.key === 'services' ? 'خدمة' : section.target.key === 'stages' ? 'مرحلة' : section.target.key === 'offices' ? 'مقر' : section.target.key === 'faq' ? 'سؤال' : section.target.key === 'work_gallery' ? 'عمل' : section.target.key === 'reviews' ? 'تقييم' : section.target.key === 'maintenance_guide' ? 'خطوة' : 'مدينة';
   const editingCities = section.target.sector === 'hvac' && section.target.key === 'service_areas';
 
   useEffect(() => {
@@ -185,9 +193,9 @@ export default function SupabaseSectorSections() {
 
   return <section className="space-y-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs sm:p-7">
     <h2 className="text-lg font-extrabold tracking-tight text-slate-900">محتوى قطاعات هارد</h2>
-    <label className="block">القسم <select disabled={busy} value={active} onChange={(event) => setActive(Number(event.target.value))} className={inputStyle}>
+    <label className="block">القسم <SearchableSelect disabled={busy} value={active} onChange={(event) => setActive(Number(event.target.value))} className={inputStyle}>
       {sections.map((item, index) => <option value={index} key={item.title}>{item.title}</option>)}
-    </select></label>
+    </SearchableSelect></label>
     {section.target.sector === 'construction' && section.target.key === 'offices' && (
       <p className="text-sm text-slate-600">لتثبيت الدبوس، أدخل خط العرض والطول للمقر ثم اضغط «حفظ ونشر». إذا تركت القيمتين صفرًا، تبحث الخريطة باستخدام عنوان المقر.</p>
     )}
@@ -199,6 +207,12 @@ export default function SupabaseSectorSections() {
         {editingList && Array.isArray(form) ? <>
           {form.map((city, index) => (
             <div key={city && typeof city === 'object' && !Array.isArray(city) ? String(city.id ?? index) : index} className="space-y-2">
+              {section.target.key === 'work_gallery' && city && typeof city === 'object' && !Array.isArray(city) && <label className="block text-sm">فئة العمل
+                <SearchableSelect className={inputStyle} value={String(city.categoryId || JSON.stringify([city.categoryAr, city.categoryEn]))} onChange={(event) => {
+                  const category = categories.find((item) => item.id === event.target.value);
+                  if (category) { edit([index, 'categoryId'], category.id); edit([index, 'categoryAr'], category.nameAr); edit([index, 'categoryEn'], category.nameEn); }
+                }}><option value="">اختر فئة</option>{categories.filter((item) => item.active).map((category) => <option key={category.id} value={category.id}>{category.nameAr} / {category.nameEn}</option>)}</SearchableSelect>
+              </label>}
               {renderField(city, [index])}
               {!editingTypes && <button type="button" className="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:border-blue-300 hover:text-blue-700 transition-colors disabled:opacity-40 text-rose-700" onClick={() =>
                 setForm((current) => Array.isArray(current) ? current.filter((_, i) => i !== index) : current)
@@ -209,7 +223,7 @@ export default function SupabaseSectorSections() {
             const template = (section.fallback as Json[])[0];
             if (!template || typeof template !== 'object' || Array.isArray(template)) return;
             const item = Object.fromEntries(Object.entries(template).map(([key, value]) =>
-              [key, key === 'id' ? crypto.randomUUID() : key === 'active' ? true : key === 'rating' ? 5 : typeof value === 'string' ? '' : typeof value === 'number' ? 0 : false]
+              [key, key === 'id' ? crypto.randomUUID() : key === 'active' ? true : key === 'rating' ? 5 : typeof value === 'string' ? '' : typeof value === 'number' ? 0 : Array.isArray(value) ? [] : value && typeof value === 'object' ? structuredClone(value) : false]
             ));
             setForm((current) => Array.isArray(current) ? [...current, item] : current);
           }}>إضافة {itemLabel}</button>

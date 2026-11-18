@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import React, { useState, useEffect } from 'react';
 import {
   FileText,
@@ -196,7 +197,7 @@ export const CMSFormSchemaEditor: React.FC<CMSFormSchemaEditorProps> = ({
     }));
   };
 
-  // Save Config to Firestore via Server Validation Service
+  // Save the validated form configuration
   const handleSaveConfig = async () => {
     setIsSaving(true);
     setSaveStatus(null);
@@ -231,7 +232,7 @@ export const CMSFormSchemaEditor: React.FC<CMSFormSchemaEditorProps> = ({
           <li>{isAr ? 'اختر النموذج المطلوب، ثم راجع نوع الحقل واسمه وخياراته وما إذا كان إلزاميًا.' : 'Select a form and review each field’s type, label, options, and required setting.'}</li>
           <li>{isAr ? 'أدخل تسميات الحقول ونصوص المساعدة بالعربية والإنجليزية. احفظ المسودة وراجعها في المعاينة.' : 'Enter Arabic and English labels and help text. Save and preview the draft.'}</li>
           <li>{isAr ? 'استخدم التحقق قبل النشر واتبع رسائل التحقق. يحفظ النشر إصدارًا من تعريف النموذج.' : 'Run the publishing checks and address any validation messages. Publishing stores a version of the form definition.'}</li>
-          <li>{isAr ? 'راجع النموذج العام المعني بعد النشر. تظهر الطلبات التي يرسلها الزوار في صندوق الطلبات.' : 'Review the corresponding public form after publishing. Visitor submissions go to the request inbox.'}</li>
+          <li>{isAr ? 'الحقول الإضافية تظهر في النموذج العام بعد النشر وتُحفظ كاملة مع الطلب. لتغيير النصوص الأساسية الحالية استخدم إدارة المحتوى ← محرر نصوص الواجهة. تظهر الطلبات في صندوق الطلبات.' : 'Review the corresponding public form after publishing. Visitor submissions go to the request inbox.'}</li>
         </ol>
       </details>
       {/* Header Banner */}
@@ -460,7 +461,7 @@ export const CMSFormSchemaEditor: React.FC<CMSFormSchemaEditorProps> = ({
                       {/* Field Type Select (Whitelisted) */}
                       <div className="flex items-center gap-1.5 text-xs">
                         <span className="text-slate-500 font-medium">{isAr ? 'نوع الحقل:' : 'Type:'}</span>
-                        <select
+                        <SearchableSelect
                           value={field.type}
                           onChange={(e) =>
                             handleUpdateField(idx, { type: e.target.value as AllowedFieldType })
@@ -473,7 +474,7 @@ export const CMSFormSchemaEditor: React.FC<CMSFormSchemaEditorProps> = ({
                               {t}
                             </option>
                           ))}
-                        </select>
+                        </SearchableSelect>
                       </div>
 
                       {/* Required Checkbox */}

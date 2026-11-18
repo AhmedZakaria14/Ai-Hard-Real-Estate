@@ -1,3 +1,5 @@
+import { LocalizedValue } from './LocalizedValue';
+import { ManagedImg } from './ManagedElements';
 import { useEffect, useState } from 'react';
 import { readCompanyContent } from '../../lib/db/companyContent';
 import { getLocalizedText } from '../../lib/utils';
@@ -18,8 +20,12 @@ export function usePublishedCompanyContent() {
   });
   useEffect(() => {
     const controller = new AbortController();
+    let generation = 0;
+    const refresh = () => {
+    const version = ++generation;
     void readCompanyContent(controller.signal).then((rows) => {
       if (controller.signal.aborted) return;
+      if (version !== generation) return;
       const byKind = <T,>(kind: keyof PublicCompanyContent) =>
         rows.filter((row: { kind: string }) => row.kind === kind)
           .map((row) => row.body as T);
@@ -32,7 +38,13 @@ export function usePublishedCompanyContent() {
         stories: byKind<Testimonial>('stories'),
       });
     }).catch((error) => { if (!controller.signal.aborted) console.error('Company directory unavailable', error); });
-    return () => controller.abort();
+    };
+    const stored = (event: StorageEvent) => { if (event.key === 'hard-company-saved') refresh(); };
+    refresh();
+    window.addEventListener('focus', refresh);
+    window.addEventListener('hard-company-saved', refresh);
+    window.addEventListener('storage', stored);
+    return () => { controller.abort(); window.removeEventListener('focus', refresh); window.removeEventListener('hard-company-saved', refresh); window.removeEventListener('storage', stored); };
   }, []);
   return content;
 }
@@ -50,13 +62,13 @@ export function PublishedCompanyContent({ language }: { language: Language }) {
 
   return <div className="mx-auto max-w-7xl space-y-12 px-4 pb-12">
     {sections.filter((section) => section.cards.length).map((section) => <section key={section.id} id={section.id} className="scroll-mt-24 space-y-4">
-      <h2 className="text-2xl font-bold">{section.title}</h2>
+      <h2 className="text-2xl font-bold"><LocalizedValue value={section.title} /></h2>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {section.cards.map((card) => <article key={card.id} className="space-y-2 rounded-2xl border border-slate-200 p-4">
-          {card.image && <img src={card.image} alt={card.name} loading="lazy" className="h-32 w-full object-contain" />}
-          {'value' in card && <p className="text-2xl font-bold">{card.value}</p>}
-          <h3 className="font-semibold">{card.name}</h3>
-          {card.detail && <p className="text-sm text-slate-600">{card.detail}</p>}
+          {card.image && <ManagedImg copyScope="realestate.PublishedCompanyContent" src={card.image} alt={card.name} loading="lazy" className="h-32 w-full object-contain" />}
+          {'value' in card && <p className="text-2xl font-bold"><LocalizedValue value={card.value} /></p>}
+          <h3 className="font-semibold"><LocalizedValue value={card.name} /></h3>
+          {card.detail && <p className="text-sm text-slate-600"><LocalizedValue value={card.detail} /></p>}
         </article>)}
       </div>
     </section>)}

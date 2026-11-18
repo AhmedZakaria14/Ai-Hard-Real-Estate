@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   MailCheck,
@@ -249,7 +250,7 @@ export const CMSJoinList: React.FC<CMSJoinListProps> = ({
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs">
             <Filter className="w-3.5 h-3.5 text-slate-500" />
-            <select
+            <SearchableSelect
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
               className="bg-transparent font-medium text-slate-700 focus:outline-none cursor-pointer"
@@ -257,7 +258,7 @@ export const CMSJoinList: React.FC<CMSJoinListProps> = ({
               <option value="all">{isAr ? 'جميع الحالات' : 'All Statuses'}</option>
               <option value="active">{isAr ? 'نشط فقط (Active)' : 'Active Only'}</option>
               <option value="unsubscribed">{isAr ? 'ملغي الاشتراك (Unsubscribed)' : 'Unsubscribed'}</option>
-            </select>
+            </SearchableSelect>
           </div>
         </div>
       </div>

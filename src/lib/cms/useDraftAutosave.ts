@@ -152,7 +152,7 @@ export function useDraftAutosave<T = any>({
           setErrorMessage(`Conflict: Another admin saved revision ${err.remoteRevision}`);
         } else {
           setSaveStatus('failed');
-          setErrorMessage(err?.message || 'Failed to save draft to Supabase');
+          setErrorMessage(err?.message || 'Failed to save draft to the database');
         }
       }
     },

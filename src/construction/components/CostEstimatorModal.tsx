@@ -1,3 +1,6 @@
+import { LocalizedValue } from '../../components/ui/LocalizedValue';
+import { InterfaceText } from '../../components/ui/InterfaceText';
+import { ManagedButton, ManagedInput } from '../../components/ui/ManagedElements';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import React, { useState } from 'react';
 import {
@@ -135,20 +138,20 @@ export function CostEstimatorModal() {
             </div>
             <div>
               <h2 className="text-lg sm:text-xl font-bold font-display-serif text-[#0f243e]">
-                {t.calculator.title}
+                <LocalizedValue value={t.calculator.title} />
               </h2>
-              <p className="text-xs text-slate-500">{t.calculator.subtitle}</p>
+              <p className="text-xs text-slate-500"><LocalizedValue value={t.calculator.subtitle} /></p>
             </div>
           </div>
 
-          <button
+          <ManagedButton copyScope="construction.CostEstimatorModal"
             type="button"
             onClick={closeCostEstimator}
             className="p-2 rounded-xl bg-white hover:bg-slate-100 text-slate-500 hover:text-slate-900 border border-slate-200 transition-colors cursor-pointer"
             aria-label={isAr ? 'إغلاق الحاسبة' : 'Close cost estimator'}
           >
             <X className="w-5 h-5" />
-          </button>
+          </ManagedButton>
         </div>
 
         {/* Step Indicator Tabs */}
@@ -162,7 +165,7 @@ export function CostEstimatorModal() {
                 : 'border-transparent text-slate-600 hover:text-slate-900'
             }`}
           >
-            {t.calculator.step1}
+            <LocalizedValue value={t.calculator.step1} />
           </button>
           <button
             type="button"
@@ -173,7 +176,7 @@ export function CostEstimatorModal() {
                 : 'border-transparent text-slate-600 hover:text-slate-900'
             }`}
           >
-            {t.calculator.step2}
+            <LocalizedValue value={t.calculator.step2} />
           </button>
           <button
             type="button"
@@ -184,7 +187,7 @@ export function CostEstimatorModal() {
                 : 'border-transparent text-slate-600 hover:text-slate-900'
             }`}
           >
-            {t.calculator.step3}
+            <LocalizedValue value={t.calculator.step3} />
           </button>
         </div>
 
@@ -196,11 +199,11 @@ export function CostEstimatorModal() {
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-[#0072b8]" />
                 <span className="text-xs font-bold text-[#0f243e]">
-                  {isAr ? 'فرضيات ومعايير التقدير الحالية:' : 'Current Active Calculation Assumptions:'}
+                  {isAr ? <InterfaceText id="construction.CostEstimatorModal.k26aczd" source="فرضيات ومعايير التقدير الحالية:" /> : <InterfaceText id="construction.CostEstimatorModal.kvahv21" source="Current Active Calculation Assumptions:" />}
                 </span>
               </div>
               <span className="text-[10px] font-semibold text-slate-600 bg-white px-2.5 py-0.5 rounded-full border border-slate-200">
-                {isAr ? 'محدث تلقائياً' : 'Live Auto-Updated'}
+                {isAr ? <InterfaceText id="construction.CostEstimatorModal.k1o3skts" source="محدث تلقائياً" /> : <InterfaceText id="construction.CostEstimatorModal.k1aftms" source="Live Auto-Updated" />}
               </span>
             </div>
 
@@ -208,7 +211,7 @@ export function CostEstimatorModal() {
               {/* Project Type */}
               <div className="p-2.5 rounded-xl bg-white border border-slate-200 space-y-1">
                 <div className="flex items-center justify-between text-[10px] text-slate-600 font-medium">
-                  <span>{isAr ? 'نوع المنشأة' : 'Project Type'}</span>
+                  <span>{isAr ? <InterfaceText id="construction.CostEstimatorModal.k1f4p1f6" source="نوع المنشأة" /> : <InterfaceText id="construction.CostEstimatorModal.kitubsq" source="Project Type" />}</span>
                   <span
                     className={`px-1.5 py-0.2 rounded text-[9px] font-bold ${
                       isProjectTypeDefault
@@ -216,7 +219,7 @@ export function CostEstimatorModal() {
                         : 'bg-sky-50 text-[#0072b8] border border-sky-200'
                     }`}
                   >
-                    {isProjectTypeDefault ? (isAr ? 'افتراضي' : 'Default') : (isAr ? 'مخصص' : 'Custom')}
+                    <LocalizedValue value={isProjectTypeDefault ? (isAr ? 'افتراضي' : 'Default') : (isAr ? 'مخصص' : 'Custom')} />
                   </span>
                 </div>
                 <div className="text-xs font-bold text-slate-900 truncate">
@@ -227,7 +230,7 @@ export function CostEstimatorModal() {
               {/* Finish Level */}
               <div className="p-2.5 rounded-xl bg-white border border-slate-200 space-y-1">
                 <div className="flex items-center justify-between text-[10px] text-slate-500">
-                  <span>{isAr ? 'مستوى التشطيب' : 'Finish Level'}</span>
+                  <span>{isAr ? <InterfaceText id="construction.CostEstimatorModal.k19okn76" source="مستوى التشطيب" /> : <InterfaceText id="construction.CostEstimatorModal.k1gsvxtw" source="Finish Level" />}</span>
                   <span
                     className={`px-1.5 py-0.2 rounded text-[9px] font-bold ${
                       isFinishingDefault
@@ -235,7 +238,7 @@ export function CostEstimatorModal() {
                         : 'bg-sky-50 text-[#009ee2] border border-sky-200'
                     }`}
                   >
-                    {isFinishingDefault ? (isAr ? 'افتراضي' : 'Default') : (isAr ? 'مخصص' : 'Custom')}
+                    <LocalizedValue value={isFinishingDefault ? (isAr ? 'افتراضي' : 'Default') : (isAr ? 'مخصص' : 'Custom')} />
                   </span>
                 </div>
                 <div className="text-xs font-bold text-slate-900 truncate">
@@ -246,7 +249,7 @@ export function CostEstimatorModal() {
               {/* Area & Floors */}
               <div className="p-2.5 rounded-xl bg-white border border-slate-200 space-y-1">
                 <div className="flex items-center justify-between text-[10px] text-slate-500">
-                  <span>{isAr ? 'المساحة والأدوار' : 'BUA & Floors'}</span>
+                  <span>{isAr ? <InterfaceText id="construction.CostEstimatorModal.kgeihvc" source="المساحة والأدوار" /> : <InterfaceText id="construction.CostEstimatorModal.kxlzlzc" source="BUA & Floors" />}</span>
                   <span
                     className={`px-1.5 py-0.2 rounded text-[9px] font-bold ${
                       isAreaDefault
@@ -254,18 +257,18 @@ export function CostEstimatorModal() {
                         : 'bg-sky-50 text-[#009ee2] border border-sky-200'
                     }`}
                   >
-                    {isAreaDefault ? (isAr ? 'افتراضي' : 'Default') : (isAr ? 'مخصص' : 'Custom')}
+                    <LocalizedValue value={isAreaDefault ? (isAr ? 'افتراضي' : 'Default') : (isAr ? 'مخصص' : 'Custom')} />
                   </span>
                 </div>
                 <div className="text-xs font-bold text-slate-900 truncate">
-                  {formatAreaBUA(costParams.builtUpArea, language)} • {formatConstructionDigits(costParams.floors, language)} {isAr ? 'أدوار' : 'Fl.'}
+                  <LocalizedValue value={formatAreaBUA(costParams.builtUpArea, language)} /> • <LocalizedValue value={formatConstructionDigits(costParams.floors, language)} /> {isAr ? <InterfaceText id="construction.CostEstimatorModal.ksvtzxp" source="أدوار" /> : <InterfaceText id="construction.CostEstimatorModal.klhz96b" source="Fl." />}
                 </div>
               </div>
 
               {/* Extras */}
               <div className="p-2.5 rounded-xl bg-white border border-slate-200 space-y-1">
                 <div className="flex items-center justify-between text-[10px] text-slate-500">
-                  <span>{isAr ? 'الإضافات الخاصة' : 'Selected Extras'}</span>
+                  <span>{isAr ? <InterfaceText id="construction.CostEstimatorModal.ka37nsu" source="الإضافات الخاصة" /> : <InterfaceText id="construction.CostEstimatorModal.kacch63" source="Selected Extras" />}</span>
                   <span
                     className={`px-1.5 py-0.2 rounded text-[9px] font-bold ${
                       isExtrasDefault
@@ -273,11 +276,11 @@ export function CostEstimatorModal() {
                         : 'bg-sky-50 text-[#009ee2] border border-sky-200'
                     }`}
                   >
-                    {isExtrasDefault ? (isAr ? 'افتراضي' : 'Default') : (isAr ? 'مخصص' : 'Custom')}
+                    <LocalizedValue value={isExtrasDefault ? (isAr ? 'افتراضي' : 'Default') : (isAr ? 'مخصص' : 'Custom')} />
                   </span>
                 </div>
                 <div className="text-xs font-bold text-slate-900 truncate" title={getActiveExtrasList()}>
-                  {getActiveExtrasList()}
+                  <LocalizedValue value={getActiveExtrasList()} />
                 </div>
               </div>
             </div>
@@ -287,7 +290,7 @@ export function CostEstimatorModal() {
           {activeStep === 1 && (
             <div className="space-y-4 animate-in fade-in-50">
               <label className="text-sm font-bold text-[#0f243e] block">
-                {t.calculator.step1}
+                <LocalizedValue value={t.calculator.step1} />
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                 {projectTypes.map((pt) => {
@@ -304,8 +307,8 @@ export function CostEstimatorModal() {
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <span className="text-2xl">{pt.icon}</span>
-                        <span className="text-xs sm:text-sm font-bold">{pt.label}</span>
+                        <span className="text-2xl"><LocalizedValue value={pt.icon} /></span>
+                        <span className="text-xs sm:text-sm font-bold"><LocalizedValue value={pt.label} /></span>
                       </div>
                       {isSelected && <Check className="w-4 h-4 text-[#009ee2]" />}
                     </button>
@@ -319,7 +322,7 @@ export function CostEstimatorModal() {
                   onClick={() => setActiveStep(2)}
                   className="px-6 py-2.5 rounded-xl bg-[#009ee2] hover:bg-[#008bc7] text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-2xs"
                 >
-                  <span>{isAr ? 'التالي: مستوى التشطيب' : 'Next: Finishing Level'}</span>
+                  <span>{isAr ? <InterfaceText id="construction.CostEstimatorModal.klsa7he" source="التالي: مستوى التشطيب" /> : <InterfaceText id="construction.CostEstimatorModal.keb7dxd" source="Next: Finishing Level" />}</span>
                   <ArrowIcon className="w-4 h-4" />
                 </button>
               </div>
@@ -330,7 +333,7 @@ export function CostEstimatorModal() {
           {activeStep === 2 && (
             <div className="space-y-4 animate-in fade-in-50">
               <label className="text-sm font-bold text-[#0f243e] block">
-                {t.calculator.step2}
+                <LocalizedValue value={t.calculator.step2} />
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {finishingLevels.map((fl) => {
@@ -347,10 +350,10 @@ export function CostEstimatorModal() {
                       }`}
                     >
                       <div className="flex items-center justify-between w-full">
-                        <span className="text-sm font-bold text-[#0f243e]">{fl.label}</span>
+                        <span className="text-sm font-bold text-[#0f243e]"><LocalizedValue value={fl.label} /></span>
                         {isSelected && <Check className="w-4 h-4 text-[#009ee2]" />}
                       </div>
-                      <p className="text-xs text-slate-600 leading-relaxed">{fl.desc}</p>
+                      <p className="text-xs text-slate-600 leading-relaxed"><LocalizedValue value={fl.desc} /></p>
                     </button>
                   );
                 })}
@@ -362,14 +365,14 @@ export function CostEstimatorModal() {
                   onClick={() => setActiveStep(1)}
                   className="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-900 cursor-pointer"
                 >
-                  {isAr ? 'السابق' : 'Previous'}
+                  {isAr ? <InterfaceText id="construction.CostEstimatorModal.k1wz6mnq" source="السابق" /> : <InterfaceText id="construction.CostEstimatorModal.k1t5jxvs" source="Previous" />}
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveStep(3)}
                   className="px-6 py-2.5 rounded-xl bg-[#009ee2] hover:bg-[#008bc7] text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-2xs"
                 >
-                  <span>{isAr ? 'التالي: المساحة والإضافات' : 'Next: Area & Addons'}</span>
+                  <span>{isAr ? <InterfaceText id="construction.CostEstimatorModal.kpg9l4o" source="التالي: المساحة والإضافات" /> : <InterfaceText id="construction.CostEstimatorModal.k1c4eg3g" source="Next: Area & Addons" />}</span>
                   <ArrowIcon className="w-4 h-4" />
                 </button>
               </div>
@@ -384,10 +387,10 @@ export function CostEstimatorModal() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <label className="text-xs sm:text-sm font-bold text-[#0f243e] flex items-center gap-2">
                     <Sliders className="w-4 h-4 text-[#009ee2]" />
-                    <span>{t.calculator.buaLabel}</span>
+                    <span><LocalizedValue value={t.calculator.buaLabel} /></span>
                   </label>
                   <div className="flex items-center gap-2">
-                    <input
+                    <ManagedInput copyScope="construction.CostEstimatorModal"
                       type="number"
                       min={50}
                       max={20000}
@@ -398,7 +401,7 @@ export function CostEstimatorModal() {
                       aria-label={isAr ? 'إدخال المساحة بالمتر المربع' : 'Enter area in square meters'}
                     />
                     <span className="px-3 py-1 rounded-lg bg-[#e8f4fc] text-[#009ee2] font-extrabold text-xs border border-[#d0e9fa]">
-                      {formatAreaBUA(costParams.builtUpArea, language)}
+                      <LocalizedValue value={formatAreaBUA(costParams.builtUpArea, language)} />
                     </span>
                   </div>
                 </div>
@@ -416,17 +419,17 @@ export function CostEstimatorModal() {
                 />
 
                 <div className="flex justify-between text-[10px] text-slate-500 font-medium">
-                  <span>{formatAreaSimple(150, language)}</span>
-                  <span>{formatAreaSimple(1500, language)}</span>
-                  <span>{formatAreaSimple(3000, language)}</span>
-                  <span>{formatAreaSimple(5000, language)}</span>
+                  <span><LocalizedValue value={formatAreaSimple(150, language)} /></span>
+                  <span><LocalizedValue value={formatAreaSimple(1500, language)} /></span>
+                  <span><LocalizedValue value={formatAreaSimple(3000, language)} /></span>
+                  <span><LocalizedValue value={formatAreaSimple(5000, language)} /></span>
                 </div>
               </div>
 
               {/* Number of Floors */}
               <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                 <label className="text-xs sm:text-sm font-bold text-[#0f243e] block">
-                  {t.calculator.floorsLabel}
+                  <LocalizedValue value={t.calculator.floorsLabel} />
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {[1, 2, 3, 4, 5, 6].map((num) => (
@@ -440,7 +443,7 @@ export function CostEstimatorModal() {
                           : 'bg-white border border-slate-200 text-slate-700 hover:border-sky-200'
                       }`}
                     >
-                      {num} {isAr ? 'أدوار' : 'Fl.'}
+                      <LocalizedValue value={num} /> {isAr ? <InterfaceText id="construction.CostEstimatorModal.ksvtzxp" source="أدوار" /> : <InterfaceText id="construction.CostEstimatorModal.klhz96b" source="Fl." />}
                     </button>
                   ))}
                 </div>
@@ -449,13 +452,13 @@ export function CostEstimatorModal() {
               {/* Addons Grid */}
               <div className="space-y-3">
                 <label className="text-xs sm:text-sm font-bold text-[#0f243e] block">
-                  {isAr ? 'الإضافات والمرافق الإنشائية:' : 'Structural Addons & Features:'}
+                  {isAr ? <InterfaceText id="construction.CostEstimatorModal.k1uo02ld" source="الإضافات والمرافق الإنشائية:" /> : <InterfaceText id="construction.CostEstimatorModal.kl0qxi0" source="Structural Addons & Features:" />}
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {/* Basement Toggle */}
                   <label className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between cursor-pointer hover:border-sky-200">
                     <span className="text-xs font-semibold text-slate-700">
-                      {t.calculator.addons.basement}
+                      <LocalizedValue value={t.calculator.addons.basement} />
                     </span>
                     <input
                       type="checkbox"
@@ -470,7 +473,7 @@ export function CostEstimatorModal() {
                   {/* Pool Toggle */}
                   <label className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between cursor-pointer hover:border-sky-200">
                     <span className="text-xs font-semibold text-slate-700">
-                      {t.calculator.addons.pool}
+                      <LocalizedValue value={t.calculator.addons.pool} />
                     </span>
                     <input
                       type="checkbox"
@@ -485,7 +488,7 @@ export function CostEstimatorModal() {
                   {/* Elevator Toggle */}
                   <label className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between cursor-pointer hover:border-sky-200">
                     <span className="text-xs font-semibold text-slate-700">
-                      {t.calculator.addons.elevator}
+                      <LocalizedValue value={t.calculator.addons.elevator} />
                     </span>
                     <input
                       type="checkbox"
@@ -500,7 +503,7 @@ export function CostEstimatorModal() {
                   {/* Smart Home Toggle */}
                   <label className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between cursor-pointer hover:border-sky-200">
                     <span className="text-xs font-semibold text-slate-700">
-                      {t.calculator.addons.smartHome}
+                      <LocalizedValue value={t.calculator.addons.smartHome} />
                     </span>
                     <input
                       type="checkbox"
@@ -523,35 +526,35 @@ export function CostEstimatorModal() {
               <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0" />
               <span>
                 {isAr
-                  ? 'تقدير أولي استرشادي (نسبة التفاوت المقدرة ±٧٪) — يتطلب الاعتماد النهائي دراسة المخططات وجداول الكميات (BOQ)'
-                  : 'Preliminary Baseline Estimate (±7% Variance) — Final contract pricing requires BOQ & architectural review'}
+                  ? <InterfaceText id="construction.CostEstimatorModal.k1h6s87l" source="تقدير أولي استرشادي (نسبة التفاوت المقدرة ±٧٪) — يتطلب الاعتماد النهائي دراسة المخططات وجداول الكميات (BOQ)" />
+                  : <InterfaceText id="construction.CostEstimatorModal.k1qntxq4" source="Preliminary Baseline Estimate (±7% Variance) — Final contract pricing requires BOQ & architectural review" />}
               </span>
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#009ee2]">
-                  {t.calculator.resultsTitle}
+                  <LocalizedValue value={t.calculator.resultsTitle} />
                 </span>
                 <div className="text-2xl sm:text-3xl font-black font-display-serif text-[#0f243e] pt-1">
-                  {formatSAR(currentEstimate.minTotalSAR, isAr)} -{' '}
-                  {formatSAR(currentEstimate.maxTotalSAR, isAr)}
+                  <LocalizedValue value={formatSAR(currentEstimate.minTotalSAR, isAr)} /> -<LocalizedValue value={' '} />
+                  <LocalizedValue value={formatSAR(currentEstimate.maxTotalSAR, isAr)} />
                 </div>
                 <div className="text-xs text-slate-500 font-medium pt-0.5">
-                  {t.calculator.breakdown.averageM2}{' '}
+                  <LocalizedValue value={t.calculator.breakdown.averageM2} /><LocalizedValue value={' '} />
                   <span className="font-bold text-[#009ee2]">
-                    {formatSAR(currentEstimate.pricePerM2SAR, isAr)}
+                    <LocalizedValue value={formatSAR(currentEstimate.pricePerM2SAR, isAr)} />
                   </span>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
                 <div className="p-3 rounded-xl bg-white border border-sky-100 text-start shadow-2xs">
-                  <div className="text-[10px] text-slate-500">{t.calculator.estimatedDuration}</div>
+                  <div className="text-[10px] text-slate-500"><LocalizedValue value={t.calculator.estimatedDuration} /></div>
                   <div className="text-base font-bold text-[#009ee2] flex items-center gap-1">
                     <Clock className="w-4 h-4" />
                     <span>
-                      {formatConstructionDigits(currentEstimate.estimatedDurationMonths, language)} {t.calculator.months}
+                      <LocalizedValue value={formatConstructionDigits(currentEstimate.estimatedDurationMonths, language)} /> <LocalizedValue value={t.calculator.months} />
                     </span>
                   </div>
                 </div>
@@ -562,33 +565,33 @@ export function CostEstimatorModal() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div className="p-3 rounded-xl bg-white border border-slate-200 text-start space-y-1 shadow-2xs">
                 <div className="text-[10px] text-slate-500">
-                  {t.calculator.breakdown.structural}
+                  <LocalizedValue value={t.calculator.breakdown.structural} />
                 </div>
                 <div className="font-bold text-[#0f243e]">
-                  {formatSAR(currentEstimate.structuralCostSAR, isAr)}
+                  <LocalizedValue value={formatSAR(currentEstimate.structuralCostSAR, isAr)} />
                 </div>
               </div>
 
               <div className="p-3 rounded-xl bg-white border border-slate-200 text-start space-y-1 shadow-2xs">
                 <div className="text-[10px] text-slate-500">
-                  {t.calculator.breakdown.finishing}
+                  <LocalizedValue value={t.calculator.breakdown.finishing} />
                 </div>
                 <div className="font-bold text-[#0f243e]">
-                  {formatSAR(currentEstimate.finishingCostSAR, isAr)}
-                </div>
-              </div>
-
-              <div className="p-3 rounded-xl bg-white border border-slate-200 text-start space-y-1 shadow-2xs">
-                <div className="text-[10px] text-slate-500">{t.calculator.breakdown.mep}</div>
-                <div className="font-bold text-[#0f243e]">
-                  {formatSAR(currentEstimate.mepCostSAR, isAr)}
+                  <LocalizedValue value={formatSAR(currentEstimate.finishingCostSAR, isAr)} />
                 </div>
               </div>
 
               <div className="p-3 rounded-xl bg-white border border-slate-200 text-start space-y-1 shadow-2xs">
-                <div className="text-[10px] text-slate-500">{t.calculator.breakdown.addons}</div>
+                <div className="text-[10px] text-slate-500"><LocalizedValue value={t.calculator.breakdown.mep} /></div>
                 <div className="font-bold text-[#0f243e]">
-                  {formatSAR(currentEstimate.addonsCostSAR, isAr)}
+                  <LocalizedValue value={formatSAR(currentEstimate.mepCostSAR, isAr)} />
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-white border border-slate-200 text-start space-y-1 shadow-2xs">
+                <div className="text-[10px] text-slate-500"><LocalizedValue value={t.calculator.breakdown.addons} /></div>
+                <div className="font-bold text-[#0f243e]">
+                  <LocalizedValue value={formatSAR(currentEstimate.addonsCostSAR, isAr)} />
                 </div>
               </div>
             </div>
@@ -600,11 +603,11 @@ export function CostEstimatorModal() {
               className="w-full py-3.5 px-6 rounded-xl bg-[#009ee2] hover:bg-[#008bc7] text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-sky-500/20 cursor-pointer"
             >
               <FileText className="w-4 h-4" />
-              <span>{t.calculator.exportBtn}</span>
+              <span><LocalizedValue value={t.calculator.exportBtn} /></span>
               <ArrowIcon className="w-4 h-4" />
             </button>
 
-            <p className="text-[10px] text-slate-500 text-center">{t.calculator.disclaimer}</p>
+            <p className="text-[10px] text-slate-500 text-center"><LocalizedValue value={t.calculator.disclaimer} /></p>
           </div>
         </div>
       </div>

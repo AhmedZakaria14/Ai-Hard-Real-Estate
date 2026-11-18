@@ -1,3 +1,5 @@
+import { uploadMediaAsset } from '../../lib/cmsMediaLibrary';
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import { usePropertyTypes } from '../../lib/usePropertyTypes';
 import { getPropertyTypeLabel } from '../../lib/propertyTaxonomy';
 import { useEffect, useState, type FormEvent } from 'react';
@@ -142,20 +144,8 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
       }
       }
       if (imageFile instanceof File && imageFile.size > 0) {
-        const extension = imageTypes[imageFile.type];
-        if (!extension || imageFile.size > 15 * 1024 * 1024) {
-          setNotice('اختر صورة مدعومة لا يزيد حجمها عن 15 ميغابايت.');
-          return;
-        }
-        const path = collection + '/' + crypto.randomUUID() + '.' + extension;
-        const bucket = client.storage.from('hard-public-catalog');
-        const { error: uploadError } = await bucket.upload(path, imageFile, {
-          contentType: imageFile.type,
-          cacheControl: '31536000',
-          upsert: false,
-        });
-        if (uploadError) throw uploadError;
-        const url = bucket.getPublicUrl(path).data.publicUrl;
+        const asset = await uploadMediaAsset({file: imageFile, sector: construction ? 'construction' : hvac ? 'hvac' : 'realestate'});
+        const url = asset.downloadUrl;
         if ('images' in content) content.images = [url, ...content.images.slice(1)];
         else content.image = url;
       }
@@ -223,10 +213,10 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
           </>}
         </div>;
       })}
-      {construction && 'buaM2' in selected.content && <><label>تصنيف المشروع<select name="projectCategory" required className={inputClass}
+      {construction && 'buaM2' in selected.content && <><label>تصنيف المشروع<SearchableSelect name="projectCategory" required className={inputClass}
         defaultValue={'category' in selected.content && isConstructionProjectCategory(selected.content.category) ? selected.content.category : 'residential'}>
         {Object.entries(constructionProjectCategories).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
-      </select></label>
+      </SearchableSelect></label>
         <label>سنة المشروع<input name="projectYear" inputMode="numeric" className={inputClass} defaultValue={selected.content.year ?? ''} /></label>
         <label>المساحة المبنية (م²)<input name="projectArea" type="number" min="0" step="any" className={inputClass} defaultValue={selected.content.buaM2} /></label>
         <label>مدة المشروع بالأشهر<input name="projectDuration" type="number" min="0" className={inputClass} defaultValue={selected.content.durationMonths ?? ''} /></label>
@@ -235,10 +225,10 @@ export default function SupabaseArticleEditor({ client, collection = 'blog_posts
         <label>المدينة بالعربية<input name="cityAr" className={inputClass} defaultValue={selected.content.cityAr} /></label>
         <label>المدينة بالإنجليزية<input name="cityEn" className={inputClass} defaultValue={selected.content.cityEn} /></label>
       </>}
-      {'price' in selected.content && <label>نوع العقار<select name="propertyType" required className={inputClass} defaultValue={selectedPropertyType}>
+      {'price' in selected.content && <label>نوع العقار<SearchableSelect name="propertyType" required className={inputClass} defaultValue={selectedPropertyType}>
         {!propertyTypes.some((item) => item.id === selectedPropertyType) && <option value={selectedPropertyType}>{getPropertyTypeLabel(selectedPropertyType, 'ar', propertyTypes)}</option>}
         {propertyTypes.filter((item) => item.active || item.id === selectedPropertyType).map((item) => <option key={item.id} value={item.id}>{item.nameAr}</option>)}
-      </select></label>}
+      </SearchableSelect></label>}
       {'price' in selected.content && <label>السعر بالريال<input name="price" type="number" min="0" step="0.01" required className={inputClass} defaultValue={selected.content.price.sar} /></label>}
       {'startingPriceSAR' in selected.content && <>
         <label>السعر الابتدائي<input name="price" className={inputClass} defaultValue={selected.content.startingPriceSAR} /></label>

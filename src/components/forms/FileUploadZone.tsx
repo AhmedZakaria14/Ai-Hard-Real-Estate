@@ -1,3 +1,6 @@
+import { LocalizedValue } from '../ui/LocalizedValue';
+import { InterfaceText } from '../ui/InterfaceText';
+import { ManagedButton } from '../ui/ManagedElements';
 import React, { useState, useRef } from 'react';
 import {
   UploadCloud,
@@ -11,7 +14,7 @@ import {
   Trash2,
   Paperclip,
 } from 'lucide-react';
-import { FormAttachmentMeta } from '../../types/firestore-schema';
+import { FormAttachmentMeta } from '../../types/backend-schema';
 import {
   uploadFormAttachment,
   validateAttachmentFile,
@@ -159,14 +162,14 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
   };
 
   return (
-    <div className="w-full space-y-3">
+    <div data-upload-pending={isUploading} className="w-full space-y-3">
       <div className="flex items-center justify-between">
         <label className="text-sm font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
           <Paperclip className="w-4 h-4 text-emerald-600" />
-          <span>{isAr ? labelAr : labelEn}</span>
+          <span><LocalizedValue value={isAr ? labelAr : labelEn} /></span>
         </label>
         <span className="text-xs text-slate-500 font-mono">
-          {currentCount}/{mergedConfig.maxCount} {isAr ? 'ملفات' : 'files'}
+          <LocalizedValue value={currentCount} />/<LocalizedValue value={mergedConfig.maxCount} /> {isAr ? <InterfaceText id="realestate.FileUploadZone.k1nz07e6" source="ملفات" /> : <InterfaceText id="realestate.FileUploadZone.khgbno0" source="files" />}
         </span>
       </div>
 
@@ -198,13 +201,13 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
           {isUploading ? (
             <div className="flex items-center gap-2 text-emerald-600 py-1">
               <Loader2 className="w-6 h-6 animate-spin" />
-              <span className="text-sm font-medium">{isAr ? 'جاري رفع وتشفير الملف...' : 'Uploading file...'}</span>
+              <span className="text-sm font-medium">{isAr ? <InterfaceText id="realestate.FileUploadZone.kbsunf7" source="جارٍ رفع الملف بأمان…" /> : <InterfaceText id="realestate.FileUploadZone.k3gh46o" source="Uploading file..." />}</span>
             </div>
           ) : isMaxReached ? (
             <div className="flex items-center gap-2 text-slate-500 py-1">
               <CheckCircle2 className="w-5 h-5 text-emerald-500" />
               <span className="text-xs font-medium">
-                {isAr ? 'وصلت للحد الأقصى المسموح به للمرفقات.' : 'Maximum attachment count reached.'}
+                {isAr ? <InterfaceText id="realestate.FileUploadZone.kz3shkw" source="وصلت للحد الأقصى المسموح به للمرفقات." /> : <InterfaceText id="realestate.FileUploadZone.k1ligw2v" source="Maximum attachment count reached." />}
               </span>
             </div>
           ) : (
@@ -214,10 +217,10 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
               </div>
               <div>
                 <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                  {isAr ? 'انقر لاختيار الملفات أو اسحبها إلى هنا' : 'Click to select or drag and drop files here'}
+                  {isAr ? <InterfaceText id="realestate.FileUploadZone.k1tbe2hm" source="انقر لاختيار الملفات أو اسحبها إلى هنا" /> : <InterfaceText id="realestate.FileUploadZone.kkob068" source="Click to select or drag and drop files here" />}
                 </p>
                 <p className="text-[11px] text-slate-500 mt-0.5">
-                  {isAr ? helpTextAr : helpTextEn} ({isAr ? ALLOWED_EXTENSIONS_LABEL_AR : ALLOWED_EXTENSIONS_LABEL})
+                  <LocalizedValue value={isAr ? helpTextAr : helpTextEn} /> (<LocalizedValue value={isAr ? ALLOWED_EXTENSIONS_LABEL_AR : ALLOWED_EXTENSIONS_LABEL} />)
                 </p>
               </div>
             </>
@@ -229,7 +232,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
       {uploadError && (
         <div className="flex items-start gap-2 p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/50 rounded-lg text-rose-700 dark:text-rose-300 text-xs">
           <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-          <span>{uploadError}</span>
+          <span><LocalizedValue value={uploadError} /></span>
         </div>
       )}
 
@@ -237,7 +240,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
       {attachments.length > 0 && (
         <div className="space-y-2 pt-1">
           <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-            {isAr ? 'المرفقات الجاهزة للإرسال:' : 'Attached Files Ready for Submission:'}
+            {isAr ? <InterfaceText id="realestate.FileUploadZone.kklqauu" source="المرفقات الجاهزة للإرسال:" /> : <InterfaceText id="realestate.FileUploadZone.kwv1ruc" source="Attached Files Ready for Submission:" />}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {attachments.map((att) => (
@@ -246,23 +249,23 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
                 className="flex items-center justify-between p-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xs group"
               >
                 <div className="flex items-center gap-2.5 overflow-hidden">
-                  {getFileIcon(att.mimeType)}
+                  <LocalizedValue value={getFileIcon(att.mimeType)} />
                   <div className="truncate text-right">
                     <p className="text-xs font-medium text-slate-800 dark:text-slate-200 truncate dir-ltr">
-                      {att.fileName}
+                      <LocalizedValue value={att.fileName} />
                     </p>
-                    <span className="text-[10px] text-slate-500">{formatFileSize(att.fileSizeBytes)}</span>
+                    <span className="text-[10px] text-slate-500"><LocalizedValue value={formatFileSize(att.fileSizeBytes)} /></span>
                   </div>
                 </div>
 
-                <button
+                <ManagedButton copyScope="realestate.FileUploadZone"
                   type="button"
                   onClick={(e) => handleRemoveAttachment(e, att)}
                   title={isAr ? 'إزالة الملف' : 'Remove file'}
                   className="p-1 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-md hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
-                </button>
+                </ManagedButton>
               </div>
             ))}
           </div>

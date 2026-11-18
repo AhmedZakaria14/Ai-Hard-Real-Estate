@@ -1,4 +1,4 @@
-import { LocalizedText } from '../types/firestore-schema';
+import { LocalizedText } from '../types/backend-schema';
 
 export type TranslationStatus = 'complete' | 'missing_en' | 'missing_ar' | 'empty';
 

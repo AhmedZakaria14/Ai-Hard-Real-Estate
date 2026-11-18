@@ -1,3 +1,8 @@
+import { LocalizedValue } from '../components/ui/LocalizedValue';
+import { useCustomerFormConfig, ConfiguredFormFields } from '../components/forms/ConfiguredFormFields';
+import { SearchableSelect } from '../components/ui/SearchableSelect';
+import { InterfaceText } from '../components/ui/InterfaceText';
+import { ManagedInput, ManagedTextarea } from '../components/ui/ManagedElements';
 import React, { useState } from 'react';
 import {
   Phone,
@@ -22,6 +27,8 @@ interface ContactPageProps {
 }
 
 export function ContactPage({ onNavigate, language }: ContactPageProps) {
+  const formConfig = useCustomerFormConfig('general_contact');
+
   const { translations } = useTextOverride();
   const t = translations[language];
 
@@ -40,7 +47,7 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
   const ar = language === 'ar';
   const requiredMark = <span className="text-red-600" aria-hidden="true"> *</span>;
   const fieldError = (field: keyof typeof fieldErrors) => fieldErrors[field] &&
-    <p role="alert" id={`contact-error-${field}`} className="mt-1 text-xs font-medium text-red-700">{fieldErrors[field]}</p>;
+    <p role="alert" id={`contact-error-${field}`} className="mt-1 text-xs font-medium text-red-700"><LocalizedValue value={fieldErrors[field]} /></p>;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,7 +83,7 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
 
     setLoading(true);
     try {
-      const result = await submitCustomerForm({
+      const result = await formConfig.submit({
         formType: 'general_contact',
         sector: 'group',
         name: fullName.trim(),
@@ -121,10 +128,10 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
       {/* Header */}
       <div className="space-y-3 max-w-3xl">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 font-display-serif tracking-tight">
-          {t.contact.pageTitle}
+          <LocalizedValue value={t.contact.pageTitle} />
         </h1>
         <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-          {t.contact.pageSubtitle}
+          <LocalizedValue value={t.contact.pageSubtitle} />
         </p>
       </div>
 
@@ -132,7 +139,7 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
         {/* Left Form: Direct Message & Lead Capture (7 cols) */}
         <div className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-xs space-y-6">
           <h2 className="text-xl font-bold text-slate-900 font-display-serif">
-            {t.contact.formTitle}
+            <LocalizedValue value={t.contact.formTitle} />
           </h2>
 
           {submitted ? (
@@ -141,31 +148,32 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                 <CheckCircle2 className="w-8 h-8" />
               </div>
               <h3 className="text-xl font-bold text-slate-900 font-display-serif">
-                {language === 'en' ? 'Message Sent Successfully' : 'تم إرسال رسالتك بنجاح'}
+                {language === 'en' ? <InterfaceText id="realestate.ContactPage.k1bc5as3" source="Message Sent Successfully" /> : <InterfaceText id="realestate.ContactPage.k1nvqm1y" source="تم إرسال رسالتك بنجاح" />}
               </h3>
               <p className="text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
-                {t.contact.submitSuccess}
+                <LocalizedValue value={t.contact.submitSuccess} />
               </p>
               <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 text-start text-xs space-y-1.5 max-w-md mx-auto text-slate-600">
-                <p><strong>{language === 'en' ? 'Inquiry Reference:' : 'رقم المرجع:'}</strong> <span className="font-mono font-bold text-slate-900">{leadRef}</span></p>
+                <p><strong>{language === 'en' ? <InterfaceText id="realestate.ContactPage.kgm598f" source="Inquiry Reference:" /> : <InterfaceText id="realestate.ContactPage.k1lt3bxh" source="رقم المرجع:" />}</strong> <span className="font-mono font-bold text-slate-900"><LocalizedValue value={leadRef} /></span></p>
                 <p className="flex items-center gap-1.5 text-blue-600 font-semibold pt-1 border-t border-slate-200">
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>CRM Synchronization: {crmRef || 'Active'}</span>
+                  <span><InterfaceText id="realestate.ContactPage.k1i0vejd" source="CRM Synchronization: " />{crmRef || <InterfaceText id="realestate.ContactPage.k8qzyhb" source="Active" />}</span>
                 </p>
               </div>
               <div className="pt-2">
                 <Button variant="secondary" onClick={handleReset}>
-                  {language === 'en' ? 'Send Another Message' : 'إرسال رسالة أخرى'}
+                  {language === 'en' ? <InterfaceText id="realestate.ContactPage.kg6x98j" source="Send Another Message" /> : <InterfaceText id="realestate.ContactPage.klqpd1k" source="إرسال رسالة أخرى" />}
                 </Button>
               </div>
             </div>
           ) : (
             <form noValidate onSubmit={handleSubmit} className="space-y-4">
+            <ConfiguredFormFields form={formConfig} language={language} />
               <div>
                 <label htmlFor="contact-page-fullname" className="block text-xs font-semibold text-slate-700 mb-1">
-                  {t.contact.fullName}{requiredMark}
+                  <LocalizedValue value={t.contact.fullName} /><LocalizedValue value={requiredMark} />
                 </label>
-                <input
+                <ManagedInput copyScope="realestate.ContactPage"
                   id="contact-page-fullname" data-field="name" aria-invalid={Boolean(fieldErrors.name)}
                     aria-describedby={fieldErrors.name ? 'contact-error-name' : undefined}
                   type="text"
@@ -176,15 +184,15 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                   onChange={(e) => setFullName(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                 />
-                  {fieldError('name')}
+                  <LocalizedValue value={fieldError('name')} />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="contact-page-email" className="block text-xs font-semibold text-slate-700 mb-1">
-                    {t.contact.email}{requiredMark}
+                    <LocalizedValue value={t.contact.email} /><LocalizedValue value={requiredMark} />
                   </label>
-                  <input
+                  <ManagedInput copyScope="realestate.ContactPage"
                     id="contact-page-email" data-field="email" aria-invalid={Boolean(fieldErrors.email)}
                     aria-describedby={fieldErrors.email ? 'contact-error-email' : undefined}
                     type="email"
@@ -199,13 +207,13 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                     }}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                   />
-                  {fieldError('email')}
+                  <LocalizedValue value={fieldError('email')} />
                 </div>
                 <div>
                   <label htmlFor="contact-page-phone" className="block text-xs font-semibold text-slate-700 mb-1">
-                    {t.contact.phone}{requiredMark}
+                    <LocalizedValue value={t.contact.phone} /><LocalizedValue value={requiredMark} />
                   </label>
-                  <input
+                  <ManagedInput copyScope="realestate.ContactPage"
                     id="contact-page-phone" data-field="phone" aria-invalid={Boolean(fieldErrors.phone)}
                     aria-describedby={fieldErrors.phone ? 'contact-error-phone' : undefined}
                     type="tel"
@@ -219,20 +227,20 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                     }}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                   />
-                  {fieldError('phone')}
+                  <LocalizedValue value={fieldError('phone')} />
                 </div>
               </div>
 
               {contactError && (
-                <p role="alert" className="text-xs text-rose-600 font-medium">{contactError}</p>
+                <p role="alert" className="text-xs text-rose-600 font-medium"><LocalizedValue value={contactError} /></p>
               )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="contact-page-inquiry-type" className="block text-xs font-semibold text-slate-700 mb-1">
-                    {t.contact.inquiryType}{requiredMark}
+                    <LocalizedValue value={t.contact.inquiryType} /><LocalizedValue value={requiredMark} />
                   </label>
-                  <select
+                  <SearchableSelect
                     id="contact-page-inquiry-type" data-field="type" aria-invalid={Boolean(fieldErrors.type)}
                     aria-describedby={fieldErrors.type ? 'contact-error-type' : undefined}
                     required
@@ -246,14 +254,14 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                     <option value="listing">{language === 'en' ? 'Listing / Selling' : 'إدراج / بيع عقار'}</option>
                     <option value="investment">{language === 'en' ? 'Investment Advisory' : 'استشارات استثمارية'}</option>
                     <option value="consultation">{language === 'en' ? 'General Consultation' : 'استشارة عامة'}</option>
-                  </select>
-                  {fieldError('type')}
+                  </SearchableSelect>
+                  <LocalizedValue value={fieldError('type')} />
                 </div>
                 <div>
                   <label htmlFor="contact-page-subject" className="block text-xs font-semibold text-slate-700 mb-1">
-                    {t.contact.subject}
+                    <LocalizedValue value={t.contact.subject} />
                   </label>
-                  <input
+                  <ManagedInput copyScope="realestate.ContactPage"
                     id="contact-page-subject"
                     type="text"
                     placeholder={ar ? 'موضوع الرسالة' : 'Message subject'}
@@ -266,9 +274,9 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
 
               <div>
                 <label htmlFor="contact-page-message" className="block text-xs font-semibold text-slate-700 mb-1">
-                  {ar ? 'تفاصيل رسالتك' : 'Message details'}{requiredMark}
+                  {ar ? <InterfaceText id="realestate.ContactPage.kcstyf2" source="تفاصيل رسالتك" /> : <InterfaceText id="realestate.ContactPage.k1s9xzyi" source="Message details" />}<LocalizedValue value={requiredMark} />
                 </label>
-                <textarea
+                <ManagedTextarea copyScope="realestate.ContactPage"
                   id="contact-page-message" data-field="message" aria-invalid={Boolean(fieldErrors.message)}
                     aria-describedby={fieldErrors.message ? 'contact-error-message' : undefined}
                   required
@@ -278,12 +286,12 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                   onChange={(e) => setMessage(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
                 />
-                  {fieldError('message')}
+                  <LocalizedValue value={fieldError('message')} />
               </div>
 
               <Button type="submit" isLoading={loading} className="w-full font-bold">
                 <Send className="w-4 h-4" />
-                <span>{t.cta.sendMessage}</span>
+                <span><LocalizedValue value={t.cta.sendMessage} /></span>
               </Button>
             </form>
           )}
@@ -294,7 +302,7 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
           {/* Quick Contact Box */}
           <div className="bg-slate-900 text-white p-6 sm:p-8 rounded-3xl space-y-6 border border-slate-800">
             <h3 className="text-xl font-bold font-display-serif text-white">
-              {t.contact.officeLocations}
+              <LocalizedValue value={t.contact.officeLocations} />
             </h3>
 
             <div className="space-y-4 text-xs sm:text-sm text-slate-300">
@@ -302,12 +310,12 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                 <MapPin className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-white block font-semibold">
-                    {t.contact.headquarters}
+                    <LocalizedValue value={t.contact.headquarters} />
                   </strong>
                   <span>
                     {language === 'en'
-                      ? 'Prince Mutaib Road, Hajr Dist., Dammam, Eastern Province, Saudi Arabia'
-                      : 'طريق الأمير متعب، حي هجر، الدمام، المنطقة الشرقية، المملكة العربية السعودية'}
+                      ? <InterfaceText id="realestate.ContactPage.k1jiw7rw" source="Prince Mutaib Road, Hajr Dist., Dammam, Eastern Province, Saudi Arabia" />
+                      : <InterfaceText id="realestate.ContactPage.k10bp7x6" source="طريق الأمير متعب، حي هجر، الدمام، المنطقة الشرقية، المملكة العربية السعودية" />}
                   </span>
                 </div>
               </div>
@@ -316,9 +324,9 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                 <Clock className="w-5 h-5 text-blue-400 shrink-0" />
                 <div>
                   <strong className="text-white block font-semibold">
-                    {t.contact.hours}
+                    <LocalizedValue value={t.contact.hours} />
                   </strong>
-                  <span>{t.contact.hoursValue}</span>
+                  <span><LocalizedValue value={t.contact.hoursValue} /></span>
                 </div>
               </div>
 
@@ -326,10 +334,10 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                 <Phone className="w-5 h-5 text-blue-400 shrink-0" />
                 <div>
                   <strong className="text-white block font-semibold">
-                    {language === 'en' ? 'Direct Line' : 'الخط المباشر'}
+                    {language === 'en' ? <InterfaceText id="realestate.ContactPage.klm7mhy" source="Direct Line" /> : <InterfaceText id="realestate.ContactPage.k1x4d0td" source="الخط المباشر" />}
                   </strong>
                   <a href="tel:+966556125711" dir="ltr" className="text-blue-300 hover:underline inline-block text-left">
-                    <bdi dir="ltr">{t.contact.phoneValue}</bdi>
+                    <bdi dir="ltr"><LocalizedValue value={t.contact.phoneValue} /></bdi>
                   </a>
                 </div>
               </div>
@@ -338,10 +346,10 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                 <Mail className="w-5 h-5 text-blue-400 shrink-0" />
                 <div>
                   <strong className="text-white block font-semibold">
-                    {language === 'en' ? 'Inquiries Desk' : 'البريد الإلكتروني'}
+                    {language === 'en' ? <InterfaceText id="realestate.ContactPage.k10yffnf" source="Inquiries Desk" /> : <InterfaceText id="realestate.ContactPage.kz14tgk" source="البريد الإلكتروني" />}
                   </strong>
                   <a href="mailto:info@hardgp.com" className="text-blue-300 hover:underline">
-                    {t.contact.emailValue}
+                    <LocalizedValue value={t.contact.emailValue} />
                   </a>
                 </div>
               </div>
@@ -358,12 +366,12 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                 className="w-full justify-center"
               >
                 <MessageSquare className="w-4 h-4" />
-                <span>{t.cta.chatOnWhatsApp}</span>
+                <span><LocalizedValue value={t.cta.chatOnWhatsApp} /></span>
               </Button>
             </div>
           </div>
           <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-            <h3 className="px-5 py-4 font-bold">{ar ? 'موقع المكتب على الخريطة' : 'Office location on the map'}</h3>
+            <h3 className="px-5 py-4 font-bold">{ar ? <InterfaceText id="realestate.ContactPage.k2q0va2" source="موقع المكتب على الخريطة" /> : <InterfaceText id="realestate.ContactPage.k12apozs" source="Office location on the map" />}</h3>
             <iframe title={ar ? 'خريطة مقر هارد للعقارات في حي هجر بالدمام' : 'Map of HARD Real Estate office, Hajr, Dammam'}
               className="h-60 w-full border-0 sm:h-64" loading="lazy" allowFullScreen
               referrerPolicy="no-referrer-when-downgrade"

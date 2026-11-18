@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Sparkles, CheckCircle2, AlertTriangle, Languages } from 'lucide-react';
-import { LocalizedText } from '../../types/firestore-schema';
+import { LocalizedText } from '../../types/backend-schema';
 import {
   getTranslationStatus,
   generateDraftTranslation,

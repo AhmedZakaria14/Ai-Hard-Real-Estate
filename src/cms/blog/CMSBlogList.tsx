@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import { blogCategories, blogCategoryKey, type CatalogBlogCategory } from '../../lib/blogCategories';
 import React, { useState, useMemo } from 'react';
 import {
@@ -219,7 +220,7 @@ export const CMSBlogList: React.FC<CMSBlogListProps> = ({
 
         {/* Dropdown Filters & View Mode */}
         <div className="flex items-center gap-2.5 flex-wrap">
-          <select
+          <SearchableSelect
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
             className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
@@ -228,9 +229,9 @@ export const CMSBlogList: React.FC<CMSBlogListProps> = ({
             {categories.map((c) => (
               <option key={c.key} value={c.key}>{c.label[language]}</option>
             ))}
-          </select>
+          </SearchableSelect>
 
-          <select
+          <SearchableSelect
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
@@ -241,7 +242,7 @@ export const CMSBlogList: React.FC<CMSBlogListProps> = ({
                 {isAr ? opt.labelAr : opt.labelEn}
               </option>
             ))}
-          </select>
+          </SearchableSelect>
 
           {/* View Mode Toggle */}
           <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
@@ -368,7 +369,7 @@ export const CMSBlogList: React.FC<CMSBlogListProps> = ({
 
                       {/* Status Dropdown */}
                       <td className="py-3.5 px-4">
-                        <select
+                        <SearchableSelect
                           value={currentStatus}
                           onChange={(e) => onQuickStatusChange(post, e.target.value as BlogStatus)}
                           className={`text-[10px] font-bold px-2 py-1 rounded-lg border focus:outline-none cursor-pointer ${statusInfo.color}`}
@@ -378,7 +379,7 @@ export const CMSBlogList: React.FC<CMSBlogListProps> = ({
                               {isAr ? opt.labelAr : opt.labelEn}
                             </option>
                           ))}
-                        </select>
+                        </SearchableSelect>
                       </td>
 
                       {/* Actions */}

@@ -1,3 +1,7 @@
+import { LocalizedValue } from '../../components/ui/LocalizedValue';
+import { useCustomerFormConfig, ConfiguredFormFields } from '../../components/forms/ConfiguredFormFields';
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
+import { ManagedButton, ManagedInput, ManagedTextarea } from '../../components/ui/ManagedElements';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import React, { useState, useEffect } from 'react';
 import {
@@ -30,6 +34,7 @@ export function QuoteModal() {
 }
 
 function QuoteModalContent() {
+  const formConfig = useCustomerFormConfig('construction_quote');
   const {
     language,
     closeQuoteModal,
@@ -91,7 +96,7 @@ function QuoteModalContent() {
 
     setIsSubmitting(true);
     try {
-      const result = await submitCustomerForm({
+      const result = await formConfig.submit({
         formType: 'construction_quote',
         sector: 'construction',
         name: clientName.trim(),
@@ -158,20 +163,20 @@ function QuoteModalContent() {
             </div>
             <div>
               <h2 className="text-lg font-bold font-display-serif text-[#0f243e]">
-                {t.quoteModal.title}
+                <LocalizedValue value={t.quoteModal.title} />
               </h2>
-              <p className="text-xs text-slate-500">{t.quoteModal.subtitle}</p>
+              <p className="text-xs text-slate-500"><LocalizedValue value={t.quoteModal.subtitle} /></p>
             </div>
           </div>
 
-          <button
+          <ManagedButton copyScope="construction.QuoteModal"
             type="button"
             onClick={closeQuoteModal}
             className="p-2 rounded-xl bg-white hover:bg-slate-100 text-slate-500 hover:text-slate-900 border border-slate-200 transition-colors cursor-pointer"
             aria-label="Close"
           >
             <X className="w-5 h-5" />
-          </button>
+          </ManagedButton>
         </div>
 
         {/* Modal Body: Form or Success */}
@@ -185,19 +190,19 @@ function QuoteModalContent() {
 
               <div className="space-y-2">
                 <h3 className="text-xl font-bold font-display-serif text-[#0f243e]">
-                  {t.quoteModal.successTitle}
+                  <LocalizedValue value={t.quoteModal.successTitle} />
                 </h3>
                 <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
-                  {t.quoteModal.successDesc}
+                  <LocalizedValue value={t.quoteModal.successDesc} />
                 </p>
               </div>
 
               {/* Reference Number Box */}
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between max-w-md mx-auto">
                 <div className="text-start">
-                  <div className="text-[10px] text-slate-500">{t.quoteModal.refNum}</div>
+                  <div className="text-[10px] text-slate-500"><LocalizedValue value={t.quoteModal.refNum} /></div>
                   <div className="text-base font-black font-mono text-[#009ee2]">
-                    {submittedLead.referenceNumber}
+                    <LocalizedValue value={submittedLead.referenceNumber} />
                   </div>
                 </div>
 
@@ -207,7 +212,7 @@ function QuoteModalContent() {
                   className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-xs font-bold text-slate-700 border border-slate-200 flex items-center gap-1.5 cursor-pointer shadow-2xs"
                 >
                   {copiedRef ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedRef ? (isAr ? 'تم النسخ' : 'Copied') : (isAr ? 'نسخ' : 'Copy')}</span>
+                  <span><LocalizedValue value={copiedRef ? (isAr ? 'تم النسخ' : 'Copied') : (isAr ? 'نسخ' : 'Copy')} /></span>
                 </button>
               </div>
 
@@ -219,7 +224,7 @@ function QuoteModalContent() {
                   className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-emerald-600/20 cursor-pointer"
                 >
                   <MessageCircle className="w-4 h-4" />
-                  <span>{t.quoteModal.whatsappConfirm}</span>
+                  <span><LocalizedValue value={t.quoteModal.whatsappConfirm} /></span>
                 </button>
 
                 <button
@@ -227,16 +232,17 @@ function QuoteModalContent() {
                   onClick={closeQuoteModal}
                   className="px-6 py-3 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold text-xs cursor-pointer shadow-2xs"
                 >
-                  {t.quoteModal.close}
+                  <LocalizedValue value={t.quoteModal.close} />
                 </button>
               </div>
             </div>
           ) : (
             /* Lead Capture Form */
             <form onSubmit={handleSubmit} className="space-y-4">
+            <ConfiguredFormFields form={formConfig} language={language} />
               {validationError && (
                 <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs font-medium">
-                  {validationError}
+                  <LocalizedValue value={validationError} />
                 </div>
               )}
 
@@ -245,9 +251,9 @@ function QuoteModalContent() {
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                     <User className="w-3.5 h-3.5 text-[#0072b8]" />
-                    <span>{t.quoteModal.fullName}</span>
+                    <span><LocalizedValue value={t.quoteModal.fullName} /></span>
                   </label>
-                  <input
+                  <ManagedInput copyScope="construction.QuoteModal"
                     type="text"
                     required
                     value={clientName}
@@ -260,9 +266,9 @@ function QuoteModalContent() {
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                     <Phone className="w-3.5 h-3.5 text-[#0072b8]" />
-                    <span>{t.quoteModal.phone}</span>
+                    <span><LocalizedValue value={t.quoteModal.phone} /></span>
                   </label>
-                  <input
+                  <ManagedInput copyScope="construction.QuoteModal"
                     type="tel"
                     required
                     value={phoneNumber}
@@ -278,9 +284,9 @@ function QuoteModalContent() {
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                     <Mail className="w-3.5 h-3.5 text-[#0072b8]" />
-                    <span>{t.quoteModal.email}</span>
+                    <span><LocalizedValue value={t.quoteModal.email} /></span>
                   </label>
-                  <input
+                  <ManagedInput copyScope="construction.QuoteModal"
                     type="email"
                     required
                     value={email}
@@ -293,17 +299,17 @@ function QuoteModalContent() {
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                     <MapPin className="w-3.5 h-3.5 text-[#0072b8]" />
-                    <span>{t.quoteModal.cityDistrict}</span>
+                    <span><LocalizedValue value={t.quoteModal.cityDistrict} /></span>
                   </label>
                   <div className="grid grid-cols-2 gap-2">
-                    <input
+                    <ManagedInput copyScope="construction.QuoteModal"
                       type="text"
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
                       placeholder={isAr ? 'المدينة' : 'City'}
                       className="w-full px-3.5 py-2.5 bg-white border border-slate-300 hover:border-slate-400 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-500 focus:border-[#0072b8] focus:ring-2 focus:ring-[#0072b8]/20 focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
                     />
-                    <input
+                    <ManagedInput copyScope="construction.QuoteModal"
                       type="text"
                       value={district}
                       onChange={(e) => setDistrict(e.target.value)}
@@ -319,9 +325,9 @@ function QuoteModalContent() {
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                     <Building2 className="w-3.5 h-3.5 text-[#0072b8]" />
-                    <span>{t.quoteModal.projectType}</span>
+                    <span><LocalizedValue value={t.quoteModal.projectType} /></span>
                   </label>
-                  <select
+                  <SearchableSelect
                     value={projectType}
                     onChange={(e) => setProjectType(e.target.value as ConstructionProjectType)}
                     className="w-full px-3.5 py-2.5 bg-white border border-slate-300 hover:border-slate-400 rounded-xl text-xs sm:text-sm font-medium text-slate-900 focus:border-[#0072b8] focus:ring-2 focus:ring-[#0072b8]/20 focus:outline-none disabled:bg-slate-100 disabled:text-slate-500 cursor-pointer"
@@ -332,13 +338,13 @@ function QuoteModalContent() {
                     <option value="duplex">{t.calculator.types.duplex}</option>
                     <option value="residential-compound">{t.calculator.types.compound}</option>
                     <option value="warehouse">{t.calculator.types.warehouse}</option>
-                  </select>
+                  </SearchableSelect>
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                     <Layers className="w-3.5 h-3.5 text-[#0072b8]" />
-                    <span>{t.quoteModal.builtUpArea}</span>
+                    <span><LocalizedValue value={t.quoteModal.builtUpArea} /></span>
                   </label>
                   <input
                     type="number"
@@ -353,9 +359,9 @@ function QuoteModalContent() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-800">
-                    {t.quoteModal.budgetRange}
+                    <LocalizedValue value={t.quoteModal.budgetRange} />
                   </label>
-                  <input
+                  <ManagedInput copyScope="construction.QuoteModal"
                     type="text"
                     value={budgetRangeSAR}
                     onChange={(e) => setBudgetRangeSAR(e.target.value)}
@@ -366,9 +372,9 @@ function QuoteModalContent() {
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-800">
-                    {t.quoteModal.timeline}
+                    <LocalizedValue value={t.quoteModal.timeline} />
                   </label>
-                  <input
+                  <ManagedInput copyScope="construction.QuoteModal"
                     type="text"
                     value={timeline}
                     onChange={(e) => setTimeline(e.target.value)}
@@ -381,7 +387,7 @@ function QuoteModalContent() {
               {/* File Attachment Dropzone */}
               <div className="space-y-1.5 pt-1">
                 <label className="text-xs font-bold text-slate-700 block">
-                  {t.quoteModal.plansUpload}
+                  <LocalizedValue value={t.quoteModal.plansUpload} />
                 </label>
                 <label className="border-2 border-dashed border-slate-300 hover:border-[#009ee2] rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer transition-colors bg-slate-50">
                   <input
@@ -393,12 +399,12 @@ function QuoteModalContent() {
                   {uploadedFileName ? (
                     <div className="flex items-center gap-2 text-xs font-bold text-[#009ee2]">
                       <File className="w-4 h-4" />
-                      <span>{uploadedFileName}</span>
+                      <span><LocalizedValue value={uploadedFileName} /></span>
                     </div>
                   ) : (
                     <div className="space-y-1 text-center">
                       <UploadCloud className="w-6 h-6 text-slate-400 mx-auto" />
-                      <div className="text-[11px] text-slate-500">{t.quoteModal.dropPlans}</div>
+                      <div className="text-[11px] text-slate-500"><LocalizedValue value={t.quoteModal.dropPlans} /></div>
                     </div>
                   )}
                 </label>
@@ -407,9 +413,9 @@ function QuoteModalContent() {
               {/* Notes */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700 block">
-                  {t.quoteModal.notes}
+                  <LocalizedValue value={t.quoteModal.notes} />
                 </label>
-                <textarea
+                <ManagedTextarea copyScope="construction.QuoteModal"
                   rows={3}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
@@ -425,7 +431,7 @@ function QuoteModalContent() {
                 className="w-full py-3.5 px-6 rounded-xl bg-[#009ee2] hover:bg-[#008bc7] disabled:opacity-50 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-sky-500/20 cursor-pointer"
               >
                 <FileText className="w-4 h-4" />
-                <span>{isSubmitting ? t.quoteModal.submitting : t.quoteModal.submitBtn}</span>
+                <span><LocalizedValue value={isSubmitting ? t.quoteModal.submitting : t.quoteModal.submitBtn} /></span>
                 <ArrowIcon className="w-4 h-4" />
               </button>
             </form>

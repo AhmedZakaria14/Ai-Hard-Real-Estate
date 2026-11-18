@@ -1,3 +1,6 @@
+import { LocalizedValue } from '../../components/ui/LocalizedValue';
+import { useCustomerFormConfig, ConfiguredFormFields } from '../../components/forms/ConfiguredFormFields';
+import { ManagedButton, ManagedInput, ManagedTextarea } from '../../components/ui/ManagedElements';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import React, { useState, useEffect, useRef, useId } from 'react';
 import {
@@ -19,6 +22,8 @@ import { pick } from '../translations';
 import { submitCustomerForm } from '../../lib/forms/formSubmissionService';
 
 export function HVACQuoteDialog() {
+  const formConfig = useCustomerFormConfig('hvac_service');
+
   const { hvac: T } = useTextOverride();
   const {
     language,
@@ -139,7 +144,7 @@ export function HVACQuoteDialog() {
 
     setIsSubmitting(true);
     try {
-      const result = await submitCustomerForm({
+      const result = await formConfig.submit({
         formType: 'hvac_service',
         sector: 'hvac',
         name: fullName.trim(),
@@ -216,15 +221,15 @@ ${isUrgent ? '⚠️ Urgency: Emergency Request' : ''}`;
             </div>
             <div>
               <h3 id={titleId} className="font-semibold text-base sm:text-lg">
-                {pick(T.quoteForm.dialogTitle, language)}
+                <LocalizedValue value={pick(T.quoteForm.dialogTitle, language)} />
               </h3>
               <p className="text-xs text-slate-300">
-                {cityName} • {serviceName}
+                <LocalizedValue value={cityName} /> • <LocalizedValue value={serviceName} />
               </p>
             </div>
           </div>
 
-          <button
+          <ManagedButton copyScope="hvac.HVACQuoteDialog"
             type="button"
             onClick={closeQuoteDialog}
             aria-label={isAr ? 'إغلاق نافذة طلب عرض السعر' : 'Close quote request dialog'}
@@ -232,7 +237,7 @@ ${isUrgent ? '⚠️ Urgency: Emergency Request' : ''}`;
             className="p-2.5 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0EA5E9] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1E293B] transition-colors cursor-pointer shrink-0"
           >
             <X className="w-5 h-5" aria-hidden="true" />
-          </button>
+          </ManagedButton>
         </div>
 
         {/* Modal Body */}
@@ -246,13 +251,13 @@ ${isUrgent ? '⚠️ Urgency: Emergency Request' : ''}`;
 
               <div className="space-y-2">
                 <h4 className="text-xl font-semibold text-slate-900">
-                  {pick(T.quoteForm.successMessage, language)}
+                  <LocalizedValue value={pick(T.quoteForm.successMessage, language)} />
                 </h4>
                 <div className="inline-block px-4 py-2 rounded-xl bg-slate-100 border border-slate-200 text-[#0EA5E9] font-mono font-bold text-lg">
-                  <bdi dir="ltr">{submittedLead.referenceNumber}</bdi>
+                  <bdi dir="ltr"><LocalizedValue value={submittedLead.referenceNumber} /></bdi>
                 </div>
                 <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto pt-1">
-                  {pick(T.quoteForm.dialogSubtitle, language)}
+                  <LocalizedValue value={pick(T.quoteForm.dialogSubtitle, language)} />
                 </p>
               </div>
 
@@ -264,7 +269,7 @@ ${isUrgent ? '⚠️ Urgency: Emergency Request' : ''}`;
                   className="px-5 py-3 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
                 >
                   <MessageSquare className="w-4 h-4" />
-                  <span>{pick(T.quoteForm.whatsappHandoff, language)}</span>
+                  <span><LocalizedValue value={pick(T.quoteForm.whatsappHandoff, language)} /></span>
                 </button>
 
                 <button
@@ -272,30 +277,31 @@ ${isUrgent ? '⚠️ Urgency: Emergency Request' : ''}`;
                   onClick={closeQuoteDialog}
                   className="px-5 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm transition-colors cursor-pointer"
                 >
-                  {pick(T.quoteForm.closeBtn, language)}
+                  <LocalizedValue value={pick(T.quoteForm.closeBtn, language)} />
                 </button>
               </div>
             </div>
           ) : (
             /* Submission Form */
             <form onSubmit={handleSubmit} className="space-y-4 text-start">
+            <ConfiguredFormFields form={formConfig} language={language} />
               {quoteError && (
                 <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold">
-                  {quoteError}
+                  <LocalizedValue value={quoteError} />
                 </div>
               )}
               <p className="text-xs text-slate-600 pb-1">
-                {pick(T.quoteForm.dialogSubtitle, language)}
+                <LocalizedValue value={pick(T.quoteForm.dialogSubtitle, language)} />
               </p>
 
               {/* Full Name */}
               <div>
                 <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                  {pick(T.quoteForm.fullNameLabel, language)} *
+                  <LocalizedValue value={pick(T.quoteForm.fullNameLabel, language)} /> <span className="text-red-600">*</span>
                 </label>
                 <div className="relative">
                   <User className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
+                  <ManagedInput copyScope="hvac.HVACQuoteDialog"
                     type="text"
                     required
                     value={fullName}
@@ -309,11 +315,11 @@ ${isUrgent ? '⚠️ Urgency: Emergency Request' : ''}`;
               {/* Phone */}
               <div>
                 <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                  {pick(T.quoteForm.phoneLabel, language)} *
+                  <LocalizedValue value={pick(T.quoteForm.phoneLabel, language)} /> <span className="text-red-600">*</span>
                 </label>
                 <div className="relative">
                   <Phone className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
+                  <ManagedInput copyScope="hvac.HVACQuoteDialog"
                     type="tel"
                     required
                     dir="ltr"
@@ -328,11 +334,11 @@ ${isUrgent ? '⚠️ Urgency: Emergency Request' : ''}`;
               {/* Email Optional */}
               <div>
                 <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                  {pick(T.quoteForm.emailLabel, language)}
+                  <LocalizedValue value={pick(T.quoteForm.emailLabel, language)} />
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
+                  <ManagedInput copyScope="hvac.HVACQuoteDialog"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -345,9 +351,9 @@ ${isUrgent ? '⚠️ Urgency: Emergency Request' : ''}`;
               {/* Notes */}
               <div>
                 <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                  {pick(T.quoteForm.notesLabel, language)}
+                  <LocalizedValue value={pick(T.quoteForm.notesLabel, language)} />
                 </label>
-                <textarea
+                <ManagedTextarea copyScope="hvac.HVACQuoteDialog"
                   rows={2}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
@@ -374,7 +380,7 @@ ${isUrgent ? '⚠️ Urgency: Emergency Request' : ''}`;
                   className="text-xs font-semibold text-amber-900 flex items-center gap-1.5 cursor-pointer"
                 >
                   <AlertTriangle className="w-3.5 h-3.5 text-[#F97316]" />
-                  <span>{pick(T.quoteForm.urgencyLabel, language)}</span>
+                  <span><LocalizedValue value={pick(T.quoteForm.urgencyLabel, language)} /></span>
                 </label>
               </div>
 
@@ -387,9 +393,9 @@ ${isUrgent ? '⚠️ Urgency: Emergency Request' : ''}`;
                 >
                   <Send className="w-4 h-4" />
                   <span>
-                    {isSubmitting
+                    <LocalizedValue value={isSubmitting
                       ? pick(T.quoteForm.sendingBtn, language)
-                      : pick(T.quoteForm.submitBtn, language)}
+                      : pick(T.quoteForm.submitBtn, language)} />
                   </span>
                 </button>
               </div>

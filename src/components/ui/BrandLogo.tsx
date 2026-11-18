@@ -1,3 +1,5 @@
+import { LocalizedValue } from './LocalizedValue';
+import { ManagedImg } from './ManagedElements';
 import React from 'react';
 import { Language } from '../../types';
 import { useSiteSettings } from '../../context/SiteSettingsContext';
@@ -88,13 +90,13 @@ export function BrandLogo({
     ? 'تسويق ووساطة عقارية فاخرة'
     : 'Marketing & Luxury Brokerage';
 
-  const wordmark = standardWordmark && sector !== 'portal' ? sectorWordmarks[sector][language] : null;
+  const wordmark = standardWordmark && sector !== 'portal' ? { name: brandName, tagline } : null;
 
   return (
     <div className={`flex items-center gap-3 select-none ${className}`}>
       {/* Official Emblem */}
       <div className={`relative shrink-0 ${currentSize.h} flex items-center justify-center transition-transform duration-200 group-hover:scale-105`}>
-        <img
+        <ManagedImg copyScope="realestate.BrandLogo"
           src={logoSrc}
           alt={wordmark?.name ?? brandName}
           className={`${currentSize.h} w-auto object-contain object-center max-w-[min(10rem,32vw)] shrink-0 py-0.5 drop-shadow-xs`}
@@ -111,7 +113,7 @@ export function BrandLogo({
             <span
               className={`font-bold tracking-tight font-display-serif ${wordmark ? 'text-sm text-[#0076BB] sm:text-base' : currentSize.textClass + (variant === 'light' ? ' text-white' : ' text-slate-900')}`}
             >
-              {wordmark?.name ?? brandName}
+              <LocalizedValue value={wordmark?.name ?? brandName} />
             </span>
           </div>
           <span
@@ -119,7 +121,7 @@ export function BrandLogo({
               variant === 'light' ? 'text-sky-300/80' : wordmark ? 'text-slate-600' : 'text-slate-500'
             }`}
           >
-            {wordmark?.tagline ?? tagline}
+            <LocalizedValue value={wordmark?.tagline ?? tagline} />
           </span>
         </div>
       )}

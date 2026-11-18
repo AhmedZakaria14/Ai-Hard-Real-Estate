@@ -2,6 +2,7 @@ import { hardAdminClient } from './hardAdminClient';
 import type { BlogPost, Project, Property } from '../../types';
 import { canonicalPropertyCity } from '../propertySearch';
 import type { PublicProperty, CatalogEntry } from './hardCatalog';
+import { assertMediaReady } from '../mediaSaveGuard';
 
 const editableFields = {
   properties: ['slug', 'title', 'description', 'location', 'price', 'type', 'status', 'bedrooms', 'bathrooms',
@@ -20,6 +21,7 @@ export async function updatePublishedCatalog<T extends { id: string }>(
   id: string,
   updates: Partial<T>,
 ): Promise<T> {
+  assertMediaReady();
   if (collection === 'blog_posts' && 'status' in updates && updates.status !== 'published') {
     throw new Error('هذا المحرر يعدّل النسخة المنشورة. حفظ المسودات وإلغاء النشر غير متاحين هنا بعد.');
   }
@@ -29,7 +31,7 @@ export async function updatePublishedCatalog<T extends { id: string }>(
     .eq('collection', collection).eq('id', id)
     .maybeSingle<CatalogEntry<T>>();
   if (readError) throw readError;
-  if (!entry) throw new Error('السجل غير موجود في كتالوج Supabase المنشور.');
+  if (!entry) throw new Error('السجل غير موجود في الكتالوج المنشور.');
 
   const changes = collection === 'blog_posts'
     ? { ...updates, date: (entry.content as { date?: string }).date, publishedAt: (entry.content as { publishedAt?: string }).publishedAt, updatedAt: new Date().toISOString() }
@@ -58,7 +60,7 @@ function buildPublicContent(collection: EditableCollection, id: string, updates:
     ...(Array.isArray(content.images) ? content.images : []),
     ...(Array.isArray(content.gallery) ? content.gallery : [])]) {
     if (image == null || image === '') continue;
-    if (typeof image !== 'string' || !/^https:\/\/[^\s]+$/i.test(image) || /\/object\/sign\//i.test(image)) {
+    if (typeof image !== 'string' || !/^(https:\/\/[^\s]+|\/media\/catalog\/[^\s\\]+)$/i.test(image) || /\/object\/sign\//i.test(image)) {
       throw new Error('استخدم رابط HTTPS عامًا وثابتًا أو ارفع الصورة من مكتبة الوسائط العامة.');
     }
   }
@@ -76,6 +78,7 @@ function buildPublicContent(collection: EditableCollection, id: string, updates:
 }
 
 export async function createPublishedProperty(property: Partial<Property>): Promise<PublicProperty> {
+  assertMediaReady();
   const id = crypto.randomUUID();
   const slug = (property.slug || 'property') + '-' + id;
   const content = buildPublicContent('properties', id, { ...property, slug });
@@ -87,6 +90,7 @@ export async function createPublishedProperty(property: Partial<Property>): Prom
 }
 
 export async function createPublishedProject(project: Partial<Project>): Promise<Project> {
+  assertMediaReady();
   const id = crypto.randomUUID();
   const slug = (project.slug || 'project') + '-' + id;
   const content = buildPublicContent('projects', id, { ...project, slug });
@@ -98,6 +102,7 @@ export async function createPublishedProject(project: Partial<Project>): Promise
 }
 
 export async function createPublishedArticle(article: Partial<BlogPost>): Promise<BlogPost> {
+  assertMediaReady();
   if (article.status && article.status !== 'published') {
     throw new Error('يدعم كتالوج المقالات نشر المقالات. احفظ نص المسودة خارج محرر الكتالوج إلى أن يصبح جاهزًا للنشر.');
   }

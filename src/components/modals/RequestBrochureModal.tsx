@@ -1,3 +1,7 @@
+import { LocalizedValue } from '../ui/LocalizedValue';
+import { useCustomerFormConfig, ConfiguredFormFields } from '../forms/ConfiguredFormFields';
+import { InterfaceText } from '../ui/InterfaceText';
+import { ManagedInput } from '../ui/ManagedElements';
 import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
@@ -19,6 +23,8 @@ export function RequestBrochureModal({
   language,
   project,
 }: RequestBrochureModalProps) {
+  const formConfig = useCustomerFormConfig('project_inquiry');
+
   const { translations } = useTextOverride();
   const t = translations[language];
   const [fullName, setFullName] = useState('');
@@ -40,7 +46,7 @@ export function RequestBrochureModal({
 
     setIsLoading(true);
     try {
-      const result = await submitCustomerForm({
+      const result = await formConfig.submit({
         formType: 'project_inquiry',
         sector: 'realestate',
         name: fullName.trim() || email.split('@')[0],
@@ -105,59 +111,58 @@ export function RequestBrochureModal({
           </div>
 
           <h4 className="text-lg font-bold text-slate-900 font-display-serif">
-            {language === 'en' ? 'Brochure Request Received!' : 'تم طلب الكتيب بنجاح!'}
+            {language === 'en' ? <InterfaceText id="realestate.RequestBrochureModal.kvwjnia" source="Brochure Request Received!" /> : <InterfaceText id="realestate.RequestBrochureModal.ktzys7g" source="تم طلب الكتيب بنجاح!" />}
           </h4>
 
           <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-md mx-auto">
             {language === 'en' ? (
-              <>
-                We have registered your request for the full investment brochure for{' '}
-                <strong className="text-slate-900">{project.title[language]}</strong> using{' '}
-                <strong className="text-blue-700 font-mono">{confirmedEmail}</strong>.
+              <><InterfaceText id="realestate.RequestBrochureModal.kggxf3s" source="We have registered your request for the full investment brochure for" /><LocalizedValue value={' '} />
+                <strong className="text-slate-900"><LocalizedValue value={project.title[language]} /></strong><InterfaceText id="realestate.RequestBrochureModal.ktcuu4n" source="using" /><LocalizedValue value={' '} />
+                <strong className="text-blue-700 font-mono"><LocalizedValue value={confirmedEmail} /></strong>.
               </>
             ) : (
-              <>
-                تم تسجيل طلبك للحصول على الكتيب التعريفي الشامل لمشروع{' '}
-                <strong className="text-slate-900">{project.title[language]}</strong> باستخدام البريد الإلكتروني{' '}
-                <strong className="text-blue-700 font-mono">{confirmedEmail}</strong>.
+              <><InterfaceText id="realestate.RequestBrochureModal.k1nxyl67" source="تم تسجيل طلبك للحصول على الكتيب التعريفي الشامل لمشروع" /><LocalizedValue value={' '} />
+                <strong className="text-slate-900"><LocalizedValue value={project.title[language]} /></strong><InterfaceText id="realestate.RequestBrochureModal.k1g53orx" source="باستخدام البريد الإلكتروني" /><LocalizedValue value={' '} />
+                <strong className="text-blue-700 font-mono"><LocalizedValue value={confirmedEmail} /></strong>.
               </>
             )}
           </p>
 
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-start text-xs space-y-1 text-slate-600">
             <p>
-              <strong>{language === 'en' ? 'Reference Code:' : 'رقم المرجع:'}</strong>{' '}
-              <span className="font-mono font-bold text-slate-900">{leadRef}</span>
+              <strong>{language === 'en' ? <InterfaceText id="realestate.RequestBrochureModal.k1dodnt7" source="Reference Code:" /> : <InterfaceText id="realestate.RequestBrochureModal.k1lt3bxh" source="رقم المرجع:" />}</strong><LocalizedValue value={' '} />
+              <span className="font-mono font-bold text-slate-900"><LocalizedValue value={leadRef} /></span>
             </p>
             <p className="flex items-center gap-1 text-blue-600 font-semibold pt-1 border-t border-slate-200">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>{language === 'en' ? `Recorded in CRM (${crmRef || 'Synced'})` : `تم التوثيق بالنظام (${crmRef || 'مكتمل'})`}</span>
+              <span><LocalizedValue value={language === 'en' ? `Recorded in CRM (${crmRef || 'Synced'})` : `تم التوثيق بالنظام (${crmRef || 'مكتمل'})`} /></span>
             </p>
           </div>
 
           <div className="pt-2">
             <Button variant="secondary" onClick={handleReset} className="w-full">
-              {language === 'en' ? 'Close' : 'إغلاق'}
+              {language === 'en' ? <InterfaceText id="realestate.RequestBrochureModal.k1l0xxoj" source="Close" /> : <InterfaceText id="realestate.RequestBrochureModal.kysudiz" source="إغلاق" />}
             </Button>
           </div>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
+            <ConfiguredFormFields form={formConfig} language={language} />
           <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
               <FileText className="w-5 h-5" />
             </div>
             <div className="min-w-0 text-start">
-              <h5 className="text-xs font-bold text-slate-900 truncate">{project.title[language]}</h5>
-              <p className="text-[11px] text-slate-500">{project.developer[language]}</p>
+              <h5 className="text-xs font-bold text-slate-900 truncate"><LocalizedValue value={project.title[language]} /></h5>
+              <p className="text-[11px] text-slate-500"><LocalizedValue value={project.developer[language]} /></p>
             </div>
           </div>
 
           <div>
             <label htmlFor="brochure-email" className="block text-xs font-semibold text-slate-700 mb-1">
-              {language === 'en' ? 'Delivery Email Destination *' : 'البريد الإلكتروني لاستلام الكتيب *'}
+              {language === 'en' ? <InterfaceText id="realestate.RequestBrochureModal.khbt3mf" source="Delivery Email Destination *" /> : <InterfaceText id="realestate.RequestBrochureModal.k1xq1m72" source="البريد الإلكتروني لاستلام الكتيب *" />}
             </label>
-            <input
+            <ManagedInput copyScope="realestate.RequestBrochureModal"
               id="brochure-email"
               type="email"
               required
@@ -171,9 +176,9 @@ export function RequestBrochureModal({
 
           <div>
             <label htmlFor="brochure-fullname" className="block text-xs font-semibold text-slate-700 mb-1">
-              {t.contact.fullName} *
+              <LocalizedValue value={t.contact.fullName} /> <span className="text-red-600">*</span>
             </label>
-            <input
+            <ManagedInput copyScope="realestate.RequestBrochureModal"
               id="brochure-fullname"
               type="text"
               required
@@ -187,9 +192,9 @@ export function RequestBrochureModal({
 
           <div>
             <label htmlFor="brochure-phone" className="block text-xs font-semibold text-slate-700 mb-1">
-              {t.contact.phone} ({language === 'en' ? 'Optional' : 'اختياري'})
+              <LocalizedValue value={t.contact.phone} /> ({language === 'en' ? <InterfaceText id="realestate.RequestBrochureModal.k1yfbac9" source="Optional" /> : <InterfaceText id="realestate.RequestBrochureModal.kvjfzt2" source="اختياري" />})
             </label>
-            <input
+            <ManagedInput copyScope="realestate.RequestBrochureModal"
               id="brochure-phone"
               type="tel"
               placeholder="+966 50 000 0000"
@@ -202,7 +207,7 @@ export function RequestBrochureModal({
           <div className="pt-2">
             <Button type="submit" isLoading={isLoading} className="w-full">
               <Send className="w-4 h-4" />
-              <span>{language === 'en' ? 'Submit Brochure Request' : 'تسجيل طلب الكتيب'}</span>
+              <span>{language === 'en' ? <InterfaceText id="realestate.RequestBrochureModal.k1vlkk4a" source="Submit Brochure Request" /> : <InterfaceText id="realestate.RequestBrochureModal.k1fyzrlj" source="تسجيل طلب الكتيب" />}</span>
             </Button>
           </div>
         </form>

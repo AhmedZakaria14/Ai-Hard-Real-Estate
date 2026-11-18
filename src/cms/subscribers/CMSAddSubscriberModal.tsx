@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import React, { useState } from 'react';
 import { X, MailCheck, Save, Mail, FileText, Globe } from 'lucide-react';
 import { Language } from '../../types';
@@ -105,7 +106,7 @@ export const CMSAddSubscriberModal: React.FC<CMSAddSubscriberModalProps> = ({
               <Globe className="w-3.5 h-3.5 text-blue-600" />
               <span>{isAr ? 'مصدر التسجيل' : 'Registration Source'}</span>
             </label>
-            <select
+            <SearchableSelect
               value={source}
               onChange={(e) => setSource(e.target.value)}
               className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"
@@ -115,7 +116,7 @@ export const CMSAddSubscriberModal: React.FC<CMSAddSubscriberModalProps> = ({
               <option value="VIP Investor Event">{isAr ? 'معرض أو لقاء مستثمرين' : 'VIP Investor Event'}</option>
               <option value="Phone / WhatsApp Inquiry">{isAr ? 'استفسار هاتفي أو واتساب' : 'Phone / WhatsApp Inquiry'}</option>
               <option value="Cityscape Global">{isAr ? 'معرض سيتي سكيب' : 'Cityscape Global'}</option>
-            </select>
+            </SearchableSelect>
           </div>
 
           {/* Notes */}

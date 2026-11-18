@@ -313,7 +313,7 @@ export function subscribeToPublishedCalculatorConfig(
       if (!controller.signal.aborted) onUpdate(config ?? fallback);
     } catch (error) {
       if (!controller.signal.aborted) {
-        console.warn('Could not load Supabase calculator; using default configuration', error);
+        console.warn('Could not load the database calculator; using default configuration', error);
         onUpdate(fallback);
       }
     }

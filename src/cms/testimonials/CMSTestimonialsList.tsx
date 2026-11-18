@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import React, { useState, useMemo } from 'react';
 import {
   Award,
@@ -179,7 +180,7 @@ export const CMSTestimonialsList: React.FC<CMSTestimonialsListProps> = ({
           {/* Category Filter */}
           <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs">
             <Filter className="w-3.5 h-3.5 text-slate-500" />
-            <select
+            <SearchableSelect
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
               className="bg-transparent font-medium text-slate-700 focus:outline-none cursor-pointer"
@@ -190,13 +191,13 @@ export const CMSTestimonialsList: React.FC<CMSTestimonialsListProps> = ({
                   {isAr ? c.labelAr : c.labelEn}
                 </option>
               ))}
-            </select>
+            </SearchableSelect>
           </div>
 
           {/* Rating Filter */}
           <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs">
             <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-            <select
+            <SearchableSelect
               value={ratingFilter}
               onChange={(e) => setRatingFilter(e.target.value)}
               className="bg-transparent font-medium text-slate-700 focus:outline-none cursor-pointer"
@@ -205,7 +206,7 @@ export const CMSTestimonialsList: React.FC<CMSTestimonialsListProps> = ({
               <option value="5">5 {isAr ? 'نجوم' : 'Stars'}</option>
               <option value="4">4 {isAr ? 'نجوم' : 'Stars'}</option>
               <option value="3">3 {isAr ? 'نجوم' : 'Stars'}</option>
-            </select>
+            </SearchableSelect>
           </div>
         </div>
       </div>

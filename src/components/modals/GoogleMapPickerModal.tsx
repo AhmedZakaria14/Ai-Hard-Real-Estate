@@ -1,3 +1,6 @@
+import { LocalizedValue } from '../ui/LocalizedValue';
+import { InterfaceText } from '../ui/InterfaceText';
+import { ManagedButton, ManagedInput } from '../ui/ManagedElements';
 import React, { useEffect, useRef, useState } from 'react';
 import { X, MapPin, Search, Check, Layers, Navigation, LocateFixed, Compass, Loader2 } from 'lucide-react';
 import L from 'leaflet';
@@ -343,24 +346,24 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
             </div>
             <div>
               <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
-                <span>{isAr ? 'تحديد موقع العقار على الخريطة التفاعلية' : 'Interactive Property Location Map'}</span>
+                <span>{isAr ? <InterfaceText id="realestate.GoogleMapPickerModal.k1jnz409" source="تحديد موقع العقار على الخريطة التفاعلية" /> : <InterfaceText id="realestate.GoogleMapPickerModal.k1mrq3k5" source="Interactive Property Location Map" />}</span>
               </h3>
               <p className="text-[11px] sm:text-xs text-slate-300">
                 {isAr
-                  ? 'انقر على أي موقع لتثبيت الدبوس أو اسحب الدبوس لتحديث الإحداثيات'
-                  : 'Click anywhere to pin, or drag the marker to update coordinates'}
+                  ? <InterfaceText id="realestate.GoogleMapPickerModal.kkmc7fv" source="انقر على أي موقع لتثبيت الدبوس أو اسحب الدبوس لتحديث الإحداثيات" />
+                  : <InterfaceText id="realestate.GoogleMapPickerModal.k1r3zrv7" source="Click anywhere to pin, or drag the marker to update coordinates" />}
               </p>
             </div>
           </div>
 
-          <button
+          <ManagedButton copyScope="realestate.GoogleMapPickerModal"
             type="button"
             onClick={onClose}
             aria-label="Close Map"
             className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
-          </button>
+          </ManagedButton>
         </div>
 
         {/* Search & Quick City Filter Bar */}
@@ -368,7 +371,7 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
           {/* Search Form */}
           <form onSubmit={handleSearch} className="relative flex-1">
             <Search className="w-4 h-4 text-slate-400 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
+            <ManagedInput copyScope="realestate.GoogleMapPickerModal"
               type="text"
               placeholder={
                 isAr
@@ -387,7 +390,7 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
               {searching ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
               ) : (
-                <span>{isAr ? 'بحث' : 'Search'}</span>
+                <span>{isAr ? <InterfaceText id="realestate.GoogleMapPickerModal.k12smhhb" source="بحث" /> : <InterfaceText id="realestate.GoogleMapPickerModal.k1j0itop" source="Search" />}</span>
               )}
             </button>
           </form>
@@ -395,7 +398,7 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
           {/* Quick Cities Navigator */}
           <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0 no-scrollbar shrink-0">
             <span className="text-[11px] font-bold text-slate-500 shrink-0 me-1">
-              {isAr ? 'انتقال سريع:' : 'Quick Cities:'}
+              {isAr ? <InterfaceText id="realestate.GoogleMapPickerModal.kd64hr2" source="انتقال سريع:" /> : <InterfaceText id="realestate.GoogleMapPickerModal.knt7l4j" source="Quick Cities:" />}
             </span>
             {SAUDI_CITIES.map((city) => (
               <button
@@ -404,7 +407,7 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
                 onClick={() => jumpToCity(city)}
                 className="px-2.5 py-1 bg-white hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 whitespace-nowrap transition-colors cursor-pointer shadow-2xs"
               >
-                {isAr ? city.nameAr : city.nameEn}
+                <LocalizedValue value={isAr ? city.nameAr : city.nameEn} />
               </button>
             ))}
           </div>
@@ -429,7 +432,7 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
                 }`}
               >
                 <Layers className="w-3.5 h-3.5" />
-                <span>{isAr ? 'خريطة' : 'Map'}</span>
+                <span>{isAr ? <InterfaceText id="realestate.GoogleMapPickerModal.k1j2s692" source="خريطة" /> : <InterfaceText id="realestate.GoogleMapPickerModal.kj1sac1" source="Map" />}</span>
               </button>
               <button
                 type="button"
@@ -441,12 +444,12 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
                 }`}
               >
                 <Layers className="w-3.5 h-3.5" />
-                <span>{isAr ? 'قمر صناعي' : 'Satellite'}</span>
+                <span>{isAr ? <InterfaceText id="realestate.GoogleMapPickerModal.k1q2mn4s" source="قمر صناعي" /> : <InterfaceText id="realestate.GoogleMapPickerModal.k1k1p022" source="Satellite" />}</span>
               </button>
             </div>
 
             {/* Locate My Current GPS Button */}
-            <button
+            <ManagedButton copyScope="realestate.GoogleMapPickerModal"
               type="button"
               onClick={handleCurrentLocation}
               disabled={locatingUser}
@@ -458,8 +461,8 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
               ) : (
                 <LocateFixed className="w-3.5 h-3.5 text-blue-600" />
               )}
-              <span>{isAr ? 'موقعي الحالي' : 'My GPS'}</span>
-            </button>
+              <span>{isAr ? <InterfaceText id="realestate.GoogleMapPickerModal.k1hrsml2" source="موقعي الحالي" /> : <InterfaceText id="realestate.GoogleMapPickerModal.k1cf7e7b" source="My GPS" />}</span>
+            </ManagedButton>
           </div>
 
           {/* Real-time Instructions Overlay Badge */}
@@ -467,8 +470,8 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
             <Compass className="w-4 h-4 text-blue-400 shrink-0 animate-spin duration-5000" />
             <span>
               {isAr
-                ? 'انقر على أي نقطة على الخريطة لتثبيت موقع العقار بدقة.'
-                : 'Click directly on the map to place the property pin.'}
+                ? <InterfaceText id="realestate.GoogleMapPickerModal.k176178l" source="انقر على أي نقطة على الخريطة لتثبيت موقع العقار بدقة." />
+                : <InterfaceText id="realestate.GoogleMapPickerModal.k17l0d82" source="Click directly on the map to place the property pin." />}
             </span>
           </div>
         </div>
@@ -479,19 +482,19 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
           <div className="w-full sm:flex-1 text-start">
             <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
               <Navigation className="w-3.5 h-3.5 text-emerald-600" />
-              <span>{isAr ? 'الموقع والإحداثيات المختارة:' : 'Selected Coordinates & Area:'}</span>
+              <span>{isAr ? <InterfaceText id="realestate.GoogleMapPickerModal.k5bkzrw" source="الموقع والإحداثيات المختارة:" /> : <InterfaceText id="realestate.GoogleMapPickerModal.ky70e74" source="Selected Coordinates & Area:" />}</span>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <div className="px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-xl font-mono text-xs sm:text-sm font-bold text-blue-700 shadow-2xs">
-                {coords.lat.toFixed(6)}, {coords.lng.toFixed(6)}
+                <LocalizedValue value={coords.lat.toFixed(6)} />, <LocalizedValue value={coords.lng.toFixed(6)} />
               </div>
               {addressText ? (
                 <div className="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 truncate max-w-[280px] sm:max-w-md">
-                  📍 {addressText}
+                  📍 <LocalizedValue value={addressText} />
                 </div>
               ) : (
                 <span className="text-xs text-slate-400 italic">
-                  {isAr ? '(جارٍ استخراج اسم الحي تلقائياً...)' : '(Extracting district...)'}
+                  {isAr ? <InterfaceText id="realestate.GoogleMapPickerModal.k152ekc9" source="(جارٍ استخراج اسم الحي تلقائياً...)" /> : <InterfaceText id="realestate.GoogleMapPickerModal.k1d8vrin" source="(Extracting district...)" />}
                 </span>
               )}
             </div>
@@ -504,7 +507,7 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
               onClick={onClose}
               className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs sm:text-sm transition-colors cursor-pointer w-1/2 sm:w-auto"
             >
-              {isAr ? 'إلغاء' : 'Cancel'}
+              {isAr ? <InterfaceText id="realestate.GoogleMapPickerModal.k1dwe0m2" source="إلغاء" /> : <InterfaceText id="realestate.GoogleMapPickerModal.kew9em3" source="Cancel" />}
             </button>
             <button
               type="button"
@@ -512,7 +515,7 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
               className="flex items-center justify-center gap-2 px-7 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs sm:text-sm transition-all shadow-md shadow-blue-600/30 hover:shadow-blue-600/50 cursor-pointer w-1/2 sm:w-auto"
             >
               <Check className="w-4 h-4" />
-              <span>{isAr ? 'تأكيد الموقع' : 'Confirm Location'}</span>
+              <span>{isAr ? <InterfaceText id="realestate.GoogleMapPickerModal.kxibcyj" source="تأكيد الموقع" /> : <InterfaceText id="realestate.GoogleMapPickerModal.k1tzip66" source="Confirm Location" />}</span>
             </button>
           </div>
         </div>

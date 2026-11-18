@@ -1,3 +1,8 @@
+import { LocalizedValue } from '../../components/ui/LocalizedValue';
+import { useCustomerFormConfig, ConfiguredFormFields } from '../../components/forms/ConfiguredFormFields';
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
+import { InterfaceText } from '../../components/ui/InterfaceText';
+import { ManagedButton, ManagedInput, ManagedTextarea } from '../../components/ui/ManagedElements';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import React, { useState, useEffect, useRef, useId } from 'react';
 import {
@@ -16,11 +21,13 @@ import {
 } from 'lucide-react';
 import { useHVAC } from '../context/HVACContext';
 import { pick } from '../translations';
-import { FormAttachmentMeta } from '../../types/firestore-schema';
+import { FormAttachmentMeta } from '../../types/backend-schema';
 import { submitCustomerForm } from '../../lib/forms/formSubmissionService';
 import { FileUploadZone } from '../../components/forms/FileUploadZone';
 
 export function HVACBookingModal() {
+  const formConfig = useCustomerFormConfig('hvac_service');
+
   const { hvac: T } = useTextOverride();
   const {
     language,
@@ -150,7 +157,7 @@ export function HVACBookingModal() {
 
     setIsSubmitting(true);
     try {
-      const result = await submitCustomerForm({
+      const result = await formConfig.submit({
         formType: 'hvac_service',
         sector: 'hvac',
         name: name.trim(),
@@ -230,15 +237,15 @@ City: ${cityName}`;
             </div>
             <div>
               <h3 id={titleId} className="font-semibold text-base sm:text-lg">
-                {pick(T.bookingModal.title, language)}
+                <LocalizedValue value={pick(T.bookingModal.title, language)} />
               </h3>
               <p className="text-xs text-slate-300">
-                {pick(T.bookingModal.subtitle, language)}
+                <LocalizedValue value={pick(T.bookingModal.subtitle, language)} />
               </p>
             </div>
           </div>
 
-          <button
+          <ManagedButton copyScope="hvac.HVACBookingModal"
             type="button"
             onClick={closeBookingModal}
             aria-label={isAr ? 'إغلاق نافذة حجز خدمة التكييف' : 'Close booking dialog'}
@@ -246,7 +253,7 @@ City: ${cityName}`;
             className="p-2.5 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0EA5E9] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1E293B] transition-colors cursor-pointer shrink-0"
           >
             <X className="w-5 h-5" aria-hidden="true" />
-          </button>
+          </ManagedButton>
         </div>
 
         {/* Modal Content */}
@@ -260,16 +267,16 @@ City: ${cityName}`;
 
               <div className="space-y-2">
                 <div className="inline-block px-3 py-1 rounded-md bg-amber-50 border border-amber-200 text-amber-900 text-xs font-medium">
-                  {pick(T.bookingModal.resultStatusBadge, language)}
+                  <LocalizedValue value={pick(T.bookingModal.resultStatusBadge, language)} />
                 </div>
                 <h4 className="text-xl font-semibold text-slate-900">
-                  {pick(T.bookingModal.resultTitle, language)}
+                  <LocalizedValue value={pick(T.bookingModal.resultTitle, language)} />
                 </h4>
                 <div className="inline-block px-4 py-2 rounded-xl bg-slate-100 border border-slate-200 text-[#0EA5E9] font-mono font-bold text-lg">
-                  <bdi dir="ltr">{confirmedLead.referenceNumber}</bdi>
+                  <bdi dir="ltr"><LocalizedValue value={confirmedLead.referenceNumber} /></bdi>
                 </div>
                 <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
-                  {pick(T.bookingModal.resultDesc, language)}
+                  <LocalizedValue value={pick(T.bookingModal.resultDesc, language)} />
                 </p>
               </div>
 
@@ -280,7 +287,7 @@ City: ${cityName}`;
                   className="px-5 py-3 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
                 >
                   <MessageSquare className="w-4 h-4" />
-                  <span>{isAr ? 'متابعة وتأكيد الطلب عبر الواتساب' : 'Follow up via WhatsApp'}</span>
+                  <span>{isAr ? <InterfaceText id="hvac.HVACBookingModal.k191p4hk" source="متابعة وتأكيد الطلب عبر الواتساب" /> : <InterfaceText id="hvac.HVACBookingModal.k1bi19rt" source="Follow up via WhatsApp" />}</span>
                 </button>
 
                 <button
@@ -288,26 +295,27 @@ City: ${cityName}`;
                   onClick={closeBookingModal}
                   className="px-5 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm transition-colors cursor-pointer"
                 >
-                  {pick(T.quoteForm.closeBtn, language)}
+                  <LocalizedValue value={pick(T.quoteForm.closeBtn, language)} />
                 </button>
               </div>
             </div>
           ) : (
             /* Booking Form */
             <form onSubmit={handleSubmit} className="space-y-4 text-start">
+            <ConfiguredFormFields form={formConfig} language={language} />
               {bookingError && (
                 <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold">
-                  {bookingError}
+                  <LocalizedValue value={bookingError} />
                 </div>
               )}
               {/* Service Select */}
               <div>
                 <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                  {pick(T.bookingModal.serviceSelect, language)} *
+                  <LocalizedValue value={pick(T.bookingModal.serviceSelect, language)} /> <span className="text-red-600">*</span>
                 </label>
                 <div className="relative">
                   <Wrench className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <select
+                  <SearchableSelect
                     required
                     value={service}
                     onChange={(e) => setService(e.target.value)}
@@ -321,7 +329,7 @@ City: ${cityName}`;
                         {isAr ? s.titleAr : s.titleEn}
                       </option>
                     ))}
-                  </select>
+                  </SearchableSelect>
                 </div>
               </div>
 
@@ -330,7 +338,7 @@ City: ${cityName}`;
                 {/* Preferred Date */}
                 <div>
                   <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                    {pick(T.bookingModal.dateLabel, language)} *
+                    <LocalizedValue value={pick(T.bookingModal.dateLabel, language)} /> <span className="text-red-600">*</span>
                   </label>
                   <div className="relative">
                     <CalendarIcon className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -347,11 +355,11 @@ City: ${cityName}`;
                 {/* Time Slot */}
                 <div>
                   <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                    {pick(T.bookingModal.timeSlotLabel, language)} *
+                    <LocalizedValue value={pick(T.bookingModal.timeSlotLabel, language)} /> <span className="text-red-600">*</span>
                   </label>
                   <div className="relative">
                     <Clock className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    <select
+                    <SearchableSelect
                       value={slot}
                       onChange={(e) => setSlot(e.target.value as any)}
                       className="w-full ps-9 pe-8 py-2.5 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed cursor-pointer"
@@ -360,7 +368,7 @@ City: ${cityName}`;
                       <option value="afternoon">{pick(T.bookingModal.slotAfternoon, language)}</option>
                       <option value="evening">{pick(T.bookingModal.slotEvening, language)}</option>
                       <option value="emergency">{pick(T.bookingModal.slotEmergency, language)}</option>
-                    </select>
+                    </SearchableSelect>
                   </div>
                 </div>
               </div>
@@ -368,11 +376,11 @@ City: ${cityName}`;
               {/* City Selection */}
               <div>
                 <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                  {pick(T.bookingModal.city, language)} *
+                  <LocalizedValue value={pick(T.bookingModal.city, language)} /> <span className="text-red-600">*</span>
                 </label>
                 <div className="relative">
                   <MapPin className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <select
+                  <SearchableSelect
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     className="w-full ps-9 pe-8 py-2.5 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed cursor-pointer"
@@ -382,16 +390,16 @@ City: ${cityName}`;
                         {isAr ? c.cityNameAr : c.cityNameEn}
                       </option>
                     ))}
-                  </select>
+                  </SearchableSelect>
                 </div>
               </div>
 
               {city === 'other' && (
                 <div className="animate-in fade-in duration-200">
                   <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                    {pick(T.quoteForm.otherCityLabel, language)} *
+                    <LocalizedValue value={pick(T.quoteForm.otherCityLabel, language)} /> <span className="text-red-600">*</span>
                   </label>
-                  <input
+                  <ManagedInput copyScope="hvac.HVACBookingModal"
                     type="text"
                     required
                     value={customCity}
@@ -406,11 +414,11 @@ City: ${cityName}`;
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                    {pick(T.bookingModal.clientName, language)} *
+                    <LocalizedValue value={pick(T.bookingModal.clientName, language)} /> <span className="text-red-600">*</span>
                   </label>
                   <div className="relative">
                     <User className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    <input
+                    <ManagedInput copyScope="hvac.HVACBookingModal"
                       type="text"
                       required
                       value={name}
@@ -423,11 +431,11 @@ City: ${cityName}`;
 
                 <div>
                   <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                    {pick(T.bookingModal.phone, language)} *
+                    <LocalizedValue value={pick(T.bookingModal.phone, language)} /> <span className="text-red-600">*</span>
                   </label>
                   <div className="relative">
                     <Phone className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    <input
+                    <ManagedInput copyScope="hvac.HVACBookingModal"
                       type="tel"
                       required
                       dir="ltr"
@@ -443,9 +451,9 @@ City: ${cityName}`;
               {/* Notes */}
               <div>
                 <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                  {pick(T.bookingModal.notes, language)}
+                  <LocalizedValue value={pick(T.bookingModal.notes, language)} />
                 </label>
-                <textarea
+                <ManagedTextarea copyScope="hvac.HVACBookingModal"
                   rows={2}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
@@ -477,9 +485,9 @@ City: ${cityName}`;
                 >
                   <Send className="w-4 h-4" />
                   <span>
-                    {isSubmitting
+                    <LocalizedValue value={isSubmitting
                       ? pick(T.quoteForm.sendingBtn, language)
-                      : pick(T.bookingModal.submitBtn, language)}
+                      : pick(T.bookingModal.submitBtn, language)} />
                   </span>
                 </button>
               </div>

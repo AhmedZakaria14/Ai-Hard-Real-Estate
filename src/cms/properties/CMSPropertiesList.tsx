@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import { usePropertyTypes } from '../../lib/usePropertyTypes';
 import React, { useState, useMemo } from 'react';
 import {
@@ -218,7 +219,7 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
           </span>
 
           {/* Type Filter */}
-          <select
+          <SearchableSelect
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
             className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
@@ -227,10 +228,10 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
             {propertyTypes.filter((item) => item.active).map((item) => (
                     <option key={item.id} value={item.id}>{isAr ? item.nameAr : item.nameEn}</option>
                   ))}
-          </select>
+          </SearchableSelect>
 
           {/* Status Filter */}
-          <select
+          <SearchableSelect
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
             className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
@@ -241,10 +242,10 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
             <option value="off-plan">{isAr ? 'على الخارطة (Off-Plan)' : 'Off-Plan'}</option>
             <option value="exclusive">{isAr ? 'عقار حصري (Exclusive)' : 'Exclusive'}</option>
             <option value="new-launch">{isAr ? 'إطلاق حديث (New Launch)' : 'New Launch'}</option>
-          </select>
+          </SearchableSelect>
 
           {/* City Filter */}
-          <select
+          <SearchableSelect
             value={selectedCity}
             onChange={(e) => setSelectedCity(e.target.value)}
             className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
@@ -258,7 +259,7 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
                 </option>
               );
             })}
-          </select>
+          </SearchableSelect>
 
           {/* Featured Toggle Filter */}
           <button
@@ -401,7 +402,7 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
 
                     {/* Status Toggle */}
                     <td className="py-3 px-3 text-center whitespace-nowrap">
-                      <select
+                      <SearchableSelect
                         value={prop.status}
                         onChange={(e) => onQuickStatusChange(prop, e.target.value as ListingStatus)}
                         className={`text-[11px] font-bold py-1 px-2 rounded-lg border cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 ${
@@ -419,7 +420,7 @@ export const CMSPropertiesList: React.FC<CMSPropertiesListProps> = ({
                         <option value="off-plan">{isAr ? 'على الخارطة' : 'Off-Plan'}</option>
                         <option value="exclusive">{isAr ? 'حصري' : 'Exclusive'}</option>
                         <option value="new-launch">{isAr ? 'إطلاق جديد' : 'New Launch'}</option>
-                      </select>
+                      </SearchableSelect>
                     </td>
 
                     {/* Featured Star */}

@@ -1,3 +1,6 @@
+import { LocalizedValue } from './LocalizedValue';
+import { InterfaceText } from './InterfaceText';
+import { ManagedInput } from './ManagedElements';
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Search, ChevronDown, X, Check } from 'lucide-react';
 import { normalizePropertySearch } from '../../lib/propertySearch';
@@ -108,7 +111,7 @@ export const CitySearchDropdown: React.FC<CitySearchDropdownProps> = ({
     <div ref={containerRef} className={`relative text-start ${className}`}>
       {label && (
         <label htmlFor={id} className="block text-[11px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
-          {label}
+          <LocalizedValue value={label} />
         </label>
       )}
 
@@ -124,7 +127,7 @@ export const CitySearchDropdown: React.FC<CitySearchDropdownProps> = ({
         aria-expanded={isOpen}
       >
         <span className={`truncate block ${!displayValue ? 'text-slate-400 font-normal' : 'text-slate-900 font-semibold'}`}>
-          {displayValue || displayPlaceholder}
+          <LocalizedValue value={displayValue || displayPlaceholder} />
         </span>
 
         <div className="absolute top-3 end-3 flex items-center gap-1">
@@ -157,7 +160,7 @@ export const CitySearchDropdown: React.FC<CitySearchDropdownProps> = ({
           <div className="p-2.5 bg-slate-100 border-b border-slate-200">
             <div className="relative">
               <Search className="w-4 h-4 text-blue-600 absolute top-2.5 start-3 pointer-events-none" />
-              <input
+              <ManagedInput copyScope="realestate.CitySearchDropdown"
                 ref={searchInputRef}
                 type="text"
                 value={searchTerm}
@@ -200,7 +203,7 @@ export const CitySearchDropdown: React.FC<CitySearchDropdownProps> = ({
                     : 'text-slate-700 hover:bg-slate-200/70 hover:text-blue-600'
                 }`}
               >
-                <span>{displayAllLabel}</span>
+                <span><LocalizedValue value={displayAllLabel} /></span>
                 {(!value || value === 'all') && <Check className="w-4 h-4 text-white" />}
               </button>
             )}
@@ -225,7 +228,7 @@ export const CitySearchDropdown: React.FC<CitySearchDropdownProps> = ({
                         : 'text-slate-800 hover:bg-blue-50 hover:text-blue-700 active:bg-blue-100'
                     }`}
                   >
-                    <span className="font-semibold truncate">{cityName}</span>
+                    <span className="font-semibold truncate"><LocalizedValue value={cityName} /></span>
 
                     {isSelected && <Check className="w-4 h-4 text-white shrink-0 ms-2" />}
                   </button>
@@ -234,16 +237,16 @@ export const CitySearchDropdown: React.FC<CitySearchDropdownProps> = ({
             ) : (
               <div className="py-6 px-4 text-center">
                 <p className="text-xs text-slate-500">
-                  {isAr
+                  <LocalizedValue value={isAr
                     ? `لا توجد مدن تطابق البحث "${searchTerm}"`
-                    : `No cities matching "${searchTerm}"`}
+                    : `No cities matching "${searchTerm}"`} />
                 </p>
                 <button
                   type="button"
                   onClick={() => setSearchTerm('')}
                   className="mt-2 text-xs font-bold text-blue-600 hover:underline cursor-pointer"
                 >
-                  {isAr ? 'عرض جميع المدن الـ 50' : 'View all 50 cities'}
+                  {isAr ? <InterfaceText id="realestate.CitySearchDropdown.k17n9uay" source="عرض جميع المدن الـ 50" /> : <InterfaceText id="realestate.CitySearchDropdown.kwyd4w3" source="View all 50 cities" />}
                 </button>
               </div>
             )}

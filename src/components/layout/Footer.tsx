@@ -1,3 +1,6 @@
+import { LocalizedValue } from '../ui/LocalizedValue';
+import { InterfaceText } from '../ui/InterfaceText';
+import { ManagedA, ManagedInput } from '../ui/ManagedElements';
 import { useState, type FormEvent } from 'react';
 import {
   Phone,
@@ -76,31 +79,31 @@ export function Footer({ onNavigate, language }: FooterProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
           {/* Column 1: Brand / Bio */}
           <div className="space-y-4">
-            <a
+            <ManagedA copyScope="realestate.Footer"
               href="/realestate"
               onClick={(e) => handleSemanticClick(e, () => handleLinkClick('home'))}
               className="cursor-pointer group inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 rounded-xl"
               aria-label={isAr ? 'الرئيسية - هارد للعقارات' : 'HARD Real Estate Home'}
             >
               <BrandLogo size="md" language={language} variant="light" />
-            </a>
+            </ManagedA>
 
             <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
               {isAr
-                ? 'نحن في مؤسسة هارد للعقارات نرسم ملامح جديدة للتميز العقاري؛ لنكون منصتكم الأولى للوساطة والتسويق العقاري الفاخر. نلبي تطلعات كافة شرائح العملاء بأعلى معايير الاحترافية.'
-                : 'At HARD Real Estate, we are shaping a new standard of excellence as your first choice for luxury real estate brokerage and marketing. We serve clients of every kind with the highest standards of professionalism.'}
+                ? <InterfaceText id="realestate.Footer.ko6mw4a" source="نحن في مؤسسة هارد للعقارات نرسم ملامح جديدة للتميز العقاري؛ لنكون منصتكم الأولى للوساطة والتسويق العقاري الفاخر. نلبي تطلعات كافة شرائح العملاء بأعلى معايير الاحترافية." />
+                : <InterfaceText id="realestate.Footer.kvvujnq" source="At HARD Real Estate, we are shaping a new standard of excellence as your first choice for luxury real estate brokerage and marketing. We serve clients of every kind with the highest standards of professionalism." />}
             </p>
 
-            <p className="flex items-start gap-2 pt-2 text-xs font-medium text-blue-400">
+            <p className="flex items-start gap-2 pt-2 text-sm font-normal text-slate-300">
               <ShieldCheck className="size-4 shrink-0" aria-hidden="true" />
-              <span>{isAr ? 'مؤسسة وساطة وتسويق عقاري مرخصة رسمياً' : 'Officially licensed real estate brokerage and marketing firm'}
-                <br />{isAr ? '(رخصة فال)' : '(FAL License)'}
+              <span>{isAr ? <InterfaceText id="realestate.Footer.knc34ga" source="مؤسسة وساطة وتسويق عقاري مرخصة رسمياً" /> : <InterfaceText id="realestate.Footer.k1nswnpv" source="Officially licensed real estate brokerage and marketing firm" />}
+                <br />{isAr ? <InterfaceText id="realestate.Footer.k6pw5k1" source="(رخصة فال)" /> : <InterfaceText id="realestate.Footer.k1fl355w" source="(FAL License)" />}
               </span>
             </p>
             <div className="space-y-2 pt-2">
-              <p className="text-xs font-semibold text-slate-300">{isAr ? 'تابعنا على:' : 'Follow us on:'}</p>
+              <p className="text-xs font-semibold text-slate-300">{isAr ? <InterfaceText id="realestate.Footer.k1y0ocvc" source="تابعنا على:" /> : <InterfaceText id="realestate.Footer.khxrxml" source="Follow us on:" />}</p>
               <div className="flex items-center gap-2.5">
-                <a
+                <ManagedA copyScope="realestate.Footer"
                   href="https://www.instagram.com/hardgrp"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -109,8 +112,8 @@ export function Footer({ onNavigate, language }: FooterProps) {
                   title="Instagram (@hardgrp)"
                 >
                   <Instagram className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                </a>
-                <a
+                </ManagedA>
+                <ManagedA copyScope="realestate.Footer"
                   href="https://x.com/HARDGRP"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -125,18 +128,18 @@ export function Footer({ onNavigate, language }: FooterProps) {
                   >
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                   </svg>
-                </a>
+                </ManagedA>
               </div>
             </div>
           </div>
 
           <nav aria-label={t.footer.sitemap}>
-            <h4 className="mb-4 text-sm font-bold text-white">{t.footer.sitemap}</h4>
+            <h4 className="mb-4 text-sm font-bold text-white"><LocalizedValue value={t.footer.sitemap} /></h4>
             <ul className="space-y-2 text-xs sm:text-sm">
               {realEstateNavigationPages.map((page) => <li key={page}>
                 <a href={getPageHref(page)} onClick={(event) => handleSemanticClick(event, () => handleLinkClick(page))}
                   className="inline-block py-0.5 text-slate-300 hover:text-blue-400 focus-visible:underline">
-                  {t.nav[page]}
+                  <LocalizedValue value={t.nav[page]} />
                 </a>
               </li>)}
             </ul>
@@ -145,7 +148,7 @@ export function Footer({ onNavigate, language }: FooterProps) {
           {/* Contact information */}
           <div className="space-y-4">
             <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-2 font-ui-sans">
-              {t.footer.contactInfo}
+              <LocalizedValue value={t.footer.contactInfo} />
             </h4>
 
             <div className="space-y-2.5 text-xs text-slate-300 pb-2">
@@ -153,8 +156,8 @@ export function Footer({ onNavigate, language }: FooterProps) {
                 <MapPin className="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5" />
                 <span className="leading-snug">
                   {language === 'en'
-                    ? 'Prince Mutaib Road, Hajr Dist., Dammam, KSA'
-                    : 'طريق الأمير متعب، حي هجر، الدمام، السعودية'}
+                    ? <InterfaceText id="realestate.Footer.khrej2z" source="Prince Mutaib Road, Hajr Dist., Dammam, KSA" />
+                    : <InterfaceText id="realestate.Footer.k1k1pl3c" source="طريق الأمير متعب، حي هجر، الدمام، السعودية" />}
                 </span>
               </div>
 
@@ -165,7 +168,7 @@ export function Footer({ onNavigate, language }: FooterProps) {
                   dir="ltr"
                   className="hover:text-blue-400 transition-colors font-medium text-left"
                 >
-                  <bdi dir="ltr">+966 55 612 5711</bdi>
+                  <bdi dir="ltr"><LocalizedValue value="+966 55 612 5711" /></bdi>
                 </a>
               </div>
 
@@ -189,7 +192,7 @@ export function Footer({ onNavigate, language }: FooterProps) {
                   dir="ltr"
                   className="text-emerald-400 hover:text-emerald-300 transition-colors font-medium text-left"
                 >
-                  <bdi dir="ltr">+966 55 612 5711</bdi>
+                  <bdi dir="ltr"><LocalizedValue value="+966 55 612 5711" /></bdi>
                 </a>
               </div>
             </div>
@@ -198,29 +201,29 @@ export function Footer({ onNavigate, language }: FooterProps) {
 
           <div className="space-y-2">
               <h5 className="text-xs font-bold text-white uppercase tracking-wider mb-1 font-ui-sans">
-                {t.footer.newsletterTitle}
+                <LocalizedValue value={t.footer.newsletterTitle} />
               </h5>
               <p className="text-[11px] text-slate-400 leading-relaxed mb-2">
-                {t.footer.newsletterSubtitle}
+                <LocalizedValue value={t.footer.newsletterSubtitle} />
               </p>
 
               {subscribed ? (
                 <div className="p-3 bg-blue-950/60 border border-blue-800/80 rounded-xl text-blue-200 text-xs space-y-1 animate-in fade-in">
                   <div className="flex items-center gap-1.5 font-semibold text-white">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>{language === 'en' ? 'Subscribed' : 'تم الاشتراك'}</span>
+                    <span>{language === 'en' ? <InterfaceText id="realestate.Footer.kusah51" source="Subscribed" /> : <InterfaceText id="realestate.Footer.k1qag4p3" source="تم الاشتراك" />}</span>
                   </div>
-                  <p className="text-[11px]">{t.footer.newsletterSuccess}</p>
+                  <p className="text-[11px]"><LocalizedValue value={t.footer.newsletterSuccess} /></p>
                 </div>
               ) : (
                 <form onSubmit={handleSubscribe} className="space-y-2">
                   {subError && (
                     <div className="p-2.5 bg-rose-950/80 border border-rose-800 text-rose-200 rounded-xl text-[11px] leading-relaxed animate-in fade-in">
-                      <p>{subError}</p>
+                      <p><LocalizedValue value={subError} /></p>
                     </div>
                   )}
                   <div className="relative">
-                    <input
+                    <ManagedInput copyScope="realestate.Footer"
                       type="email"
                       required
                       placeholder={t.footer.newsletterPlaceholder}
@@ -236,7 +239,7 @@ export function Footer({ onNavigate, language }: FooterProps) {
                     isLoading={loading}
                     className="w-full justify-center text-xs py-2"
                   >
-                    <span>{t.footer.newsletterButton}</span>
+                    <span><LocalizedValue value={t.footer.newsletterButton} /></span>
                     <ArrowIcon className="w-3.5 h-3.5" />
                   </Button>
                 </form>
@@ -244,7 +247,7 @@ export function Footer({ onNavigate, language }: FooterProps) {
           </div>
         </div>
 
-        <p className="mt-12 border-t border-slate-800 pt-6 text-center text-xs text-slate-400">{t.footer.copyright}</p>
+        <p className="mt-12 border-t border-slate-800 pt-6 text-center text-xs text-slate-400"><LocalizedValue value={t.footer.copyright} /></p>
       </div>
     </footer>
   );

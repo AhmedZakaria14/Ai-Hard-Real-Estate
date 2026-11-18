@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import React, { useState, useEffect } from 'react';
 import {
   Activity,
@@ -208,7 +209,7 @@ export const CMSProductionMonitoring: React.FC<CMSProductionMonitoringProps> = (
 
         <div className="flex items-center gap-2">
           {/* Category Filter */}
-          <select
+          <SearchableSelect
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
             className="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none cursor-pointer"
@@ -219,10 +220,10 @@ export const CMSProductionMonitoring: React.FC<CMSProductionMonitoringProps> = (
             <option value="failed_notification">{isAr ? 'فشل الإشعارات Notif' : 'Failed Notification'}</option>
             <option value="upload_error">{isAr ? 'أخطاء الرفع Upload' : 'Upload Error'}</option>
             <option value="publication_failure">{isAr ? 'فشل النشر Publish' : 'Publication Failure'}</option>
-          </select>
+          </SearchableSelect>
 
           {/* Status Classification Filter */}
-          <select
+          <SearchableSelect
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none cursor-pointer"
@@ -231,7 +232,7 @@ export const CMSProductionMonitoring: React.FC<CMSProductionMonitoringProps> = (
             <option value="DEFINITIVE_FAILURE">{isAr ? 'فشل مؤكد DEFINITIVE' : 'Definitive Failure'}</option>
             <option value="TEMPORARILY_UNKNOWN">{isAr ? 'غير معروف مؤقتاً UNKNOWN' : 'Temporarily Unknown'}</option>
             <option value="SUCCESS">{isAr ? 'نجاح SUCCESS' : 'Success'}</option>
-          </select>
+          </SearchableSelect>
         </div>
       </div>
 

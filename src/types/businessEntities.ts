@@ -1,4 +1,4 @@
-import { LocalizedText } from './firestore-schema';
+import { LocalizedText } from './backend-schema';
 
 export type SectorScope = 'realestate' | 'construction' | 'hvac' | 'group' | 'all';
 export type PublicationStatus = 'published' | 'draft' | 'archived';

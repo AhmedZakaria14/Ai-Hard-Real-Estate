@@ -4,7 +4,7 @@ import {
   canManageLeads,
   canManageSettings,
   AdminRole,
-} from "../types/firestore-schema";
+} from "../types/backend-schema";
 import {
   LayoutDashboard,
   Building,

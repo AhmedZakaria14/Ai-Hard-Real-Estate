@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import React, { useState, useEffect } from 'react';
 import {
   X,
@@ -415,7 +416,7 @@ export const CMSProjectFormModal: React.FC<CMSProjectFormModalProps> = ({
                   <label className="text-xs font-bold text-slate-700">
                     {isAr ? 'حالة المشروع' : 'Project Lifecycle Status'}
                   </label>
-                  <select
+                  <SearchableSelect
                     value={status}
                     onChange={(e) => setStatus(e.target.value as ProjectStatus)}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800"
@@ -424,7 +425,7 @@ export const CMSProjectFormModal: React.FC<CMSProjectFormModalProps> = ({
                     <option value="off-plan">{isAr ? 'إطلاق مرحلي أولي (Launch Phase)' : 'Launch Phase (Initial Allocation)'}</option>
                     <option value="under-construction">{isAr ? 'قيد الإنشاء والتطوير (Under Construction)' : 'Under Construction'}</option>
                     <option value="completed">{isAr ? 'مكتمل وجاهز للتسليم (Completed / Handover)' : 'Completed / Ready for Handover'}</option>
-                  </select>
+                  </SearchableSelect>
                 </div>
 
                 <div className="space-y-1">
@@ -557,7 +558,7 @@ export const CMSProjectFormModal: React.FC<CMSProjectFormModalProps> = ({
                 <label className="text-xs font-bold text-slate-700">
                   {isAr ? 'اختر المدينة من القائمة' : 'Select City from list'}
                 </label>
-                <select
+                <SearchableSelect
                   value={cityAr}
                   onChange={(e) => {
                     const match = SAUDI_CITIES.find((c) => c.ar === e.target.value || c.en === e.target.value);
@@ -576,7 +577,7 @@ export const CMSProjectFormModal: React.FC<CMSProjectFormModalProps> = ({
                       {c.ar} - {c.en}
                     </option>
                   ))}
-                </select>
+                </SearchableSelect>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -1,3 +1,8 @@
+import { LocalizedValue } from '../components/ui/LocalizedValue';
+import { WhatsAppIcon } from '../components/ui/WhatsAppIcon';
+import { SearchableSelect } from '../components/ui/SearchableSelect';
+import { InterfaceText } from '../components/ui/InterfaceText';
+import { ManagedImg } from '../components/ui/ManagedElements';
 import { usePropertyTypes } from '../lib/usePropertyTypes';
 import { getLocalizedText } from '../lib/utils';
 import { SECTOR_CONTACT_DETAILS } from '../lib/sectors';
@@ -107,7 +112,7 @@ export function HomePage({
       >
         {/* High-End Architectural Background Image with Gradient Overlay */}
         <div className="absolute inset-0 z-0 overflow-hidden">
-          <img
+          <ManagedImg copyScope="realestate.HomePage"
             src={publicRealEstateImage(hero?.bgImageUrl, defaultRealEstateHero.bgImageUrl)}
             alt="Luxury Modern Architecture"
             loading="eager"
@@ -123,18 +128,18 @@ export function HomePage({
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 w-full space-y-10 overflow-visible">
           <div className="max-w-3xl space-y-5">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-blue-200 shadow-sm">
-              <span>{t.home.heroTag}</span>
+              <span><LocalizedValue value={t.home.heroTag} /></span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight font-display-serif leading-tight">
-              {t.home.heroTitlePrefix}{' '}
+              <LocalizedValue value={t.home.heroTitlePrefix} /><LocalizedValue value={' '} />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-sky-200 to-blue-400">
-                {t.home.heroTitleHighlight}
+                <LocalizedValue value={t.home.heroTitleHighlight} />
               </span>
             </h1>
 
             <p className="text-sm sm:text-base lg:text-lg text-slate-300 max-w-2xl font-normal leading-relaxed">
-              {t.home.heroSubtitle}
+              <LocalizedValue value={t.home.heroSubtitle} />
             </p>
           </div>
 
@@ -154,7 +159,7 @@ export function HomePage({
                     activeTab === mode ? 'bg-hard-gradient text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100'
                   }`}
                 >
-                  {mode === 'all' ? (language === 'ar' ? 'الكل' : 'All') : t.home.searchTabs[mode]}
+                  <LocalizedValue value={mode === 'all' ? (language === 'ar' ? 'الكل' : 'All') : t.home.searchTabs[mode]} />
                 </button>
               ))}
             </div>
@@ -164,7 +169,7 @@ export function HomePage({
               {/* Location / City Input with embedded 50 Saudi cities dropdown & search */}
               <div>
                 <label htmlFor="hero-city-search" className="block text-[11px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
-                  {t.properties.filters.city}
+                  <LocalizedValue value={t.properties.filters.city} />
                 </label>
                 <CitySearchDropdown
                   value={searchLocation}
@@ -179,9 +184,9 @@ export function HomePage({
               {/* Property Type Dropdown */}
               <div>
                 <label htmlFor="hero-property-type" className="block text-[11px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
-                  {t.properties.filters.type}
+                  <LocalizedValue value={t.properties.filters.type} />
                 </label>
-                <select
+                <SearchableSelect
                   id="hero-property-type"
                   value={searchType}
                   onChange={(e) => setSearchType(e.target.value)}
@@ -191,15 +196,15 @@ export function HomePage({
                   {propertyTypes.filter((item) => item.active).map((item) => (
                     <option key={item.id} value={item.id}>{language === 'ar' ? item.nameAr : item.nameEn}</option>
                   ))}
-                </select>
+                </SearchableSelect>
               </div>
 
               {/* Price Range Dropdown */}
               <div>
                 <label htmlFor="hero-property-budget" className="block text-[11px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
-                  {t.properties.filters.priceRange}
+                  <LocalizedValue value={t.properties.filters.priceRange} />
                 </label>
-                <select
+                <SearchableSelect
                   id="hero-property-budget"
                   value={searchBudget}
                   onChange={(e) => setSearchBudget(e.target.value)}
@@ -223,7 +228,7 @@ export function HomePage({
                       <option value="12m+">{language === 'en' ? '12,000,000+ SAR' : '12,000,000+ ريال'}</option>
                     </>
                   )}
-                </select>
+                </SearchableSelect>
               </div>
 
               {/* Search Submit Button */}
@@ -234,7 +239,7 @@ export function HomePage({
                   className="w-full justify-center h-11 font-bold shadow-md cursor-pointer"
                 >
                   <Search className="w-4 h-4" />
-                  <span>{t.cta.viewAvailableProperties}</span>
+                  <span><LocalizedValue value={t.cta.viewAvailableProperties} /></span>
                 </Button>
               </div>
             </form>
@@ -251,14 +256,14 @@ export function HomePage({
                 <BrandLogo size="xs" language={language} variant="dark" isIconOnly />
               </div>
               <span className="text-xs font-bold tracking-wider uppercase text-blue-100">
-                {language === 'en' ? 'Sell or Lease with HARD' : 'اعرض عقارك للبيع أو الإيجار'}
+                {language === 'en' ? <InterfaceText id="realestate.HomePage.k1kzx879" source="Sell or Lease with HARD" /> : <InterfaceText id="realestate.HomePage.k1mk62gy" source="اعرض عقارك للبيع أو الإيجار" />}
               </span>
             </div>
             <h3 className="text-2xl sm:text-3xl font-extrabold font-display-serif">
-              {t.home.marketingBannerTitle}
+              <LocalizedValue value={t.home.marketingBannerTitle} />
             </h3>
             <p className="text-xs sm:text-sm text-blue-50 leading-relaxed">
-              {t.home.marketingBannerSubtitle}
+              <LocalizedValue value={t.home.marketingBannerSubtitle} />
             </p>
           </div>
 
@@ -269,7 +274,7 @@ export function HomePage({
               onClick={onOpenListPropertyModal}
               className="font-bold text-blue-900 shadow-xl"
             >
-              <span>{t.cta.listProperty}</span>
+              <span><LocalizedValue value={t.cta.listProperty} /></span>
               <ArrowIcon className="w-4 h-4" />
             </Button>
           </div>
@@ -285,10 +290,10 @@ export function HomePage({
               className="flex flex-col items-center justify-center text-center space-y-1.5 px-3 py-2"
             >
               <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-blue-700 font-display-serif tracking-tight text-center">
-                <bdi dir="ltr">{stat.value}</bdi>
+                <bdi dir="ltr"><LocalizedValue value={stat.value} /></bdi>
               </div>
               <div className="text-xs sm:text-sm text-slate-600 font-medium text-center leading-snug">
-                {stat.label}
+                <LocalizedValue value={stat.label} />
               </div>
             </div>
           ))}
@@ -303,10 +308,10 @@ export function HomePage({
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div className="space-y-2 max-w-2xl">
             <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 font-display-serif tracking-tight">
-              {t.home.featuredSectionTitle}
+              <LocalizedValue value={t.home.featuredSectionTitle} />
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              {t.home.featuredSectionSubtitle}
+              <LocalizedValue value={t.home.featuredSectionSubtitle} />
             </p>
           </div>
 
@@ -315,7 +320,7 @@ export function HomePage({
             onClick={(e) => handleSemanticClick(e, () => onNavigate('properties'))}
             className="self-start sm:self-auto inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 text-slate-800 text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
           >
-            <span>{t.cta.viewAvailableProperties}</span>
+            <span><LocalizedValue value={t.cta.viewAvailableProperties} /></span>
             <ArrowIcon className="w-3.5 h-3.5" />
           </a>
         </div>
@@ -352,7 +357,7 @@ export function HomePage({
         <section id="project-spotlight" className="max-w-7xl mx-auto space-y-4 px-4 sm:px-6 lg:px-8">
           <div id="project-spotlight-slide" aria-live="polite" className="bg-slate-900 text-white rounded-3xl overflow-hidden border border-slate-800 shadow-2xl grid grid-cols-1 lg:grid-cols-12">
             <div className="lg:col-span-6 relative aspect-16/10 lg:aspect-auto overflow-hidden bg-slate-950">
-              <img
+              <ManagedImg copyScope="realestate.HomePage"
                 key={spotlightProject.id}
                 src={spotlightProject.image || spotlightProject.gallery?.[0]}
                 alt={getLocalizedText(spotlightProject.title, language)}
@@ -362,7 +367,7 @@ export function HomePage({
               {spotlightProject.financialMetric?.isVerified ? (
                 <div className="absolute top-4 start-4 bg-emerald-600 text-white text-xs px-3 py-1 rounded-full font-bold shadow-md flex items-center gap-1.5">
                   <TrendingUp className="w-3.5 h-3.5" />
-                  <span>{spotlightProject.financialMetric.value} {spotlightProject.financialMetric.metricLabel?.[language]}</span>
+                  <span><LocalizedValue value={spotlightProject.financialMetric.value} /> <LocalizedValue value={spotlightProject.financialMetric.metricLabel?.[language]} /></span>
                 </div>
               ) : (
                 <div
@@ -370,7 +375,7 @@ export function HomePage({
                   title={spotlightProject.financialMetric?.statusNote?.[language]}
                 >
                   <ShieldAlert className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                  <span>{spotlightProject.financialMetric?.verificationStatus?.[language] || spotlightProject.roiProjected}</span>
+                  <span><LocalizedValue value={spotlightProject.financialMetric?.verificationStatus?.[language] || spotlightProject.roiProjected} /></span>
                 </div>
               )}
             </div>
@@ -378,45 +383,45 @@ export function HomePage({
             <div className="lg:col-span-6 p-6 sm:p-10 flex flex-col justify-between space-y-6">
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <Badge variant="primary">{language === 'en' ? 'Exclusive Master Project' : 'مشروع تطويري حصري'}</Badge>
-                  <span className="text-xs text-blue-300 font-medium">{getLocalizedText(spotlightProject.developer, language)}</span>
+                  <Badge variant="primary">{language === 'en' ? <InterfaceText id="realestate.HomePage.k1k7jzz2" source="Exclusive Master Project" /> : <InterfaceText id="realestate.HomePage.k1j15a47" source="مشروع تطويري حصري" />}</Badge>
+                  <span className="text-xs text-blue-300 font-medium"><LocalizedValue value={getLocalizedText(spotlightProject.developer, language)} /></span>
                 </div>
 
                 <h3 className="text-2xl sm:text-3xl font-extrabold font-display-serif">
-                  {getLocalizedText(spotlightProject.title, language)}
+                  <LocalizedValue value={getLocalizedText(spotlightProject.title, language)} />
                 </h3>
 
                 <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  {getLocalizedText(spotlightProject.description, language)}
+                  <LocalizedValue value={getLocalizedText(spotlightProject.description, language)} />
                 </p>
 
                 {spotlightProject.financialMetric && !spotlightProject.financialMetric.isVerified && spotlightProject.financialMetric.statusNote && (
                   <div className="p-3 bg-amber-950/40 border border-amber-500/30 rounded-2xl text-[11px] text-amber-200 leading-relaxed">
-                    <strong className="text-amber-400 block mb-0.5">{language === 'en' ? 'Financial Audit Notice:' : 'إشعار التدقيق المالي:'}</strong>
-                    <span>{spotlightProject.financialMetric.statusNote[language]}</span>
+                    <strong className="text-amber-400 block mb-0.5">{language === 'en' ? <InterfaceText id="realestate.HomePage.kdk6zv1" source="Financial Audit Notice:" /> : <InterfaceText id="realestate.HomePage.k1iwuaoc" source="إشعار التدقيق المالي:" />}</strong>
+                    <span><LocalizedValue value={spotlightProject.financialMetric.statusNote[language]} /></span>
                   </div>
                 )}
 
                 <div className="grid grid-cols-2 gap-3 pt-2">
                   <div className="p-3.5 bg-slate-800/80 rounded-2xl border border-slate-700">
-                    <span className="text-[11px] text-slate-400 block font-medium">{t.projects.startingFrom}:</span>
+                    <span className="text-[11px] text-slate-400 block font-medium"><LocalizedValue value={t.projects.startingFrom} />:</span>
                     <strong className="text-base sm:text-lg text-blue-400 font-display-serif">
-                      {spotlightProject.startingPriceSAR}
+                      <LocalizedValue value={spotlightProject.startingPriceSAR} />
                     </strong>
                   </div>
                   <div className="p-3.5 bg-slate-800/80 rounded-2xl border border-slate-700">
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-slate-400 block font-medium">{t.projects.handover}:</span>
+                      <span className="text-[11px] text-slate-400 block font-medium"><LocalizedValue value={t.projects.handover} />:</span>
                       <span className="text-[10px] text-slate-400 font-mono">
-                        {spotlightProject.lastUpdated || '2026-10-09'}
+                        <LocalizedValue value={spotlightProject.lastUpdated || '2026-10-09'} />
                       </span>
                     </div>
                     <strong className="text-base sm:text-lg text-slate-200 font-medium block">
-                      {getLocalizedText(spotlightProject.handoverDate, language)}
+                      <LocalizedValue value={getLocalizedText(spotlightProject.handoverDate, language)} />
                     </strong>
                     <div className="mt-1 flex items-center justify-between text-[10px] text-slate-400">
-                      <span>{t.projects.progress}: {spotlightProject.progressPercentage ?? 0}%</span>
-                      <span className="text-blue-400 font-semibold">{t.projects.underConstruction}</span>
+                      <span><LocalizedValue value={t.projects.progress} />: <LocalizedValue value={spotlightProject.progressPercentage ?? 0} />%</span>
+                      <span className="text-blue-400 font-semibold"><LocalizedValue value={t.projects.underConstruction} /></span>
                     </div>
                   </div>
                 </div>
@@ -428,7 +433,7 @@ export function HomePage({
                   onClick={(e) => handleSemanticClick(e, () => onNavigate('projects'))}
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold justify-center shadow-lg transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
                 >
-                  <span>{t.cta.exploreProjects}</span>
+                  <span><LocalizedValue value={t.cta.exploreProjects} /></span>
                   <ArrowIcon className="w-4 h-4" />
                 </a>
                 <Button
@@ -440,8 +445,8 @@ export function HomePage({
                   variant="whatsapp"
                   className="justify-center"
                 >
-                  <MessageCircle className="size-4" aria-hidden="true" />
-                  <span>{language === 'ar' ? 'واتساب' : 'WhatsApp'}</span>
+                  <WhatsAppIcon className="size-4" aria-hidden="true" />
+                  <span>{language === 'ar' ? <InterfaceText id="realestate.HomePage.k1bmgmig" source="واتساب" /> : <InterfaceText id="realestate.HomePage.k1d5zzif" source="WhatsApp" />}</span>
                 </Button>
               </div>
             </div>
@@ -452,7 +457,7 @@ export function HomePage({
               onClick={() => setProjectIndex((index) => (index + projects.length - 1) % projects.length)}>
               <PreviousProjectIcon className="size-5" aria-hidden="true" />
             </Button>
-            <bdi dir="ltr" className="text-sm text-slate-600">{projectIndex + 1} / {projects.length}</bdi>
+            <bdi dir="ltr" className="text-sm text-slate-600"><LocalizedValue value={projectIndex + 1} /> / <LocalizedValue value={projects.length} /></bdi>
             <Button type="button" size="icon" variant="outline" aria-controls="project-spotlight-slide"
               aria-label={language === 'ar' ? 'المشروع التالي' : 'Next project'}
               onClick={() => setProjectIndex((index) => (index + 1) % projects.length)}>

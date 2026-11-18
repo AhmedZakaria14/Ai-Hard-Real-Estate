@@ -1,3 +1,7 @@
+import { LocalizedValue } from '../ui/LocalizedValue';
+import { SearchableSelect } from '../ui/SearchableSelect';
+import { InterfaceText } from '../ui/InterfaceText';
+import { ManagedImg, ManagedInput, ManagedTextarea } from '../ui/ManagedElements';
 import React, { useState } from 'react';
 import {
   X,
@@ -75,7 +79,7 @@ export function HVACShowcaseModal({
       <div className="relative w-full max-w-4xl bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden text-slate-900 my-8">
         {/* Header Banner */}
         <div className="relative h-48 sm:h-56 bg-slate-900 overflow-hidden">
-          <img
+          <ManagedImg copyScope="realestate.HVACShowcaseModal"
             src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1200&q=80"
             alt="HARD HVAC Maintenance"
             className="w-full h-full object-cover opacity-40 scale-105"
@@ -96,17 +100,17 @@ export function HVACShowcaseModal({
             <div className="space-y-1.5 text-start">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 text-xs font-bold tracking-wide">
                 <ThermometerSnowflake className="w-3.5 h-3.5 text-sky-400" />
-                <span>{isAr ? 'قطاع التكييف والخدمات الكهروميكانيكية' : 'HVAC & Mechanical Maintenance Division'}</span>
+                <span>{isAr ? <InterfaceText id="realestate.HVACShowcaseModal.k1y8q6lq" source="قطاع التكييف والخدمات الكهروميكانيكية" /> : <InterfaceText id="realestate.HVACShowcaseModal.k1y7qr6i" source="HVAC & Mechanical Maintenance Division" />}</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold font-display-serif text-white">
-                {isAr ? 'هارد لصيانة وتشغيل أنظمة التكييف' : 'HARD HVAC Maintenance & Climate Services'}
+                {isAr ? <InterfaceText id="realestate.HVACShowcaseModal.kc0i0eo" source="هارد لصيانة وتشغيل أنظمة التكييف" /> : <InterfaceText id="realestate.HVACShowcaseModal.k16ov6ic" source="HARD HVAC Maintenance & Climate Services" />}
               </h2>
             </div>
 
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 bg-sky-500/20 text-sky-300 border border-sky-500/30 rounded-xl text-xs font-bold flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5" />
-                <span>{isAr ? 'طوارئ 24/7' : '24/7 Emergency Line'}</span>
+                <span>{isAr ? <InterfaceText id="realestate.HVACShowcaseModal.k1p5wy68" source="طوارئ 24/7" /> : <InterfaceText id="realestate.HVACShowcaseModal.k9lqa5a" source="24/7 Emergency Line" />}</span>
               </span>
             </div>
           </div>
@@ -118,12 +122,12 @@ export function HVACShowcaseModal({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2 space-y-4 text-start">
               <h3 className="text-lg font-bold text-slate-900 font-display-serif">
-                {isAr ? 'حلول التبريد والتحكم بالمناخ الذكي' : 'Engineered Climate Control & Operational Reliability'}
+                {isAr ? <InterfaceText id="realestate.HVACShowcaseModal.k186a814" source="حلول التبريد والتحكم بالمناخ الذكي" /> : <InterfaceText id="realestate.HVACShowcaseModal.kojz9ql" source="Engineered Climate Control & Operational Reliability" />}
               </h3>
               <p className="text-sm text-slate-600 leading-relaxed">
                 {isAr
-                  ? 'تقدم شركة هارد لحلول وصيانة التكييف أعلى معايير الصيانة الميكانيكية والهندسية لمنظومات التبريد المركزي والشيلرات ووحدات VRF في الأبراج السكنية والتجارية والمراكز اللوجستية. نضمن أقصى درجات كفاءة الطاقة وراحة المستخدمين على مدار الساعة مع تقليل تكاليف الاستهلاك.'
-                  : 'HARD HVAC Maintenance delivers mission-critical heating, ventilation, and air conditioning engineering services across Saudi Arabia. From commercial chillers and VRF systems to comprehensive Annual Maintenance Contracts, we safeguard your building climate with certified technicians and proactive telemetry.'}
+                  ? <InterfaceText id="realestate.HVACShowcaseModal.k1pbz7o9" source="تقدم شركة هارد لحلول وصيانة التكييف أعلى معايير الصيانة الميكانيكية والهندسية لمنظومات التبريد المركزي والشيلرات ووحدات VRF في الأبراج السكنية والتجارية والمراكز اللوجستية. نضمن أقصى درجات كفاءة الطاقة وراحة المستخدمين على مدار الساعة مع تقليل تكاليف الاستهلاك." />
+                  : <InterfaceText id="realestate.HVACShowcaseModal.k17kgcbi" source="HARD HVAC Maintenance delivers mission-critical heating, ventilation, and air conditioning engineering services across Saudi Arabia. From commercial chillers and VRF systems to comprehensive Annual Maintenance Contracts, we safeguard your building climate with certified technicians and proactive telemetry." />}
               </p>
 
               {/* Capabilities Grid */}
@@ -135,9 +139,9 @@ export function HVACShowcaseModal({
                   >
                     <div className="flex items-center gap-2 text-sky-600">
                       <CheckCircle2 className="w-4 h-4 shrink-0" />
-                      <h4 className="text-xs font-bold text-slate-900">{svc.title}</h4>
+                      <h4 className="text-xs font-bold text-slate-900"><LocalizedValue value={svc.title} /></h4>
                     </div>
-                    <p className="text-[11px] text-slate-600 leading-normal">{svc.desc}</p>
+                    <p className="text-[11px] text-slate-600 leading-normal"><LocalizedValue value={svc.desc} /></p>
                   </div>
                 ))}
               </div>
@@ -147,26 +151,26 @@ export function HVACShowcaseModal({
             <div className="space-y-4">
               <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3 text-start">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  {isAr ? 'مؤشرات كفاءة الصيانة' : 'Operational Service SLA'}
+                  {isAr ? <InterfaceText id="realestate.HVACShowcaseModal.k13pg0vt" source="مؤشرات كفاءة الصيانة" /> : <InterfaceText id="realestate.HVACShowcaseModal.k1dy70fu" source="Operational Service SLA" />}
                 </h4>
                 <div className="space-y-2">
                   <div>
-                    <div className="text-2xl font-bold text-slate-900 font-display-serif">99.8%</div>
-                    <div className="text-[11px] text-slate-500">{isAr ? 'جاهزية أنظمة التبريد المركزية' : 'Cooling System Uptime'}</div>
+                    <div className="text-2xl font-bold text-slate-900 font-display-serif"><LocalizedValue value="99.8%" /></div>
+                    <div className="text-[11px] text-slate-500">{isAr ? <InterfaceText id="realestate.HVACShowcaseModal.kgs9hj7" source="جاهزية أنظمة التبريد المركزية" /> : <InterfaceText id="realestate.HVACShowcaseModal.kg0ixlv" source="Cooling System Uptime" />}</div>
                   </div>
                   <div className="border-t border-slate-200 pt-2">
-                    <div className="text-2xl font-bold text-sky-600 font-display-serif">500+</div>
-                    <div className="text-[11px] text-slate-500">{isAr ? 'مرفق ومبنى تحت عقود الصيانة' : 'Maintained Commercial Facilities'}</div>
+                    <div className="text-2xl font-bold text-sky-600 font-display-serif"><LocalizedValue value="500+" /></div>
+                    <div className="text-[11px] text-slate-500">{isAr ? <InterfaceText id="realestate.HVACShowcaseModal.k89en8d" source="مرفق ومبنى تحت عقود الصيانة" /> : <InterfaceText id="realestate.HVACShowcaseModal.kiilq1u" source="Maintained Commercial Facilities" />}</div>
                   </div>
                 </div>
               </div>
 
               {/* Direct Hotlines */}
               <div className="p-4 rounded-xl bg-sky-50 border border-sky-100 space-y-2 text-xs text-start">
-                <span className="font-bold text-sky-900 block">{isAr ? 'طوارئ وبلاغات التكييف السريعة:' : '24/7 HVAC Emergency Dispatch:'}</span>
+                <span className="font-bold text-sky-900 block">{isAr ? <InterfaceText id="realestate.HVACShowcaseModal.k1fqok6o" source="طوارئ وبلاغات التكييف السريعة:" /> : <InterfaceText id="realestate.HVACShowcaseModal.k26q7yw" source="24/7 HVAC Emergency Dispatch:" />}</span>
                 <div className="flex items-center gap-2 text-slate-700 dir-ltr">
                   <Phone className="w-3.5 h-3.5 text-sky-600" />
-                  <span>+966 13 800 4274</span>
+                  <span><LocalizedValue value="+966 13 800 4274" /></span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-700 dir-ltr">
                   <Mail className="w-3.5 h-3.5 text-sky-600" />
@@ -181,21 +185,21 @@ export function HVACShowcaseModal({
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <FileText className="w-4 h-4 text-sky-600" />
-                <span>{isAr ? 'طلب عرض سعر صيانة أو معاينة موقع' : 'Request Maintenance Quote or Site Survey'}</span>
+                <span>{isAr ? <InterfaceText id="realestate.HVACShowcaseModal.k95nu59" source="طلب عرض سعر صيانة أو معاينة موقع" /> : <InterfaceText id="realestate.HVACShowcaseModal.k11xdzix" source="Request Maintenance Quote or Site Survey" />}</span>
               </h3>
-              <span className="text-xs text-slate-500">{isAr ? 'فحص مجاني للمنشآت الكبرى' : 'Complimentary Assessment'}</span>
+              <span className="text-xs text-slate-500">{isAr ? <InterfaceText id="realestate.HVACShowcaseModal.kz5erzd" source="فحص مجاني للمنشآت الكبرى" /> : <InterfaceText id="realestate.HVACShowcaseModal.k1hhd93p" source="Complimentary Assessment" />}</span>
             </div>
 
             {submitted ? (
               <div className="p-6 rounded-xl bg-sky-50 border border-sky-200 text-center space-y-2 animate-in zoom-in-95">
                 <CheckCircle2 className="w-8 h-8 text-sky-600 mx-auto" />
                 <h4 className="text-sm font-bold text-sky-900">
-                  {isAr ? 'تم استلام طلب صيانة التكييف بنجاح!' : 'HVAC Service Request Dispatched!'}
+                  {isAr ? <InterfaceText id="realestate.HVACShowcaseModal.k1x8kf0k" source="تم استلام طلب صيانة التكييف بنجاح!" /> : <InterfaceText id="realestate.HVACShowcaseModal.k1czymzz" source="HVAC Service Request Dispatched!" />}
                 </h4>
                 <p className="text-xs text-slate-600">
                   {isAr
-                    ? 'سيقوم كبير مهندسي التكييف والتبريد بالتواصل معك لترتيب الزيارة الفنية أو إرسال تفاصيل عقد الصيانة.'
-                    : 'Our senior HVAC engineer will contact you shortly to schedule an on-site inspection or provide a tailored AMC proposal.'}
+                    ? <InterfaceText id="realestate.HVACShowcaseModal.k1x2q4rv" source="سيقوم كبير مهندسي التكييف والتبريد بالتواصل معك لترتيب الزيارة الفنية أو إرسال تفاصيل عقد الصيانة." />
+                    : <InterfaceText id="realestate.HVACShowcaseModal.ktma2z2" source="Our senior HVAC engineer will contact you shortly to schedule an on-site inspection or provide a tailored AMC proposal." />}
                 </p>
               </div>
             ) : (
@@ -203,9 +207,9 @@ export function HVACShowcaseModal({
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <label className="block text-xs font-medium text-slate-700 mb-1 text-start">
-                      {isAr ? 'اسم العميل / المبنى' : 'Client / Facility Name'} *
+                      {isAr ? <InterfaceText id="realestate.HVACShowcaseModal.k1tpp47z" source="اسم العميل / المبنى" /> : <InterfaceText id="realestate.HVACShowcaseModal.kncexhv" source="Client / Facility Name" />} <span className="text-red-600">*</span>
                     </label>
-                    <input
+                    <ManagedInput copyScope="realestate.HVACShowcaseModal"
                       type="text"
                       required
                       value={formData.name}
@@ -217,9 +221,9 @@ export function HVACShowcaseModal({
 
                   <div>
                     <label className="block text-xs font-medium text-slate-700 mb-1 text-start">
-                      {isAr ? 'رقم الجوال' : 'Phone Number'} *
+                      {isAr ? <InterfaceText id="realestate.HVACShowcaseModal.khf873v" source="رقم الجوال" /> : <InterfaceText id="realestate.HVACShowcaseModal.k1v8ev2w" source="Phone Number" />} <span className="text-red-600">*</span>
                     </label>
-                    <input
+                    <ManagedInput copyScope="realestate.HVACShowcaseModal"
                       type="tel"
                       required
                       value={formData.phone}
@@ -231,9 +235,9 @@ export function HVACShowcaseModal({
 
                   <div>
                     <label className="block text-xs font-medium text-slate-700 mb-1 text-start">
-                      {isAr ? 'نوع الخدمة المطلوبة' : 'Requested Service'}
+                      {isAr ? <InterfaceText id="realestate.HVACShowcaseModal.kyhfsl4" source="نوع الخدمة المطلوبة" /> : <InterfaceText id="realestate.HVACShowcaseModal.k1opxcko" source="Requested Service" />}
                     </label>
-                    <select
+                    <SearchableSelect
                       value={formData.serviceType}
                       onChange={(e) => setFormData({ ...formData, serviceType: e.target.value })}
                       className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 focus:outline-none"
@@ -242,15 +246,15 @@ export function HVACShowcaseModal({
                       <option value="emergency">{isAr ? 'إصلاح عطل طارئ فوري' : 'Immediate Emergency Repair'}</option>
                       <option value="duct">{isAr ? 'تنظيف وتعقيم مجاري الهواء (Duct)' : 'Air Duct Cleaning & Sanitation'}</option>
                       <option value="installation">{isAr ? 'توريد وتركيب نظام تكييف جديد' : 'New HVAC System Installation'}</option>
-                    </select>
+                    </SearchableSelect>
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-xs font-medium text-slate-700 mb-1 text-start">
-                    {isAr ? 'تفاصيل المنظومة أو الأعطال الملاحظة' : 'System Details / Issues Observed'}
+                    {isAr ? <InterfaceText id="realestate.HVACShowcaseModal.ksr8ykl" source="تفاصيل المنظومة أو الأعطال الملاحظة" /> : <InterfaceText id="realestate.HVACShowcaseModal.k1fc2zjb" source="System Details / Issues Observed" />}
                   </label>
-                  <textarea
+                  <ManagedTextarea copyScope="realestate.HVACShowcaseModal"
                     rows={2}
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -265,13 +269,13 @@ export function HVACShowcaseModal({
                     onClick={onClose}
                     className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer"
                   >
-                    {isAr ? 'إغلاق' : 'Close'}
+                    {isAr ? <InterfaceText id="realestate.HVACShowcaseModal.kysudiz" source="إغلاق" /> : <InterfaceText id="realestate.HVACShowcaseModal.k1l0xxoj" source="Close" />}
                   </button>
                   <button
                     type="submit"
                     className="px-6 py-2.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-500 text-white flex items-center gap-2 shadow-xs cursor-pointer transition-colors"
                   >
-                    <span>{isAr ? 'إرسال طلب فحص وصيانة التكييف' : 'Submit Service Dispatch'}</span>
+                    <span>{isAr ? <InterfaceText id="realestate.HVACShowcaseModal.k1p5bqan" source="إرسال طلب فحص وصيانة التكييف" /> : <InterfaceText id="realestate.HVACShowcaseModal.ki3e4c0" source="Submit Service Dispatch" />}</span>
                     <ArrowIcon className="w-3.5 h-3.5" />
                   </button>
                 </div>

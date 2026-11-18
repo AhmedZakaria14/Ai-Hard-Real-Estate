@@ -1,3 +1,8 @@
+import { LocalizedValue } from '../ui/LocalizedValue';
+import { useCustomerFormConfig, ConfiguredFormFields } from '../forms/ConfiguredFormFields';
+import { SearchableSelect } from '../ui/SearchableSelect';
+import { InterfaceText } from '../ui/InterfaceText';
+import { ManagedButton, ManagedInput, ManagedTextarea } from '../ui/ManagedElements';
 import { usePropertyTypes } from '../../lib/usePropertyTypes';
 import React, { useState } from 'react';
 import {
@@ -13,7 +18,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { Language } from '../../types';
-import { FormAttachmentMeta } from '../../types/firestore-schema';
+import { FormAttachmentMeta } from '../../types/backend-schema';
 import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSubmissionService';
 import { GoogleMapPickerModal } from './GoogleMapPickerModal';
 import { FileUploadZone } from '../forms/FileUploadZone';
@@ -36,6 +41,8 @@ export function ListPropertyModal({
   onClose,
   language,
 }: ListPropertyModalProps) {
+  const formConfig = useCustomerFormConfig('list_property');
+
   const propertyTypes = usePropertyTypes();
   const isAr = language === 'ar';
 
@@ -121,7 +128,7 @@ export function ListPropertyModal({
     }
 
     try {
-      const result = await submitCustomerForm({
+      const result = await formConfig.submit({
         formType: userRole === 'owner' ? 'list_property' : 'property_inquiry',
         sector: 'realestate',
         name: fullName.trim(),
@@ -198,17 +205,17 @@ export function ListPropertyModal({
                 <span>
                   {submittedRole === 'owner'
                     ? isAr
-                      ? 'تم تسجيل طلب إدراج وعرض العقار بنجاح!'
-                      : 'Property Listing Request Dispatched!'
+                      ? <InterfaceText id="realestate.ListPropertyModal.kekh2ij" source="تم تسجيل طلب إدراج وعرض العقار بنجاح!" />
+                      : <InterfaceText id="realestate.ListPropertyModal.k1vwdjx7" source="Property Listing Request Dispatched!" />
                     : isAr
-                    ? 'تم تسجيل طلب البحث عن عقار بنجاح!'
-                    : 'Property Search Request Dispatched!'}
+                    ? <InterfaceText id="realestate.ListPropertyModal.k1bg2rha" source="تم تسجيل طلب البحث عن عقار بنجاح!" />
+                    : <InterfaceText id="realestate.ListPropertyModal.kggvclz" source="Property Search Request Dispatched!" />}
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-emerald-900 leading-relaxed">
                 {isAr
-                  ? 'تم حفظ طلبك وتوجيهه مباشرة لقسم الوساطة والتسويق العقاري في هارد للعقارات. سيتواصل معك مستشار متخصص خلال يوم عمل واحد.'
-                  : 'Your request has been registered and routed directly to the HARD Group brokerage team. A certified manager will contact you within one business day.'}
+                  ? <InterfaceText id="realestate.ListPropertyModal.k53vf7s" source="تم حفظ طلبك وتوجيهه مباشرة لقسم الوساطة والتسويق العقاري في هارد للعقارات. سيتواصل معك مستشار متخصص خلال يوم عمل واحد." />
+                  : <InterfaceText id="realestate.ListPropertyModal.k1lk51jf" source="Your request has been registered and routed directly to the HARD Group brokerage team. A certified manager will contact you within one business day." />}
               </p>
             </div>
 
@@ -217,40 +224,40 @@ export function ListPropertyModal({
               <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                 <span className="font-bold text-slate-800 flex items-center gap-1.5">
                   <FileText className="w-4 h-4 text-blue-600" />
-                  {isAr ? 'تفاصيل الطلب المسجلة:' : 'Registered Payload Summary:'}
+                  {isAr ? <InterfaceText id="realestate.ListPropertyModal.khsxjom" source="تفاصيل الطلب المسجلة:" /> : <InterfaceText id="realestate.ListPropertyModal.k1jekvr" source="Registered Payload Summary:" />}
                 </span>
                 <span className="font-mono font-bold text-slate-900 bg-white px-2 py-0.5 border border-slate-200 rounded-md">
-                  {referenceId}
+                  <LocalizedValue value={referenceId} />
                 </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-700">
                 <div>
-                  <span className="text-slate-400 block">{isAr ? 'مسار الطلب / الصفة:' : 'User Intent Role:'}</span>
-                  <strong className="text-slate-900">{submittedIntentLabel}</strong>
+                  <span className="text-slate-400 block">{isAr ? <InterfaceText id="realestate.ListPropertyModal.k1i0gtzu" source="مسار الطلب / الصفة:" /> : <InterfaceText id="realestate.ListPropertyModal.k1os0pa2" source="User Intent Role:" />}</span>
+                  <strong className="text-slate-900"><LocalizedValue value={submittedIntentLabel} /></strong>
                 </div>
                 <div>
-                  <span className="text-slate-400 block">{isAr ? 'نوع العقار:' : 'Property Type:'}</span>
-                  <strong className="text-slate-900">{submittedPropertyTypeLabel}</strong>
+                  <span className="text-slate-400 block">{isAr ? <InterfaceText id="realestate.ListPropertyModal.k1wybrj8" source="نوع العقار:" /> : <InterfaceText id="realestate.ListPropertyModal.k1t5bu7y" source="Property Type:" />}</span>
+                  <strong className="text-slate-900"><LocalizedValue value={submittedPropertyTypeLabel} /></strong>
                 </div>
                 <div>
-                  <span className="text-slate-400 block">{isAr ? 'صاحب الطلب:' : 'Applicant Name:'}</span>
-                  <strong className="text-slate-900">{fullName}</strong>
+                  <span className="text-slate-400 block">{isAr ? <InterfaceText id="realestate.ListPropertyModal.k1pay3um" source="صاحب الطلب:" /> : <InterfaceText id="realestate.ListPropertyModal.kb8atnq" source="Applicant Name:" />}</span>
+                  <strong className="text-slate-900"><LocalizedValue value={fullName} /></strong>
                 </div>
                 <div>
-                  <span className="text-slate-400 block">{isAr ? 'وسيلة التواصل:' : 'Contact Method:'}</span>
-                  <strong className="text-blue-700 font-mono">{phone || email}</strong>
+                  <span className="text-slate-400 block">{isAr ? <InterfaceText id="realestate.ListPropertyModal.k12adwxw" source="وسيلة التواصل:" /> : <InterfaceText id="realestate.ListPropertyModal.k1nwayde" source="Contact Method:" />}</span>
+                  <strong className="text-blue-700 font-mono"><LocalizedValue value={phone || email} /></strong>
                 </div>
               </div>
 
               <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-slate-600">
                 <span className="flex items-center gap-1 font-semibold text-blue-600">
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>{isAr ? 'مزامنة الـ CRM: مكتملة' : 'CRM Integration: Active'}</span>
+                  <span>{isAr ? <InterfaceText id="realestate.ListPropertyModal.ks6h1y2" source="مزامنة الـ CRM: مكتملة" /> : <InterfaceText id="realestate.ListPropertyModal.k1l435gh" source="CRM Integration: Active" />}</span>
                 </span>
                 <span className="flex items-center gap-1 text-emerald-700 font-semibold">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>{isAr ? 'توثيق رسمي غير ملزم' : 'Verified Request'}</span>
+                  <span>{isAr ? <InterfaceText id="realestate.ListPropertyModal.k1di6t48" source="توثيق رسمي غير ملزم" /> : <InterfaceText id="realestate.ListPropertyModal.kyouv4" source="Verified Request" />}</span>
                 </span>
               </div>
             </div>
@@ -270,7 +277,7 @@ export function ListPropertyModal({
                 className="w-full sm:w-auto flex-1 justify-center"
               >
                 <MessageSquare className="w-4 h-4" />
-                <span>{isAr ? 'متابعة مباشرة عبر واتساب' : 'Follow up via WhatsApp'}</span>
+                <span>{isAr ? <InterfaceText id="realestate.ListPropertyModal.kt90ani" source="متابعة مباشرة عبر واتساب" /> : <InterfaceText id="realestate.ListPropertyModal.k1bi19rt" source="Follow up via WhatsApp" />}</span>
               </Button>
 
               <Button
@@ -279,19 +286,20 @@ export function ListPropertyModal({
                 onClick={handleReset}
                 className="w-full sm:w-auto text-slate-700 border-slate-300"
               >
-                <span>{isAr ? 'إغلاق النافذة' : 'Close Window'}</span>
+                <span>{isAr ? <InterfaceText id="realestate.ListPropertyModal.kd1pq17" source="إغلاق النافذة" /> : <InterfaceText id="realestate.ListPropertyModal.k1jos4bt" source="Close Window" />}</span>
               </Button>
             </div>
           </div>
         ) : (
           /* Main Interactive Form with Prominent Intent Entry Choices */
           <form onSubmit={handleSubmit} className="space-y-5 pt-1">
+            <ConfiguredFormFields form={formConfig} language={language} />
             {/* ========================================================================= */}
             {/* PROMINENT ENTRY CHOICE CARDS (Owner vs Buyer/Tenant)                     */}
             {/* ========================================================================= */}
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider text-start">
-                {isAr ? '١. اختر نوع الخدمة المطلوبة:' : '1. Choose the service you need:'}
+                {isAr ? <InterfaceText id="realestate.ListPropertyModal.k189gqqt" source="١. اختر نوع الخدمة المطلوبة:" /> : <InterfaceText id="realestate.ListPropertyModal.k1uikh6i" source="1. Choose the service you need:" />}
               </label>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -322,13 +330,13 @@ export function ListPropertyModal({
                           : 'bg-slate-200/80 text-slate-600'
                       }`}
                     >
-                      {isAr ? 'للمُلاّك' : 'For Owners'}
+                      {isAr ? <InterfaceText id="realestate.ListPropertyModal.kn80i2s" source="للمُلاّك" /> : <InterfaceText id="realestate.ListPropertyModal.k1dmqbbg" source="For Owners" />}
                     </span>
                   </div>
 
                   <div>
                     <h4 className="text-sm font-bold font-display-serif">
-                      {isAr ? 'عرض/إدراج عقار' : 'List My Property'}
+                      {isAr ? <InterfaceText id="realestate.ListPropertyModal.kwj8iyb" source="عرض/إدراج عقار" /> : <InterfaceText id="realestate.ListPropertyModal.k1sgmote" source="List My Property" />}
                     </h4>
                     <p
                       className={`text-xs mt-1 leading-relaxed ${
@@ -336,8 +344,8 @@ export function ListPropertyModal({
                       }`}
                     >
                       {isAr
-                        ? 'أنا مالك وأبحث عن بيع أو تأجير عقاري'
-                        : 'I own a property and want to sell or rent it out'}
+                        ? <InterfaceText id="realestate.ListPropertyModal.k1tndvhv" source="أنا مالك وأبحث عن بيع أو تأجير عقاري" />
+                        : <InterfaceText id="realestate.ListPropertyModal.k12kcpor" source="I own a property and want to sell or rent it out" />}
                     </p>
                   </div>
                 </button>
@@ -369,13 +377,13 @@ export function ListPropertyModal({
                           : 'bg-slate-200/80 text-slate-600'
                       }`}
                     >
-                      {isAr ? 'للمشترين/للمستأجرين' : 'For Buyers / Tenants'}
+                      {isAr ? <InterfaceText id="realestate.ListPropertyModal.kqxlr2u" source="للمشترين/للمستأجرين" /> : <InterfaceText id="realestate.ListPropertyModal.kfoq3m0" source="For Buyers / Tenants" />}
                     </span>
                   </div>
 
                   <div>
                     <h4 className="text-sm font-bold font-display-serif">
-                      {isAr ? 'طلب عقار' : 'Request a Property'}
+                      {isAr ? <InterfaceText id="realestate.ListPropertyModal.k1v3g1x" source="طلب عقار" /> : <InterfaceText id="realestate.ListPropertyModal.kimro72" source="Request a Property" />}
                     </h4>
                     <p
                       className={`text-xs mt-1 leading-relaxed ${
@@ -383,8 +391,8 @@ export function ListPropertyModal({
                       }`}
                     >
                       {isAr
-                        ? 'أنا مشتري أو مستأجر وأبحث عن عقار بمواصفات خاّصة'
-                        : 'I am looking to buy or rent a property with custom criteria'}
+                        ? <InterfaceText id="realestate.ListPropertyModal.k18nr9y8" source="أنا مشتري أو مستأجر وأبحث عن عقار بمواصفات خاّصة" />
+                        : <InterfaceText id="realestate.ListPropertyModal.k711etg" source="I am looking to buy or rent a property with custom criteria" />}
                     </p>
                   </div>
                 </button>
@@ -401,15 +409,15 @@ export function ListPropertyModal({
                   <Building2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
                   <p className="leading-relaxed">
                     {isAr
-                      ? 'خدمة عرض العقارات: أدخل تفاصيل الموقع، نوع العقار، وهل ترغب بالبيع أم الإيجار لربط عقارك بالمستثمرين والمشترين.'
-                      : 'Owner Listing Service: Enter your property location, property type, and specify Sale or Rent to connect with matched clients.'}
+                      ? <InterfaceText id="realestate.ListPropertyModal.k1pi9s5v" source="خدمة عرض العقارات: أدخل تفاصيل الموقع، نوع العقار، وهل ترغب بالبيع أم الإيجار لربط عقارك بالمستثمرين والمشترين." />
+                      : <InterfaceText id="realestate.ListPropertyModal.k1v87ynf" source="Owner Listing Service: Enter your property location, property type, and specify Sale or Rent to connect with matched clients." />}
                   </p>
                 </div>
 
                 {/* 1. Property Address Selection (Map vs Short Address) */}
                 <div className="space-y-2.5">
                   <label className="block text-xs font-bold text-slate-800 text-start">
-                    {isAr ? 'عنوان وموقع العقار:' : 'Property Location:'}
+                    {isAr ? <InterfaceText id="realestate.ListPropertyModal.k3dxohx" source="عنوان وموقع العقار:" /> : <InterfaceText id="realestate.ListPropertyModal.ktbzwvj" source="Property Location:" />}
                   </label>
 
                   {/* Option Map */}
@@ -427,11 +435,11 @@ export function ListPropertyModal({
                         className="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
                       />
                       <span className="text-xs font-semibold text-slate-800">
-                        {isAr ? 'الخريطة' : 'Map'}
+                        {isAr ? <InterfaceText id="realestate.ListPropertyModal.kp0ke8v" source="الخريطة" /> : <InterfaceText id="realestate.ListPropertyModal.kj1sac1" source="Map" />}
                       </span>
                     </label>
 
-                    <button
+                    <ManagedButton copyScope="realestate.ListPropertyModal"
                       type="button"
                       onClick={() => {
                         setAddressMethod('map');
@@ -441,10 +449,10 @@ export function ListPropertyModal({
                       title={isAr ? 'فتح الخريطة التفاعلية' : 'Open interactive map'}
                     >
                       <MapPin className="w-4 h-4 text-blue-600" />
-                    </button>
+                    </ManagedButton>
 
                     <div className="relative flex-1">
-                      <input
+                      <ManagedInput copyScope="realestate.ListPropertyModal"
                         id="list-property-map-address"
                         type="text"
                         readOnly
@@ -472,12 +480,12 @@ export function ListPropertyModal({
                         className="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
                       />
                       <span className="text-xs font-semibold text-slate-800">
-                        {isAr ? 'عنوان مختصر' : 'Short Address'}
+                        {isAr ? <InterfaceText id="realestate.ListPropertyModal.k1ms62b2" source="عنوان مختصر" /> : <InterfaceText id="realestate.ListPropertyModal.kybxvxp" source="Short Address" />}
                       </span>
                     </label>
 
                     <div className="relative flex-1">
-                      <input
+                      <ManagedInput copyScope="realestate.ListPropertyModal"
                         id="list-property-short-address"
                         type="text"
                         placeholder={isAr ? 'أدخل العنوان الوطني المختصر (مثل: RYD-1234)' : 'Enter short national address (e.g., RYD-1234)'}
@@ -494,9 +502,9 @@ export function ListPropertyModal({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label htmlFor="list-property-type-owner" className="block text-xs font-bold text-slate-800 mb-1 text-start">
-                      {isAr ? 'نوع العقار' : 'Property Type'} <span aria-hidden="true" className="text-rose-600">*</span>
+                      {isAr ? <InterfaceText id="realestate.ListPropertyModal.k1ou70fq" source="نوع العقار" /> : <InterfaceText id="realestate.ListPropertyModal.k77dnw0" source="Property Type" />} <span aria-hidden="true" className="text-rose-600">*</span>
                     </label>
-                    <select
+                    <SearchableSelect
                       id="list-property-type-owner"
                       value={propertyType}
                       onChange={(e) => setPropertyType(e.target.value)}
@@ -512,12 +520,12 @@ export function ListPropertyModal({
                           {t.label}
                         </option>
                       ))}
-                    </select>
+                    </SearchableSelect>
                   </div>
 
                   <div>
                     <label className="block text-xs font-bold text-slate-800 mb-1 text-start">
-                      {isAr ? 'نوع العرض' : 'Listing Purpose'}
+                      {isAr ? <InterfaceText id="realestate.ListPropertyModal.k13u705b" source="نوع العرض" /> : <InterfaceText id="realestate.ListPropertyModal.kq2cr49" source="Listing Purpose" />}
                     </label>
                     <div className="flex items-center gap-4 py-1.5">
                       <label className="inline-flex items-center gap-2 cursor-pointer select-none">
@@ -530,7 +538,7 @@ export function ListPropertyModal({
                           className="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
                         />
                         <span className="text-xs font-bold text-slate-800">
-                          {isAr ? 'بيع' : 'For Sale'}
+                          {isAr ? <InterfaceText id="realestate.ListPropertyModal.k17vsqgq" source="بيع" /> : <InterfaceText id="realestate.ListPropertyModal.kdey6dn" source="For Sale" />}
                         </span>
                       </label>
                       <label className="inline-flex items-center gap-2 cursor-pointer select-none">
@@ -543,7 +551,7 @@ export function ListPropertyModal({
                           className="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
                         />
                         <span className="text-xs font-bold text-slate-800">
-                          {isAr ? 'تأجير' : 'For Rent'}
+                          {isAr ? <InterfaceText id="realestate.ListPropertyModal.klkh4iz" source="تأجير" /> : <InterfaceText id="realestate.ListPropertyModal.k17ubc37" source="For Rent" />}
                         </span>
                       </label>
                     </div>
@@ -562,17 +570,17 @@ export function ListPropertyModal({
                   <Search className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
                   <p className="leading-relaxed">
                     {isAr
-                      ? 'خدمة البحث عن عقار: حدد مواصفات العقار المطلوب (الحي والمساحة والميزانية)، وسنقوم بمطابقتها مع محفظة العقارات المتاحة.'
-                      : 'Custom Property Search Service: Specify your desired property criteria (district, size, budget) to match with our portfolio.'}
+                      ? <InterfaceText id="realestate.ListPropertyModal.k10iqlyo" source="خدمة البحث عن عقار: حدد مواصفات العقار المطلوب (الحي والمساحة والميزانية)، وسنقوم بمطابقتها مع محفظة العقارات المتاحة." />
+                      : <InterfaceText id="realestate.ListPropertyModal.koxxa0t" source="Custom Property Search Service: Specify your desired property criteria (district, size, budget) to match with our portfolio." />}
                   </p>
                 </div>
 
                 {/* 1. Property Description / Specifications */}
                 <div>
                   <label htmlFor="list-property-desc" className="block text-xs font-bold text-slate-800 mb-1.5 text-start">
-                    {isAr ? 'وصف العقار والمواصفات المطلوبة' : 'Desired Property Specifications'} <span aria-hidden="true" className="text-rose-600">*</span>
+                    {isAr ? <InterfaceText id="realestate.ListPropertyModal.kgew2lf" source="وصف العقار والمواصفات المطلوبة" /> : <InterfaceText id="realestate.ListPropertyModal.k1jiyc5s" source="Desired Property Specifications" />} <span aria-hidden="true" className="text-rose-600">*</span>
                   </label>
-                  <textarea
+                  <ManagedTextarea copyScope="realestate.ListPropertyModal"
                     id="list-property-desc"
                     rows={3}
                     required
@@ -592,9 +600,9 @@ export function ListPropertyModal({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label htmlFor="list-property-type-seeker" className="block text-xs font-bold text-slate-800 mb-1 text-start">
-                      {isAr ? 'نوع العقار المطلوب' : 'Property Type'} <span aria-hidden="true" className="text-rose-600">*</span>
+                      {isAr ? <InterfaceText id="realestate.ListPropertyModal.kwlwscn" source="نوع العقار المطلوب" /> : <InterfaceText id="realestate.ListPropertyModal.k77dnw0" source="Property Type" />} <span aria-hidden="true" className="text-rose-600">*</span>
                     </label>
-                    <select
+                    <SearchableSelect
                       id="list-property-type-seeker"
                       value={propertyType}
                       onChange={(e) => setPropertyType(e.target.value)}
@@ -610,12 +618,12 @@ export function ListPropertyModal({
                           {t.label}
                         </option>
                       ))}
-                    </select>
+                    </SearchableSelect>
                   </div>
 
                   <div>
                     <label className="block text-xs font-bold text-slate-800 mb-1 text-start">
-                      {isAr ? 'نوع الطلب' : 'Request Purpose'}
+                      {isAr ? <InterfaceText id="realestate.ListPropertyModal.k1xg9sxi" source="نوع الطلب" /> : <InterfaceText id="realestate.ListPropertyModal.k42csok" source="Request Purpose" />}
                     </label>
                     <div className="flex items-center gap-4 py-1.5">
                       <label className="inline-flex items-center gap-2 cursor-pointer select-none">
@@ -628,7 +636,7 @@ export function ListPropertyModal({
                           className="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
                         />
                         <span className="text-xs font-bold text-slate-800">
-                          {isAr ? 'شراء' : 'To Buy'}
+                          {isAr ? <InterfaceText id="realestate.ListPropertyModal.k14mem1y" source="شراء" /> : <InterfaceText id="realestate.ListPropertyModal.kvvrtcs" source="To Buy" />}
                         </span>
                       </label>
                       <label className="inline-flex items-center gap-2 cursor-pointer select-none">
@@ -641,7 +649,7 @@ export function ListPropertyModal({
                           className="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
                         />
                         <span className="text-xs font-bold text-slate-800">
-                          {isAr ? 'استئجار' : 'To Rent'}
+                          {isAr ? <InterfaceText id="realestate.ListPropertyModal.k19g2pr9" source="استئجار" /> : <InterfaceText id="realestate.ListPropertyModal.k13ey6yf" source="To Rent" />}
                         </span>
                       </label>
                     </div>
@@ -675,14 +683,14 @@ export function ListPropertyModal({
             {/* ========================================================================= */}
             <div className="border-t border-slate-100 pt-4 space-y-3">
               <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider text-start">
-                {isAr ? '٢. بيانات التواصل للمتابعة:' : '2. Your Contact Information:'}
+                {isAr ? <InterfaceText id="realestate.ListPropertyModal.k6bwpw6" source="٢. بيانات التواصل للمتابعة:" /> : <InterfaceText id="realestate.ListPropertyModal.k33dd2w" source="2. Your Contact Information:" />}
               </label>
 
               <div>
                 <label htmlFor="list-property-fullname" className="block text-xs font-bold text-slate-800 mb-1.5 text-start">
-                  {isAr ? 'الاسم الكامل' : 'Full Name'} <span aria-hidden="true" className="text-rose-600">*</span>
+                  {isAr ? <InterfaceText id="realestate.ListPropertyModal.k16duk29" source="الاسم الكامل" /> : <InterfaceText id="realestate.ListPropertyModal.k4eocnj" source="Full Name" />} <span aria-hidden="true" className="text-rose-600">*</span>
                 </label>
-                <input
+                <ManagedInput copyScope="realestate.ListPropertyModal"
                   id="list-property-fullname"
                   type="text"
                   required
@@ -697,9 +705,9 @@ export function ListPropertyModal({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label htmlFor="list-property-phone" className="block text-xs font-bold text-slate-800 mb-1.5 text-start">
-                    {isAr ? 'رقم الهاتف' : 'Phone Number'} <span aria-hidden="true" className="text-rose-600">*</span>
+                    {isAr ? <InterfaceText id="realestate.ListPropertyModal.keh9c3v" source="رقم الهاتف" /> : <InterfaceText id="realestate.ListPropertyModal.k1v8ev2w" source="Phone Number" />} <span aria-hidden="true" className="text-rose-600">*</span>
                   </label>
-                  <input
+                  <ManagedInput copyScope="realestate.ListPropertyModal"
                     id="list-property-phone"
                     type="tel"
                     required
@@ -716,9 +724,9 @@ export function ListPropertyModal({
 
                 <div>
                   <label htmlFor="list-property-email" className="block text-xs font-bold text-slate-800 mb-1.5 text-start">
-                    {isAr ? 'البريد الإلكتروني' : 'Email Address'} {userRole === 'owner' && <span aria-hidden="true" className="text-rose-600">*</span>}
+                    {isAr ? <InterfaceText id="realestate.ListPropertyModal.kz14tgk" source="البريد الإلكتروني" /> : <InterfaceText id="realestate.ListPropertyModal.k1v4tmnn" source="Email Address" />} {userRole === 'owner' && <span aria-hidden="true" className="text-rose-600">*</span>}
                   </label>
-                  <input
+                  <ManagedInput copyScope="realestate.ListPropertyModal"
                     id="list-property-email"
                     type="email"
                     required={userRole === 'owner'}
@@ -734,7 +742,7 @@ export function ListPropertyModal({
               </div>
 
               {contactError && (
-                <p role="alert" className="text-xs text-rose-700 font-semibold">{contactError}</p>
+                <p role="alert" className="text-xs text-rose-700 font-semibold"><LocalizedValue value={contactError} /></p>
               )}
             </div>
 
@@ -746,7 +754,7 @@ export function ListPropertyModal({
                 className="w-full py-3 font-bold justify-center text-sm shadow-md"
               >
                 <span>
-                  {isAr ? 'إرسال الطلب' : 'Submit Request'}
+                  {isAr ? <InterfaceText id="realestate.ListPropertyModal.kwg6isz" source="إرسال الطلب" /> : <InterfaceText id="realestate.ListPropertyModal.k1wao0v4" source="Submit Request" />}
                 </span>
               </Button>
             </div>

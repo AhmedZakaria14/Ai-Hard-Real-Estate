@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import { Bell, BarChart3, CheckCircle2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { hardAdminClient } from '../../lib/db/hardAdminClient';
@@ -66,9 +67,9 @@ export default function SupabaseOperations({ section, refresh }: { section: 'rep
     {error && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
     {loading && <p role="status">جارٍ التحميل…</p>}
     {section === 'reports' ? <>
-      <label>الفترة <select className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 outline-none" value={days} onChange={(e) => setDays(Number(e.target.value))}>
+      <label>الفترة <SearchableSelect className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 outline-none" value={days} onChange={(e) => setDays(Number(e.target.value))}>
         {[30, 90, 365].map((value) => <option key={value} value={value}>{value} يومًا</option>)}
-      </select></label>
+      </SearchableSelect></label>
       {!loading && !error && report && <dl className="grid gap-3 sm:grid-cols-3">
         {(Object.keys(labels) as (keyof RequestMetrics)[]).map((key) => <div key={key} className="rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50/70 to-white p-5">
           <dt className="text-xs font-semibold text-slate-500">{labels[key]}</dt><dd className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900">{report[key]}</dd>

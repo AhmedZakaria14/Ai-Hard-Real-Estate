@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Upload, Link2, X, Image as ImageIcon, Check, Trash2, Plus, Sparkles, FolderOpen } from 'lucide-react';
 import { Language } from '../../types';
 import { uploadMediaAsset } from '../../lib/cmsMediaLibrary';
@@ -30,17 +30,21 @@ export const CMSImageUpload: React.FC<SingleImageUploadProps> = ({
   const isAr = language === 'ar';
   const [activeTab, setActiveTab] = useState<'upload' | 'url'>('upload');
   const [uploading, setUploading] = useState(false);
-  const [urlInput, setUrlInput] = useState(value && value.startsWith('http') ? value : '');
+  const [progress, setProgress] = useState(0);
+  const [urlInput, setUrlInput] = useState(value || '');
   const [isDragging, setIsDragging] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isMediaLibraryOpen, setIsMediaLibraryOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => setUrlInput(value || ''), [value]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      processFile(file);
+      void processFile(file);
+      e.target.value = '';
     }
   };
 
@@ -59,12 +63,13 @@ export const CMSImageUpload: React.FC<SingleImageUploadProps> = ({
     setError(null);
     setFileName(file.name);
     setUploading(true);
+    setProgress(0);
 
     try {
-      const asset = await uploadMediaAsset({ file });
+      const asset = await uploadMediaAsset({ file, onProgress: setProgress });
       onChange(asset.downloadUrl);
-    } catch {
-      setError(isAr ? 'تعذر رفع الصورة. حاول مرة أخرى.' : 'Could not upload the image. Try again.');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : (isAr ? 'تعذر رفع الصورة. حاول مرة أخرى.' : 'Could not upload the image. Try again.'));
     } finally {
       setUploading(false);
     }
@@ -84,7 +89,7 @@ export const CMSImageUpload: React.FC<SingleImageUploadProps> = ({
     setIsDragging(false);
     const file = e.dataTransfer.files?.[0];
     if (file) {
-      processFile(file);
+      void processFile(file);
     }
   };
 
@@ -122,6 +127,7 @@ export const CMSImageUpload: React.FC<SingleImageUploadProps> = ({
 
   return (
     <div data-upload-pending={uploading} className="space-y-2.5">
+      {uploading && <p role="status" className="text-sm font-semibold text-blue-700">{isAr ? 'جارٍ رفع الصورة…' : 'Uploading image…'} {progress}%</p>}
       {label && (
         <div className="flex items-center justify-between">
           <label className="text-xs font-bold text-slate-700 text-start flex items-center gap-1.5">
@@ -204,7 +210,7 @@ export const CMSImageUpload: React.FC<SingleImageUploadProps> = ({
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp,image/avif,image/gif,image/svg+xml"
             onChange={handleFileChange}
             className="hidden"
           />
@@ -371,6 +377,7 @@ export const CMSMultiImageGallery: React.FC<MultiImageGalleryProps> = ({
   const isAr = language === 'ar';
   const [activeTab, setActiveTab] = useState<'upload' | 'url'>('upload');
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [newUrl, setNewUrl] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -392,10 +399,11 @@ export const CMSMultiImageGallery: React.FC<MultiImageGalleryProps> = ({
     }
     setError(null);
     setUploading(true);
+    setProgress(0);
     const uploaded: string[] = [];
     for (const file of imageFiles) {
       try {
-        const asset = await uploadMediaAsset({ file });
+        const asset = await uploadMediaAsset({ file, onProgress: setProgress });
         uploaded.push(asset.downloadUrl);
       } catch {
         setError(isAr ? 'تعذر رفع صورة واحدة أو أكثر.' : 'One or more images could not be uploaded.');
@@ -444,6 +452,7 @@ export const CMSMultiImageGallery: React.FC<MultiImageGalleryProps> = ({
 
   return (
     <div data-upload-pending={uploading} className="space-y-3">
+      {uploading && <p role="status" className="text-sm font-semibold text-blue-700">{isAr ? 'جارٍ رفع الصور…' : 'Uploading images…'} {progress}%</p>}
       {label && (
         <div className="flex items-center justify-between">
           <label className="text-xs font-bold text-slate-700 text-start flex items-center gap-1.5">
@@ -503,7 +512,7 @@ export const CMSMultiImageGallery: React.FC<MultiImageGalleryProps> = ({
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp,image/avif,image/gif,image/svg+xml"
             multiple
             onChange={handleFileChange}
             className="hidden"

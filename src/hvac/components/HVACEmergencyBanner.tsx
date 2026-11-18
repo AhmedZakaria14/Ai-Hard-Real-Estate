@@ -1,3 +1,5 @@
+import { LocalizedValue } from '../../components/ui/LocalizedValue';
+import { WhatsAppIcon } from '../../components/ui/WhatsAppIcon';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import React from 'react';
 import { Phone, MessageSquare, AlertTriangle, ShieldCheck } from 'lucide-react';
@@ -6,13 +8,13 @@ import { pick } from '../translations';
 
 export function HVACEmergencyBanner() {
   const { hvac: T } = useTextOverride();
-  const { language, isAr } = useHVAC();
+  const { language, isAr, operatingHours } = useHVAC();
 
   const handleWhatsAppEmergency = () => {
     const text = isAr
       ? 'السلام عليكم، لدي بلاغ طوارئ عاجل لتوقف التكييف وأطلب مباشرة فني صيانة.'
       : 'Hello, I have an urgent emergency AC breakdown and need rapid technician dispatch.';
-    const url = `https://wa.me/966550641000?text=${encodeURIComponent(text)}`;
+    const url = `https://wa.me/${operatingHours.whatsappNumber.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
@@ -28,15 +30,15 @@ export function HVACEmergencyBanner() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F97316] opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#F97316]"></span>
               </span>
-              <span>{pick(T.emergencyBanner.badge, language)}</span>
+              <span><LocalizedValue value={pick(T.emergencyBanner.badge, language)} /></span>
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight leading-snug">
-              {pick(T.emergencyBanner.title, language)}
+              <LocalizedValue value={pick(T.emergencyBanner.title, language)} />
             </h2>
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              {pick(T.emergencyBanner.desc, language)}
+              <LocalizedValue value={pick(T.emergencyBanner.desc, language)} />
             </p>
           </div>
 
@@ -44,16 +46,16 @@ export function HVACEmergencyBanner() {
           <div className="flex flex-col sm:flex-row items-center gap-4 shrink-0 w-full sm:w-auto">
             {/* Direct Call Button */}
             <a
-              href="tel:+966550641000"
+              href={`tel:${operatingHours.emergencyPhone.replace(/\s/g, '')}`}
               className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-[#007EBA] hover:bg-[#006A9A] text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2.5 shadow-md cursor-pointer"
             >
               <Phone className="w-4 h-4 animate-bounce" />
-              <span>{pick(T.emergencyBanner.callBtn, language)}</span>
+              <span><LocalizedValue value={pick(T.emergencyBanner.callBtn, language)} /></span>
             </a>
 
             {/* WhatsApp Navigation Link */}
             <a
-              href={`https://wa.me/966550641000?text=${encodeURIComponent(
+              href={`https://wa.me/${operatingHours.whatsappNumber.replace(/\D/g, '')}?text=${encodeURIComponent(
                 isAr
                   ? 'السلام عليكم، لدي بلاغ طوارئ عاجل لتوقف التكييف وأطلب مباشرة فني صيانة.'
                   : 'Hello, I have an urgent emergency AC breakdown and need rapid technician dispatch.'
@@ -62,8 +64,8 @@ export function HVACEmergencyBanner() {
               rel="noopener noreferrer"
               className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2.5 border border-emerald-600 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0EA5E9]"
             >
-              <MessageSquare className="w-4 h-4 text-white" />
-              <span>{pick(T.emergencyBanner.whatsappBtn, language)}</span>
+              <WhatsAppIcon className="w-4 h-4 text-white" />
+              <span><LocalizedValue value={pick(T.emergencyBanner.whatsappBtn, language)} /></span>
             </a>
           </div>
         </div>

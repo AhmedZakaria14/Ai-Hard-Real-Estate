@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import type { CatalogBlogCategory } from '../../lib/blogCategories';
 import React, { useState, useEffect } from 'react';
 import {
@@ -294,18 +295,18 @@ Investors allocating capital towards premium coastal assets are experiencing str
                   <label className="text-xs font-bold text-slate-700">
                     {isAr ? 'تصنيف المقال' : 'Article category'}
                   </label>
-                  <select value={categoryId} required onChange={(event) => setCategoryId(event.target.value)}
+                  <SearchableSelect value={categoryId} required onChange={(event) => setCategoryId(event.target.value)}
                     className="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs font-semibold">
                     <option value="" disabled>{isAr ? 'اختر تصنيفًا' : 'Choose a category'}</option>
                     {categories.map((item) => <option key={item.key} value={item.key}>{item.label[language]}</option>)}
-                  </select>
+                  </SearchableSelect>
                 </div>
 
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-700">
                     {isAr ? 'حالة النشر' : 'Publish Status'}
                   </label>
-                  <select
+                  <SearchableSelect
                     value={status}
                     onChange={(e) => setStatus(e.target.value as BlogStatus)}
                     className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800"
@@ -313,7 +314,7 @@ Investors allocating capital towards premium coastal assets are experiencing str
                     <option value="published">{isAr ? 'منشور للعامة (Published & Live)' : 'Published & Live'}</option>
                     <option value="draft">{isAr ? 'مسودة قيد التحرير (Draft)' : 'Draft / Internal'}</option>
                     <option value="archived">{isAr ? 'مؤرشف (Archived)' : 'Archived'}</option>
-                  </select>
+                  </SearchableSelect>
                 </div>
 
                 <div className="space-y-1">

@@ -1,3 +1,4 @@
+import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import React, { useState, useEffect } from 'react';
 import { X, Tag, Save, Sparkles, FolderTree } from 'lucide-react';
 import { Language, BlogCategory } from '../../types';
@@ -233,7 +234,7 @@ export const CMSCategoryModal: React.FC<CMSCategoryModalProps> = ({
               <label className="text-xs font-bold text-slate-700">
                 {isAr ? 'لون الشارة والتدرج' : 'Badge Color Gradient'}
               </label>
-              <select
+              <SearchableSelect
                 value={color}
                 onChange={(e) => setColor(e.target.value)}
                 className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800"
@@ -243,7 +244,7 @@ export const CMSCategoryModal: React.FC<CMSCategoryModalProps> = ({
                     {preset.label}
                   </option>
                 ))}
-              </select>
+              </SearchableSelect>
             </div>
 
             <div className="space-y-1">

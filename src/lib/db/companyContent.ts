@@ -1,5 +1,11 @@
 import { hardAdminClient } from './hardAdminClient';
 import { hardPublishableKey, hardSupabaseUrl } from './hardCatalog';
+import { assertMediaReady } from '../mediaSaveGuard';
+
+function contentChanged() {
+  window.dispatchEvent(new Event('hard-company-saved'));
+  try { localStorage.setItem('hard-company-saved', String(Date.now())); } catch { /* Focus reload is sufficient. */ }
+}
 
 export type CompanyContentKind = 'team' | 'offices' | 'statistics' | 'partners' | 'stories' | 'faqs' | 'certifications' | 'enhanced_testimonials';
 type CompanyContentRow<T> = { kind: CompanyContentKind; id: string; body: T };
@@ -19,17 +25,20 @@ export async function readAdminCompanyContent() {
 }
 
 export async function saveCompanyContent<T extends { id: string }>(kind: CompanyContentKind, item: T, creating = false) {
+  assertMediaReady();
   const row = { kind, id: item.id, body: item };
   const table = hardAdminClient.from('hard_company_content');
   const query = creating ? table.insert(row) : table.update({ body: item }).eq('kind', kind).eq('id', item.id);
   const { data, error } = await query.select('kind,id,body').single<CompanyContentRow<T>>();
   if (error) throw error;
+  contentChanged();
   return data.body;
 }
 
 export async function deleteCompanyContent(kind: CompanyContentKind, id: string) {
   const { data, error } = await hardAdminClient.from('hard_company_content').delete().eq('kind', kind).eq('id', id).select('id').maybeSingle();
   if (error) throw error;
+  contentChanged();
   return Boolean(data);
 }
 

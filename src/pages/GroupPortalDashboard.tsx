@@ -1,3 +1,6 @@
+import { LocalizedValue } from '../components/ui/LocalizedValue';
+import { InterfaceText } from '../components/ui/InterfaceText';
+import { ManagedImg, ManagedButton, ManagedA } from '../components/ui/ManagedElements';
 import { defaultGroupPortal, groupPortalSection } from '../lib/groupPortalContent';
 import { subscribeSectorSection } from '../lib/db/hardSectorSections';
 import { usePublishedBrandEmblem } from '../components/ui/BrandLogo';
@@ -87,7 +90,7 @@ export function GroupPortalDashboard({
           {/* HARD Group Logo and Title with Corporate Group Portal underneath */}
           <div className="flex items-center gap-3">
             <div className="relative h-12 sm:h-14 w-auto flex items-center justify-center">
-              <img
+              <ManagedImg copyScope="portal.GroupPortalDashboard"
                 src={emblem} onError={({ currentTarget }) => { if (!currentTarget.src.endsWith('/logo.svg')) currentTarget.src = '/logo.svg'; }}
                 alt="HARD Group"
                 className="h-10 sm:h-12 w-auto object-contain drop-shadow-xs"
@@ -95,10 +98,10 @@ export function GroupPortalDashboard({
             </div>
             <div className="flex flex-col justify-center text-start">
               <span className="font-display-serif font-black text-lg sm:text-xl text-sky-600 tracking-tight leading-tight">
-                {isAr ? content.titleAr : content.titleEn}
+                <LocalizedValue value={isAr ? content.titleAr : content.titleEn} />
               </span>
               <span className="text-xs sm:text-sm font-semibold text-slate-700 leading-tight">
-                {isAr ? content.subtitleAr : content.subtitleEn}
+                <LocalizedValue value={isAr ? content.subtitleAr : content.subtitleEn} />
               </span>
             </div>
           </div>
@@ -106,15 +109,15 @@ export function GroupPortalDashboard({
           {/* Right Actions: Language Switcher */}
           <div className="flex items-center gap-3">
             {/* Language Switcher */}
-            <button
+            <ManagedButton copyScope="portal.GroupPortalDashboard"
               type="button"
               onClick={toggleLanguage}
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 border border-slate-200 transition-colors cursor-pointer"
               aria-label="Toggle language"
             >
               <Globe className="w-4 h-4 text-sky-600" />
-              <span>{language === 'en' ? 'العربية' : 'English'}</span>
-            </button>
+              <span>{language === 'en' ? <InterfaceText id="portal.GroupPortalDashboard.k1agd4ix" source="العربية" /> : <InterfaceText id="portal.GroupPortalDashboard.k7nql6j" source="English" />}</span>
+            </ManagedButton>
           </div>
         </div>
       </header>
@@ -124,10 +127,10 @@ export function GroupPortalDashboard({
         {/* Intro Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <h1 className="text-2xl sm:text-4xl font-bold font-display-serif text-slate-900 tracking-tight">
-            {isAr ? content.titleAr : content.titleEn}
+            <LocalizedValue value={isAr ? content.titleAr : content.titleEn} />
           </h1>
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-            {isAr ? content.introAr : content.introEn}
+            <LocalizedValue value={isAr ? content.introAr : content.introEn} />
           </p>
         </div>
 
@@ -140,19 +143,19 @@ export function GroupPortalDashboard({
                 className="bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between group"
               >
                 {/* 1. Main Image (clickable) */}
-                <a
+                <ManagedA copyScope="portal.GroupPortalDashboard"
                   href={div.href}
                   onClick={(e) => handleSemanticClick(e, div.onClick)}
                   className="aspect-16/10 overflow-hidden bg-slate-100 relative block cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                   aria-label={isAr ? div.nameAr : div.nameEn}
                 >
-                  <img
+                  <ManagedImg copyScope="portal.GroupPortalDashboard"
                     src={div.image}
                     alt={isAr ? div.nameAr : div.nameEn}
                     className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
                     loading="lazy"
                   />
-                </a>
+                </ManagedA>
 
                 {/* 2. Brief Description with Title as Hyperlink */}
                 <div className="p-6 flex-1 flex flex-col space-y-3 text-start">
@@ -162,12 +165,12 @@ export function GroupPortalDashboard({
                       onClick={(e) => handleSemanticClick(e, div.onClick)}
                       className="text-lg sm:text-xl font-bold text-slate-900 group-hover:text-sky-600 hover:text-sky-600 font-display-serif transition-colors inline-flex items-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:underline"
                     >
-                      <span>{isAr ? div.nameAr : div.nameEn}</span>
+                      <span><LocalizedValue value={isAr ? div.nameAr : div.nameEn} /></span>
                       <ArrowIcon className="w-4 h-4 text-sky-600 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </a>
                   </h2>
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                    {isAr ? div.descriptionAr : div.descriptionEn}
+                    <LocalizedValue value={isAr ? div.descriptionAr : div.descriptionEn} />
                   </p>
                 </div>
               </div>
@@ -178,7 +181,7 @@ export function GroupPortalDashboard({
 
       {/* Corporate Group Footer matching Real Estate palette */}
       <footer className="bg-white border-t border-slate-200/80 px-4 py-8 mt-auto text-center text-xs text-slate-600">
-        <p>{isAr ? content.footerAr : content.footerEn}</p>
+        <p><LocalizedValue value={isAr ? content.footerAr : content.footerEn} /></p>
       </footer>
 
       {/* Interactive Modals */}
