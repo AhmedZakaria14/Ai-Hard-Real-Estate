@@ -253,7 +253,7 @@ export function ListPropertyModal({
               <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-slate-600">
                 <span className="flex items-center gap-1 font-semibold text-blue-600">
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>{isAr ? <InterfaceText id="realestate.ListPropertyModal.ks6h1y2" source="مزامنة الـ CRM: مكتملة" /> : <InterfaceText id="realestate.ListPropertyModal.k1l435gh" source="CRM Integration: Active" />}</span>
+                  <span>{isAr ? <InterfaceText id="realestate.ListPropertyModal.ks6h1y2" source="تم حفظ الطلب" /> : <InterfaceText id="realestate.ListPropertyModal.k1l435gh" source="Request saved" />}</span>
                 </span>
                 <span className="flex items-center gap-1 text-emerald-700 font-semibold">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />

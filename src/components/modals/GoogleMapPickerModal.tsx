@@ -7,13 +7,13 @@ import L from 'leaflet';
 import { Language } from '../../types';
 
 // Custom SVG Pin Icon for Leaflet
-const createCustomPinIcon = () => {
+const createCustomPinIcon = (language: Language) => {
   return L.divIcon({
     className: 'custom-map-pin',
     html: `
-      <div style="position: relative; display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -100%);">
-        <div style="background-color: #2563eb; color: white; padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: 700; white-space: nowrap; box-shadow: 0 4px 12px rgba(37,99,235,0.4); margin-bottom: 2px; border: 1.5px solid white;">
-          موقع العقار
+      <div style="position: relative; width: 34px; height: 42px;">
+        <div style="position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background-color: #2563eb; color: white; padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: 700; white-space: nowrap; box-shadow: 0 4px 12px rgba(37,99,235,0.4); margin-bottom: 2px; border: 1.5px solid white;">
+          ${language === 'ar' ? 'موقع العقار' : 'Property location'}
         </div>
         <svg width="34" height="42" viewBox="0 0 24 30" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));">
           <path d="M12 0C5.37258 0 0 5.37258 0 12C0 19.5 10.5 28.5 11.385 29.25C11.745 29.55 12.255 29.55 12.615 29.25C13.5 28.5 24 19.5 24 12C24 5.37258 18.6274 0 12 0Z" fill="#dc2626"/>
@@ -167,7 +167,7 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
 
       // Custom Marker
       const marker = L.marker([initial.lat, initial.lng], {
-        icon: createCustomPinIcon(),
+        icon: createCustomPinIcon(language),
         draggable: true,
       }).addTo(map);
 

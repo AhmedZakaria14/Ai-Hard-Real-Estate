@@ -3,7 +3,7 @@ import { useCustomerFormConfig, ConfiguredFormFields } from '../forms/Configured
 import { SearchableSelect } from '../ui/SearchableSelect';
 import { InterfaceText } from '../ui/InterfaceText';
 import { ManagedInput, ManagedTextarea } from '../ui/ManagedElements';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Property, Language } from '../../types';
@@ -38,14 +38,23 @@ export function BookViewingModal({
   const [notes, setNotes] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [leadRef, setLeadRef] = useState('');
-  const [crmRef, setCrmRef] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [contactError, setContactError] = useState('');
+  useEffect(() => {
+    if (!isOpen) return;
+    setPreferredDate(''); setPreferredTime('morning'); setFullName(''); setEmail(''); setPhone(''); setNotes('');
+    setSubmitted(false); setLeadRef(''); setContactError('');
+  }, [isOpen, property?.id]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!property) return;
     setContactError('');
+    const requestedDate = String(new FormData(e.currentTarget).get('preferredDate') || preferredDate);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(requestedDate)) {
+      setContactError(language === 'ar' ? 'اختر تاريخًا صحيحًا للمعاينة.' : 'Choose a valid viewing date.');
+      return;
+    }
 
     if (!fullName.trim()) return;
     if (!phone.trim()) {
@@ -68,16 +77,15 @@ export function BookViewingModal({
         entityId: property.id,
         entityTitle: property?.title?.[language] || property?.title?.en || '',
         language,
-        message: `Format: ${tourType}\nPreferred Date: ${preferredDate}\nPreferred Time: ${preferredTime}\nNotes: ${notes}`,
+        message: `Format: ${tourType}\nPreferred Date: ${requestedDate}\nPreferred Time: ${preferredTime}\nNotes: ${notes}`,
         details: {
           tourType,
-          preferredDate,
+          preferredDate: requestedDate,
           preferredTime,
           agentAssigned: (property as any).agent?.name?.en || 'HARD Advisor',
         },
       });
       setLeadRef(result.trackingCode);
-      setCrmRef(`CRM-${result.leadId.slice(-6).toUpperCase()}`);
       setSubmitted(true);
     } catch (err: any) {
       console.error('Failed to book viewing', err);
@@ -125,10 +133,7 @@ export function BookViewingModal({
             <p><strong>{language === 'en' ? <InterfaceText id="realestate.BookViewingModal.k1dodnt7" source="Reference Code:" /> : <InterfaceText id="realestate.BookViewingModal.k1lt3bxh" source="رقم المرجع:" />}</strong> <span className="font-mono font-bold text-slate-900"><LocalizedValue value={leadRef} /></span></p>
             <p><strong>{language === 'en' ? <InterfaceText id="realestate.BookViewingModal.k86is9i" source="Property:" /> : <InterfaceText id="realestate.BookViewingModal.k176wl4l" source="العقار:" />}</strong> <LocalizedValue value={property?.title?.[language] || ''} /></p>
             <p><strong>{language === 'en' ? <InterfaceText id="realestate.BookViewingModal.k1ki0y1k" source="Format:" /> : <InterfaceText id="realestate.BookViewingModal.k1bx1lvv" source="النوع:" />}</strong> <LocalizedValue value={t.modals.inPerson} /></p>
-            <p className="flex items-center gap-1.5 text-blue-600 font-semibold pt-1 border-t border-slate-200">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span><InterfaceText id="realestate.BookViewingModal.k1qldqm8" source="CRM Hook: " />{crmRef || <InterfaceText id="realestate.BookViewingModal.k1v0cssw" source="Synced to Real Estate CRM" />}</span>
-            </p>
+
           </div>
           <div className="pt-2 flex flex-col sm:flex-row gap-2 justify-center">
             <Button
@@ -185,6 +190,7 @@ export function BookViewingModal({
                 {/* Overlaid native HTML5 date input */}
                 <ManagedInput copyScope="realestate.BookViewingModal"
                   id="book-viewing-date"
+                  name="preferredDate"
                   type="date"
                   required
                   aria-required="true"

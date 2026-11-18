@@ -214,7 +214,7 @@ export const translations = {
       inquirySuccess: {
         title: 'Inquiry Submitted Successfully!',
         referenceId: 'Inquiry Reference',
-        message: 'Thank you. The listing broker has been assigned to your request and will respond within 15 minutes.',
+        message: 'Thank you. The listing broker has been assigned to your request and will respond within one business day.',
         agentCallback: 'Priority Agent Callback Active',
         sendAnother: 'Send Another Inquiry',
       },
@@ -617,7 +617,7 @@ export const translations = {
       inquirySuccess: {
         title: 'تم إرسال استفسارك بنجاح!',
         referenceId: 'رقم المرجع',
-        message: 'شكراً لك. تم توجيه طلبك إلى الوسيط المختص وسيقوم بالرد والتواصل معك خلال 15 دقيقة.',
+        message: 'شكراً لك. تم توجيه طلبك إلى الوسيط المختص وسيقوم بالرد والتواصل معك خلال يوم عمل واحد.',
         agentCallback: 'خدمة الرد السريع مفعلة',
         sendAnother: 'إرسال استفسار آخر',
       },

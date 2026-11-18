@@ -8,6 +8,7 @@ export type AllowedMimeType =
   | 'image/webp'
   | 'image/gif'
   | 'image/avif'
+  | 'image/svg+xml'
   | 'application/pdf'
   | 'application/msword'
   | 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -18,6 +19,7 @@ export const APPROVED_FILE_TYPES: AllowedMimeType[] = [
   'image/webp',
   'image/gif',
   'image/avif',
+  'image/svg+xml',
   'application/pdf',
   'application/msword',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',

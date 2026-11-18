@@ -40,7 +40,6 @@ export function InquiryModal({
   const [attachments, setAttachments] = useState<FormAttachmentMeta[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [leadRef, setLeadRef] = useState('');
-  const [crmRef, setCrmRef] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [contactError, setContactError] = useState('');
 
@@ -93,7 +92,6 @@ export function InquiryModal({
         },
       });
       setLeadRef(result.trackingCode);
-      setCrmRef(`CRM-${result.leadId.slice(-6).toUpperCase()}`);
       setSubmitted(true);
     } catch (err: any) {
       console.error('Failed to submit advisory inquiry', err);
@@ -121,7 +119,7 @@ export function InquiryModal({
       isOpen={isOpen}
       onClose={handleReset}
       title={language === 'en' ? 'Direct Advisory Inquiry' : 'طلب استشارة عقارية مباشرة'}
-      subtitle={language === 'en' ? 'Connect with a certified brokerage advisor within 15 minutes.' : 'تواصل مع مستشار وساطة عقارية معتمد خلال 15 دقيقة.'}
+      subtitle={language === 'en' ? 'Connect with a certified brokerage advisor within one business day.' : 'تواصل مع مستشار وساطة عقارية معتمد خلال يوم عمل واحد.'}
       maxWidth="md"
     >
       {submitted ? (
@@ -137,10 +135,7 @@ export function InquiryModal({
           </p>
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 text-start text-xs space-y-1 text-slate-600">
             <p><strong>{language === 'en' ? <InterfaceText id="realestate.InquiryModal.k1dodnt7" source="Reference Code:" /> : <InterfaceText id="realestate.InquiryModal.k1lt3bxh" source="رقم المرجع:" />}</strong> <span className="font-mono font-bold text-slate-900"><LocalizedValue value={leadRef} /></span></p>
-            <p className="flex items-center gap-1 text-blue-600 font-semibold pt-1 border-t border-slate-200">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span><InterfaceText id="realestate.InquiryModal.k1qldqm8" source="CRM Hook: " />{crmRef || <InterfaceText id="realestate.InquiryModal.kelqq9w" source="Synced to CRM" />}</span>
-            </p>
+
           </div>
           <div className="pt-2">
             <Button variant="secondary" onClick={handleReset} className="w-full">

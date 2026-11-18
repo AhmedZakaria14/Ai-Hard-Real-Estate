@@ -19,7 +19,7 @@ export function CMSSectionImage({ label, url, onChange, sector, language }: {
         disabled={busy} onChange={(event) => onChange(event.target.value)} />
     </label>
     <label className="block">{ar ? 'رفع صورة للمسودة' : 'Upload draft image'}
-      <input type="file" className="block max-w-full" accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
+      <input type="file" className="block max-w-full" accept="image/jpeg,image/png,image/webp,image/avif,image/gif,image/svg+xml"
         disabled={busy} onChange={async (event) => {
           const input = event.currentTarget;
           const file = input.files?.[0];

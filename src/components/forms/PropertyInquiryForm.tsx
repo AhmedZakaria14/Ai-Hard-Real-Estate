@@ -54,7 +54,6 @@ export function PropertyInquiryForm({
   const [submitError, setSubmitError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
   const [referenceNumber, setReferenceNumber] = useState('');
-  const [crmRefNumber, setCrmRefNumber] = useState('');
   const [submittedTime, setSubmittedTime] = useState('');
 
   // Validate form fields
@@ -126,7 +125,6 @@ export function PropertyInquiryForm({
         minute: '2-digit',
       });
       setReferenceNumber(result.trackingCode);
-      setCrmRefNumber(`CRM-${result.leadId.slice(-6).toUpperCase()}`);
       setSubmittedTime(now);
       setIsSuccess(true);
       if (onSuccess) onSuccess();
@@ -197,20 +195,13 @@ export function PropertyInquiryForm({
               <span className="font-semibold text-slate-900"><LocalizedValue value={fullName} /></span>
             </div>
             <div className="flex justify-between border-b border-slate-100 pb-1.5">
-              <span className="text-slate-500">{isAr ? <InterfaceText id="realestate.PropertyInquiryForm.kpx2rxg" source="مزامنة الـ CRM:" /> : <InterfaceText id="realestate.PropertyInquiryForm.ki2efyx" source="CRM Sync Hook:" />}</span>
-              <span className="font-mono font-bold text-blue-600 flex items-center gap-1">
-                <Sparkles className="w-3 h-3" />
-                {crmRefNumber || <InterfaceText id="realestate.PropertyInquiryForm.kelqq9w" source="Synced to CRM" />}
-              </span>
-            </div>
-            <div className="flex justify-between border-b border-slate-100 pb-1.5">
               <span className="text-slate-500">{isAr ? <InterfaceText id="realestate.PropertyInquiryForm.k1it8pbk" source="وقت الإرسال:" /> : <InterfaceText id="realestate.PropertyInquiryForm.kra6vej" source="Submitted At:" />}</span>
               <span className="font-medium text-slate-700"><LocalizedValue value={submittedTime} /></span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500">{isAr ? <InterfaceText id="realestate.PropertyInquiryForm.kytuzzv" source="متوسط وقت الرد:" /> : <InterfaceText id="realestate.PropertyInquiryForm.k2urv5m" source="Expected Callback:" />}</span>
               <span className="font-bold text-emerald-700">
-                {isAr ? <InterfaceText id="realestate.PropertyInquiryForm.knuxpvb" source="أقل من 15 دقيقة" /> : <InterfaceText id="realestate.PropertyInquiryForm.k972pqu" source="< 15 minutes" />}
+                {isAr ? <InterfaceText id="realestate.PropertyInquiryForm.knuxpvb" source="خلال يوم عمل واحد" /> : <InterfaceText id="realestate.PropertyInquiryForm.k972pqu" source="Within one business day" />}
               </span>
             </div>
           </div>

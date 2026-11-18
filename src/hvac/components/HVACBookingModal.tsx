@@ -150,10 +150,11 @@ export function HVACBookingModal() {
     ? customCity || (isAr ? 'المنطقة الشرقية' : 'Eastern Province')
     : (isAr ? area?.cityNameAr : area?.cityNameEn) || city;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setBookingError('');
-    if (!name.trim() || !phone.trim() || !date || !service || !city) return;
+    const requestedDate = String(new FormData(e.currentTarget).get('preferredDate') || date);
+    if (!name.trim() || !phone.trim() || !requestedDate || !service || !city) return;
 
     setIsSubmitting(true);
     try {
@@ -164,11 +165,11 @@ export function HVACBookingModal() {
         email: '',
         phone: phone.trim(),
         language,
-        message: `Service: ${service}\nPreferred Date: ${date} (${slot})\nCity: ${cityName}\nNotes: ${notes}`,
+        message: `Service: ${service}\nPreferred Date: ${requestedDate} (${slot})\nCity: ${cityName}\nNotes: ${notes}`,
         attachments,
         details: {
           service,
-          date,
+          date: requestedDate,
           slot,
           city: cityName,
           customCity: city === 'other' ? customCity : undefined,
@@ -237,10 +238,10 @@ City: ${cityName}`;
             </div>
             <div>
               <h3 id={titleId} className="font-semibold text-base sm:text-lg">
-                <LocalizedValue value={pick(T.bookingModal.title, language)} />
+                <LocalizedValue value={isAr ? bookingCopy.modalTitleAr : bookingCopy.modalTitleEn} />
               </h3>
               <p className="text-xs text-slate-300">
-                <LocalizedValue value={pick(T.bookingModal.subtitle, language)} />
+                <LocalizedValue value={isAr ? bookingCopy.modalSubtitleAr : bookingCopy.modalSubtitleEn} />
               </p>
             </div>
           </div>
@@ -344,9 +345,11 @@ City: ${cityName}`;
                     <CalendarIcon className="w-4 h-4 text-slate-500 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
                       type="date"
+                      name="preferredDate"
                       required
                       value={date}
                       onChange={(e) => setDate(e.target.value)}
+                      onInput={(e) => setDate(e.currentTarget.value)}
                       className="w-full ps-9 pe-4 py-2.5 rounded-xl border border-slate-300 hover:border-slate-400 text-sm font-medium text-slate-900 bg-white focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed"
                     />
                   </div>
@@ -487,7 +490,7 @@ City: ${cityName}`;
                   <span>
                     <LocalizedValue value={isSubmitting
                       ? pick(T.quoteForm.sendingBtn, language)
-                      : pick(T.bookingModal.submitBtn, language)} />
+                      : (isAr ? bookingCopy.submitButtonAr : bookingCopy.submitButtonEn)} />
                   </span>
                 </button>
               </div>

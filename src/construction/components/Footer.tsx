@@ -29,7 +29,7 @@ export function Footer({ onNavigate }: FooterProps) {
   const isAr = language === 'ar';
 
   return (
-    <footer className="bg-[#0b1b2d] text-slate-400 border-t border-slate-800 text-xs">
+    <footer className="bg-[#034DA2] text-slate-400 border-t border-slate-800 text-xs">
       {/* Main Footer Body */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 text-start">
         {/* Col 1: Brand & Tagline */}
@@ -158,7 +158,7 @@ export function Footer({ onNavigate }: FooterProps) {
       </div>
 
       {/* Sub-Footer Copyright */}
-      <div className="border-t border-slate-900 py-6 bg-[#071320]">
+      <div className="border-t border-slate-900 py-6 bg-[#034DA2]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-[11px] text-slate-400">
           <div>
             {isAr ? <InterfaceText id="construction.Footer.k1nnp6oa" source="جميع الحقوق محفوظة. هارد للمقاولات@٢٠٢٦" /> : <InterfaceText id="construction.Footer.ko2a357" source="Copyright. HARD Contracting@2026" />}

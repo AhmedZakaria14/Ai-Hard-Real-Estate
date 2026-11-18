@@ -89,6 +89,13 @@ export function validateFormPayload(
   if (payload.formType === 'newsletter_signup') {
     return errors;
   }
+  if (payload.formType === 'book_viewing') {
+    const date = payload.details?.preferredDate;
+    const parsed = typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date) ? new Date(date + 'T12:00:00Z') : null;
+    if (!parsed || Number.isNaN(parsed.valueOf()) || parsed.toISOString().slice(0, 10) !== date) {
+      errors.preferredDate = isAr ? 'اختر تاريخًا صحيحًا للمعاينة.' : 'Choose a valid viewing date.';
+    }
+  }
 
   const nameTrimmed = payload.name ? payload.name.trim() : '';
   if (!nameTrimmed || nameTrimmed.length < 2) {

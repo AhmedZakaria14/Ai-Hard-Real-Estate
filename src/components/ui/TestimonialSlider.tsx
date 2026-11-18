@@ -23,7 +23,7 @@ export function TestimonialSlider({ testimonials, language }: TestimonialSliderP
   const pageCount = Math.ceil(testimonials.length / storiesPerPage);
   const currentPage = page % pageCount;
   const start = currentPage * storiesPerPage;
-  const stories = testimonials.slice(start, start + storiesPerPage);
+  const stories = Array.from({ length: Math.min(storiesPerPage, testimonials.length) }, (_, offset) => testimonials[(start + offset) % testimonials.length]);
   const ArrowBack = ar ? ChevronRight : ChevronLeft;
   const ArrowNext = ar ? ChevronLeft : ChevronRight;
   const arrowClass = 'flex size-10 items-center justify-center rounded-full border border-slate-700 bg-slate-800 text-white hover:bg-blue-700';

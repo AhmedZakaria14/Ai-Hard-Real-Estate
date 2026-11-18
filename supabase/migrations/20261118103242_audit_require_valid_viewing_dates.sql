@@ -1,0 +1,2 @@
+-- New viewing requests must include a real calendar date; historic records are preserved.
+alter table public.hard_form_submissions add constraint hard_viewing_date_required check (form_type <> 'book_viewing' or coalesce((payload#>>'{details,preferredDate}') ~ '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$' and (payload#>>'{details,preferredDate}')::date::text=(payload#>>'{details,preferredDate}'),false)) not valid;

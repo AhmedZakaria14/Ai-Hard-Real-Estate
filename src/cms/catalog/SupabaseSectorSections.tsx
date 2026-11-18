@@ -135,6 +135,9 @@ export default function SupabaseSectorSections() {
   function renderField(value: Json, path: FieldPath = []) {
     const key = String(path.at(-1) ?? '');
     if (fixedKeys.has(key) || value === null) return null;
+    if (section.target.key === 'page_media' && ['constructionHeroImage', 'hvacHeroImage'].includes(key)) return null;
+    if (section.target.sector === 'hvac' && section.target.key === 'hero' && ['badgeAr','badgeEn','ctaPrimaryAr','ctaPrimaryEn','ctaEmergencyAr','ctaEmergencyEn'].includes(key)) return null;
+    if (section.target.key === 'hours_contact' && ['hoursFridayAr','hoursFridayEn','is24x7EmergencyActive','googleMapsUrl'].includes(key)) return null;
     if (typeof value === 'object') {
       const fields = Object.entries(value).map(([child, item]) => renderField(item, [...path, child]));
       return path.length ? <fieldset key={path.join('.')} className="space-y-3 rounded border p-3">
@@ -153,7 +156,7 @@ export default function SupabaseSectorSections() {
           : typeof value === 'number' ? <input type="number" step="any" min={key === 'lat' ? -90 : key === 'lng' ? -180 : undefined} max={key === 'lat' ? 90 : key === 'lng' ? 180 : undefined} required className={inputStyle} value={value} onChange={(event) => edit(path, Number(event.target.value))} />
           : <textarea className={inputStyle} rows={value.length > 80 ? 3 : 1} dir="auto" required={editingCities && (key === 'cityNameAr' || key === 'cityNameEn')} value={value} onChange={(event) => edit(path, event.target.value)} />}
       </label>
-      {imageKey.test(key) && <label className="text-sm">رفع الصورة <input type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif" onChange={(event) => {
+      {imageKey.test(key) && <label className="text-sm">رفع الصورة <input type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif,image/svg+xml" onChange={(event) => {
         const file = event.target.files?.[0];
         if (file) void upload(file, path);
       }} /></label>}

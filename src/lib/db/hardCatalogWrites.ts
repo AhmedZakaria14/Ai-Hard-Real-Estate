@@ -9,7 +9,7 @@ const editableFields = {
     'areaSqFt', 'areaSqM', 'featured', 'images', 'amenities', 'features', 'regaLicenseNumber', 'adLicenseNumber', 'wafiPermitNumber'],
   projects: ['slug', 'title', 'developer', 'location', 'city', 'startingPriceSAR', 'handoverDate', 'unitsTotal',
     'unitsAvailable', 'roiProjected', 'image', 'gallery', 'category', 'status', 'progressPercentage',
-    'lastUpdated', 'description', 'highlights', 'featured', 'brochureUrl'],
+    'lastUpdated', 'description', 'highlights', 'featured', 'brochureUrl', 'financialMetric'],
   blog_posts: ['slug', 'title', 'excerpt', 'category', 'categoryId', 'date', 'publishedAt', 'updatedAt', 'readTime', 'author', 'authorRole',
     'authorAvatar', 'image', 'imageAlt', 'content', 'featured', 'tags'],
 } as const;

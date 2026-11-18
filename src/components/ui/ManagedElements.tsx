@@ -15,6 +15,9 @@ export const ManagedInput = forwardRef<HTMLInputElement, ComponentPropsWithoutRe
   onChange={(event) => {
     if (props.type === 'tel') event.target.value = event.target.value.replace(/[٠-٩]/g, (char) => String(char.charCodeAt(0) - 1632)).replace(/[۰-۹]/g, (char) => String(char.charCodeAt(0) - 1776));
     props.onChange?.(event);
+  }} onInput={(event) => {
+    props.onInput?.(event);
+    if (props.type === 'date') props.onChange?.(event as unknown as React.ChangeEvent<HTMLInputElement>);
   }} />);
 export const ManagedTextarea = forwardRef<HTMLTextAreaElement, ComponentPropsWithoutRef<'textarea'> & CopyProps>(({ copyScope, ...props }, ref) => <textarea {...useCopyAttributes(copyScope, props)} maxLength={props.maxLength ?? 6000} ref={ref} />);
 export const ManagedImg = forwardRef<HTMLImageElement, ComponentPropsWithoutRef<'img'> & CopyProps>(({ copyScope, ...props }, ref) => <img {...useCopyAttributes(copyScope, props)} ref={ref} />);
