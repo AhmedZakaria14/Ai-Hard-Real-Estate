@@ -50,7 +50,6 @@ export function ProjectInquiryModal({
   const [message, setMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [leadRef, setLeadRef] = useState('');
-  const [crmRef, setCrmRef] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [contactError, setContactError] = useState('');
 
@@ -109,7 +108,6 @@ export function ProjectInquiryModal({
       });
 
       setLeadRef(result.trackingCode);
-      setCrmRef(`CRM-${result.leadId.slice(-6).toUpperCase()}`);
       setSubmitted(true);
     } catch (err: any) {
       console.error('Failed to submit project inquiry', err);
@@ -201,13 +199,7 @@ export function ProjectInquiryModal({
                 <span className="text-slate-400 block font-sans">{language === 'en' ? <InterfaceText id="realestate.ProjectInquiryModal.k1dwpi7m" source="Inquiry Ref ID:" /> : <InterfaceText id="realestate.ProjectInquiryModal.k1b8xt8c" source="رقم مرجع الطلب:" />}</span>
                 <span className="font-bold text-slate-900"><LocalizedValue value={leadRef} /></span>
               </div>
-              <div>
-                <span className="text-slate-400 block font-sans">{language === 'en' ? <InterfaceText id="realestate.ProjectInquiryModal.k1fzqftn" source="CRM Dispatch Status:" /> : <InterfaceText id="realestate.ProjectInquiryModal.kh0qypp" source="حالة المزامنة بالسي إر إم:" />}</span>
-                <span className="text-emerald-600 font-bold flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" />
-                  {crmRef || <InterfaceText id="realestate.ProjectInquiryModal.k1l2pcv2" source="Synced to Developer CRM" />}
-                </span>
-              </div>
+
             </div>
           </div>
 
@@ -220,8 +212,8 @@ export function ProjectInquiryModal({
               </strong>
               <p className="text-[11px] text-amber-800 leading-relaxed">
                 {language === 'en'
-                  ? <InterfaceText id="realestate.ProjectInquiryModal.krwg53j" source="This submission registers an inquiry and priority interest. It does not constitute a final binding purchase contract or guaranteed unit reservation. Our sales manager will contact you within 15 minutes to review unit floor plans and verify availability." />
-                  : <InterfaceText id="realestate.ProjectInquiryModal.kzmjpbm" source="تم تسجيل هذا الطلب كاستفسار وحجز أولوية تخصيص، ولا يُعد عقداً ملزماً أو حجزاً نهائياً. سيقوم مستشار مبيعات المشروع بالتواصل معك خلال 15 دقيقة لاستعراض المخططات وتأكيد التوفر الفعلي." />}
+                  ? <InterfaceText id="realestate.ProjectInquiryModal.krwg53j" source="This submission registers an inquiry and priority interest. It does not constitute a final binding purchase contract or guaranteed unit reservation. Our sales manager will contact you within one business day to review unit floor plans and verify availability." />
+                  : <InterfaceText id="realestate.ProjectInquiryModal.kzmjpbm" source="تم تسجيل هذا الطلب كاستفسار وحجز أولوية تخصيص، ولا يُعد عقداً ملزماً أو حجزاً نهائياً. سيقوم مستشار مبيعات المشروع بالتواصل معك خلال يوم عمل واحد لاستعراض المخططات وتأكيد التوفر الفعلي." />}
               </p>
             </div>
           </div>

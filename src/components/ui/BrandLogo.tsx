@@ -111,7 +111,7 @@ export function BrandLogo({
         <div className="flex min-w-0 flex-col justify-center leading-tight">
           <div className="flex items-baseline gap-1.5">
             <span
-              className={`font-bold tracking-tight font-display-serif ${wordmark ? 'text-sm text-[#0076BB] sm:text-base' : currentSize.textClass + (variant === 'light' ? ' text-white' : ' text-slate-900')}`}
+              className={`font-bold tracking-tight font-display-serif ${wordmark ? 'text-sm sm:text-base ' + (variant === 'light' ? 'text-white' : 'text-[#0076BB]') : currentSize.textClass + (variant === 'light' ? ' text-white' : ' text-slate-900')}`}
             >
               <LocalizedValue value={wordmark?.name ?? brandName} />
             </span>

@@ -29,6 +29,8 @@ import {
   PageSeoConfig,
   LegalPolicyContent,
   getStoredSeoConfigs,
+  loadSeoConfigs,
+  loadLegalPolicy,
   saveStoredSeoConfigs,
   getStoredLegalPolicy,
   saveStoredLegalPolicy,
@@ -47,6 +49,16 @@ interface CMSSeoLegalEditorProps {
 
 export const CMSSeoLegalEditor: React.FC<CMSSeoLegalEditorProps> = ({ language }) => {
   const isAr = language === 'ar';
+  const [configLoading, setConfigLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [persistenceError, setPersistenceError] = useState('');
+  useEffect(() => {
+    const controller = new AbortController();
+    Promise.all([loadSeoConfigs(controller.signal), loadLegalPolicy(controller.signal)]).then(([seo, legal]) => {
+      if (!controller.signal.aborted) { setSeoConfigs(seo); setLegalPolicy(legal); setConfigLoading(false); }
+    }).catch(() => { if (!controller.signal.aborted) setPersistenceError(isAr ? 'تعذر تحميل الإعدادات. أعد فتح القسم للمحاولة.' : 'Could not load settings. Reopen this section to retry.'); });
+    return () => controller.abort();
+  }, []);
   const { properties, projects, blogPosts } = useData();
 
   const [activeSubTab, setActiveSubTab] = useState<'seo' | 'legal' | 'sitemap'>('seo');
@@ -76,7 +88,10 @@ export const CMSSeoLegalEditor: React.FC<CMSSeoLegalEditorProps> = ({ language }
     }));
   };
 
-  const handleSaveSeoConfigs = () => {
+  const handleSaveSeoConfigs = async () => {
+    if (configLoading || saving) return;
+    setSaving(true); setPersistenceError('');
+    try {
     // Sanitize configs before saving to prevent injection
     const sanitized: Record<string, PageSeoConfig> = {};
     Object.entries(seoConfigs).forEach(([key, cfg]) => {
@@ -96,7 +111,7 @@ export const CMSSeoLegalEditor: React.FC<CMSSeoLegalEditorProps> = ({ language }
       };
     });
 
-    saveStoredSeoConfigs(sanitized);
+    await saveStoredSeoConfigs(sanitized);
     setSeoConfigs(sanitized);
 
     // Apply to current head if active page matches
@@ -106,6 +121,8 @@ export const CMSSeoLegalEditor: React.FC<CMSSeoLegalEditorProps> = ({ language }
 
     setSeoStatusMessage(isAr ? 'تم حفظ وإعادة تطبيق إعدادات SEO بنجاح!' : 'SEO metadata saved and applied successfully!');
     setTimeout(() => setSeoStatusMessage(null), 3500);
+    } catch { setPersistenceError(isAr ? 'تعذر حفظ الإعدادات في قاعدة البيانات. التعديلات ما زالت متاحة للمحاولة.' : 'Could not save settings. Your edits are preserved for retry.'); }
+    finally { setSaving(false); }
   };
 
   // --- STATE 2: LEGAL POLICY CONFIGS ---
@@ -115,14 +132,19 @@ export const CMSSeoLegalEditor: React.FC<CMSSeoLegalEditorProps> = ({ language }
 
   const missingLegalFlags = validateLegalPolicyCompleteness(legalPolicy);
 
-  const handleSaveLegalPolicy = () => {
-    saveStoredLegalPolicy(legalPolicy);
+  const handleSaveLegalPolicy = async () => {
+    if (configLoading || saving) return;
+    setSaving(true); setPersistenceError('');
+    try {
+    await saveStoredLegalPolicy(legalPolicy);
     setLegalStatusMessage(
       isAr
         ? 'تم حفظ واعتماد وثيقة السياسات والشروط المعتمدة بنجاح!'
         : 'Approved legal policy document saved successfully!'
     );
     setTimeout(() => setLegalStatusMessage(null), 3500);
+    } catch { setPersistenceError(isAr ? 'تعذر حفظ الإعدادات في قاعدة البيانات. التعديلات ما زالت متاحة للمحاولة.' : 'Could not save settings. Your edits are preserved for retry.'); }
+    finally { setSaving(false); }
   };
 
   const handleAddPrivacySection = () => {
@@ -222,6 +244,8 @@ export const CMSSeoLegalEditor: React.FC<CMSSeoLegalEditorProps> = ({ language }
 
   return (
     <div dir={isAr ? 'rtl' : 'ltr'} className="space-y-6">
+      {persistenceError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{persistenceError}</p>}
+      {configLoading && <p role="status" className="text-sm text-slate-500">{isAr ? 'جارٍ تحميل الإعدادات المحفوظة…' : 'Loading saved settings…'}</p>}
       {/* Top Header & Subtab Switcher */}
       <div className="bg-white rounded-3xl border border-slate-200 shadow-xs p-6 space-y-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
@@ -344,7 +368,7 @@ export const CMSSeoLegalEditor: React.FC<CMSSeoLegalEditorProps> = ({ language }
 
                   <button
                     type="button"
-                    onClick={handleSaveSeoConfigs}
+                    disabled={configLoading || saving} onClick={handleSaveSeoConfigs}
                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
                   >
                     <Save className="w-3.5 h-3.5" />
@@ -488,7 +512,7 @@ export const CMSSeoLegalEditor: React.FC<CMSSeoLegalEditorProps> = ({ language }
 
               <button
                 type="button"
-                onClick={handleSaveLegalPolicy}
+                disabled={configLoading || saving} onClick={handleSaveLegalPolicy}
                 className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
               >
                 <Save className="w-3.5 h-3.5" />

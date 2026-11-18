@@ -204,7 +204,7 @@ export function Hero() {
           <div className="p-5 rounded-2xl bg-white border border-sky-100 shadow-sm text-start space-y-1 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <span className="text-2xl sm:text-4xl font-black font-display-serif text-[#0f243e] tracking-tight">
-                <LocalizedValue value={formatConstructionDigits(t.hero.stats.yearsCount, language)} />
+                <LocalizedValue value={formatConstructionDigits(heroContent.stats.yearsCount ?? t.hero.stats.yearsCount, language)} />
               </span>
               <div className="p-2.5 rounded-xl bg-[#eef7ff] text-[#009ee2] border border-sky-100">
                 <Award className="w-5 h-5" />
@@ -217,7 +217,7 @@ export function Hero() {
           <div className="p-5 rounded-2xl bg-white border border-sky-100 shadow-sm text-start space-y-1 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <span className="text-2xl sm:text-4xl font-black font-display-serif text-[#0f243e] tracking-tight">
-                <LocalizedValue value={formatConstructionDigits(t.hero.stats.projectsCount, language)} />
+                <LocalizedValue value={formatConstructionDigits(heroContent.stats.projectsCount, language)} />
               </span>
               <div className="p-2.5 rounded-xl bg-[#eef7ff] text-[#009ee2] border border-sky-100">
                 <Building className="w-5 h-5" />
@@ -230,7 +230,7 @@ export function Hero() {
           <div className="p-5 rounded-2xl bg-white border border-sky-100 shadow-sm text-start space-y-1 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <span className="text-2xl sm:text-4xl font-black font-display-serif text-[#0f243e] tracking-tight">
-                <LocalizedValue value={formatConstructionDigits(t.hero.stats.satisfactionCount, language)} />
+                <LocalizedValue value={formatConstructionDigits(heroContent.stats.satisfactionRate, language)} />
               </span>
               <div className="p-2.5 rounded-xl bg-[#eef7ff] text-[#009ee2] border border-sky-100">
                 <CheckCircle2 className="w-5 h-5" />
@@ -242,7 +242,7 @@ export function Hero() {
           {/* Stat 4: 350,000+ m2 */}
           <div className="p-5 rounded-2xl bg-white border border-sky-100 shadow-sm text-start space-y-1 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
-              <span className="text-2xl sm:text-4xl font-black font-display-serif text-[#0f243e] tracking-tight"><LocalizedValue value="350,000+" /></span>
+              <span className="text-2xl sm:text-4xl font-black font-display-serif text-[#0f243e] tracking-tight"><LocalizedValue value={heroContent.stats.buaM2Total.replace(/\s*(?:م²|m²|m2)$/i, '')} /></span>
               <div className="p-2.5 rounded-xl bg-[#eef7ff] text-[#009ee2] border border-sky-100">
                 <Maximize2 className="w-5 h-5" />
               </div>

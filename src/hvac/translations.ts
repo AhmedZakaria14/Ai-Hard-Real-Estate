@@ -161,8 +161,8 @@ export const T = {
       ar: 'استكمال بيانات طلب عرض السعر',
     },
     dialogSubtitle: {
-      en: 'Our dispatch engineer will review your system specs and confirm exact timing within 15 minutes.',
-      ar: 'سيقوم مهندس التشغيل بمراجعة تفاصيل جهازك والتواصل لتأكيد الموعد خلال 15 دقيقة.',
+      en: 'Our dispatch engineer will review your system specs and confirm exact timing within one business day.',
+      ar: 'سيقوم مهندس التشغيل بمراجعة تفاصيل جهازك والتواصل لتأكيد الموعد خلال يوم عمل واحد.',
     },
     fullNameLabel: {
       en: 'Full Name',

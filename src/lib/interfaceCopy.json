@@ -416,7 +416,11 @@
     "construction.QuoteModal.ks8scy4": "الحي (حطين)",
     "construction.QuoteModal.kjx3jg1": "مثال: ٥ - ٨ مليون ريال",
     "construction.QuoteModal.k1gj5378": "خلال ٣ أشهر",
-    "construction.QuoteModal.knjhxxe": "أي مواصفات خاصة، شروط استشارية، أو متطلبات محددة..."
+    "construction.QuoteModal.knjhxxe": "أي مواصفات خاصة، شروط استشارية، أو متطلبات محددة...",
+    "construction.ContactSection.kxzppa7": "الاسم",
+    "construction.ContactSection.kz14tgk": "البريد الإلكتروني",
+    "construction.ContactSection.keh9c3v": "رقم الهاتف",
+    "construction.ContactSection.k1pfijfs": "الرسالة"
   },
   "en": {
     "realestate.AboutPage.kpqvebp": "Officially licensed real estate marketing and brokerage",
@@ -905,6 +909,10 @@
     "construction.QuoteModal.k1ie6zi6": "District (Hittin)",
     "construction.QuoteModal.kiikynp": "e.g. 5M - 8M SAR",
     "construction.QuoteModal.k5w9nde": "Within 3 months",
-    "construction.QuoteModal.k6he0s3": "Any special requirements or specifications..."
+    "construction.QuoteModal.k6he0s3": "Any special requirements or specifications...",
+    "construction.ContactSection.k4el6o6": "Name",
+    "construction.ContactSection.kinbfc7": "Email",
+    "construction.ContactSection.kkb2lhr": "Phone",
+    "construction.ContactSection.k1cam7ic": "Message"
   }
 }

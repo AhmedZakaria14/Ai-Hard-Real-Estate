@@ -10,6 +10,7 @@ export interface ConstructionHeroContent {
   subtitleEn: string;
   bgImageUrl: string;
   stats: {
+    yearsCount?: string;
     projectsCount: string;
     buaM2Total: string;
     safetyHours: string;
@@ -87,6 +88,7 @@ export const DEFAULT_HERO_CONTENT: ConstructionHeroContent = {
   bgImageUrl:
     'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1600&q=80',
   stats: {
+    yearsCount: '15+',
     projectsCount: '٤٥+',
     buaM2Total: '١٨٠,٠٠٠+ م²',
     safetyHours: '١.٥ مليون+ ساعة',

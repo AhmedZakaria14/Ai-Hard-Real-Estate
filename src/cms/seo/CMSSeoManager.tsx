@@ -7,6 +7,8 @@ import {
   PageSeoConfig,
   LegalPolicyContent,
   getStoredSeoConfigs,
+  loadSeoConfigs,
+  loadLegalPolicy,
   saveStoredSeoConfigs,
   getStoredLegalPolicy,
   saveStoredLegalPolicy,
@@ -39,6 +41,16 @@ interface CMSSeoManagerProps {
 
 export const CMSSeoManager: React.FC<CMSSeoManagerProps> = ({ language }) => {
   const isAr = language === 'ar';
+  const [configLoading, setConfigLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [persistenceError, setPersistenceError] = useState('');
+  useEffect(() => {
+    const controller = new AbortController();
+    Promise.all([loadSeoConfigs(controller.signal), loadLegalPolicy(controller.signal)]).then(([seo, legal]) => {
+      if (!controller.signal.aborted) { setSeoConfigs(seo); setLegalPolicy(legal); setConfigLoading(false); }
+    }).catch(() => { if (!controller.signal.aborted) setPersistenceError(isAr ? 'تعذر تحميل الإعدادات. أعد فتح القسم للمحاولة.' : 'Could not load settings. Reopen this section to retry.'); });
+    return () => controller.abort();
+  }, []);
   const { properties, projects, blogPosts } = useData();
 
   const [activeTab, setActiveTab] = useState<'seo' | 'legal'>('seo');
@@ -69,18 +81,28 @@ export const CMSSeoManager: React.FC<CMSSeoManagerProps> = ({ language }) => {
     setSeoConfigs(newConfigs);
   };
 
-  const handleSaveSeoSettings = () => {
-    saveStoredSeoConfigs(seoConfigs);
+  const handleSaveSeoSettings = async () => {
+    if (configLoading || saving) return;
+    setSaving(true); setPersistenceError('');
+    try {
+    await saveStoredSeoConfigs(seoConfigs);
     // Apply live SEO to current head
     applyPageSeoToHead(currentSeo, language);
     setSaveSuccessMsg(isAr ? 'تم حفظ إعدادات SEO وبيانات المشتركة بنجاح!' : 'SEO & Social metadata saved successfully!');
     setTimeout(() => setSaveSuccessMsg(null), 3000);
+    } catch { setPersistenceError(isAr ? 'تعذر حفظ الإعدادات في قاعدة البيانات. التعديلات ما زالت متاحة للمحاولة.' : 'Could not save settings. Your edits are preserved for retry.'); }
+    finally { setSaving(false); }
   };
 
-  const handleSaveLegalPolicy = () => {
-    saveStoredLegalPolicy(legalPolicy);
+  const handleSaveLegalPolicy = async () => {
+    if (configLoading || saving) return;
+    setSaving(true); setPersistenceError('');
+    try {
+    await saveStoredLegalPolicy(legalPolicy);
     setSaveSuccessMsg(isAr ? 'تم حفظ نصوص سياسة الخصوصية والشروط المعتمدة!' : 'Approved Privacy & Terms Policy saved successfully!');
     setTimeout(() => setSaveSuccessMsg(null), 3000);
+    } catch { setPersistenceError(isAr ? 'تعذر حفظ الإعدادات في قاعدة البيانات. التعديلات ما زالت متاحة للمحاولة.' : 'Could not save settings. Your edits are preserved for retry.'); }
+    finally { setSaving(false); }
   };
 
   const handleDownloadSitemapXml = () => {
@@ -113,6 +135,8 @@ export const CMSSeoManager: React.FC<CMSSeoManagerProps> = ({ language }) => {
 
   return (
     <div className="space-y-6">
+      {persistenceError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{persistenceError}</p>}
+      {configLoading && <p role="status" className="text-sm text-slate-500">{isAr ? 'جارٍ تحميل الإعدادات المحفوظة…' : 'Loading saved settings…'}</p>}
       {/* Top Banner Header */}
       <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
@@ -249,7 +273,7 @@ export const CMSSeoManager: React.FC<CMSSeoManagerProps> = ({ language }) => {
                 </div>
 
                 <button
-                  onClick={handleSaveSeoSettings}
+                  disabled={configLoading || saving} onClick={handleSaveSeoSettings}
                   className="px-5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-md transition-colors flex items-center gap-1.5"
                 >
                   <Save className="w-4 h-4" />
@@ -454,7 +478,7 @@ export const CMSSeoManager: React.FC<CMSSeoManagerProps> = ({ language }) => {
               </h3>
 
               <button
-                onClick={handleSaveLegalPolicy}
+                disabled={configLoading || saving} onClick={handleSaveLegalPolicy}
                 className="px-5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-md transition-colors flex items-center gap-1.5"
               >
                 <Save className="w-4 h-4" />

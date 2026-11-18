@@ -31,8 +31,8 @@ export function getPageTitle(options: PageTitleOptions): string {
   switch (page) {
     case 'portal':
       return isAr
-        ? 'مجموعة هارد | بوابة المجموعة'
-        : 'HARD Group | Corporate Group Portal';
+        ? 'مجموعة هارد'
+        : 'HARD Group';
 
     case 'home':
       return isAr
@@ -116,8 +116,8 @@ export function getPageTitle(options: PageTitleOptions): string {
           : 'Construction Projects | HARD Contracting';
       }
       return isAr
-        ? 'هارد للمقاولات العامة والإنشاءات | مجموعة هارد'
-        : 'HARD Contracting & General Construction | HARD Group';
+        ? 'هارد للمقاولات'
+        : 'HARD Contracting';
 
     case 'hvac':
       if (options.isHvacCMS) {
@@ -126,7 +126,7 @@ export function getPageTitle(options: PageTitleOptions): string {
           : 'HVAC CMS Dashboard | HARD HVAC Maintenance';
       }
       return isAr
-        ? 'هارد لصيانة وتكييف الهواء | مجموعة هارد'
+        ? 'هارد لصيانة التكييف'
         : 'HARD HVAC Maintenance | HARD Group';
 
     case 'not-found':

@@ -52,7 +52,7 @@ const labels: Record<string, string> = {
   headlineAr: 'العنوان بالعربية', headlineEn: 'العنوان بالإنجليزية',
   subtitleAr: 'الوصف بالعربية', subtitleEn: 'الوصف بالإنجليزية',
   'serv-1': 'الوساطة العقارية', 'serv-2': 'التسويق العقاري', 'serv-3': 'الاستشارات الاستثمارية',
-  stats: 'الأرقام المعروضة فوق الصورة', value: 'القيمة',
+  stats: 'الأرقام المعروضة', value: 'القيمة', yearsCount: 'سنوات الخبرة', projectsCount: 'عدد المشاريع المنجزة', buaM2Total: 'مسطحات البناء المنجزة', satisfactionRate: 'نسبة رضا العملاء',
   bgImageUrl: 'رابط صورة الغلاف', googleMapsUrl: 'رابط الخريطة',
   officeEmail: 'البريد الإلكتروني للمكتب', emergencyPhone: 'هاتف الطوارئ',
   cityNameAr: 'اسم المدينة بالعربية', cityNameEn: 'اسم المدينة بالإنجليزية',
@@ -135,6 +135,7 @@ export default function SupabaseSectorSections() {
   function renderField(value: Json, path: FieldPath = []) {
     const key = String(path.at(-1) ?? '');
     if (fixedKeys.has(key) || value === null) return null;
+    if (section.target.sector === 'construction' && section.target.key === 'hero' && key === 'safetyHours') return null;
     if (section.target.key === 'page_media' && ['constructionHeroImage', 'hvacHeroImage'].includes(key)) return null;
     if (section.target.sector === 'hvac' && section.target.key === 'hero' && ['badgeAr','badgeEn','ctaPrimaryAr','ctaPrimaryEn','ctaEmergencyAr','ctaEmergencyEn'].includes(key)) return null;
     if (section.target.key === 'hours_contact' && ['hoursFridayAr','hoursFridayEn','is24x7EmergencyActive','googleMapsUrl'].includes(key)) return null;

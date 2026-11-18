@@ -33,7 +33,6 @@ export function RequestBrochureModal({
   const [submitted, setSubmitted] = useState(false);
   const [confirmedEmail, setConfirmedEmail] = useState('');
   const [leadRef, setLeadRef] = useState('');
-  const [crmRef, setCrmRef] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState('');
 
@@ -65,7 +64,6 @@ export function RequestBrochureModal({
 
       setConfirmedEmail(email.trim());
       setLeadRef(result.trackingCode);
-      setCrmRef(`CRM-${result.leadId.slice(-6).toUpperCase()}`);
       setSubmitted(true);
     } catch (err: any) {
       console.error('Failed to submit brochure request', err);
@@ -133,10 +131,7 @@ export function RequestBrochureModal({
               <strong>{language === 'en' ? <InterfaceText id="realestate.RequestBrochureModal.k1dodnt7" source="Reference Code:" /> : <InterfaceText id="realestate.RequestBrochureModal.k1lt3bxh" source="رقم المرجع:" />}</strong><LocalizedValue value={' '} />
               <span className="font-mono font-bold text-slate-900"><LocalizedValue value={leadRef} /></span>
             </p>
-            <p className="flex items-center gap-1 text-blue-600 font-semibold pt-1 border-t border-slate-200">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span><LocalizedValue value={language === 'en' ? `Recorded in CRM (${crmRef || 'Synced'})` : `تم التوثيق بالنظام (${crmRef || 'مكتمل'})`} /></span>
-            </p>
+
           </div>
 
           <div className="pt-2">

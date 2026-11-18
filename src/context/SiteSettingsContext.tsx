@@ -84,29 +84,29 @@ export const DEFAULT_PORTAL_SETTINGS: PublicBrandingSettings = {
   contactEmail: 'info@hardgp.com',
   supportPhone: '+966 55 612 5711',
   whatsappNumber: '+966 55 612 5711',
-  tollFreeNumber: '800 123 4567',
+  tollFreeNumber: '',
   workingHours: {
     ar: 'الأحد - الخميس: 8:00 صباحاً - 5:00 مساءً',
     en: 'Sun - Thu: 8:00 AM - 5:00 PM',
   },
 
   socialLinks: {
-    twitter: 'https://twitter.com/hardgroup_sa',
+    twitter: 'https://x.com/HARDGRP',
     linkedin: 'https://linkedin.com/company/hardgroup-sa',
-    instagram: 'https://instagram.com/hardgroup_sa',
+    instagram: 'https://www.instagram.com/hardgrp',
     youtube: 'https://youtube.com/@hardgroup_sa',
   },
 
   office: {
     address: {
-      ar: 'طريق الملك فهد، البرج الإستثماري، الرياض 12211',
-      en: 'King Fahd Road, Investment Tower, Riyadh 12211',
+      ar: 'طريق الأمير متعب بن عبد العزيز، حي هجر، الدمام، المملكة العربية السعودية',
+      en: 'Prince Mutaib bin Abdulaziz Road, Hajr, Dammam, Saudi Arabia',
     },
     city: {
-      ar: 'الرياض، المملكة العربية السعودية',
-      en: 'Riyadh, Kingdom of Saudi Arabia',
+      ar: 'الدمام، المملكة العربية السعودية',
+      en: 'Dammam, Saudi Arabia',
     },
-    googleMapsUrl: 'https://maps.google.com/?q=Riyadh+Saudi+Arabia',
+    googleMapsUrl: 'https://maps.google.com/?q=26.373703,50.102998',
   },
 
   footerContent: {
@@ -125,7 +125,7 @@ export const DEFAULT_PORTAL_SETTINGS: PublicBrandingSettings = {
   designTokens: {
     primaryAccent: '#0284c7',
     secondaryAccent: '#0f172a',
-    darkBgToken: '#090d16',
+    darkBgToken: '#034DA2',
     fontFamily: 'Tajawal, Cairo, sans-serif',
   },
 };
@@ -139,7 +139,7 @@ export const DEFAULT_SECTOR_SETTINGS: Record<SectorId, Partial<PublicBrandingSet
     designTokens: {
       primaryAccent: '#0284c7', // Sky Blue
       secondaryAccent: '#0369a1',
-      darkBgToken: '#090d16',
+      darkBgToken: '#034DA2',
       fontFamily: 'Tajawal, sans-serif',
     },
   },
@@ -148,9 +148,9 @@ export const DEFAULT_SECTOR_SETTINGS: Record<SectorId, Partial<PublicBrandingSet
     siteName: { ar: 'هارد للمقاولات', en: 'HARD Contracting' },
     tagline: { ar: 'مقاولات عامة وإنشائية', en: 'Contracting & Construction' },
     designTokens: {
-      primaryAccent: '#d97706', // Amber Gold
-      secondaryAccent: '#b45309',
-      darkBgToken: '#120d06',
+      primaryAccent: '#0284c7',
+      secondaryAccent: '#0369a1',
+      darkBgToken: '#034DA2',
       fontFamily: 'Tajawal, sans-serif',
     },
   },
@@ -159,9 +159,9 @@ export const DEFAULT_SECTOR_SETTINGS: Record<SectorId, Partial<PublicBrandingSet
     siteName: { ar: 'هارد لصيانة التكييف', en: 'HARD HVAC Maintenance' },
     tagline: { ar: 'صيانة احترافية', en: 'Professional Maintenance' },
     designTokens: {
-      primaryAccent: '#0d9488', // Teal Cyan
-      secondaryAccent: '#0f766e',
-      darkBgToken: '#061314',
+      primaryAccent: '#0284c7',
+      secondaryAccent: '#0369a1',
+      darkBgToken: '#034DA2',
       fontFamily: 'Tajawal, sans-serif',
     },
   },
@@ -227,7 +227,9 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   useEffect(() => {
     const controller = new AbortController();
+    let generation = 0;
     async function loadPublished() {
+      const request = ++generation;
       try {
         const response = await fetch(hardSupabaseUrl + '/rest/v1/hard_site_branding?visibility=eq.published&select=sector,settings', {
           headers: { apikey: hardPublishableKey },
@@ -236,7 +238,7 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
         });
         if (!response.ok) throw new Error('Could not fetch published branding');
         const rows: { sector: SectorId; settings: PublicBrandingSettings }[] = await response.json();
-        if (controller.signal.aborted) return;
+        if (controller.signal.aborted || request !== generation) return;
         setPublishedSettings((previous) => {
           const result = { ...previous };
           for (const { sector, settings } of rows) result[sector] = { ...previous[sector], ...settings, sector };
@@ -248,8 +250,17 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
         if (!controller.signal.aborted) setIsLoading(false);
       }
     }
+    const onStorage = (event: StorageEvent) => { if (event.key === 'hard-branding-saved') void loadPublished(); };
+    window.addEventListener('focus', loadPublished);
+    window.addEventListener('hard-branding-saved', loadPublished);
+    window.addEventListener('storage', onStorage);
     void loadPublished();
-    return () => controller.abort();
+    return () => {
+      controller.abort();
+      window.removeEventListener('focus', loadPublished);
+      window.removeEventListener('hard-branding-saved', loadPublished);
+      window.removeEventListener('storage', onStorage);
+    };
   }, []);
 
   useEffect(() => {
@@ -340,7 +351,11 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }, { onConflict: 'sector,visibility' });
     if (error) throw error;
     if (visibility === 'draft') setDraftSettings((previous) => ({ ...previous, [sector]: payload }));
-    else setPublishedSettings((previous) => ({ ...previous, [sector]: payload }));
+    else {
+      setPublishedSettings((previous) => ({ ...previous, [sector]: payload }));
+      window.dispatchEvent(new Event('hard-branding-saved'));
+      try { localStorage.setItem('hard-branding-saved', String(Date.now())); } catch { /* Focus reload remains available. */ }
+    }
   }
 
   const saveDraftSettings = (sector: SectorId, settings: PublicBrandingSettings) => persistSettings(sector, settings, 'draft');

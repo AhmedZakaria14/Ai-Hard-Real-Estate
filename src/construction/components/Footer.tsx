@@ -2,7 +2,7 @@ import { LocalizedValue } from '../../components/ui/LocalizedValue';
 import { InterfaceText } from '../../components/ui/InterfaceText';
 import { ManagedImg } from '../../components/ui/ManagedElements';
 import { useTextOverride } from '../../context/TextOverrideContext';
-import { usePublishedBrandEmblem } from '../../components/ui/BrandLogo';
+import { BrandLogo, usePublishedBrandEmblem } from '../../components/ui/BrandLogo';
 import React from 'react';
 import {
   ShieldCheck,
@@ -34,21 +34,7 @@ export function Footer({ onNavigate }: FooterProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 text-start">
         {/* Col 1: Brand & Tagline */}
         <div className="space-y-4 lg:col-span-1">
-          <div className="flex items-center gap-3">
-            <ManagedImg copyScope="construction.Footer"
-              src={emblem} onError={({ currentTarget }) => { if (!currentTarget.src.endsWith('/logo.svg')) currentTarget.src = '/logo.svg'; }}
-              alt="HARD Group"
-              className="h-10 w-auto object-contain"
-            />
-            <div>
-              <div className="font-display-serif font-black text-base text-white">
-                {isAr ? <InterfaceText id="construction.Footer.kfuun6i" source="هارد للمقاولات" /> : <InterfaceText id="construction.Footer.kzfqcle" source="HARD Contracting Co." />}
-              </div>
-              <div className="text-[10px] text-[#009ee2] font-bold">
-                {isAr ? <InterfaceText id="construction.Footer.kdy5nk9" source="مقاولات عامة وإنشائية" /> : <InterfaceText id="construction.Footer.k1pggh98" source="General Contracting & Construction" />}
-              </div>
-            </div>
-          </div>
+          <BrandLogo sector="construction" size="md" language={language} variant="light" standardWordmark />
 
           <p className="text-xs text-slate-300 leading-relaxed">
             <LocalizedValue value={t.brand.tagline.replace('في المملكة', 'في المنطقة الشرقية')} />. <LocalizedValue value={t.brand.slogan.replace('في المملكة', 'في المنطقة الشرقية')} />.

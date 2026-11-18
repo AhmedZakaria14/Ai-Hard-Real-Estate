@@ -6,6 +6,7 @@
  */
 
 import { Language, PageId } from '../../types';
+import { readSectorSection, saveSectorSection, subscribeSectorSection } from '../db/hardSectorSections';
 
 export interface PageSeoConfig {
   pageId: PageId | 'privacy' | 'terms';
@@ -91,8 +92,8 @@ const DEFAULT_SEO_CONFIGS: Record<string, PageSeoConfig> = {
   portal: {
     pageId: 'portal',
     title: {
-      en: 'HARD Group | Corporate Holding Division',
-      ar: 'مجموعة هارد | البوابة الرئيسية للقطاعات',
+      en: 'HARD Group',
+      ar: 'مجموعة هارد',
     },
     description: {
       en: 'HARD Group - Unified multi-sector platform for Real Estate Brokerage, General Contracting, and Enterprise HVAC Solutions in Saudi Arabia.',
@@ -203,12 +204,12 @@ const DEFAULT_SEO_CONFIGS: Record<string, PageSeoConfig> = {
   construction: {
     pageId: 'construction',
     title: {
-      en: 'HARD Contracting | Class-1 General Construction',
-      ar: 'هارد للمقاولات العامة والإنشاءات | كود البناء السعودي',
+      en: 'HARD Contracting',
+      ar: 'هارد للمقاولات',
     },
     description: {
-      en: 'Class-1 certified general contractor delivering commercial towers and residential communities with SBC compliance.',
-      ar: 'الذراع الهندسي لمجموعة هارد - مقاولات عامة مصنفة فئة أولى لتنفيذ المباني والأبراج التجارية بكود البناء السعودي.',
+      en: 'General contracting and construction in the Eastern Province, delivering commercial and residential projects with Saudi Building Code compliance.',
+      ar: 'هارد للمقاولات العامة والإنشائية في المنطقة الشرقية لتنفيذ المشاريع التجارية والسكنية وفق كود البناء السعودي.',
     },
     ogImage: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=80',
     indexable: true,
@@ -217,11 +218,11 @@ const DEFAULT_SEO_CONFIGS: Record<string, PageSeoConfig> = {
   hvac: {
     pageId: 'hvac',
     title: {
-      en: 'HARD HVAC | Enterprise Climate & Maintenance Solutions',
-      ar: 'هارد لأنظمة التكييف والحلول المركزية | صيانة 24/7',
+      en: 'HARD HVAC Maintenance',
+      ar: 'هارد لصيانة التكييف',
     },
     description: {
-      en: 'Enterprise HVAC chilled water systems, VRF installations, and 24/7 rapid emergency dispatch.',
+      en: 'Professional air conditioning maintenance, central HVAC systems and VRF services in the Eastern Province.',
       ar: 'حلول التكييف المركزي والمياه المثلجة وأنظمة VRF والخدمات الكهروميكانيكية الطارئة للمنشآت.',
     },
     ogImage: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1200&q=80',
@@ -249,7 +250,7 @@ const DEFAULT_SEO_CONFIGS: Record<string, PageSeoConfig> = {
       ar: 'الشروط والأحكام والضوابط التشغيلية | مجموعة هارد',
     },
     description: {
-      en: 'Operational terms and brokerage advisory conditions governed by REGA License #7200018492 and Saudi laws.',
+      en: 'Operational terms and brokerage advisory conditions governed by REGA License #1200048912 and Saudi laws.',
       ar: 'الشروط والأحكام المعتمدة والضوابط التنظيمية لمجموعة هارد وخدمات الوساطة العقارية المرخصة.',
     },
     ogImage: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80',
@@ -258,26 +259,27 @@ const DEFAULT_SEO_CONFIGS: Record<string, PageSeoConfig> = {
   },
 };
 
-const SEO_STORAGE_KEY = 'hard_cms_page_seo_configs_v1';
-const LEGAL_STORAGE_KEY = 'hard_cms_approved_legal_policy_v1';
+let publishedSeoConfigs = DEFAULT_SEO_CONFIGS;
 
 export function getStoredSeoConfigs(): Record<string, PageSeoConfig> {
-  try {
-    const raw = localStorage.getItem(SEO_STORAGE_KEY);
-    if (!raw) return DEFAULT_SEO_CONFIGS;
-    const parsed = JSON.parse(raw);
-    return { ...DEFAULT_SEO_CONFIGS, ...parsed };
-  } catch {
-    return DEFAULT_SEO_CONFIGS;
-  }
+  return publishedSeoConfigs;
 }
 
-export function saveStoredSeoConfigs(configs: Record<string, PageSeoConfig>): void {
-  try {
-    localStorage.setItem(SEO_STORAGE_KEY, JSON.stringify(configs));
-  } catch (e) {
-    console.warn('Failed to save SEO configs to localStorage:', e);
-  }
+export async function loadSeoConfigs(signal?: AbortSignal): Promise<Record<string, PageSeoConfig>> {
+  const saved = await readSectorSection<Record<string, PageSeoConfig>>({sector: 'realestate', key: 'seo'}, signal);
+  return publishedSeoConfigs = {...DEFAULT_SEO_CONFIGS, ...saved};
+}
+
+export function subscribeSeoConfigs(callback: (configs: Record<string, PageSeoConfig>) => void) {
+  return subscribeSectorSection({sector: 'realestate', key: 'seo'}, DEFAULT_SEO_CONFIGS, (saved) => {
+    publishedSeoConfigs = {...DEFAULT_SEO_CONFIGS, ...saved};
+    callback(publishedSeoConfigs);
+  });
+}
+
+export async function saveStoredSeoConfigs(configs: Record<string, PageSeoConfig>): Promise<void> {
+  await saveSectorSection({sector: 'realestate', key: 'seo'}, configs);
+  publishedSeoConfigs = {...DEFAULT_SEO_CONFIGS, ...configs};
 }
 
 /**
@@ -298,8 +300,8 @@ export const DEFAULT_LEGAL_POLICY: LegalPolicyContent = {
           ar: '1. هوية جهة التحكم ونطاق سياسة الخصوصية',
         },
         body: {
-          en: 'HARD Real Estate Group (Commercial Registration #2051254311, REGA License #7200018492, Al Khobar, Saudi Arabia) acts as the Data Controller under the Saudi Personal Data Protection Law (PDPL). This policy applies to all personal data collected through our web portals.',
-          ar: 'تعد شركة هارد للعقارات (السجل التجاري رقم 2051254311 وترخيص الهيئة العامة للعقار رقم 7200018492، الخبر، المملكة العربية السعودية) جهة التحكم بالبيانات وفق نظام حماية البيانات الشخصية (PDPL) بالمملكة.',
+          en: 'HARD Real Estate Group (Commercial Registration #1111111111, REGA License #1200048912, Al Khobar, Saudi Arabia) acts as the Data Controller under the Saudi Personal Data Protection Law (PDPL). This policy applies to all personal data collected through our web portals.',
+          ar: 'تعد شركة هارد للعقارات (السجل التجاري رقم 1111111111 وترخيص الهيئة العامة للعقار رقم 1200048912، الخبر، المملكة العربية السعودية) جهة التحكم بالبيانات وفق نظام حماية البيانات الشخصية (PDPL) بالمملكة.',
         },
         isRequired: true,
       },
@@ -334,8 +336,8 @@ export const DEFAULT_LEGAL_POLICY: LegalPolicyContent = {
           ar: '4. حقوق صاحب البيانات والتواصل مع ضابط الحماية',
         },
         body: {
-          en: 'In accordance with PDPL, you retain the right to request access, correction, or destruction of your personal records. Contact our Privacy Compliance Officer at info@hardgp.com or +966 13 800 4273.',
-          ar: 'يحق لك وفق نظام PDPL طلب الاطلاع أو تصحيح أو إتلاف بياناتك الشخصية من سجلاتنا عبر التواصل المباشر مع مسئول حماية البيانات عبر info@hardgp.com أو الهاتف +966 13 800 4273.',
+          en: 'In accordance with PDPL, you retain the right to request access, correction, or destruction of your personal records. Contact our Privacy Compliance Officer at info@hardgp.com or +966 55 612 5711.',
+          ar: 'يحق لك وفق نظام PDPL طلب الاطلاع أو تصحيح أو إتلاف بياناتك الشخصية من سجلاتنا عبر التواصل المباشر مع مسئول حماية البيانات عبر info@hardgp.com أو الهاتف +966 55 612 5711.',
         },
         isRequired: true,
       },
@@ -355,8 +357,8 @@ export const DEFAULT_LEGAL_POLICY: LegalPolicyContent = {
           ar: '1. التراخيص والتسجيل الرسمي',
         },
         body: {
-          en: 'HARD Real Estate is an officially registered brokerage and real estate services company under REGA License #7200018492 and Commercial Registration #2051254311, operating in Eastern Province, Riyadh, and Jeddah.',
-          ar: 'شركة هارد للعقارات هي مؤسسة عقارية ووساطة مرخصة رسمياً من الهيئة العامة للعقار بموجب ترخيص رقم 7200018492 والسجل التجاري رقم 2051254311.',
+          en: 'HARD Real Estate is an officially registered brokerage and real estate services company under REGA License #1200048912 and Commercial Registration #1111111111, operating in Eastern Province, Riyadh, and Jeddah.',
+          ar: 'شركة هارد للعقارات هي مؤسسة عقارية ووساطة مرخصة رسمياً من الهيئة العامة للعقار بموجب ترخيص رقم 1200048912 والسجل التجاري رقم 1111111111.',
         },
         isRequired: true,
       },
@@ -387,8 +389,8 @@ export const DEFAULT_LEGAL_POLICY: LegalPolicyContent = {
     ],
   },
   complianceFlags: {
-    regaLicenseId: '7200018492',
-    commercialRegNum: '2051254311',
+    regaLicenseId: '1200048912',
+    commercialRegNum: '1111111111',
     dataControllerEmail: 'info@hardgp.com',
     isRegaCompliant: true,
     isPdplCompliant: true,
@@ -396,23 +398,19 @@ export const DEFAULT_LEGAL_POLICY: LegalPolicyContent = {
   },
 };
 
+let publishedLegalPolicy = DEFAULT_LEGAL_POLICY;
 export function getStoredLegalPolicy(): LegalPolicyContent {
-  try {
-    const raw = localStorage.getItem(LEGAL_STORAGE_KEY);
-    if (!raw) return DEFAULT_LEGAL_POLICY;
-    const parsed = JSON.parse(raw);
-    return { ...DEFAULT_LEGAL_POLICY, ...parsed };
-  } catch {
-    return DEFAULT_LEGAL_POLICY;
-  }
+  return publishedLegalPolicy;
 }
 
-export function saveStoredLegalPolicy(policy: LegalPolicyContent): void {
-  try {
-    localStorage.setItem(LEGAL_STORAGE_KEY, JSON.stringify(policy));
-  } catch (e) {
-    console.warn('Failed to save legal policy to localStorage:', e);
-  }
+export async function loadLegalPolicy(signal?: AbortSignal): Promise<LegalPolicyContent> {
+  const saved = await readSectorSection<LegalPolicyContent>({sector: 'realestate', key: 'legal'}, signal);
+  return publishedLegalPolicy = {...DEFAULT_LEGAL_POLICY, ...saved};
+}
+
+export async function saveStoredLegalPolicy(policy: LegalPolicyContent): Promise<void> {
+  await saveSectorSection({sector: 'realestate', key: 'legal'}, policy);
+  publishedLegalPolicy = policy;
 }
 
 /**

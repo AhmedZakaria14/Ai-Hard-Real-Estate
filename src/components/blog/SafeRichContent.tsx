@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { renderRichContentToHtml } from '../../lib/blogUtils';
+import { displayDigits } from '../ui/LocalizedValue';
 
 interface SafeRichContentProps {
   content: string;
@@ -17,8 +18,16 @@ export const SafeRichContent: React.FC<SafeRichContentProps> = ({
   className = '',
 }) => {
   const safeHtml = useMemo(() => {
-    return renderRichContentToHtml(content || '');
-  }, [content]);
+    const html = renderRichContentToHtml(content || '');
+    if (!dir || typeof DOMParser === 'undefined') return html;
+    const document = new DOMParser().parseFromString(html, 'text/html');
+    const walker = document.createTreeWalker(document.body, 4);
+    let node: Node | null;
+    while ((node = walker.nextNode())) {
+      node.textContent = displayDigits(node.textContent || '', dir === 'rtl' ? 'ar' : 'en');
+    }
+    return document.body.innerHTML;
+  }, [content, dir]);
 
   return (
     <div

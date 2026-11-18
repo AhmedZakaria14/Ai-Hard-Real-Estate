@@ -12,6 +12,7 @@ import { Badge } from '../components/ui/Badge';
 import { SafeRichContent } from '../components/blog/SafeRichContent';
 import { getPageTitle, updateDocumentTitle } from '../lib/pageTitles';
 import { getLocalizedText } from '../lib/utils';
+import { formatPublicationDate } from '../lib/publicDate';
 
 
 export function BlogPage({ language, articleId }: { language: Language; articleId: string | null }) {
@@ -46,7 +47,7 @@ export function BlogPage({ language, articleId }: { language: Language; articleI
   const visible = posts.filter((post) => activeCategory === 'all' || blogCategoryKey(post) === activeCategory);
   const href = (post: BlogPost) => '/realestate/blog/' + encodeURIComponent(post.id);
   const label = (post: BlogPost) => categories.find((item) => item.key === blogCategoryKey(post))?.label[language] || getLocalizedText(post.category, language);
-  const date = (post: BlogPost) => post.date || post.publishedAt?.slice(0, 10) || '';
+  const date = (post: BlogPost) => formatPublicationDate(post.date || post.publishedAt, language);
 
   return <div className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
     {articleId && <a href="/realestate/blog" className="inline-block font-semibold text-blue-700 hover:underline">{ar ? <InterfaceText id="realestate.BlogPage.kf9mpyv" source="العودة إلى المدونة" /> : <InterfaceText id="realestate.BlogPage.k11o4pv0" source="Back to the blog" />}</a>}

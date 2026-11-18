@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Language, PageId } from '../../types';
 import { translations as defaultTranslations } from '../../lib/translations';
+import { useSiteSettings } from '../../context/SiteSettingsContext';
 import { useTextOverride } from '../../context/TextOverrideContext';
 import { submitCustomerForm } from '../../lib/forms/formSubmissionService';
 import { Button } from '../ui/Button';
@@ -28,6 +29,8 @@ interface FooterProps {
 
 export function Footer({ onNavigate, language }: FooterProps) {
   const { translations } = useTextOverride();
+  const { getEffectiveSettings } = useSiteSettings();
+  const brand = getEffectiveSettings('realestate');
   const t = translations[language] || defaultTranslations[language];
   const isAr = language === 'ar';
   const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -104,7 +107,7 @@ export function Footer({ onNavigate, language }: FooterProps) {
               <p className="text-xs font-semibold text-slate-300">{isAr ? <InterfaceText id="realestate.Footer.k1y0ocvc" source="تابعنا على:" /> : <InterfaceText id="realestate.Footer.khxrxml" source="Follow us on:" />}</p>
               <div className="flex items-center gap-2.5">
                 <ManagedA copyScope="realestate.Footer"
-                  href="https://www.instagram.com/hardgrp"
+                  href={brand.socialLinks.instagram || 'https://www.instagram.com/hardgrp'}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-pink-400 hover:bg-slate-800/90 hover:border-pink-500/40 transition-all group shadow-xs"
@@ -114,7 +117,7 @@ export function Footer({ onNavigate, language }: FooterProps) {
                   <Instagram className="w-4 h-4 group-hover:scale-110 transition-transform" />
                 </ManagedA>
                 <ManagedA copyScope="realestate.Footer"
-                  href="https://x.com/HARDGRP"
+                  href={brand.socialLinks.twitter || 'https://x.com/HARDGRP'}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800/90 hover:border-slate-600 transition-all group shadow-xs"
@@ -155,44 +158,42 @@ export function Footer({ onNavigate, language }: FooterProps) {
               <div className="flex items-start gap-2">
                 <MapPin className="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5" />
                 <span className="leading-snug">
-                  {language === 'en'
-                    ? <InterfaceText id="realestate.Footer.khrej2z" source="Prince Mutaib Road, Hajr Dist., Dammam, KSA" />
-                    : <InterfaceText id="realestate.Footer.k1k1pl3c" source="طريق الأمير متعب، حي هجر، الدمام، السعودية" />}
+                  <LocalizedValue value={brand.office.address[language]} />
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
                 <Phone className="w-3.5 h-3.5 text-blue-400 shrink-0" />
                 <a
-                  href="tel:+966556125711"
+                  href={'tel:' + brand.supportPhone.replace(/\s/g, '')}
                   dir="ltr"
                   className="hover:text-blue-400 transition-colors font-medium text-left"
                 >
-                  <bdi dir="ltr"><LocalizedValue value="+966 55 612 5711" /></bdi>
+                  <bdi dir="ltr"><LocalizedValue value={brand.supportPhone} /></bdi>
                 </a>
               </div>
 
               <div className="flex items-center gap-2">
                 <Mail className="w-3.5 h-3.5 text-blue-400 shrink-0" />
                 <a
-                  href="mailto:info@hardgp.com"
+                  href={'mailto:' + brand.contactEmail}
                   dir="ltr"
                   className="hover:text-blue-400 transition-colors"
                 >
-                  info@hardgp.com
+                  {brand.contactEmail}
                 </a>
               </div>
 
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                 <a
-                  href="https://wa.me/966556125711"
+                  href={'https://wa.me/' + brand.whatsappNumber.replace(/\D/g, '')}
                   target="_blank"
                   rel="noopener noreferrer"
                   dir="ltr"
                   className="text-emerald-400 hover:text-emerald-300 transition-colors font-medium text-left"
                 >
-                  <bdi dir="ltr"><LocalizedValue value="+966 55 612 5711" /></bdi>
+                  <bdi dir="ltr"><LocalizedValue value={brand.whatsappNumber} /></bdi>
                 </a>
               </div>
             </div>

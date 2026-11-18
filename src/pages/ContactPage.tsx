@@ -16,6 +16,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { Language, PageId } from '../types';
+import { useSiteSettings } from '../context/SiteSettingsContext';
 import { useTextOverride } from '../context/TextOverrideContext';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
@@ -30,6 +31,8 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
   const formConfig = useCustomerFormConfig('general_contact');
 
   const { translations } = useTextOverride();
+  const { getEffectiveSettings } = useSiteSettings();
+  const brand = getEffectiveSettings('realestate');
   const t = translations[language];
 
   const [fullName, setFullName] = useState('');
@@ -40,7 +43,6 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
   const [message, setMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [leadRef, setLeadRef] = useState('');
-  const [crmRef, setCrmRef] = useState('');
   const [loading, setLoading] = useState(false);
   const [contactError, setContactError] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<'name' | 'email' | 'phone' | 'type' | 'message', string>>>({});
@@ -85,7 +87,7 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
     try {
       const result = await formConfig.submit({
         formType: 'general_contact',
-        sector: 'group',
+        sector: 'realestate',
         name: fullName.trim(),
         email: email.trim(),
         phone: normalizedPhone,
@@ -94,11 +96,10 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
         details: {
           inquiryType,
           subject: derivedSubject,
-          recipientEmail: 'info@hardgp.com',
+          recipientEmail: brand.contactEmail,
         },
       });
       setLeadRef(result.trackingCode);
-      setCrmRef(`CRM-${result.leadId.slice(-6).toUpperCase()}`);
       setSubmitted(true);
     } catch (err: any) {
       console.error('Contact form submission failed', err);
@@ -155,10 +156,6 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
               </p>
               <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 text-start text-xs space-y-1.5 max-w-md mx-auto text-slate-600">
                 <p><strong>{language === 'en' ? <InterfaceText id="realestate.ContactPage.kgm598f" source="Inquiry Reference:" /> : <InterfaceText id="realestate.ContactPage.k1lt3bxh" source="رقم المرجع:" />}</strong> <span className="font-mono font-bold text-slate-900"><LocalizedValue value={leadRef} /></span></p>
-                <p className="flex items-center gap-1.5 text-blue-600 font-semibold pt-1 border-t border-slate-200">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span><InterfaceText id="realestate.ContactPage.k1i0vejd" source="CRM Synchronization: " />{crmRef || <InterfaceText id="realestate.ContactPage.k8qzyhb" source="Active" />}</span>
-                </p>
               </div>
               <div className="pt-2">
                 <Button variant="secondary" onClick={handleReset}>
@@ -313,9 +310,7 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                     <LocalizedValue value={t.contact.headquarters} />
                   </strong>
                   <span>
-                    {language === 'en'
-                      ? <InterfaceText id="realestate.ContactPage.k1jiw7rw" source="Prince Mutaib Road, Hajr Dist., Dammam, Eastern Province, Saudi Arabia" />
-                      : <InterfaceText id="realestate.ContactPage.k10bp7x6" source="طريق الأمير متعب، حي هجر، الدمام، المنطقة الشرقية، المملكة العربية السعودية" />}
+                    <LocalizedValue value={brand.office.address[language]} />
                   </span>
                 </div>
               </div>
@@ -326,7 +321,7 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                   <strong className="text-white block font-semibold">
                     <LocalizedValue value={t.contact.hours} />
                   </strong>
-                  <span><LocalizedValue value={t.contact.hoursValue} /></span>
+                  <span><LocalizedValue value={brand.workingHours[language]} /></span>
                 </div>
               </div>
 
@@ -336,8 +331,8 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                   <strong className="text-white block font-semibold">
                     {language === 'en' ? <InterfaceText id="realestate.ContactPage.klm7mhy" source="Direct Line" /> : <InterfaceText id="realestate.ContactPage.k1x4d0td" source="الخط المباشر" />}
                   </strong>
-                  <a href="tel:+966556125711" dir="ltr" className="text-blue-300 hover:underline inline-block text-left">
-                    <bdi dir="ltr"><LocalizedValue value={t.contact.phoneValue} /></bdi>
+                  <a href={'tel:' + brand.supportPhone.replace(/\s/g, '')} dir="ltr" className="text-blue-300 hover:underline inline-block text-left">
+                    <bdi dir="ltr"><LocalizedValue value={brand.supportPhone} /></bdi>
                   </a>
                 </div>
               </div>
@@ -348,8 +343,8 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
                   <strong className="text-white block font-semibold">
                     {language === 'en' ? <InterfaceText id="realestate.ContactPage.k10yffnf" source="Inquiries Desk" /> : <InterfaceText id="realestate.ContactPage.kz14tgk" source="البريد الإلكتروني" />}
                   </strong>
-                  <a href="mailto:info@hardgp.com" className="text-blue-300 hover:underline">
-                    <LocalizedValue value={t.contact.emailValue} />
+                  <a href={'mailto:' + brand.contactEmail} className="text-blue-300 hover:underline">
+                    <LocalizedValue value={brand.contactEmail} />
                   </a>
                 </div>
               </div>
@@ -358,7 +353,7 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
             {/* Direct WhatsApp Callout Button */}
             <div className="pt-2 border-t border-slate-800">
               <Button
-                href="https://wa.me/966556125711?text=Hello%20HARD%20Real%20Estate,%20I%20would%20like%20to%20connect%20with%20a%20broker."
+                href={'https://wa.me/' + brand.whatsappNumber.replace(/\D/g, '')}
                 target="_blank"
                 rel="noopener noreferrer"
                 variant="whatsapp"
@@ -375,7 +370,7 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
             <iframe title={ar ? 'خريطة مقر هارد للعقارات في حي هجر بالدمام' : 'Map of HARD Real Estate office, Hajr, Dammam'}
               className="h-60 w-full border-0 sm:h-64" loading="lazy" allowFullScreen
               referrerPolicy="no-referrer-when-downgrade"
-              src={`https://maps.google.com/maps?q=${encodeURIComponent('طريق الأمير متعب بن عبد العزيز، حي هجر، الدمام، السعودية')}&hl=${language}&z=15&output=embed`} />
+              src={`https://maps.google.com/maps?q=${encodeURIComponent(brand.office.address[language])}&hl=${language}&z=15&output=embed`} />
           </section>
         </div>
       </div>

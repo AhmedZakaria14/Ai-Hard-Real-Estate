@@ -31,7 +31,7 @@ import { TextOverrideProvider } from './context/TextOverrideContext';
 import { SiteSettingsProvider } from './context/SiteSettingsContext';
 import { parsePropertyQueryParams, serializePropertyQueryParams } from './lib/propertyUrlParams';
 import { getPageTitle, getPageDescription, updateDocumentTitle } from './lib/pageTitles';
-import { getStoredSeoConfigs, applyPageSeoToHead } from './lib/seo/seoManager';
+import { getStoredSeoConfigs, subscribeSeoConfigs, applyPageSeoToHead } from './lib/seo/seoManager';
 import { PrivacyTermsModal } from './components/modals/PrivacyTermsModal';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 
@@ -308,6 +308,9 @@ function AppContent() {
     }
   }, [properties]);
 
+  const [seoConfigs, setSeoConfigs] = useState(getStoredSeoConfigs);
+  useEffect(() => subscribeSeoConfigs(setSeoConfigs), []);
+
   // Synchronize document dir and lang attributes
   useEffect(() => {
     document.documentElement.lang = language;
@@ -316,7 +319,8 @@ function AppContent() {
 
   // Synchronize document title and OpenGraph metadata across all sectors and pages
   useEffect(() => {
-    const seoConfigs = getStoredSeoConfigs();
+    // Detail pages apply their own title after loading the selected record.
+    if (/^\/(?:realestate\/blog|construction\/projects)\/[^/]+/.test(window.location.pathname)) return;
     const pageConfig = seoConfigs[currentPage];
     if (pageConfig) {
       applyPageSeoToHead(pageConfig, language);
@@ -358,7 +362,7 @@ function AppContent() {
       }
       prerenderStatusMeta.setAttribute('content', '404');
     }
-  }, [currentPage, language, selectedProperty]);
+  }, [currentPage, language, selectedProperty, seoConfigs]);
 
   const handleNavigate = (page: PageId, filters?: PropertyFilterParams) => {
     if (page === 'properties') {
@@ -460,6 +464,7 @@ function AppContent() {
   if (currentPage === 'construction') {
     return (
       <ErrorBoundary>
+        <SectorNav currentPage="construction" language={language} onNavigate={handleNavigate} />
         <ConstructionPage
           language={language}
           onLanguageChange={setLanguage}
@@ -474,6 +479,7 @@ function AppContent() {
   if (currentPage === 'hvac') {
     return (
       <ErrorBoundary>
+        <SectorNav currentPage="hvac" language={language} onNavigate={handleNavigate} />
         <HVACPage
           language={language}
           onLanguageChange={setLanguage}
