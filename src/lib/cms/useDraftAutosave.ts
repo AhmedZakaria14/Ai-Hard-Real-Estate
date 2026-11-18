@@ -1,7 +1,7 @@
 /**
  * HARD GROUP - CMS DEBOUNCED AUTOSAVE HOOK
  * 
- * Manages autosaving drafts to Firestore with debouncing, status indicators,
+ * Manages autosaving drafts to the database with debouncing, status indicators,
  * revision concurrency control, offline backup buffer, and navigation warnings.
  */
 

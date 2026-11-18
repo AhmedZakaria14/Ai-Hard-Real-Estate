@@ -2,7 +2,7 @@
  * HARD GROUP - TRUSTED CALCULATOR ENGINE
  * 
  * Implements core engineering & financial calculation logic in trusted application code.
- * Accepts versioned configuration coefficients from Firestore or default fallbacks.
+ * Accepts versioned configuration coefficients from the shared database or default fallbacks.
  * Prevents arbitrary formula execution while supporting dynamic admin coefficients.
  */
 

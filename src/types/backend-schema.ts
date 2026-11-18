@@ -1,5 +1,5 @@
 /**
- * HARD Group - Comprehensive Firestore Database Schema Specification
+ * HARD Group - Unified Backend Data Schema Specification
  * Version: 2.0.0
  * 
  * Architecture Principles:
@@ -83,7 +83,7 @@ export interface SiteSettingsDoc {
     ogImage: string;
   };
   publicationStatus: PublicationStatus;
-  updatedAt: string; // ISO String or Firestore ServerTimestamp
+  updatedAt: string; // ISO timestamp string
   updatedBy: string; // UID
 }
 
