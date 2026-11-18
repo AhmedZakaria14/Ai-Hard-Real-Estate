@@ -1,6 +1,6 @@
 import { InterfaceText } from './InterfaceText';
 import * as React from 'react';
-import { AlertTriangle, RefreshCw, Home, Trash2 } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 
 export interface ErrorBoundaryProps {
   children?: React.ReactNode;
@@ -33,23 +33,8 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   private handleResetState = () => {
-    try {
-      sessionStorage.clear();
-    } catch {
-      // Ignore
-    }
     this.setState({ hasError: false, error: null, errorInfo: null });
     window.location.reload();
-  };
-
-  private handleFullReset = () => {
-    try {
-      localStorage.clear();
-      sessionStorage.clear();
-    } catch {
-      // Ignore
-    }
-    window.location.href = '/';
   };
 
   public override render() {
@@ -74,24 +59,14 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
               </div>
               <div>
                 <h2 className="text-xl font-bold text-white font-display-serif">
-                  {isAr ? <InterfaceText id="realestate.ErrorBoundary.koe7sq7" source="تعذر تحميل هذه الصفحة مؤقتاً" /> : <InterfaceText id="realestate.ErrorBoundary.k1j5y128" source="Application Recovered Gracefully" />}
+                  {isAr ? <InterfaceText id="realestate.ErrorBoundary.koe7sq7" source="تعذر تحميل هذه الصفحة مؤقتاً" /> : <InterfaceText id="realestate.ErrorBoundary.k1j5y128" source="Page temporarily unavailable" />}
                 </h2>
                 <p className="text-xs text-slate-400 mt-0.5">
                   {isAr
-                    ? <InterfaceText id="realestate.ErrorBoundary.k10w6nhu" source="تم اعتراض الاستثناء لمنع الشاشة البيضاء وإتاحة التعافي التلقائي" />
-                    : <InterfaceText id="realestate.ErrorBoundary.kj9j3rg" source="An error was caught to prevent a blank page and enable instant recovery." />}
+                    ? <InterfaceText id="realestate.ErrorBoundary.k10w6nhu" source="يرجى إعادة تحميل الصفحة للمحاولة مرة أخرى." />
+                    : <InterfaceText id="realestate.ErrorBoundary.kj9j3rg" source="Please reload this page to try again." />}
                 </p>
               </div>
-            </div>
-
-            <div className="p-4 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-2 font-mono text-xs text-slate-300">
-              <div className="flex items-center justify-between text-slate-500 text-[11px]">
-                <span><InterfaceText id="realestate.ErrorBoundary.k16yho0x" source="Diagnostic Error Code" /></span>
-                <span className="text-amber-400 font-bold"><InterfaceText id="realestate.ErrorBoundary.k1tr150o" source="ERR_REACT_RUNTIME_CAUGHT" /></span>
-              </div>
-              <p className="text-rose-300 break-words font-semibold">
-                {this.state.error?.message || <InterfaceText id="realestate.ErrorBoundary.ketpzgp" source="Unknown runtime error occurred during component mount." />}
-              </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
@@ -113,13 +88,6 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
 
 
 
-              <button
-                onClick={this.handleFullReset}
-                className="w-full py-3 px-4 bg-rose-950/60 hover:bg-rose-900/80 text-rose-200 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer border border-rose-800/60"
-              >
-                <Trash2 className="w-4 h-4 text-rose-400" />
-                <span>{isAr ? <InterfaceText id="realestate.ErrorBoundary.ka9hsu8" source="مسح التخزين وإعادة الضبط" /> : <InterfaceText id="realestate.ErrorBoundary.ks8icoa" source="Reset Local Storage" />}</span>
-              </button>
             </div>
           </div>
         </div>

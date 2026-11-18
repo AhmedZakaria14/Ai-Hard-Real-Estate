@@ -2,6 +2,15 @@ import {lazy, StrictMode, Suspense} from 'react';
 import {createRoot} from 'react-dom/client';
 import './index.css';
 import { ErrorBoundary } from './components/ui/ErrorBoundary.tsx';
+import { mayRecoverModuleLoad } from './lib/moduleRecovery';
+
+window.addEventListener('vite:preloadError', (event) => {
+  try {
+    if (!mayRecoverModuleLoad(window.sessionStorage)) return;
+    event.preventDefault();
+    window.location.reload();
+  } catch { /* The recovery screen remains available if storage is blocked. */ }
+});
 
 const legacyAdminPaths = new Set(['/cms', '/realestate/admin', '/realestate/cms', '/construction/cms', '/hvac/cms', '/admin/cms']);
 const legacyAdminHashes = new Set(['admin', 'cms', 'realestate/admin', 'realestate/cms', 'construction/cms', 'hvac/cms']);
