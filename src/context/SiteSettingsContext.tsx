@@ -146,7 +146,7 @@ export const DEFAULT_SECTOR_SETTINGS: Record<SectorId, Partial<PublicBrandingSet
   construction: {
     sector: 'construction',
     siteName: { ar: 'هارد للمقاولات', en: 'HARD Contracting' },
-    tagline: { ar: 'مقاولات عامة وإنشائية', en: 'Contracting & Construction' },
+    tagline: { ar: 'مقاولات وتشييد', en: 'Contracting & Construction' },
     designTokens: {
       primaryAccent: '#0284c7',
       secondaryAccent: '#0369a1',
