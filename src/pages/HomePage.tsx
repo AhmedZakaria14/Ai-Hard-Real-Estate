@@ -6,6 +6,7 @@ import { ManagedImg } from '../components/ui/ManagedElements';
 import { usePropertyTypes } from '../lib/usePropertyTypes';
 import { getLocalizedText } from '../lib/utils';
 import { SECTOR_CONTACT_DETAILS } from '../lib/sectors';
+import { useSiteSettings } from '../context/SiteSettingsContext';
 import { subscribeSectorSection } from '../lib/db/hardSectorSections';
 import { defaultRealEstateHero, publicRealEstateImage, realEstateHeroSection } from '../lib/realEstateHomeContent';
 import React, { useState } from 'react';
@@ -80,7 +81,9 @@ export function HomePage({
   const spotlightProject = projects[projectIndex];
   const PreviousProjectIcon = language === 'ar' ? ChevronRight : ChevronLeft;
   const NextProjectIcon = language === 'ar' ? ChevronLeft : ChevronRight;
-  const projectWhatsapp = SECTOR_CONTACT_DETAILS.realestate.whatsapp.replace(/\D/g, '');
+  const { getEffectiveSettings } = useSiteSettings();
+  const realEstateBrand = getEffectiveSettings('realestate');
+  const projectWhatsapp = (realEstateBrand.whatsappNumber || SECTOR_CONTACT_DETAILS.realestate.whatsapp).replace(/\D/g, '');
   React.useEffect(() => {
     const controller = new AbortController();
     loadPublishedProjects(controller.signal).then((items) => {
