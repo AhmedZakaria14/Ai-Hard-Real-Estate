@@ -3,14 +3,14 @@ import { ConstructionLanguage } from '../types';
 export const constructionTranslations = {
   ar: {
     brand: {
-      name: 'هارد للمقاولات العامة والإنشاءات',
+      name: 'هارد للمقاولات',
       groupName: 'مجموعة هارد',
       shortName: 'هارد للمقاولات',
-      tagline: 'ريادة الهندسة الإنشائية وتسليم المفتاح في المملكة',
+      tagline: 'مقاولات عامة وإنشائية',
       slogan: 'نبني معالم الحاضر والمستقبل برؤية هندسية راسخة',
     },
     credentials: {
-      classA: 'تصنيف فئة أولى معتمد',
+      classA: 'تصنيف معتمد',
       sbc: 'مطابق لكود البناء السعودي SBC',
       warranty: 'ضمان إنشائي ١٠ سنوات',
       sce: '',
@@ -29,7 +29,7 @@ export const constructionTranslations = {
       callUs: 'اتصال مباشر',
     },
     hero: {
-      badge: 'شركة وطنية مصنفة • مقاولات عامة وهندسة إنشائية',
+      badge: 'هارد للمقاولات العامة والإنشائية',
       title: 'نبني معالم المستقبل بكفاءة هندسية لا تضاهى',
       subtitle:
         'الذراع الهندسي والإنشائي لمجموعة هارد، متخصصون في تنفيذ الأبراج التجارية، القصور السكنية الفاخرة، والمشاريع الكبرى بنظام تسليم المفتاح وفق أعلى معايير كود البناء السعودي.',
@@ -50,7 +50,7 @@ export const constructionTranslations = {
       badge: 'الريادة والمصداقية الإنشائية',
       title: '١٥ عاماً من الابتكار الهندسي والالتزام الصارم بالجودة',
       description:
-        'تأسست هارد للمقاولات كذراع إنشائي رائد في المملكة العربية السعودية، مساهمة بفاعلية في النهضة العمرانية لتحقيق مستهدفات رؤية السعودية ٢٠٣٠. نعتمد على كادر هندسي متخصص وأحدث تقنيات البناء الحديث (Modern Construction Methods).',
+        'تأسست مؤسسة عبد المحسن الدوسري (هارد) للمقاولات في قطاع المقاولات والإنشاءات بالمنطقة الشرقية، ونعتمد على كادر هندسي متخصص وأحدث تقنيات البناء الحديث لتقديم مشاريع متكاملة وفق كود البناء السعودي.',
       tabs: {
         quality: 'إدارة الجودة والرقابة الفنية',
         safety: 'السلامة والصحة المهنية (OSHA)',
@@ -267,7 +267,7 @@ export const constructionTranslations = {
       slogan: 'Building Enduring Landmarks with Precision Engineering',
     },
     credentials: {
-      classA: 'Class-A Certified General Contractor',
+      classA: 'Certified classification',
       sbc: '100% Saudi Building Code (SBC) Compliant',
       warranty: '10-Year Certified Structural Warranty',
       sce: '',
