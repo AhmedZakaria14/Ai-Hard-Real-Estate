@@ -311,7 +311,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
             </div>
 
             {/* Preliminary Benchmark Highlight Card */}
-            <div className="p-6 bg-slate-900 text-white rounded-3xl max-w-xl mx-auto text-start space-y-4 border border-slate-800 shadow-xl">
+            <div className="p-6 bg-[#034DA2] text-white rounded-3xl max-w-xl mx-auto text-start space-y-4 border border-blue-800/60 shadow-xl">
               <div className="flex items-center justify-between border-b border-slate-800 pb-3">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-blue-400" />
@@ -732,7 +732,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                 </div>
 
                 {/* Live Algorithm Estimate Preview */}
-                <div className="p-4 bg-slate-900 text-white rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 border border-slate-800">
+                <div className="p-4 bg-[#034DA2] text-white rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 border border-blue-800/60">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0">
                       <TrendingUp className="w-5 h-5" />
