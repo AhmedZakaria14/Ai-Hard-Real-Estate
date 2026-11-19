@@ -137,7 +137,7 @@ export function BookViewingModal({
           </div>
           <div className="pt-2 flex flex-col sm:flex-row gap-2 justify-center">
             <Button
-              href={`https://wa.me/966556125711?text=${encodeURIComponent(
+              href={`https://wa.me/${String(property.agent?.whatsapp || '').replace(/\D/g, '')}?text=${encodeURIComponent(
                 language === 'en'
                   ? `Hello HARD Real Estate, I have booked a viewing for "${property?.title?.en || ''}" (Ref: ${leadRef}). Please confirm.`
                   : `مرحباً هارد للعقارات، لقد حجزت موعداً لمعاينة "${property?.title?.ar || ''}" (رقم المرجع: ${leadRef}). يرجى التأكيد.`
