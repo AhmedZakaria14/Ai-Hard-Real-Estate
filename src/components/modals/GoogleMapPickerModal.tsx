@@ -339,7 +339,7 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
         className="relative z-10 flex h-[calc(100dvh-env(safe-area-inset-top))] w-full min-w-0 max-w-5xl flex-col overflow-hidden border border-slate-200 bg-white shadow-2xl sm:h-[min(85dvh,56rem)] rounded-none sm:rounded-3xl transform transition-all animate-in zoom-in-95"
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-slate-100 bg-slate-900 text-white shrink-0">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-slate-100 bg-[#034DA2] text-white shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/30">
               <MapPin className="w-5 h-5" />
@@ -466,7 +466,7 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
           </div>
 
           {/* Real-time Instructions Overlay Badge */}
-          <div className="absolute top-4 start-4 z-500 px-3.5 py-2 bg-slate-900/90 text-white backdrop-blur-md rounded-xl border border-slate-700/80 shadow-lg flex items-center gap-2 text-xs font-medium max-w-[85%] sm:max-w-md pointer-events-none">
+          <div className="absolute top-4 start-4 z-500 px-3.5 py-2 bg-[#034DA2]/95 text-white backdrop-blur-md rounded-xl border border-white/20 shadow-lg flex items-center gap-2 text-xs font-medium max-w-[85%] sm:max-w-md pointer-events-none">
             <Compass className="w-4 h-4 text-blue-400 shrink-0 animate-spin duration-5000" />
             <span>
               {isAr
