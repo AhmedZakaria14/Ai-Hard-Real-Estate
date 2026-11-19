@@ -189,12 +189,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           setFaqs(list<FaqEntity>('faqs').sort(byOrder));
           setCertifications(list<Certification>('certifications').sort(byOrder));
           setEnhancedTestimonials(list<EnhancedTestimonial>('enhanced_testimonials').sort(byOrder));
-          if (!isAdmin) return;
-          setTeamMembers(list<TeamMember>('team'));
-          setOffices(list<OfficeLocation>('offices'));
-          setStatistics(list<BusinessStatistic>('statistics'));
-          setPartnerBrands(list<PartnerBrand>('partners'));
+          setTeamMembers(list<TeamMember>('team').sort(byOrder));
+          setOffices(list<OfficeLocation>('offices').sort(byOrder));
+          setStatistics(list<BusinessStatistic>('statistics').sort(byOrder));
+          setPartnerBrands(list<PartnerBrand>('partners').sort(byOrder));
           setTestimonials(list<Testimonial>('stories'));
+          if (!isAdmin) return;
         }).catch((error) => {
           if (!signal.aborted) console.error('Could not load company content', error);
         });
