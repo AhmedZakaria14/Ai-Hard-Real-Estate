@@ -87,10 +87,10 @@ export const CMSAuthorModal: React.FC<CMSAuthorModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center overflow-hidden bg-slate-950/70 p-0 sm:p-4 backdrop-blur-xs [padding-top:env(safe-area-inset-top)] sm:[padding-top:1rem]">
       <div
         dir={isAr ? 'rtl' : 'ltr'}
-        className="bg-white w-full max-w-xl rounded-3xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200"
+        className="flex w-full min-w-0 max-w-xl flex-col overflow-hidden border border-slate-200 bg-white shadow-2xl max-h-[calc(100dvh-env(safe-area-inset-top))] sm:max-h-[calc(100dvh-2rem)] rounded-t-3xl sm:rounded-3xl animate-in fade-in zoom-in-95 duration-200"
       >
         <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
           <div className="flex items-center gap-3">
@@ -116,7 +116,7 @@ export const CMSAuthorModal: React.FC<CMSAuthorModalProps> = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:p-6 sm:pb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-700">
@@ -127,7 +127,7 @@ export const CMSAuthorModal: React.FC<CMSAuthorModalProps> = ({
                 required
                 value={nameEn}
                 onChange={(e) => setNameEn(e.target.value)}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base sm:text-sm text-slate-900"
                 placeholder="e.g. Faisal Al-Otaibi"
               />
             </div>
@@ -142,7 +142,7 @@ export const CMSAuthorModal: React.FC<CMSAuthorModalProps> = ({
                 dir="rtl"
                 value={nameAr}
                 onChange={(e) => setNameAr(e.target.value)}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base sm:text-sm text-slate-900"
                 placeholder="مثال: فيصل العتيبي"
               />
             </div>
@@ -158,7 +158,7 @@ export const CMSAuthorModal: React.FC<CMSAuthorModalProps> = ({
                 required
                 value={roleEn}
                 onChange={(e) => setRoleEn(e.target.value)}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base sm:text-xs text-slate-900"
                 placeholder="Chief Investment Officer"
               />
             </div>
@@ -173,7 +173,7 @@ export const CMSAuthorModal: React.FC<CMSAuthorModalProps> = ({
                 dir="rtl"
                 value={roleAr}
                 onChange={(e) => setRoleAr(e.target.value)}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base sm:text-xs text-slate-900"
                 placeholder="رئيس الاستثمار العقاري"
               />
             </div>
@@ -187,7 +187,7 @@ export const CMSAuthorModal: React.FC<CMSAuthorModalProps> = ({
               rows={2}
               value={bioEn}
               onChange={(e) => setBioEn(e.target.value)}
-              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
+              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base sm:text-xs text-slate-900"
               placeholder="Professional biography and background..."
             />
           </div>
@@ -201,7 +201,7 @@ export const CMSAuthorModal: React.FC<CMSAuthorModalProps> = ({
               dir="rtl"
               value={bioAr}
               onChange={(e) => setBioAr(e.target.value)}
-              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
+              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base sm:text-xs text-slate-900"
               placeholder="نبذة مهنية عن الكاتب والخبرات السابقة..."
             />
           </div>
@@ -229,7 +229,7 @@ export const CMSAuthorModal: React.FC<CMSAuthorModalProps> = ({
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base sm:text-xs text-slate-900"
                 placeholder="author@hardrealestate.sa"
               />
             </div>
@@ -243,7 +243,7 @@ export const CMSAuthorModal: React.FC<CMSAuthorModalProps> = ({
                 type="url"
                 value={linkedin}
                 onChange={(e) => setLinkedin(e.target.value)}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base sm:text-xs text-slate-900"
                 placeholder="https://linkedin.com/in/username"
               />
             </div>
