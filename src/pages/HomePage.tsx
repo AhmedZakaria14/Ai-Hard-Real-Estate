@@ -124,8 +124,8 @@ export function HomePage({
             referrerPolicy="no-referrer"
             className="w-full h-full object-cover object-center opacity-65 brightness-110 contrast-105 scale-105 transform duration-1000 ease-out"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/45 to-slate-900/15" />
-          <div className="absolute inset-0 bg-radial-at-c from-transparent via-slate-950/25 to-slate-950/60" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#034DA2]/90 via-[#034DA2]/45 to-[#034DA2]/15" />
+          <div className="absolute inset-0 bg-radial-at-c from-transparent via-[#034DA2]/25 to-[#034DA2]/60" />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 w-full space-y-10 overflow-visible">
