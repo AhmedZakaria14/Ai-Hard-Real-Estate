@@ -95,11 +95,11 @@ export function BrandLogo({
   return (
     <div className={`flex items-center gap-3 select-none ${className}`}>
       {/* Official Emblem */}
-      <div className={`relative shrink-0 ${currentSize.h} flex items-center justify-center transition-transform duration-200 group-hover:scale-105`}>
+      <div className={`relative shrink-0 ${currentSize.h} flex items-center justify-center overflow-visible px-1 py-1 transition-transform duration-200 group-hover:scale-105`}>
         <ManagedImg copyScope="realestate.BrandLogo"
           src={logoSrc}
           alt={wordmark?.name ?? brandName}
-          className={`${currentSize.h} w-auto object-contain object-center max-w-[min(10rem,32vw)] shrink-0 py-0.5 drop-shadow-xs`}
+          className={`max-h-full w-auto object-contain object-center max-w-[min(10rem,32vw)] shrink-0 drop-shadow-xs`}
           loading="eager"
           decoding="async"
           onError={({ currentTarget }) => { if (!currentTarget.src.endsWith('/logo.svg')) currentTarget.src = '/logo.svg'; }}
