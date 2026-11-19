@@ -75,8 +75,8 @@ export function HVACShowcaseModal({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="relative w-full max-w-4xl bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden text-slate-900 my-8">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center overflow-hidden bg-slate-900/60 p-0 sm:p-4 backdrop-blur-xs animate-in fade-in duration-200 [padding-top:env(safe-area-inset-top)] sm:[padding-top:1rem]">
+      <div className="relative flex w-full min-w-0 max-w-4xl flex-col overflow-hidden border border-slate-200 bg-white text-slate-900 shadow-xl max-h-[calc(100dvh-env(safe-area-inset-top))] sm:max-h-[calc(100dvh-2rem)] rounded-t-2xl sm:rounded-2xl my-0 sm:my-4">
         {/* Header Banner */}
         <div className="relative h-48 sm:h-56 bg-slate-900 overflow-hidden">
           <ManagedImg copyScope="realestate.HVACShowcaseModal"
@@ -117,7 +117,7 @@ export function HVACShowcaseModal({
         </div>
 
         {/* Content Body */}
-        <div className="p-6 sm:p-8 space-y-8 max-h-[calc(85vh-220px)] overflow-y-auto bg-white">
+        <div className="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain bg-white p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:space-y-8 sm:p-8 sm:pb-8">
           {/* Overview */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2 space-y-4 text-start">
@@ -215,7 +215,7 @@ export function HVACShowcaseModal({
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder={isAr ? 'الاسم الكريم أو اسم البرج' : 'e.g. Al-Rawdah Plaza'}
-                      className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 focus:outline-none"
+                      className="w-full min-w-0 px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-base sm:text-xs text-slate-900 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 focus:outline-none"
                     />
                   </div>
 
