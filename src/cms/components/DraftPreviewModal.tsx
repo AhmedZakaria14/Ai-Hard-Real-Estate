@@ -53,7 +53,7 @@ export const DraftPreviewModal: React.FC<DraftPreviewModalProps> = ({
       : 'max-w-full';
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-slate-900/95 backdrop-blur-md animate-fade-in font-ui-sans">
+    <div className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-slate-900/95 backdrop-blur-md animate-fade-in font-ui-sans [padding-top:env(safe-area-inset-top)] [padding-bottom:env(safe-area-inset-bottom)]">
       {/* Top Banner */}
       <DraftPreviewBanner
         isAr={isAr}
@@ -62,12 +62,12 @@ export const DraftPreviewModal: React.FC<DraftPreviewModalProps> = ({
       />
 
       {/* Toolbar Controls */}
-      <div className="bg-slate-950 border-b border-slate-800 px-6 py-3 flex items-center justify-between text-white">
-        <div className="flex items-center gap-3">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-slate-800 bg-slate-950 px-3 py-3 text-white sm:px-6">
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
           <span className="text-xs font-bold text-slate-400">
             {isAr ? 'عنوان الصفحة:' : 'Previewing:'}
           </span>
-          <span className="text-sm font-bold text-white font-display-serif">
+          <span className="min-w-0 truncate text-sm font-bold text-white font-display-serif">
             {title}
           </span>
         </div>
@@ -123,7 +123,7 @@ export const DraftPreviewModal: React.FC<DraftPreviewModalProps> = ({
       </div>
 
       {/* Simulated Viewport Body */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-8 flex justify-center bg-slate-900/50">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3 sm:p-8 flex justify-center bg-slate-900/50">
         <div
           dir={isAr ? 'rtl' : 'ltr'}
           className={`w-full bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden transition-all duration-300 ${viewportWidthClass}`}
