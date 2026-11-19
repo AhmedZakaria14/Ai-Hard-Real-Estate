@@ -173,7 +173,7 @@ export function ProjectsSection() {
                       e.preventDefault();
                       openProjectModal(proj);
                     }}
-                    className="relative aspect-16/10 overflow-hidden bg-slate-900 block cursor-pointer"
+                    className="relative aspect-16/10 overflow-hidden bg-[#034DA2] block cursor-pointer"
                     aria-label={isAr ? proj.titleAr || '' : proj.titleEn || ''}
                   >
                     <ManagedImg copyScope="construction.ProjectsSection"
