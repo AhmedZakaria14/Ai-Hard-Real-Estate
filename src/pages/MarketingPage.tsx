@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Language, PageId } from '../types';
 import { useTextOverride } from '../context/TextOverrideContext';
+import { useSiteSettings } from '../context/SiteSettingsContext';
 import { Button } from '../components/ui/Button';
 import { BrandLogo } from '../components/ui/BrandLogo';
 import { ValuationWizard } from '../components/forms/ValuationWizard';
@@ -28,6 +29,8 @@ export function MarketingPage({
   onOpenListPropertyModal,
 }: MarketingPageProps) {
   const { translations } = useTextOverride();
+  const { getEffectiveSettings } = useSiteSettings();
+  const realEstateBrand = getEffectiveSettings('realestate');
   const [showValuation, setShowValuation] = useState(false);
   const t = translations[language];
   const ArrowIcon = language === 'ar' ? ArrowLeft : ArrowRight;
@@ -108,7 +111,7 @@ export function MarketingPage({
               {language === 'ar' ? <InterfaceText id="realestate.MarketingPage.k1mzwjto" source="اطلب تقييم عقارك" /> : <InterfaceText id="realestate.MarketingPage.k1vro5kx" source="Request a property valuation" />}
             </Button>
             <Button
-              href="https://wa.me/966556125711?text=Hello%20HARD%20Real%20Estate,%20I%20would%20like%20a%20property%20valuation."
+              href={`https://wa.me/${String(realEstateBrand.whatsappNumber || '').replace(/\D/g, '')}?text=${encodeURIComponent(language === 'ar' ? 'مرحباً هارد للعقارات، أود الاستفسار عن خدمات التسويق العقاري.' : 'Hello HARD Real Estate, I would like to ask about real estate marketing services.')}`}
               target="_blank"
               rel="noopener noreferrer"
               variant="whatsapp"
