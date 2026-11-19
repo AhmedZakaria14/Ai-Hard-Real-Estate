@@ -156,7 +156,7 @@ export function getPageDescription(options: PageTitleOptions): string {
 
     case 'home':
       return isAr
-        ? 'شركة هارد للعقارات - منصة وساطة وتسويق عقاري رائدة في المملكة العربية السعودية، معتمدة من الهيئة العامة للعقار (فال).'
+        ? 'مؤسسة هارد للعقارات - وساطة وتسويق عقاري مرخصة، تقدم خدماتها بمهنية وشفافية وتدعم قرارات البيع والشراء والاستثمار.'
         : 'HARD Real Estate - Premier Saudi real estate marketing and certified brokerage platform for prime residential, luxury, and commercial properties.';
 
     case 'properties':
@@ -176,13 +176,13 @@ export function getPageDescription(options: PageTitleOptions): string {
 
     case 'construction':
       return isAr
-        ? 'الذراع الهندسي والإنشائي لمجموعة هارد - مقاولات عامة مصنفة فئة أولى، تنفيذ الأبراج والمجمعات التجارية والسكنية وفق كود البناء السعودي.'
-        : 'Class-A certified general contractor delivering turnkey commercial towers, residential communities, and infrastructure with Saudi Building Code compliance.';
+        ? 'هارد للمقاولات - خدمات مقاولات وإنشاءات للمشاريع السكنية والتجارية في المنطقة الشرقية وفق كود البناء السعودي ومعايير الجودة المعتمدة.'
+        : 'HARD Contracting delivers residential and commercial construction services across the Eastern Province in line with the Saudi Building Code and approved quality standards.';
 
     case 'hvac':
       return isAr
-        ? 'الذراع التخصصي للخدمات الكهروميكانيكية والتبريد - عقود صيانة وقائية للمكيفات المركزية والتشيلرات وأنظمة VRF وطوارئ على مدار 24/7.'
-        : 'Specialized electro-mechanical engineering services providing chiller overhauls, VRF installations, smart climate automation, and 24/7 emergency dispatch.';
+        ? 'هارد لصيانة التكييف - خدمات صيانة وتشغيل أنظمة التبريد والتهوية والتكييف، وعقود صيانة واستجابة سريعة لمختلف الطلبات.'
+        : 'HARD HVAC Maintenance provides cooling, ventilation, AC maintenance, service contracts, and rapid response for customer requests.';
 
     case 'not-found':
       return isAr
