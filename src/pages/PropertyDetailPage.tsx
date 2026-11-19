@@ -134,7 +134,7 @@ export function PropertyDetailPage({
       {/* Gallery Section */}
       <div className="space-y-3">
         {/* Main large image */}
-        <div className="relative aspect-16/9 sm:aspect-21/9 rounded-3xl overflow-hidden bg-slate-900 shadow-lg">
+        <div className="relative aspect-16/9 sm:aspect-21/9 rounded-3xl overflow-hidden bg-[#034DA2] shadow-lg">
           <ManagedImg copyScope="realestate.PropertyDetailPage"
             src={property.images[activeImageIndex] || property.images[0]}
             alt={
