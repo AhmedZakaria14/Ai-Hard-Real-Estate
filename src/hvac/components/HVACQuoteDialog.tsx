@@ -201,7 +201,7 @@ ${isUrgent ? '⚠️ Urgency: Emergency Request' : ''}`;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center overflow-hidden bg-slate-950/60 p-0 sm:p-4 backdrop-blur-sm animate-in fade-in duration-200 [padding-top:env(safe-area-inset-top)] sm:[padding-top:1rem]"
       onClick={closeQuoteDialog}
       dir={isAr ? 'rtl' : 'ltr'}
     >
@@ -212,11 +212,11 @@ ${isUrgent ? '⚠️ Urgency: Emergency Request' : ''}`;
         aria-modal="true"
         aria-labelledby={titleId}
         onKeyDown={handleKeyDown}
-        className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl relative focus:outline-none"
+        className="relative flex w-full min-w-0 max-w-lg flex-col overflow-hidden border border-slate-200 bg-white shadow-2xl focus:outline-none max-h-[calc(100dvh-env(safe-area-inset-top))] sm:max-h-[calc(100dvh-2rem)] rounded-t-2xl sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="bg-[#1E293B] text-white px-6 py-4 flex items-center justify-between">
+        <div className="flex shrink-0 items-center justify-between bg-[#1E293B] px-4 py-4 text-white sm:px-6">
           <div className="flex items-center gap-2.5">
             <div className="p-1.5 rounded-lg bg-[#0EA5E9]/20 text-[#0EA5E9]">
               <FileText className="w-5 h-5" />
@@ -243,7 +243,7 @@ ${isUrgent ? '⚠️ Urgency: Emergency Request' : ''}`;
         </div>
 
         {/* Modal Body */}
-        <div className="p-6">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:p-6 sm:pb-6">
           {submittedLead ? (
             /* Success State */
             <div className="text-center space-y-5 py-4">
