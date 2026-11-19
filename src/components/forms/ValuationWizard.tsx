@@ -270,7 +270,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
               style={{ width: `${(currentStep / totalSteps) * 100}%` }}
             ></div>
           </div>
-          <div className="grid grid-cols-4 text-[11px] font-medium text-slate-500">
+          <div className="grid grid-cols-2 gap-y-1 text-[11px] font-medium text-slate-500 sm:grid-cols-4">
             <span className={currentStep >= 1 ? 'text-blue-600 font-bold' : ''}>
               {isAr ? <InterfaceText id="realestate.ValuationWizard.ku38cdq" source="1. المواصفات" /> : <InterfaceText id="realestate.ValuationWizard.k1w6axe5" source="1. Architecture" />}
             </span>
@@ -566,7 +566,7 @@ export function ValuationWizard({ language, onSuccess, isModal = false }: Valuat
                   <label className="block text-xs font-bold text-slate-700 mb-2">
                     {isAr ? <InterfaceText id="realestate.ValuationWizard.kadusd0" source="حالة الأثاث والفرش" /> : <InterfaceText id="realestate.ValuationWizard.k1hctxny" source="Furnishing Status" />}
                   </label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                     {[
                       { id: 'furnished', label: isAr ? 'مفروش بالكامل (فاخر)' : 'Fully Furnished' },
                       { id: 'semi', label: isAr ? 'نصف مفروش (أجهزة مطبخ)' : 'Semi-Furnished' },
