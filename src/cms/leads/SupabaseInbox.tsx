@@ -222,6 +222,14 @@ export default function OperationsWorkspace({ initialSection, adminEmail, langua
         className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold"><RefreshCw className="me-2 inline h-4 w-4" />تحديث</button>
     )}
       {view === 'backup' ? <SupabaseDataExport /> : view === 'reports' || view === 'notifications' ? <SupabaseOperations key={view} section={view} refresh={refresh} /> : view === 'calculators' ? <CMSCalculatorConfig language={language} adminEmail={adminEmail} /> : view === 'sector_sections' ? <SupabaseSectorSections /> : view === 'media' ? <CMSMediaLibrary language={language} /> : view !== 'requests' && view !== 'appointments' && view !== 'archive' ? <SupabaseArticleEditor key={view} client={client} collection={view === 'articles' ? 'blog_posts' : view} /> : <>
+      {view === 'requests' && <details className="rounded-lg border border-blue-200 bg-blue-50/60 p-4 text-sm">
+        <summary className="cursor-pointer font-semibold text-blue-900">أين تظهر الطلبات المرسلة من الموقع؟</summary>
+        <div className="mt-2 space-y-2 leading-6 text-slate-700">
+          <p>كل النماذج العامة تُحفظ في <code>hard_form_submissions</code> وتظهر هنا برقم المتابعة نفسه الذي يراه العميل، مثل LST وINQ وCST وHVAC.</p>
+          <p>استخدم رقم المتابعة لمطابقة الطلب، ثم غيّر حالته إلى «تم التواصل» أو «مغلق». المرفقات الخاصة تظهر داخل بطاقة الطلب ويمكن تنزيلها للمسؤول المصرح له.</p>
+          <p>طلبات حجز المعاينة ذات الموعد تظهر كذلك في تبويب «المواعيد والمعاينات»، والطلبات القديمة يمكن نقلها إلى الأرشيف أو استعادتها.</p>
+        </div>
+      </details>}
       {isAppointments && <details className="rounded-lg border p-4 text-sm">
         <summary className="cursor-pointer font-semibold">طريقة اختبار حجز المعاينة</summary>
         <ol className="mt-2 list-decimal space-y-2 ps-5">
