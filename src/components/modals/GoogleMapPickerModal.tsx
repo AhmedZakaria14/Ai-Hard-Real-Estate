@@ -414,7 +414,7 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
         </div>
 
         {/* Map Canvas Workspace */}
-        <div className="relative flex-1 w-full bg-slate-100 overflow-hidden">
+        <div className="relative min-h-0 flex-1 w-full bg-slate-100 overflow-hidden">
           {/* Leaflet Map DOM Element */}
           <div ref={mapContainerRef} className="w-full h-full z-0 cursor-crosshair" />
 
@@ -477,7 +477,7 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
         </div>
 
         {/* Selected Coordinates Readout & Action Footer */}
-        <div className="p-4 sm:p-5 bg-white border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0 shadow-lg">
+        <div className="flex shrink-0 flex-col items-center justify-between gap-4 border-t border-slate-200 bg-white p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-lg sm:flex-row sm:p-5 sm:pb-5">
           {/* Coordinates & Detected Address readout */}
           <div className="w-full sm:flex-1 text-start">
             <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
