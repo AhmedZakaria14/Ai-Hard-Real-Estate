@@ -92,10 +92,10 @@ export const CMSCategoryModal: React.FC<CMSCategoryModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center overflow-hidden bg-slate-950/70 p-0 sm:p-4 backdrop-blur-xs [padding-top:env(safe-area-inset-top)] sm:[padding-top:1rem]">
       <div
         dir={isAr ? 'rtl' : 'ltr'}
-        className="bg-white w-full max-w-xl rounded-3xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200"
+        className="flex w-full min-w-0 max-w-xl flex-col overflow-hidden border border-slate-200 bg-white shadow-2xl max-h-[calc(100dvh-env(safe-area-inset-top))] sm:max-h-[calc(100dvh-2rem)] rounded-t-3xl sm:rounded-3xl animate-in fade-in zoom-in-95 duration-200"
       >
         <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
           <div className="flex items-center gap-3">
@@ -121,7 +121,7 @@ export const CMSCategoryModal: React.FC<CMSCategoryModalProps> = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:p-6 sm:pb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-700">
@@ -135,7 +135,7 @@ export const CMSCategoryModal: React.FC<CMSCategoryModalProps> = ({
                   setNameEn(e.target.value);
                   if (!slugEn) setSlugEn(generateSlug(e.target.value, 'en'));
                 }}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base sm:text-sm text-slate-900"
                 placeholder="e.g. Market Intelligence"
               />
             </div>
@@ -153,7 +153,7 @@ export const CMSCategoryModal: React.FC<CMSCategoryModalProps> = ({
                   setNameAr(e.target.value);
                   if (!slugAr) setSlugAr(generateSlug(e.target.value, 'ar'));
                 }}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base sm:text-sm text-slate-900"
                 placeholder="مثال: تقارير وتحليلات السوق"
               />
             </div>
@@ -182,7 +182,7 @@ export const CMSCategoryModal: React.FC<CMSCategoryModalProps> = ({
                 type="text"
                 value={slugEn}
                 onChange={(e) => setSlugEn(e.target.value)}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base sm:text-xs font-mono text-slate-900"
                 placeholder="market-intelligence"
               />
             </div>
@@ -196,7 +196,7 @@ export const CMSCategoryModal: React.FC<CMSCategoryModalProps> = ({
                 dir="rtl"
                 value={slugAr}
                 onChange={(e) => setSlugAr(e.target.value)}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base sm:text-xs font-mono text-slate-900"
                 placeholder="tahleelat-al-souq"
               />
             </div>
@@ -210,7 +210,7 @@ export const CMSCategoryModal: React.FC<CMSCategoryModalProps> = ({
               rows={2}
               value={descEn}
               onChange={(e) => setDescEn(e.target.value)}
-              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
+              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base sm:text-xs text-slate-900"
               placeholder="Brief summary of articles in this category..."
             />
           </div>
@@ -224,7 +224,7 @@ export const CMSCategoryModal: React.FC<CMSCategoryModalProps> = ({
               dir="rtl"
               value={descAr}
               onChange={(e) => setDescAr(e.target.value)}
-              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
+              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base sm:text-xs text-slate-900"
               placeholder="وصف مختصر لمحتوى ومجالات هذا التصنيف..."
             />
           </div>
@@ -256,7 +256,7 @@ export const CMSCategoryModal: React.FC<CMSCategoryModalProps> = ({
                 min={1}
                 value={order}
                 onChange={(e) => setOrder(Number(e.target.value))}
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base sm:text-xs text-slate-900"
               />
             </div>
           </div>
