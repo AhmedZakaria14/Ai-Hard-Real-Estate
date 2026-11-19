@@ -134,8 +134,8 @@ export const CMSTestimonialFormModal: React.FC<CMSTestimonialFormModalProps> = (
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl max-w-3xl w-full border border-slate-200 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center overflow-hidden bg-slate-950/70 p-0 sm:p-4 backdrop-blur-xs [padding-top:env(safe-area-inset-top)] sm:[padding-top:1rem]">
+      <div className="flex w-full min-w-0 max-w-3xl flex-col overflow-hidden border border-slate-200 bg-white shadow-2xl max-h-[calc(100dvh-env(safe-area-inset-top))] sm:max-h-[calc(100dvh-2rem)] rounded-t-3xl sm:rounded-3xl animate-in fade-in zoom-in-95 duration-150">
         {/* Modal Header */}
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div className="flex items-center gap-3">
@@ -168,7 +168,7 @@ export const CMSTestimonialFormModal: React.FC<CMSTestimonialFormModalProps> = (
         </div>
 
         {/* Modal Body */}
-        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-6 flex-1 text-xs sm:text-sm">
+        <form onSubmit={handleSubmit} className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] text-sm sm:space-y-6 sm:p-6 sm:pb-6">
           {errors.save && <p role="alert" className="text-red-700">{errors.save}</p>}
           {/* Avatar & Rating Row */}
           <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-4">
