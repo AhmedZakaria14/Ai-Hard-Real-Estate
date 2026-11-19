@@ -55,10 +55,10 @@ export const CMSOrphanReassignModal: React.FC<CMSOrphanReassignModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center overflow-hidden bg-slate-950/70 p-0 sm:p-4 backdrop-blur-xs [padding-top:env(safe-area-inset-top)] sm:[padding-top:1rem]">
       <div
         dir={isAr ? 'rtl' : 'ltr'}
-        className="bg-white w-full max-w-lg rounded-3xl border border-red-200 shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200"
+        className="flex w-full min-w-0 max-w-lg flex-col overflow-hidden border border-red-200 bg-white shadow-2xl max-h-[calc(100dvh-env(safe-area-inset-top))] sm:max-h-[calc(100dvh-2rem)] rounded-t-3xl sm:rounded-3xl animate-in fade-in zoom-in-95 duration-200"
       >
         {/* Header */}
         <div className="px-6 py-4 bg-red-50 border-b border-red-200 flex items-center justify-between">
@@ -88,7 +88,7 @@ export const CMSOrphanReassignModal: React.FC<CMSOrphanReassignModalProps> = ({
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-4">
+        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:p-6 sm:pb-6">
           <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
             {entityType === 'category'
               ? isAr
@@ -129,7 +129,7 @@ export const CMSOrphanReassignModal: React.FC<CMSOrphanReassignModalProps> = ({
               <SearchableSelect
                 value={selectedTargetId}
                 onChange={(e) => setSelectedTargetId(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-base sm:text-sm font-semibold text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">{isAr ? '-- اختر تصنيفاً بديلاً --' : '-- Choose replacement category --'}</option>
                 {availableCategories.map((c) => (
@@ -142,7 +142,7 @@ export const CMSOrphanReassignModal: React.FC<CMSOrphanReassignModalProps> = ({
               <SearchableSelect
                 value={selectedTargetId}
                 onChange={(e) => setSelectedTargetId(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-base sm:text-sm font-semibold text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">{isAr ? '-- اختر كاتباً بديلاً --' : '-- Choose replacement author --'}</option>
                 {availableAuthors.map((a) => (
