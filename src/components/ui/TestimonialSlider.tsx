@@ -34,7 +34,7 @@ export function TestimonialSlider({ testimonials, language }: TestimonialSliderP
         const rating = Math.max(0, Math.min(5, Number(story.rating) || 0));
         const name = getLocalizedText(story.name, language);
         const identity = [getLocalizedText(story.role, language), getLocalizedText(story.location, language)].filter(Boolean);
-        return <article key={story.id} className="flex flex-col gap-5 rounded-3xl border border-slate-800 bg-slate-900 p-5 text-white sm:p-7">
+        return <article key={story.id} className="flex flex-col gap-5 rounded-3xl border border-blue-800/60 bg-[#034DA2] p-5 text-white sm:p-7">
           <p className="flex items-center gap-2 text-sm font-semibold text-amber-300">
             <Star className="size-4 fill-current" aria-hidden="true" />
             <bdi dir="ltr"><LocalizedValue value={rating.toFixed(1)} /><LocalizedValue value="/ 5" /></bdi>
