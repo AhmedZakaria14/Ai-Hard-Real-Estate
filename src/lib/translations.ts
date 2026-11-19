@@ -105,7 +105,7 @@ export const translations = {
       servicesSectionSubtitle: 'Distinct brokerage, property marketing, and investment advisory desks for sellers, buyers, investors, and developers.',
       testimonialsTag: 'Client Success Stories',
       testimonialsSectionTitle: 'Trusted by High-Net-Worth Buyers & Investors',
-      testimonialsSectionSubtitle: 'Discover how our dedicated advisory and marketing teams facilitate extraordinary real estate outcomes across the globe.',
+      testimonialsSectionSubtitle: 'Discover how our advisory and marketing teams help clients complete successful real estate transactions with confidence.',
       projectsSectionTitle: 'Master Developments & New Launches',
       projectsSectionSubtitle: 'Exclusive investment opportunities offering flexible payment milestones and strong capital appreciation.',
       marketingBannerTitle: 'Selling or Renting Your Property?',
