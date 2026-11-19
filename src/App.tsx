@@ -116,7 +116,8 @@ function detectRouteFromLocation(): {
     detectedPage = 'admin';
   } else if (rawPath.startsWith('/admin/')) {
     const sub = rawPath.substring('/admin/'.length).split('?')[0].replace(/\/+$/, '');
-    if (sub === '' || sub === 'cms') {
+    if (sub === 'cms') {
+      window.location.replace('/admin');
       detectedPage = 'admin';
     } else {
       detectedPage = 'not-found';
@@ -150,6 +151,7 @@ function detectRouteFromLocation(): {
     if (sub === '' || sub === 'home') {
       detectedPage = 'home';
     } else if (sub === 'admin' || sub === 'cms') {
+      window.location.replace('/admin');
       detectedPage = 'admin';
     } else if (sub === 'properties') {
       detectedPage = 'properties';
@@ -178,6 +180,7 @@ function detectRouteFromLocation(): {
       hash === '/admin' ||
       hash === '/cms'
     ) {
+      window.location.replace('/admin');
       detectedPage = 'admin';
     } else if (
       hash === 'properties' ||
@@ -221,6 +224,7 @@ function detectRouteFromLocation(): {
       } else if (sub === 'property-details') {
         detectedPage = 'property-details';
       } else if (sub === 'admin' || sub === 'cms') {
+        window.location.replace('/admin');
         detectedPage = 'admin';
       } else {
         detectedPage = 'not-found';
