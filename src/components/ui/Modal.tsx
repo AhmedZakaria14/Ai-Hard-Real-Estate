@@ -125,7 +125,7 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center overflow-hidden p-0 sm:p-4 [padding-top:env(safe-area-inset-top)] sm:[padding-top:1rem]"
       dir={dir}
     >
       {/* Backdrop */}
@@ -145,13 +145,13 @@ export function Modal({
         aria-describedby={subtitle ? subtitleId : undefined}
         onKeyDown={handleKeyDown}
         className={cn(
-          'relative w-full bg-white rounded-3xl shadow-2xl border border-slate-100 z-10 overflow-hidden my-6 transform transition-all duration-200 scale-100 animate-in zoom-in-95 focus:outline-none',
+          'relative z-10 flex w-full min-w-0 flex-col overflow-hidden border border-slate-100 bg-white shadow-2xl max-h-[calc(100dvh-env(safe-area-inset-top))] sm:max-h-[calc(100dvh-2rem)] rounded-t-3xl sm:rounded-3xl my-0 sm:my-4 transform transition-all duration-200 scale-100 animate-in zoom-in-95 focus:outline-none',
           maxWidthClass,
           className
         )}
       >
         {/* Header */}
-        <div className="flex items-start justify-between p-5 sm:p-6 border-b border-slate-100 bg-slate-50/50">
+        <div className="flex shrink-0 items-start justify-between border-b border-slate-100 bg-slate-50/50 p-4 sm:p-6">
           <div className="pe-6 space-y-1 flex-1">
             {title && (
               <h3 id={titleId} className="text-xl sm:text-2xl font-bold text-slate-900 font-display-serif tracking-tight">
@@ -176,7 +176,7 @@ export function Modal({
         </div>
 
         {/* Content body with internal scrolling */}
-        <div className="p-5 sm:p-6 max-h-[78vh] sm:max-h-[80vh] overflow-y-auto"><LocalizedValue value={children} /></div>
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:p-6 sm:pb-6"><LocalizedValue value={children} /></div>
       </div>
     </div>
   );
