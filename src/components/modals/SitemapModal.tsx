@@ -207,7 +207,7 @@ export function SitemapModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer"
+            className="px-5 py-2.5 bg-[#034DA2] hover:bg-blue-800 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer"
           >
             <LocalizedValue value={isAr ? 'إغلاق الخريطة' : 'Close Sitemap'} />
           </button>
