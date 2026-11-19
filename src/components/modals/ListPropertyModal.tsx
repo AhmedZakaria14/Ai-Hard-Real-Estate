@@ -309,7 +309,7 @@ export function ListPropertyModal({
                   onClick={() => setUserRole('owner')}
                   className={`p-4 rounded-2xl border text-start transition-all duration-200 flex flex-col justify-between cursor-pointer group ${
                     userRole === 'owner'
-                      ? 'bg-slate-900 border-slate-800 text-white shadow-md ring-2 ring-blue-500/50'
+                      ? 'bg-[#034DA2] border-blue-800/60 text-white shadow-md ring-2 ring-blue-300/60'
                       : 'bg-slate-50/80 border-slate-200 text-slate-800 hover:bg-slate-100 hover:border-slate-300'
                   }`}
                 >
@@ -356,7 +356,7 @@ export function ListPropertyModal({
                   onClick={() => setUserRole('seeker')}
                   className={`p-4 rounded-2xl border text-start transition-all duration-200 flex flex-col justify-between cursor-pointer group ${
                     userRole === 'seeker'
-                      ? 'bg-slate-900 border-slate-800 text-white shadow-md ring-2 ring-blue-500/50'
+                      ? 'bg-[#034DA2] border-blue-800/60 text-white shadow-md ring-2 ring-blue-300/60'
                       : 'bg-slate-50/80 border-slate-200 text-slate-800 hover:bg-slate-100 hover:border-slate-300'
                   }`}
                 >
