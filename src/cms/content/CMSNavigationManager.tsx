@@ -54,7 +54,7 @@ const SECTORS: { id: SectorId; nameAr: string; nameEn: string; icon: any }[] = [
 ];
 
 const DEFAULT_HEADER_ITEMS: NavItem[] = [
-  { id: 'nav-1', label: { ar: 'الرئيسية', en: 'Home' }, type: 'internal', targetPath: '/', isVisible: true, order: 1 },
+  { id: 'nav-1', label: { ar: 'الرئيسية', en: 'Home' }, type: 'internal', targetPath: '/realestate', isVisible: true, order: 1 },
   { id: 'nav-2', label: { ar: 'العقارات والكتالوج', en: 'Properties' }, type: 'internal', targetPath: '/realestate/properties', isVisible: true, order: 2 },
   { id: 'nav-3', label: { ar: 'المشاريع التطويرية', en: 'Projects' }, type: 'internal', targetPath: '/realestate/projects', isVisible: true, order: 3 },
   { id: 'nav-4', label: { ar: 'عن هارد', en: 'About Us' }, type: 'internal', targetPath: '/realestate/about', isVisible: true, order: 4 },
