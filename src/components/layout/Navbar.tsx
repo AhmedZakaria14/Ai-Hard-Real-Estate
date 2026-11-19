@@ -33,8 +33,12 @@ export function Navbar({ currentPage, onNavigate, language, onLanguageChange, on
   const ar = language === 'ar';
   const [mobileOpen, setMobileOpen] = useState(false);
   const [cmsItems, setCmsItems] = useState<NavItem[]>([]);
+  const [hasCmsNavigation, setHasCmsNavigation] = useState(false);
 
-  useEffect(() => subscribeNavigationDoc('header_realestate', (doc) => setCmsItems(doc?.items ?? [])), []);
+  useEffect(() => subscribeNavigationDoc('header_realestate', (doc) => {
+    setHasCmsNavigation(Boolean(doc));
+    setCmsItems(doc?.items ?? []);
+  }), []);
 
   function changePage(page: PageId) {
     setMobileOpen(false);
@@ -46,20 +50,56 @@ export function Navbar({ currentPage, onNavigate, language, onLanguageChange, on
     onOpenListPropertyModal();
   }
 
-  const links = realEstateNavigationPages.map((page) => {
-    const href = getPageHref(page);
-    const item = cmsItems.find((row) => row.isVisible && row.type !== 'external' && pathOnly(row.targetPath) === pathOnly(href));
-    const active = currentPage === page || (page === 'properties' && currentPage === 'property-details');
-    return { page, href, label: item?.label[language]?.trim() || nav[page], active };
-  });
+  const fallbackLinks = realEstateNavigationPages.map((page) => ({
+    id: page,
+    page,
+    href: getPageHref(page),
+    label: nav[page],
+    active: currentPage === page || (page === 'properties' && currentPage === 'property-details'),
+    external: false,
+    newTab: false,
+  }));
+
+  const managedLinks = cmsItems
+    .filter((item) => item.isVisible)
+    .sort((a, b) => a.order - b.order)
+    .map((item) => {
+      const matchedPage = realEstateNavigationPages.find(
+        (page) => pathOnly(getPageHref(page)) === pathOnly(item.targetPath),
+      );
+      return {
+        id: item.id,
+        page: matchedPage,
+        href: item.targetPath,
+        label: item.label[language]?.trim() || item.label.en || item.label.ar,
+        active: matchedPage
+          ? currentPage === matchedPage || (matchedPage === 'properties' && currentPage === 'property-details')
+          : false,
+        external: item.type === 'external',
+        newTab: Boolean(item.openInNewTab),
+      };
+    });
+
+  const links = hasCmsNavigation ? managedLinks : fallbackLinks;
 
   function renderLinks() {
-    return links.map(({ page, href, label, active }) => <a key={page} href={href}
-      onClick={(event) => handleSemanticClick(event, () => changePage(page))}
-      aria-current={active ? 'page' : undefined}
-      className={`relative w-fit whitespace-nowrap px-2 py-2 text-sm hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-500 ${active ? 'font-bold text-blue-700 after:absolute after:inset-x-2 after:bottom-1 after:h-0.5 after:rounded-full after:bg-blue-700' : 'font-medium text-slate-700'}`}>
-      <LocalizedValue value={label} />
-    </a>);
+    return links.map(({ id, page, href, label, active, external, newTab }) => {
+      const className = `relative w-fit whitespace-nowrap px-2 py-2 text-sm hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-500 ${active ? 'font-bold text-blue-700 after:absolute after:inset-x-2 after:bottom-1 after:h-0.5 after:rounded-full after:bg-blue-700' : 'font-medium text-slate-700'}`;
+      if (!external && page) {
+        return <a key={id} href={href}
+          onClick={(event) => handleSemanticClick(event, () => changePage(page))}
+          aria-current={active ? 'page' : undefined}
+          className={className}>
+          <LocalizedValue value={label} />
+        </a>;
+      }
+      return <a key={id} href={href}
+        target={external && newTab ? '_blank' : undefined}
+        rel={external && newTab ? 'noopener noreferrer' : undefined}
+        className={className}>
+        <LocalizedValue value={label} />
+      </a>;
+    });
   }
 
   const languageButton = <ManagedButton copyScope="realestate.Navbar" type="button" onClick={() => onLanguageChange(ar ? 'en' : 'ar')}
