@@ -59,18 +59,18 @@ export function SearchableSelect({ children, value, defaultValue, onChange, clas
     </select>
     <button ref={trigger} id={id} type="button" role="combobox" disabled={disabled} aria-expanded={open} aria-controls={listId}
       aria-haspopup="listbox" aria-required={required} aria-invalid={invalid || undefined} aria-label={props['aria-label']}
-      className={(className ?? 'w-full rounded-xl border border-slate-200 bg-white p-3 text-sm') + ' flex items-center justify-between gap-2 text-start disabled:opacity-50'}
+      className={(className ?? 'w-full rounded-xl border border-slate-200 bg-white p-3 text-sm') + ' min-w-0 flex items-center justify-between gap-2 text-start text-base sm:text-sm disabled:opacity-50'}
       onClick={() => setOpen(!open)} onKeyDown={(event) => { if (event.key === 'ArrowDown' || event.key === 'ArrowUp') { event.preventDefault(); setOpen(true); } }}>
       <span className="min-w-0 flex-1 truncate">{typeof current?.label === 'string' ? displayDigits(current.label, publicLanguage) : current?.label ?? (ar ? 'اختر خيارًا' : 'Choose an option')}</span>
       <ChevronDown className="size-4 shrink-0" aria-hidden="true" />
     </button>
     {invalid && <p role="alert" className="mt-1 text-xs text-red-600">{ar ? 'يرجى اختيار قيمة لهذا الحقل.' : 'Please select an option.'}</p>}
-    {open && <div className="absolute start-0 top-full z-[1000] mt-1 w-full min-w-48 rounded-xl border border-slate-200 bg-white text-slate-900 shadow-xl">
+    {open && <div className="absolute start-0 top-full z-[1000] mt-1 w-full min-w-0 sm:min-w-48 max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-xl border border-slate-200 bg-white text-slate-900 shadow-xl">
       <div className="relative border-b border-slate-100 p-2">
         <Search className="absolute start-4 top-4 size-4 text-slate-400" aria-hidden="true" />
         <input ref={search} aria-label={ar ? 'ابحث في الخيارات' : 'Search options'} value={query} onChange={(event) => setQuery(event.target.value)}
           placeholder={ar ? 'ابحث في الخيارات…' : 'Search options…'}
-          className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pe-2 ps-8 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full min-w-0 rounded-lg border border-slate-200 bg-slate-50 py-2 pe-2 ps-8 text-base sm:text-sm text-slate-900 outline-none focus:ring-2 focus:ring-blue-500"
           onKeyDown={(event) => {
             if (event.key === 'Escape') { event.preventDefault(); setOpen(false); trigger.current?.focus(); }
             if (event.key === 'ArrowDown') { event.preventDefault(); setActive((index) => Math.min(index + 1, filtered.length - 1)); }
@@ -79,7 +79,7 @@ export function SearchableSelect({ children, value, defaultValue, onChange, clas
             if (event.key === 'Tab') setOpen(false);
           }} />
       </div>
-      <ul id={listId} role="listbox" className="max-h-60 overflow-auto py-1">
+      <ul id={listId} role="listbox" className="max-h-[min(15rem,38dvh)] overflow-auto overscroll-contain py-1">
         {filtered.map((option, index) => <li key={option.value + index} role="option" aria-selected={selected === option.value} aria-disabled={option.disabled}>
           <button type="button" disabled={option.disabled} onMouseEnter={() => setActive(index)} onClick={() => choose(option)}
             className={'flex w-full items-center justify-between gap-2 px-3 py-2 text-start text-sm disabled:opacity-40 ' + (index === active ? 'bg-blue-50 text-blue-800' : 'hover:bg-slate-50')}>
