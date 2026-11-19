@@ -13,7 +13,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { useConstruction } from '../context/ConstructionContext';
-import { COMPANY_CREDENTIALS } from '../data/seedData';
+import { SECTOR_CONTACT_DETAILS } from '../../lib/sectors';
 import { handleSemanticClick } from '../../lib/navigation';
 
 interface FooterProps {
@@ -122,16 +122,16 @@ export function Footer({ onNavigate }: FooterProps) {
             <div className="flex items-center gap-2">
               <Phone className="w-4 h-4 text-[#009ee2] shrink-0" />
               <a
-                href={`tel:${COMPANY_CREDENTIALS.phone.replace(/\s+/g, '')}`}
+                href={`tel:${SECTOR_CONTACT_DETAILS.construction.phone.replace(/\s+/g, '')}`}
                 className="hover:text-[#009ee2] dir-ltr text-start font-semibold text-slate-200"
               >
-                <LocalizedValue value={COMPANY_CREDENTIALS.phone} />
+                <LocalizedValue value={SECTOR_CONTACT_DETAILS.construction.phone} />
               </a>
             </div>
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-[#009ee2] shrink-0" />
-              <a href={`mailto:${COMPANY_CREDENTIALS.email}`} className="hover:text-[#009ee2] text-slate-200">
-                <LocalizedValue value={COMPANY_CREDENTIALS.email} />
+              <a href={`mailto:${SECTOR_CONTACT_DETAILS.construction.email}`} className="hover:text-[#009ee2] text-slate-200">
+                <LocalizedValue value={SECTOR_CONTACT_DETAILS.construction.email} />
               </a>
             </div>
             <div className="flex items-center gap-2">
