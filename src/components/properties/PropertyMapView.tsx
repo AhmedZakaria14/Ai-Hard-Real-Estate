@@ -348,9 +348,9 @@ export function PropertyMapView({
   }, [selectedProperty?.id]);
 
   return (
-    <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden text-white font-ui-sans">
+    <div className="bg-[#034DA2] rounded-3xl border border-blue-800/60 shadow-2xl overflow-hidden text-white font-ui-sans">
       {/* 1. Header Banner */}
-      <div className="p-4 sm:p-6 bg-slate-950/90 border-b border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="p-4 sm:p-6 bg-[#034DA2]/90 border-b border-blue-800/60 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="primary" className="bg-blue-600/90 text-white border-blue-400/40">
@@ -371,7 +371,7 @@ export function PropertyMapView({
 
         {/* Map Style Controls */}
         <div className="flex items-center gap-2 self-stretch md:self-auto overflow-x-auto">
-          <div className="bg-slate-900 p-1 rounded-xl border border-slate-700 flex items-center gap-1 text-xs">
+          <div className="bg-[#034DA2] p-1 rounded-xl border border-white/20 flex items-center gap-1 text-xs">
             <button
               type="button"
               onClick={() => setMapStyle('luxury-dark')}
@@ -410,7 +410,7 @@ export function PropertyMapView({
       </div>
 
       {/* 2. District Quick Filter Bar */}
-      <div className="px-4 sm:px-6 py-2.5 bg-slate-900/90 border-b border-slate-800/80 flex items-center gap-2 overflow-x-auto text-xs scrollbar-none">
+      <div className="px-4 sm:px-6 py-2.5 bg-[#034DA2]/90 border-b border-blue-800/60/80 flex items-center gap-2 overflow-x-auto text-xs scrollbar-none">
         <span className="text-slate-400 font-semibold shrink-0">
           <LocalizedValue value={isAr ? 'تصفية المنطقة الشرقية:' : 'Eastern Province Filter:'} />
         </span>
@@ -422,7 +422,7 @@ export function PropertyMapView({
             className={`px-3.5 py-1 rounded-full whitespace-nowrap border transition-all cursor-pointer ${
               activeAreaFilter === preset.filterKey
                 ? 'bg-blue-600/30 border-blue-500 text-blue-300 font-bold'
-                : 'bg-slate-800/60 border-slate-700 text-slate-400 hover:text-slate-200'
+                : 'bg-slate-800/60 border-white/20 text-slate-400 hover:text-slate-200'
             }`}
           >
             <LocalizedValue value={preset.label} />
@@ -431,13 +431,13 @@ export function PropertyMapView({
       </div>
 
       {/* 3. Interactive Map Canvas Area */}
-      <div className="relative h-[480px] sm:h-[540px] w-full overflow-hidden bg-slate-950 flex flex-col justify-between">
+      <div className="relative h-[480px] sm:h-[540px] w-full overflow-hidden bg-[#034DA2] flex flex-col justify-between">
         {/* Map Canvas Div */}
         <div ref={mapContainerRef} className="absolute inset-0 z-0 h-full w-full" />
 
         {/* Loading Overlay */}
         {mapLoading && !mapError && (
-          <div className="absolute inset-0 z-30 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-200">
+          <div className="absolute inset-0 z-30 bg-[#034DA2]/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-200">
             <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-3" />
             <p className="text-sm font-bold text-slate-200">
               <LocalizedValue value={isAr ? 'جارٍ تحميل الخريطة التفاعلية...' : 'Loading Interactive Map...'} />
@@ -450,7 +450,7 @@ export function PropertyMapView({
 
         {/* Error Fallback State */}
         {mapError && (
-          <div className="absolute inset-0 z-30 bg-slate-950/95 flex flex-col items-center justify-center p-6 text-center animate-in fade-in">
+          <div className="absolute inset-0 z-30 bg-[#034DA2]/95 flex flex-col items-center justify-center p-6 text-center animate-in fade-in">
             <AlertTriangle className="w-10 h-10 text-amber-400 mb-3" />
             <h4 className="text-base font-bold text-white mb-1">
               <LocalizedValue value={isAr ? 'تعذر تحميل الخريطة التفاعلية' : 'Map View Temporarily Unavailable'} />
@@ -469,7 +469,7 @@ export function PropertyMapView({
 
         {/* No Results Filter State */}
         {!mapLoading && !mapError && mappedProperties.length === 0 && (
-          <div className="absolute inset-0 z-20 bg-slate-950/80 backdrop-blur-xs flex flex-col items-center justify-center p-6 text-center">
+          <div className="absolute inset-0 z-20 bg-[#034DA2]/80 backdrop-blur-xs flex flex-col items-center justify-center p-6 text-center">
             <MapPin className="w-8 h-8 text-slate-500 mb-2" />
             <p className="text-sm font-bold text-slate-300">
               <LocalizedValue value={isAr ? 'لا توجد عقارات مثبتة في هذه المنطقة حالياً' : 'No mapped properties in this selected filter'} />
@@ -486,11 +486,11 @@ export function PropertyMapView({
 
         {/* Floating Map Zoom Controls */}
         <div className="absolute top-4 right-4 z-20 flex flex-col gap-2">
-          <div className="bg-slate-900/90 backdrop-blur-md rounded-xl border border-slate-700 p-1 flex flex-col gap-1 shadow-lg">
+          <div className="bg-[#034DA2]/90 backdrop-blur-md rounded-xl border border-white/20 p-1 flex flex-col gap-1 shadow-lg">
             <button
               type="button"
               onClick={() => leafletMapRef.current?.zoomIn()}
-              className="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+              className="p-2 text-slate-300 hover:text-white hover:bg-blue-800 rounded-lg transition-colors cursor-pointer"
               title="Zoom In"
             >
               <ZoomIn className="w-4 h-4" />
@@ -498,7 +498,7 @@ export function PropertyMapView({
             <button
               type="button"
               onClick={() => leafletMapRef.current?.zoomOut()}
-              className="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+              className="p-2 text-slate-300 hover:text-white hover:bg-blue-800 rounded-lg transition-colors cursor-pointer"
               title="Zoom Out"
             >
               <ZoomOut className="w-4 h-4" />
@@ -507,7 +507,7 @@ export function PropertyMapView({
         </div>
 
         {/* Coordinate Readout Bar (Bottom-Left) */}
-        <div className="absolute bottom-4 left-4 z-20 hidden sm:flex items-center gap-3 bg-slate-950/90 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-slate-800 text-xs text-slate-300 shadow-xl">
+        <div className="absolute bottom-4 left-4 z-20 hidden sm:flex items-center gap-3 bg-[#034DA2]/90 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-blue-800/60 text-xs text-slate-300 shadow-xl">
           <Navigation className="w-3.5 h-3.5 text-blue-400" />
           <span>
             <LocalizedValue value={isAr ? 'الإحداثيات الحالية:' : 'Center Coordinates:'} /><LocalizedValue value={' '} />
@@ -521,11 +521,11 @@ export function PropertyMapView({
 
         {/* 4. Selected Property Floating Card */}
         {selectedProperty && (
-          <div className="relative z-20 m-4 p-4 bg-slate-900/95 backdrop-blur-md rounded-2xl border border-slate-700 shadow-2xl max-w-xl self-center sm:self-end flex flex-col sm:flex-row items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="relative z-20 m-4 p-4 bg-[#034DA2]/95 backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl max-w-xl self-center sm:self-end flex flex-col sm:flex-row items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
             <img
               src={selectedProperty.images[0]}
               alt={getLocalizedText(selectedProperty.title, language)}
-              className="w-full sm:w-28 h-24 object-cover rounded-xl border border-slate-700 shrink-0"
+              className="w-full sm:w-28 h-24 object-cover rounded-xl border border-white/20 shrink-0"
             />
 
             <div className="space-y-1.5 flex-1 min-w-0 text-start">
@@ -594,7 +594,7 @@ export function PropertyMapView({
                 variant="outline"
                 size="sm"
                 onClick={() => onOpenBookViewingModal(selectedProperty)}
-                className="w-full justify-center text-xs text-slate-300 border-slate-700 hover:text-white"
+                className="w-full justify-center text-xs text-slate-300 border-white/20 hover:text-white"
               >
                 <Calendar className="w-3.5 h-3.5" />
                 <span><LocalizedValue value={isAr ? 'حجز معاينة' : 'Book Tour'} /></span>
@@ -606,7 +606,7 @@ export function PropertyMapView({
 
       {/* 5. Unmapped Listings Section */}
       {unmappedProperties.length > 0 && (
-        <div className="p-4 bg-slate-950 border-t border-slate-800 text-xs text-slate-400 space-y-2">
+        <div className="p-4 bg-[#034DA2] border-t border-blue-800/60 text-xs text-slate-400 space-y-2">
           <div className="flex items-center gap-2 text-amber-400 font-bold">
             <AlertTriangle className="w-4 h-4 shrink-0" />
             <span>
@@ -627,7 +627,7 @@ export function PropertyMapView({
                 key={p.id}
                 type="button"
                 onClick={() => setSelectedProperty(p)}
-                className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 text-[11px] flex items-center gap-1 cursor-pointer transition-colors"
+                className="px-2.5 py-1 rounded-lg bg-[#034DA2] hover:bg-blue-800 border border-white/20 text-slate-300 text-[11px] flex items-center gap-1 cursor-pointer transition-colors"
               >
                 <Building className="w-3 h-3 text-amber-500" />
                 <span><LocalizedValue value={getLocalizedText(p.title, language)} /></span>
@@ -638,7 +638,7 @@ export function PropertyMapView({
       )}
 
       {/* Footer Info Hook */}
-      <div className="p-4 sm:p-5 bg-slate-950 border-t border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-400">
+      <div className="p-4 sm:p-5 bg-[#034DA2] border-t border-blue-800/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-400">
         <div className="flex items-center gap-2.5">
           <Info className="w-4 h-4 text-blue-400 shrink-0" />
           <span>
@@ -649,7 +649,7 @@ export function PropertyMapView({
         </div>
 
         <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
-          <Badge variant="outline" className="text-[10px] text-slate-400 border-slate-700">
+          <Badge variant="outline" className="text-[10px] text-slate-400 border-white/20">
             <LocalizedValue value={isAr ? 'الخبر • الدمام • الظهران' : 'Al Khobar • Dammam • Dhahran'} />
           </Badge>
         </div>
