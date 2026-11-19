@@ -91,7 +91,7 @@ export function AboutPage({ onNavigate, language }: AboutPageProps) {
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-sm">
-          <div className="space-y-1 p-4 bg-slate-800/60 rounded-2xl border border-slate-700/50">
+          <div className="space-y-1 p-4 bg-white/10 rounded-2xl border border-white/15">
             <span className="text-xs text-slate-400 block">{language === 'en' ? <InterfaceText id="realestate.AboutPage.k1kp5qmi" source="FAL License | Real Estate General Authority" /> : <InterfaceText id="realestate.AboutPage.kfxs5ub" source="رخصة فال | الهيئة العامة للعقار" />}</span>
             <bdi dir="ltr" className="font-mono font-bold text-slate-200"><LocalizedValue value="1200048912" /></bdi>
           </div>
