@@ -137,10 +137,10 @@ export function Hero() {
                   decoding="async"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0f243e]/90 via-[#0f243e]/30 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#034DA2]/90 via-[#034DA2]/30 to-transparent" />
 
                 {/* Featured Badge */}
-                <div className="absolute top-3 end-3 px-3 py-1 rounded-full text-[10px] font-extrabold bg-[#0f243e] text-white shadow-md">
+                <div className="absolute top-3 end-3 px-3 py-1 rounded-full text-[10px] font-extrabold bg-[#034DA2] text-white shadow-md">
                   {isAr ? <InterfaceText id="construction.Hero.kx9i70u" source="مشروع مميز" /> : <InterfaceText id="construction.Hero.k19m0tgh" source="Featured Landmark" />}
                 </div>
 
