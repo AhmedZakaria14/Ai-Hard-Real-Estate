@@ -74,8 +74,8 @@ export const DEFAULT_HVAC_CITIES: HVACCityArea[] = [
 }));
 
 export const DEFAULT_HVAC_HERO: HVACHeroContent = {
-  badgeEn: '24/7 Rapid Emergency Response & Engineering Care',
-  badgeAr: 'خدمة طوارئ واستجابة هاتفية على مدار الساعة ٢٤/٧',
+  badgeEn: '',
+  badgeAr: '',
   headlineEn: 'Professional AC Maintenance and Cooling to the Highest Standards',
   headlineAr: 'صيانة وغسيل أجهزة التكييف والتبريد بأعلى معايير الدقة والاحترافية',
   subtitleEn: 'Specialized engineers and technicians provide comprehensive AC washing, complex fault repairs, and air duct sanitization with reliable periodic maintenance contracts in the Eastern Province.',
@@ -83,8 +83,8 @@ export const DEFAULT_HVAC_HERO: HVACHeroContent = {
   bgImageUrl: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1600&q=80',
   ctaPrimaryEn: 'Book Technician Visit',
   ctaPrimaryAr: 'حجز موعد فني صيانة',
-  ctaEmergencyEn: 'Emergency Hotline Call',
-  ctaEmergencyAr: 'الاتصال بالطوارئ فوراً',
+  ctaEmergencyEn: '',
+  ctaEmergencyAr: '',
   isPublished: true,
 };
 
@@ -103,7 +103,7 @@ export const DEFAULT_HVAC_HOURS_CONTACT: HVACOperatingHoursContact = {
   hoursWeekdayAr: 'السبت - الخميس: ٨:٠٠ ص – ٠٥:٠٠ م',
   hoursFridayEn: '',
   hoursFridayAr: '',
-  is24x7EmergencyActive: true,
+  is24x7EmergencyActive: false,
 };
 
 export const DEFAULT_HVAC_BOOKING_COPY: HVACBookingCopy = {
