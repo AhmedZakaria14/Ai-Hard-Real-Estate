@@ -9,6 +9,7 @@ import { Button } from '../ui/Button';
 import { BrandLogo } from '../ui/BrandLogo';
 import { getPageHref, handleSemanticClick, realEstateNavigationPages } from '../../lib/navigation';
 import { subscribeNavigationDoc, type NavItem } from '../../lib/cmsNavigationManager';
+import { useSiteSettings } from '../../context/SiteSettingsContext';
 
 interface NavbarProps {
   currentPage: PageId;
@@ -24,6 +25,10 @@ function pathOnly(href: string) {
 
 export function Navbar({ currentPage, onNavigate, language, onLanguageChange, onOpenListPropertyModal }: NavbarProps) {
   const { translations } = useTextOverride();
+  const { getEffectiveSettings } = useSiteSettings();
+  const brand = getEffectiveSettings('realestate');
+  const phoneHref = 'tel:' + (brand.supportPhone || '').replace(/\s/g, '');
+  const whatsappHref = 'https://wa.me/' + (brand.whatsappNumber || '').replace(/\D/g, '');
   const nav = translations[language].nav;
   const ar = language === 'ar';
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -94,8 +99,8 @@ export function Navbar({ currentPage, onNavigate, language, onLanguageChange, on
       <nav className="flex flex-col" aria-label={ar ? 'القائمة الرئيسية' : 'Main navigation'}><LocalizedValue value={renderLinks()} /></nav>
       <div className="sm:hidden"><LocalizedValue value={propertyButton()} /></div>
       <div className="flex flex-wrap gap-2 text-xs font-semibold">
-        <a href="tel:+966556125711" className="flex items-center gap-2 rounded-xl border border-slate-200 p-2.5"><Phone className="h-3.5 w-3.5 text-blue-600" /><LocalizedValue value={nav.callUs} /></a>
-        <a href="https://wa.me/966556125711" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-2.5 text-emerald-800"><MessageSquare className="h-3.5 w-3.5" /><LocalizedValue value={nav.whatsapp} /></a>
+        <a href={phoneHref} className="flex items-center gap-2 rounded-xl border border-slate-200 p-2.5"><Phone className="h-3.5 w-3.5 text-blue-600" /><LocalizedValue value={nav.callUs} /></a>
+        <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-2.5 text-emerald-800"><MessageSquare className="h-3.5 w-3.5" /><LocalizedValue value={nav.whatsapp} /></a>
       </div>
     </div>}
   </header>;
