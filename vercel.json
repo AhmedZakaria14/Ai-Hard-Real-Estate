@@ -61,6 +61,26 @@
       "source": "/admin/cms",
       "destination": "/admin",
       "permanent": true
+    },
+    {
+      "source": "/construction/admin",
+      "destination": "/admin",
+      "permanent": true
+    },
+    {
+      "source": "/hvac/admin",
+      "destination": "/admin",
+      "permanent": true
+    },
+    {
+      "source": "/maintenance/admin",
+      "destination": "/admin",
+      "permanent": true
+    },
+    {
+      "source": "/maintenance/cms",
+      "destination": "/admin",
+      "permanent": true
     }
   ],
   "headers": [
