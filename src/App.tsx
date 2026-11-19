@@ -92,7 +92,10 @@ function detectRouteFromLocation(): {
     detectedPage = 'construction';
   } else if (rawPath.startsWith('/construction/')) {
     const sub = rawPath.substring('/construction/'.length).split('?')[0].replace(/\/+$/, '');
-    if (sub === '' || sub === 'cms' || sub === 'projects' || sub === 'project') {
+    if (sub === 'cms') {
+      window.location.replace('/admin');
+      detectedPage = 'admin';
+    } else if (sub === '' || sub === 'projects' || sub === 'project') {
       detectedPage = 'construction';
     } else {
       detectedPage = 'not-found';
@@ -107,7 +110,10 @@ function detectRouteFromLocation(): {
   } else if (rawPath.startsWith('/hvac/') || rawPath.startsWith('/maintenance/')) {
     const prefix = rawPath.startsWith('/hvac/') ? '/hvac/' : '/maintenance/';
     const sub = rawPath.substring(prefix.length).split('?')[0].replace(/\/+$/, '');
-    if (sub === '' || sub === 'cms') {
+    if (sub === 'cms') {
+      window.location.replace('/admin');
+      detectedPage = 'admin';
+    } else if (sub === '') {
       detectedPage = 'hvac';
     } else {
       detectedPage = 'not-found';
