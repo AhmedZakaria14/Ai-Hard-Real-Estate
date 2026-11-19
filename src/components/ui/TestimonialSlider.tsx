@@ -26,7 +26,7 @@ export function TestimonialSlider({ testimonials, language }: TestimonialSliderP
   const stories = Array.from({ length: Math.min(storiesPerPage, testimonials.length) }, (_, offset) => testimonials[(start + offset) % testimonials.length]);
   const ArrowBack = ar ? ChevronRight : ChevronLeft;
   const ArrowNext = ar ? ChevronLeft : ChevronRight;
-  const arrowClass = 'flex size-10 items-center justify-center rounded-full border border-slate-700 bg-slate-800 text-white hover:bg-blue-700';
+  const arrowClass = 'flex size-10 items-center justify-center rounded-full border border-blue-700 bg-[#034DA2] text-white hover:bg-blue-700';
 
   return <div className="space-y-4">
     <div id="client-story-cards" className="grid gap-4 md:grid-cols-2" aria-live="polite">
