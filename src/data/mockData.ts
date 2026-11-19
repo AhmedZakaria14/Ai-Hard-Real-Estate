@@ -884,7 +884,7 @@ export const mockServices: ServiceDetail[] = [
   {
     id: 'serv-1',
     slug: 'prime-residential-brokerage',
-    tag: { en: 'Luxury Sales & Acquisitions', ar: 'وساطة واستحواذ العقارات الفاخرة' },
+    tag: { en: '', ar: '' },
     title: {
       en: 'Prime Residential Brokerage & Portfolio Advisory',
       ar: 'الوساطة العقارية المعتمدة وإدارة المحافظ السكنية',
@@ -932,7 +932,7 @@ export const mockServices: ServiceDetail[] = [
   {
     id: 'serv-2',
     slug: 'cinematic-property-marketing',
-    tag: { en: 'Omnichannel Marketing', ar: 'التسويق العقاري السينمائي المتكامل' },
+    tag: { en: '', ar: '' },
     title: {
       en: 'Global Exposure & Bespoke Media Production',
       ar: 'تسويق عقاري سينمائي وحملات ترويجية مستهدفة',
@@ -980,7 +980,7 @@ export const mockServices: ServiceDetail[] = [
   {
     id: 'serv-3',
     slug: 'investment-advisory-developments',
-    tag: { en: 'Strategic Investment Advisory', ar: 'الاستشارات والاستثمار العقاري الاستراتيجي' },
+    tag: { en: '', ar: '' },
     title: {
       en: 'High-Yield Investment Advisory & Master Developments',
       ar: 'استشارات الاستثمار العقاري والمشاريع التطويرية الكبرى',
