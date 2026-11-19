@@ -29,14 +29,14 @@ export function Footer({ onNavigate }: FooterProps) {
   const isAr = language === 'ar';
 
   return (
-    <footer className="bg-[#034DA2] text-slate-400 border-t border-slate-800 text-xs">
+    <footer className="bg-[#034DA2] text-blue-50/80 border-t border-blue-700/70 text-xs">
       {/* Main Footer Body */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 text-start">
         {/* Col 1: Brand & Tagline */}
         <div className="space-y-4 lg:col-span-1">
           <BrandLogo sector="construction" size="md" language={language} variant="light" standardWordmark />
 
-          <p className="text-xs text-slate-300 leading-relaxed">
+          <p className="text-xs text-blue-50/85 leading-relaxed">
             <LocalizedValue value={t.brand.tagline.replace('في المملكة', 'في المنطقة الشرقية')} />. <LocalizedValue value={t.brand.slogan.replace('في المملكة', 'في المنطقة الشرقية')} />.
           </p>
 
@@ -98,15 +98,15 @@ export function Footer({ onNavigate }: FooterProps) {
             {isAr ? <InterfaceText id="construction.Footer.kdz0pb2" source="الاعتمادات والضمانات" /> : <InterfaceText id="construction.Footer.kvq1eq5" source="Credentials & Codes" />}
           </h4>
           <ul className="space-y-2 text-xs">
-            <li className="flex items-center gap-2 text-slate-300">
+            <li className="flex items-center gap-2 text-blue-50/85">
               <Award className="w-4 h-4 text-[#009ee2] shrink-0" />
               <span>{isAr ? <InterfaceText id="construction.Footer.kpt0223" source="تصنيف معتمد" /> : <InterfaceText id="construction.Footer.kqahmhm" source="Certified classification" />}</span>
             </li>
-            <li className="flex items-center gap-2 text-slate-300">
+            <li className="flex items-center gap-2 text-blue-50/85">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
               <span><LocalizedValue value={t.credentials.sbc} /></span>
             </li>
-            <li className="flex items-center gap-2 text-slate-300">
+            <li className="flex items-center gap-2 text-blue-50/85">
               <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
               <span><LocalizedValue value={t.credentials.warranty} /></span>
             </li>
@@ -123,14 +123,14 @@ export function Footer({ onNavigate }: FooterProps) {
               <Phone className="w-4 h-4 text-[#009ee2] shrink-0" />
               <a
                 href={`tel:${SECTOR_CONTACT_DETAILS.construction.phone.replace(/\s+/g, '')}`}
-                className="hover:text-[#009ee2] dir-ltr text-start font-semibold text-slate-200"
+                className="hover:text-[#009ee2] dir-ltr text-start font-semibold text-white"
               >
                 <LocalizedValue value={SECTOR_CONTACT_DETAILS.construction.phone} />
               </a>
             </div>
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-[#009ee2] shrink-0" />
-              <a href={`mailto:${SECTOR_CONTACT_DETAILS.construction.email}`} className="hover:text-[#009ee2] text-slate-200">
+              <a href={`mailto:${SECTOR_CONTACT_DETAILS.construction.email}`} className="hover:text-[#009ee2] text-white">
                 <LocalizedValue value={SECTOR_CONTACT_DETAILS.construction.email} />
               </a>
             </div>
@@ -144,8 +144,8 @@ export function Footer({ onNavigate }: FooterProps) {
       </div>
 
       {/* Sub-Footer Copyright */}
-      <div className="border-t border-slate-900 py-6 bg-[#034DA2]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-[11px] text-slate-400">
+      <div className="border-t border-white/20 py-6 bg-[#034DA2]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-[11px] text-blue-100">
           <div>
             {isAr ? <InterfaceText id="construction.Footer.k1nnp6oa" source="جميع الحقوق محفوظة. هارد للمقاولات@٢٠٢٦" /> : <InterfaceText id="construction.Footer.ko2a357" source="Copyright. HARD Contracting@2026" />}
           </div>
