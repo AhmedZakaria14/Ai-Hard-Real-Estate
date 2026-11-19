@@ -151,9 +151,9 @@ export const RevisionHistoryModal: React.FC<RevisionHistoryModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md transition-opacity">
+    <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center overflow-hidden bg-black/70 p-0 sm:p-4 backdrop-blur-md transition-opacity [padding-top:env(safe-area-inset-top)] sm:[padding-top:1rem]">
       <div
-        className="relative w-full max-w-5xl max-h-[90vh] bg-slate-900 text-white rounded-3xl border border-slate-700 shadow-2xl flex flex-col overflow-hidden"
+        className="relative flex w-full min-w-0 max-w-5xl flex-col overflow-hidden border border-slate-700 bg-slate-900 text-white shadow-2xl max-h-[calc(100dvh-env(safe-area-inset-top))] sm:max-h-[calc(100dvh-2rem)] rounded-t-3xl sm:rounded-3xl"
         dir={isAr ? 'rtl' : 'ltr'}
       >
         {/* Modal Header */}
@@ -180,9 +180,9 @@ export const RevisionHistoryModal: React.FC<RevisionHistoryModalProps> = ({
         </div>
 
         {/* Modal Content - Split View */}
-        <div className="flex-1 overflow-hidden grid grid-cols-1 md:grid-cols-12">
+        <div className="min-h-0 flex-1 overflow-hidden grid grid-cols-1 md:grid-cols-12">
           {/* Left / Top: Revisions Timeline List (5 cols) */}
-          <div className="md:col-span-5 border-r md:border-b-0 border-b border-slate-800 overflow-y-auto p-4 space-y-3 max-h-[40vh] md:max-h-full">
+          <div className="md:col-span-5 border-r md:border-b-0 border-b border-slate-800 overflow-y-auto overscroll-contain p-4 space-y-3 max-h-[34dvh] md:max-h-full">
             <div className="flex items-center justify-between px-2 py-1">
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
                 {isAr ? `النسخ المتاحة (${revisions.length})` : `Available Revisions (${revisions.length})`}
@@ -270,7 +270,7 @@ export const RevisionHistoryModal: React.FC<RevisionHistoryModalProps> = ({
           </div>
 
           {/* Right / Bottom: Selected Revision Inspection & Restoration Panel (7 cols) */}
-          <div className="md:col-span-7 p-6 overflow-y-auto space-y-5 bg-slate-900/50">
+          <div className="min-h-0 md:col-span-7 p-4 sm:p-6 overflow-y-auto overscroll-contain space-y-5 bg-slate-900/50 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:pb-6">
             {selectedRevision ? (
               <>
                 {/* Status Message */}
