@@ -159,7 +159,7 @@ export function ProjectDetailModal() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center overflow-hidden bg-slate-950/60 p-0 sm:p-4 backdrop-blur-sm [padding-top:env(safe-area-inset-top)] sm:[padding-top:1rem]"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           closeProjectModal();
@@ -169,9 +169,9 @@ export function ProjectDetailModal() {
       aria-modal="true"
       aria-labelledby="project-modal-title"
     >
-      <div className="relative w-full max-w-4xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden my-8 text-slate-900 animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative flex w-full min-w-0 max-w-4xl flex-col overflow-hidden border border-slate-200 bg-white text-slate-900 shadow-2xl max-h-[calc(100dvh-env(safe-area-inset-top))] sm:max-h-[calc(100dvh-2rem)] rounded-t-3xl sm:rounded-3xl my-0 sm:my-4 animate-in fade-in zoom-in-95 duration-200">
         {/* Navigation & Actions Top Bar */}
-        <div className="px-6 py-3.5 bg-slate-100/90 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-slate-200 bg-slate-100/90 px-3 py-3 sm:gap-3 sm:px-6 sm:py-3.5">
           {/* Return Path to Project List */}
           <ManagedButton copyScope="construction.ProjectDetailModal"
             type="button"
@@ -220,7 +220,7 @@ export function ProjectDetailModal() {
         </div>
 
         {/* Title Header */}
-        <div className="p-6 bg-slate-50 border-b border-slate-200 text-start space-y-1">
+        <div className="shrink-0 space-y-1 border-b border-slate-200 bg-slate-50 p-4 text-start sm:p-6">
           <div className="flex items-center gap-2">
             <span className="px-3 py-1 rounded-md text-[11px] font-bold bg-[#eef7ff] text-[#009ee2] border border-sky-100 uppercase">
               <LocalizedValue value={getLocalizedCategoryLabel(proj.category, language)} />
@@ -235,7 +235,7 @@ export function ProjectDetailModal() {
         </div>
 
         {/* Modal Scrollable Body */}
-        <div className="p-6 sm:p-8 space-y-8 max-h-[70vh] overflow-y-auto text-start">
+        <div className="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] text-start sm:space-y-8 sm:p-8 sm:pb-8">
           {/* Main Gallery Display */}
           <div className="space-y-3">
             <div className="relative aspect-16/9 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
