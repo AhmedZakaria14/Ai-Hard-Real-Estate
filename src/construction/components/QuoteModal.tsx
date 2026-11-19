@@ -153,8 +153,8 @@ function QuoteModalContent() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden my-8 text-slate-900">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center overflow-hidden bg-slate-950/60 p-0 sm:p-4 backdrop-blur-sm [padding-top:env(safe-area-inset-top)] sm:[padding-top:1rem]">
+      <div className="relative flex w-full min-w-0 max-w-2xl flex-col overflow-hidden border border-slate-200 bg-white text-slate-900 shadow-2xl max-h-[calc(100dvh-env(safe-area-inset-top))] sm:max-h-[calc(100dvh-2rem)] rounded-t-3xl sm:rounded-3xl my-0 sm:my-4">
         {/* Header */}
         <div className="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
           <div className="flex items-center gap-3 text-start">
@@ -180,7 +180,7 @@ function QuoteModalContent() {
         </div>
 
         {/* Modal Body: Form or Success */}
-        <div className="p-6 sm:p-8 max-h-[75vh] overflow-y-auto text-start">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] text-start sm:p-8 sm:pb-8">
           {submittedLead ? (
             /* Success State */
             <div className="space-y-6 text-center py-4 animate-in fade-in-50">
