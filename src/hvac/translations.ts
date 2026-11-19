@@ -743,16 +743,16 @@ export const T = {
       ar: 'بوابة إدارة عمليات التكييف',
     },
     pinPrompt: {
-      en: 'Enter your 4-digit administrative PIN code (Default: 2026)',
-      ar: 'أدخل رمز الأمان الإداري المكون من 4 أرقام (الافتراضي: 2026)',
+      en: 'Use the authorized admin sign-in at /admin.',
+      ar: 'استخدم تسجيل الدخول الإداري المعتمد عبر /admin.',
     },
     unlockBtn: {
       en: 'Unlock Portal',
       ar: 'فتح لوحة التحكم',
     },
     instantUnlock: {
-      en: 'Instant Access for Reviewers (PIN: 2026)',
-      ar: 'دخول سريع للمراجعة (رمز: 2026)',
+      en: 'Authorized admin access only',
+      ar: 'الدخول متاح للمسؤولين المصرح لهم فقط',
     },
     exitBtn: {
       en: 'Return to Website',
