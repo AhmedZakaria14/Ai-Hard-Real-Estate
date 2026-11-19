@@ -80,7 +80,7 @@ export function SitemapModal({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-xs sm:text-sm max-h-[65vh] overflow-y-auto pe-2">
+        <div className="grid grid-cols-1 gap-6 text-xs sm:text-sm md:grid-cols-2 md:gap-8 pe-0 sm:pe-2">
           {/* SECTION 1: HARD Group Corporate Sectors */}
           <div className="space-y-3">
             <h3 className="font-bold text-slate-900 font-display-serif text-sm uppercase tracking-wider flex items-center gap-2 border-b border-slate-200 pb-2">
