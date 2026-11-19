@@ -78,7 +78,7 @@ export function AboutSection() {
           {/* Mission Card (Left in RTL) */}
           <div className="p-6 sm:p-8 rounded-3xl bg-[#f8fafc] border border-sky-100 shadow-sm text-start space-y-4 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-2xl bg-[#0f243e] text-white shadow-md">
+              <div className="p-3 rounded-2xl bg-[#034DA2] text-white shadow-md">
                 <Target className="w-6 h-6" />
               </div>
               <div>
@@ -127,7 +127,7 @@ export function AboutSection() {
                     alt="Quality Inspection"
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0f243e]/80 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#034DA2]/80 via-transparent to-transparent" />
                   <div className="absolute bottom-3 start-3 px-3 py-1.5 rounded-lg bg-white/95 backdrop-blur-xs text-xs font-bold text-[#009ee2] shadow-sm">
                     {isAr ? <InterfaceText id="construction.AboutSection.k1ho6p47" source="إشراف هندسي يومي موثق" /> : <InterfaceText id="construction.AboutSection.ki0tcvx" source="Daily Documented Supervision" />}
                   </div>
