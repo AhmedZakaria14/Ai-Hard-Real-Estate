@@ -260,7 +260,7 @@ export function ProjectInquiryModal({
             </div>
 
             {/* Verified Unit Information Row */}
-            <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-700/80 text-center text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-slate-700/80 text-center text-xs">
               <div className="p-1.5 bg-slate-800/80 rounded-lg">
                 <span className="text-[10px] text-slate-400 block"><LocalizedValue value={t.projects.availableUnits} /></span>
                 <span className="font-bold text-slate-200">
