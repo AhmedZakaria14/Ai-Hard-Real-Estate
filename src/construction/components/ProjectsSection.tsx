@@ -182,7 +182,7 @@ export function ProjectsSection() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       loading="lazy"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0f243e]/80 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#034DA2]/80 via-transparent to-transparent" />
 
                     {/* Status Pill */}
                     <div
@@ -194,7 +194,7 @@ export function ProjectsSection() {
 
                     {/* Category & City Label */}
                     <div className="absolute bottom-3 start-3 flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#0f243e]/85 text-sky-200 border border-sky-400/30 backdrop-blur-xs">
+                      <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#034DA2]/90 text-sky-200 border border-sky-400/30 backdrop-blur-xs">
                         <LocalizedValue value={getLocalizedCategoryLabel(proj.category, language)} />
                       </span>
                       <span className="text-xs font-semibold text-slate-200">
