@@ -1,7 +1,7 @@
 import { LocalizedValue } from '../ui/LocalizedValue';
 import { InterfaceText } from '../ui/InterfaceText';
 import { ManagedA, ManagedInput } from '../ui/ManagedElements';
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import {
   Phone,
   Mail,
@@ -21,6 +21,7 @@ import { submitCustomerForm } from '../../lib/forms/formSubmissionService';
 import { Button } from '../ui/Button';
 import { BrandLogo } from '../ui/BrandLogo';
 import { getPageHref, handleSemanticClick, realEstateNavigationPages } from '../../lib/navigation';
+import { subscribeNavigationDoc, type NavItem } from '../../lib/cmsNavigationManager';
 
 interface FooterProps {
   onNavigate: (page: PageId) => void;
@@ -34,6 +35,13 @@ export function Footer({ onNavigate, language }: FooterProps) {
   const t = translations[language] || defaultTranslations[language];
   const isAr = language === 'ar';
   const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [footerItems, setFooterItems] = useState<NavItem[]>([]);
+  const [hasManagedFooter, setHasManagedFooter] = useState(false);
+
+  useEffect(() => subscribeNavigationDoc('footer_realestate', (doc) => {
+    setHasManagedFooter(Boolean(doc));
+    setFooterItems(doc?.items ?? []);
+  }), []);
   const [subscribed, setSubscribed] = useState(false);
   const [subError, setSubError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -74,6 +82,33 @@ export function Footer({ onNavigate, language }: FooterProps) {
   };
 
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
+
+  const fallbackFooterLinks = realEstateNavigationPages.map((page) => ({
+    id: page,
+    page,
+    href: getPageHref(page),
+    label: t.nav[page],
+    external: false,
+    newTab: false,
+  }));
+  const managedFooterLinks = footerItems
+    .filter((item) => item.isVisible)
+    .sort((a, b) => a.order - b.order)
+    .map((item) => {
+      const page = realEstateNavigationPages.find((candidate) =>
+        getPageHref(candidate).split(/[?#]/, 1)[0].replace(/\/+$/, '') ===
+        item.targetPath.split(/[?#]/, 1)[0].replace(/\/+$/, ''),
+      );
+      return {
+        id: item.id,
+        page,
+        href: item.targetPath,
+        label: item.label[language]?.trim() || item.label.en || item.label.ar,
+        external: item.type === 'external',
+        newTab: Boolean(item.openInNewTab),
+      };
+    });
+  const footerLinks = hasManagedFooter ? managedFooterLinks : fallbackFooterLinks;
 
   return (
     <footer className="bg-slate-950 text-slate-300 border-t border-slate-900 mt-20">
@@ -139,10 +174,17 @@ export function Footer({ onNavigate, language }: FooterProps) {
           <nav aria-label={t.footer.sitemap}>
             <h4 className="mb-4 text-sm font-bold text-white"><LocalizedValue value={t.footer.sitemap} /></h4>
             <ul className="space-y-2 text-xs sm:text-sm">
-              {realEstateNavigationPages.map((page) => <li key={page}>
-                <a href={getPageHref(page)} onClick={(event) => handleSemanticClick(event, () => handleLinkClick(page))}
-                  className="inline-block py-0.5 text-slate-300 hover:text-blue-400 focus-visible:underline">
-                  <LocalizedValue value={t.nav[page]} />
+              {footerLinks.map((item) => <li key={item.id}>
+                <a
+                  href={item.href}
+                  onClick={item.page && !item.external
+                    ? (event) => handleSemanticClick(event, () => handleLinkClick(item.page!))
+                    : undefined}
+                  target={item.external && item.newTab ? '_blank' : undefined}
+                  rel={item.external && item.newTab ? 'noopener noreferrer' : undefined}
+                  className="inline-block py-0.5 text-slate-300 hover:text-blue-400 focus-visible:underline"
+                >
+                  <LocalizedValue value={item.label} />
                 </a>
               </li>)}
             </ul>
