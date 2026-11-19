@@ -108,7 +108,7 @@ export function PropertyCard({
               referrerPolicy="no-referrer"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#034DA2]/60 via-transparent to-transparent opacity-60 pointer-events-none" />
           </ManagedA>
 
           {/* Badges Overlay */}
@@ -128,7 +128,7 @@ export function PropertyCard({
             type="button"
             onClick={handleShare}
             aria-label="Share property"
-            className="absolute top-3 end-3 w-8 h-8 rounded-full bg-slate-900/60 backdrop-blur-md text-white hover:bg-slate-900 flex items-center justify-center transition-all cursor-pointer z-10"
+            className="absolute top-3 end-3 w-8 h-8 rounded-full bg-[#034DA2]/75 backdrop-blur-md text-white hover:bg-blue-800 flex items-center justify-center transition-all cursor-pointer z-10"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
           </ManagedButton>
@@ -221,7 +221,7 @@ export function PropertyCard({
               )}
 
               <a
-                href={`https://wa.me/966556125711?text=${encodeURIComponent(
+                href={`https://wa.me/${String(property.agent?.whatsapp || '').replace(/\D/g, '')}?text=${encodeURIComponent(
                   language === 'en'
                     ? `Hello HARD Real Estate, I would like more information on "${property?.title?.en || ''}" (Ref: ${property?.id || ''}).`
                     : `مرحباً هارد للعقارات، أود الاستفسار عن عقار "${property?.title?.ar || ''}" (رقم المرجع: ${property?.id || ''}).`
@@ -249,7 +249,7 @@ export function PropertyCard({
     >
       <div>
         {/* High-Resolution Image Container with Semantic Link */}
-        <div className="relative aspect-16/10 overflow-hidden bg-slate-950">
+        <div className="relative aspect-16/10 overflow-hidden bg-[#034DA2]">
           <ManagedA copyScope="realestate.PropertyCard"
             href={detailsHref}
             onClick={(e) => handleSemanticClick(e, () => onSelectProperty(property))}
@@ -264,7 +264,7 @@ export function PropertyCard({
               referrerPolicy="no-referrer"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-70 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#034DA2]/80 via-transparent to-transparent opacity-70 pointer-events-none" />
           </ManagedA>
 
           {/* Badges on Top */}
@@ -284,7 +284,7 @@ export function PropertyCard({
             type="button"
             onClick={handleShare}
             aria-label="Share property"
-            className="absolute top-3 end-3 w-8 h-8 rounded-full bg-slate-900/60 backdrop-blur-md text-white hover:bg-slate-900 flex items-center justify-center transition-all cursor-pointer z-10"
+            className="absolute top-3 end-3 w-8 h-8 rounded-full bg-[#034DA2]/75 backdrop-blur-md text-white hover:bg-blue-800 flex items-center justify-center transition-all cursor-pointer z-10"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
           </ManagedButton>
@@ -298,7 +298,7 @@ export function PropertyCard({
               </span>
             )}
             {activeRentalPeriod && property.status === 'for-rent' && property.price.period && property.price.period !== activeRentalPeriod && (
-              <span className="text-[11px] font-semibold text-blue-200 bg-slate-900/80 px-2 py-0.5 rounded-md backdrop-blur-xs">
+              <span className="text-[11px] font-semibold text-blue-200 bg-[#034DA2]/85 px-2 py-0.5 rounded-md backdrop-blur-xs">
                 (~<LocalizedValue value={formatCurrency(getNormalizedPropertyPrice(property, activeRentalPeriod), 'SAR', language)} /><LocalizedValue value={' '} />
                 <LocalizedValue value={activeRentalPeriod === 'month' ? t.propertyDetails.perMonth : t.propertyDetails.perYear} />)
               </span>
