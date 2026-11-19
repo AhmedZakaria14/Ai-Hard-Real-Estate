@@ -1,9 +1,9 @@
 import { SectorQuickActions } from '../../components/layout/SectorQuickActions';
 import { useConstruction } from '../context/ConstructionContext';
-import { COMPANY_CREDENTIALS } from '../data/seedData';
+import { SECTOR_CONTACT_DETAILS } from '../../lib/sectors';
 
 export function FloatingWidgets() {
   const { language } = useConstruction();
-  const whatsappHref = 'https://wa.me/' + COMPANY_CREDENTIALS.whatsapp.replace(/\D/g, '');
+  const whatsappHref = 'https://wa.me/' + SECTOR_CONTACT_DETAILS.construction.whatsapp.replace(/\D/g, '');
   return <SectorQuickActions language={language} whatsappHref={whatsappHref} />;
 }
