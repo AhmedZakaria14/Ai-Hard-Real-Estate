@@ -558,8 +558,8 @@ export const T = {
       ar: 'فرق الصيانة الميدانية والطوارئ تغطي: الخبر، الدمام، الظهران، الجبيل، القطيف، سيهات، تاروت، صفوى، ورأس تنورة.',
     },
     verificationNotice: {
-      en: 'GPS Destination Verified: 26.373784° N, 50.103001° E (Al Khobar). Exact Building/Unit # & National Address Code pending final municipal assignment.',
-      ar: 'إحداثيات المقر موثقة: 26.373784° N, 50.103001° E (الخبر). رقم المبنى والرمز البريدي الوطني قيد الاعتماد البلدي النهائي.',
+      en: 'GPS destination: Dammam, 26.373703° N, 50.102998° E. Exact building/unit number is not published until confirmed.',
+      ar: 'موقع المقر: الدمام، 26.373703° N, 50.102998° E. لا يُنشر رقم المبنى أو الوحدة حتى يتم تأكيده.',
     },
     emailTitle: {
       en: 'Direct Email',
