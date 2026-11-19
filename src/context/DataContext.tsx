@@ -247,6 +247,14 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     void refreshData();
   }, [refreshData]);
 
+  useEffect(() => {
+    const { data: { subscription } } = hardAdminClient.auth.onAuthStateChange((event) => {
+      if (event === 'TOKEN_REFRESHED') return;
+      void refreshData();
+    });
+    return () => subscription.unsubscribe();
+  }, [refreshData]);
+
   // Properties CRUD
   const addProperty = async (propertyData: Partial<Property>): Promise<Property> => {
     const created = withPropertyContact(await createPublishedProperty(propertyData), propertyContact);
