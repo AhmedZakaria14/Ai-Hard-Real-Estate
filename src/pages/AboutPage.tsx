@@ -7,11 +7,17 @@ import {
   Award,
   ArrowRight,
   ArrowLeft,
+  MapPin,
+  Phone,
+  Mail,
+  Users,
+  Building2,
 } from 'lucide-react';
 import { Language, PageId } from '../types';
 import { useTextOverride } from '../context/TextOverrideContext';
 import { BrandLogo } from '../components/ui/BrandLogo';
 import { getPageHref, handleSemanticClick } from '../lib/navigation';
+import { useData } from '../context/DataContext';
 
 interface AboutPageProps {
   onNavigate: (page: PageId) => void;
@@ -21,7 +27,18 @@ interface AboutPageProps {
 export function AboutPage({ onNavigate, language }: AboutPageProps) {
   const { translations } = useTextOverride();
   const { aboutImage } = usePageMedia();
+  const { teamMembers, offices, statistics, partnerBrands } = useData();
   const t = translations[language];
+
+  const publishedForRealEstate = <T extends { sector: string; status: string; order: number }>(items: T[]) =>
+    items
+      .filter((item) => item.status === 'published' && ['realestate', 'group', 'all'].includes(item.sector))
+      .sort((a, b) => a.order - b.order);
+
+  const publishedTeam = publishedForRealEstate(teamMembers);
+  const publishedOffices = publishedForRealEstate(offices);
+  const publishedStatistics = publishedForRealEstate(statistics);
+  const publishedPartners = publishedForRealEstate(partnerBrands);
   const ArrowIcon = language === 'ar' ? ArrowLeft : ArrowRight;
 
   return (
@@ -128,6 +145,137 @@ export function AboutPage({ onNavigate, language }: AboutPageProps) {
           ))}
         </div>
       </div>
+
+      {/* Managed business statistics */}
+      {publishedStatistics.length > 0 && (
+        <section className="space-y-6" aria-labelledby="about-managed-statistics">
+          <div className="text-center space-y-2">
+            <h3 id="about-managed-statistics" className="text-2xl sm:text-3xl font-bold text-slate-900 font-display-serif">
+              {language === 'ar' ? 'مؤشرات وأرقام هارد' : 'HARD at a Glance'}
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-500">
+              {language === 'ar' ? 'المؤشرات المنشورة من لوحة الإدارة.' : 'Published metrics managed from the administration dashboard.'}
+            </p>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {publishedStatistics.map((stat) => (
+              <div key={stat.id} className="rounded-2xl border border-slate-200 bg-white p-5 text-center shadow-xs">
+                <div className="text-2xl sm:text-3xl font-black text-blue-700 font-display-serif">
+                  <LocalizedValue value={stat.value} />
+                </div>
+                <div className="mt-1 text-sm font-bold text-slate-900">
+                  <LocalizedValue value={stat.label[language]} />
+                </div>
+                {stat.description?.[language] && (
+                  <p className="mt-1 text-xs leading-relaxed text-slate-500">
+                    <LocalizedValue value={stat.description[language]} />
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Managed team members */}
+      {publishedTeam.length > 0 && (
+        <section className="space-y-6" aria-labelledby="about-managed-team">
+          <div className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-blue-600" aria-hidden="true" />
+            <h3 id="about-managed-team" className="text-2xl sm:text-3xl font-bold text-slate-900 font-display-serif">
+              {language === 'ar' ? 'فريق هارد' : 'HARD Team'}
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {publishedTeam.map((member) => (
+              <article key={member.id} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xs">
+                <div className="aspect-4/3 bg-slate-100">
+                  {member.avatar ? (
+                    <ManagedImg copyScope="realestate.AboutPage" src={member.avatar}
+                      alt={member.name[language]} referrerPolicy="no-referrer" className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-slate-300"><Users className="h-12 w-12" /></div>
+                  )}
+                </div>
+                <div className="p-5 space-y-1.5">
+                  <h4 className="text-base font-bold text-slate-900"><LocalizedValue value={member.name[language]} /></h4>
+                  <p className="text-xs font-semibold text-blue-700"><LocalizedValue value={member.role[language]} /></p>
+                  {member.bio?.[language] && <p className="pt-1 text-xs leading-relaxed text-slate-600"><LocalizedValue value={member.bio[language]} /></p>}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Managed offices */}
+      {publishedOffices.length > 0 && (
+        <section className="space-y-6" aria-labelledby="about-managed-offices">
+          <div className="flex items-center gap-2">
+            <MapPin className="h-5 w-5 text-blue-600" aria-hidden="true" />
+            <h3 id="about-managed-offices" className="text-2xl sm:text-3xl font-bold text-slate-900 font-display-serif">
+              {language === 'ar' ? 'فروع ومقرات هارد' : 'HARD Offices'}
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            {publishedOffices.map((office) => (
+              <article key={office.id} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xs">
+                {office.image && (
+                  <div className="aspect-16/7 bg-slate-100">
+                    <ManagedImg copyScope="realestate.AboutPage" src={office.image}
+                      alt={office.name[language]} referrerPolicy="no-referrer" className="h-full w-full object-cover" />
+                  </div>
+                )}
+                <div className="p-5 space-y-3">
+                  <div>
+                    <h4 className="text-base font-bold text-slate-900"><LocalizedValue value={office.name[language]} /></h4>
+                    <p className="text-xs text-slate-500"><LocalizedValue value={office.city[language]} /></p>
+                  </div>
+                  <div className="flex items-start gap-2 text-xs text-slate-600">
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
+                    <span><LocalizedValue value={office.address[language]} /></span>
+                  </div>
+                  <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs font-semibold text-slate-700">
+                    {office.phone && <a href={`tel:${office.phone.replace(/\s/g, '')}`} className="inline-flex items-center gap-1.5 hover:text-blue-700"><Phone className="h-3.5 w-3.5" /> <bdi>{office.phone}</bdi></a>}
+                    {office.email && <a href={`mailto:${office.email}`} className="inline-flex items-center gap-1.5 hover:text-blue-700"><Mail className="h-3.5 w-3.5" /> {office.email}</a>}
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Managed partner brands */}
+      {publishedPartners.length > 0 && (
+        <section className="space-y-6" aria-labelledby="about-managed-partners">
+          <div className="flex items-center gap-2">
+            <Building2 className="h-5 w-5 text-blue-600" aria-hidden="true" />
+            <h3 id="about-managed-partners" className="text-2xl sm:text-3xl font-bold text-slate-900 font-display-serif">
+              {language === 'ar' ? 'شركاؤنا' : 'Our Partners'}
+            </h3>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {publishedPartners.map((partner) => {
+              const content = (
+                <div className="flex h-28 items-center justify-center rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
+                  {partner.logoUrl ? (
+                    <ManagedImg copyScope="realestate.AboutPage" src={partner.logoUrl}
+                      alt={partner.name[language]} referrerPolicy="no-referrer" className="max-h-full max-w-full object-contain" />
+                  ) : (
+                    <span className="text-sm font-bold text-slate-700"><LocalizedValue value={partner.name[language]} /></span>
+                  )}
+                </div>
+              );
+              return partner.websiteUrl ? (
+                <a key={partner.id} href={partner.websiteUrl} target="_blank" rel="noopener noreferrer" aria-label={partner.name[language]}>
+                  {content}
+                </a>
+              ) : <div key={partner.id}>{content}</div>;
+            })}
+          </div>
+        </section>
+      )}
 
       {/* CTA Box */}
       <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-10 w-full space-y-5 text-center flex flex-col items-center">
