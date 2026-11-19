@@ -147,7 +147,7 @@ export function PrivacyTermsModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer"
+            className="px-5 py-2.5 bg-[#034DA2] hover:bg-blue-800 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer"
           >
             {isAr ? <InterfaceText id="realestate.PrivacyTermsModal.k14yt4b3" source="إغلاق المستند" /> : <InterfaceText id="realestate.PrivacyTermsModal.k1a8feo0" source="Close Document" />}
           </button>
