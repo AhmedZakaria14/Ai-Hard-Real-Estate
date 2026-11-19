@@ -255,6 +255,20 @@ Investors allocating capital towards premium coastal assets are experiencing str
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:space-y-6 sm:p-6 sm:pb-6">
+          <details className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-slate-700">
+            <summary className="cursor-pointer font-semibold text-blue-900">{isAr ? 'أين تُحفظ المقالات والنماذج الجاهزة وكيف أعدلها؟' : 'Where are articles and starter content stored and edited?'}</summary>
+            <div className="mt-2 space-y-2 leading-6">
+              <p>{isAr
+                ? 'لا توجد مكتبة قوالب منفصلة مخفية: عند إنشاء مقال جديد يبدأ المحرر بمحتوى إرشادي قابل للاستبدال بالكامل. بعد الحفظ يصبح المقال سجلًا في كتالوج المدونة بقاعدة البيانات.'
+                : 'There is no separate hidden template library. A new article opens with editable starter content; after saving it becomes a database-backed blog catalog record.'}</p>
+              <p>{isAr
+                ? 'عدّل العنوان والتصنيف والتاريخ من «تفاصيل المقال»، النص الكامل من «محتوى المقال»، وصورة الغلاف من «الغلاف والوسائط». صورة الغلاف التي تختارها هنا هي الصورة الرئيسية التي تظهر في بطاقة المقال وصفحته.'
+                : 'Edit title/category/date under Article Details, the full body under Content, and the main cover under Featured Image. The selected cover is used on the public article card and article page.'}</p>
+              <p>{isAr
+                ? 'المسودة لا تظهر للزائر حتى تغيّر الحالة إلى «منشور للعامة». تعديل مقال منشور لا يغيّر تاريخ نشره الأصلي.'
+                : 'Drafts stay hidden from visitors until Published. Editing an existing published article preserves its original publication date.'}</p>
+            </div>
+          </details>
           {saveError && <p role="alert" className="rounded bg-red-50 p-3 text-sm text-red-700">{saveError}</p>}
           {/* TAB 1: DETAILS */}
           {activeTab === 'details' && (
