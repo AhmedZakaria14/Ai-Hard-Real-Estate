@@ -422,7 +422,7 @@ export function ListPropertyModal({
 
                   {/* Option Map */}
                   <div className="flex items-center gap-2">
-                    <label className="inline-flex items-center gap-2 cursor-pointer shrink-0 select-none min-w-[85px] sm:min-w-[105px]">
+                    <label className="inline-flex min-w-0 items-center gap-2 cursor-pointer shrink select-none sm:min-w-[105px]">
                       <input
                         type="radio"
                         name="addressMethod"
