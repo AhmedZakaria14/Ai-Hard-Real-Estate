@@ -78,13 +78,13 @@ export function HVACShowcaseModal({
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center overflow-hidden bg-slate-900/60 p-0 sm:p-4 backdrop-blur-xs animate-in fade-in duration-200 [padding-top:env(safe-area-inset-top)] sm:[padding-top:1rem]">
       <div className="relative flex w-full min-w-0 max-w-4xl flex-col overflow-hidden border border-slate-200 bg-white text-slate-900 shadow-xl max-h-[calc(100dvh-env(safe-area-inset-top))] sm:max-h-[calc(100dvh-2rem)] rounded-t-2xl sm:rounded-2xl my-0 sm:my-4">
         {/* Header Banner */}
-        <div className="relative h-48 sm:h-56 bg-slate-900 overflow-hidden">
+        <div className="relative h-48 sm:h-56 bg-[#034DA2] overflow-hidden">
           <ManagedImg copyScope="realestate.HVACShowcaseModal"
             src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1200&q=80"
             alt="HARD HVAC Maintenance"
             className="w-full h-full object-cover opacity-40 scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#034DA2]/90 via-[#034DA2]/40 to-transparent" />
 
           {/* Close button */}
           <button
