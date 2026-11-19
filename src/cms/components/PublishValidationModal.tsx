@@ -98,8 +98,8 @@ export const PublishValidationModal: React.FC<PublishValidationModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fade-in font-ui-sans">
-      <div className="bg-white rounded-3xl max-w-2xl w-full border border-slate-200 shadow-2xl overflow-hidden text-start flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center overflow-hidden bg-slate-950/70 p-0 sm:p-4 backdrop-blur-md animate-fade-in font-ui-sans [padding-top:env(safe-area-inset-top)] sm:[padding-top:1rem]">
+      <div className="flex w-full min-w-0 max-w-2xl flex-col overflow-hidden border border-slate-200 bg-white text-start shadow-2xl max-h-[calc(100dvh-env(safe-area-inset-top))] sm:max-h-[calc(100dvh-2rem)] rounded-t-3xl sm:rounded-3xl">
         {/* Modal Header */}
         <div className="p-6 bg-slate-950 text-white flex items-center justify-between border-b border-slate-800">
           <div className="flex items-center gap-3">
@@ -124,7 +124,7 @@ export const PublishValidationModal: React.FC<PublishValidationModalProps> = ({
         </div>
 
         {/* Modal Content Scroll Area */}
-        <div className="p-6 overflow-y-auto space-y-6 flex-1">
+        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:space-y-6 sm:p-6 sm:pb-6">
           {/* 1. Publisher Authorization Banner */}
           <div
             className={`p-4 rounded-2xl border flex items-center justify-between gap-3 ${
