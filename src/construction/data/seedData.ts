@@ -1,52 +1,43 @@
 import { ConstructionProject, ConstructionService, ConstructionQuoteLead } from '../types';
 
 export const COMPANY_CREDENTIALS = {
-  crNumber: '1010894231',
-  taxId: '300192847100003',
+  crNumber: '',
+  taxId: '',
   momrahClassification: {
-    ar: 'تصنيف فئة أولى (المقاولات العامة)',
-    en: 'Class-A Classified General Contractor',
+    ar: 'تصنيف مقاولات معتمد',
+    en: 'Approved Contracting Classification',
   },
   sceAccreditation: {
-    ar: 'هيئة المهندسين السعوديين - اعتماد رقم #44091',
-    en: 'Saudi Council of Engineers Accredited #44091',
+    ar: '',
+    en: '',
   },
   sbcCompliance: {
-    ar: '١٠٠٪ مطابقة كود البناء السعودي (SBC)',
-    en: '100% Saudi Building Code (SBC) Compliant',
+    ar: 'مطابقة متطلبات كود البناء السعودي (SBC)',
+    en: 'Saudi Building Code (SBC) Compliance',
   },
   structuralWarranty: {
-    ar: 'ضمان إنشائي معتمد لمدة ١٠ سنوات',
-    en: '10-Year Certified Structural Warranty',
+    ar: 'الضمان الإنشائي وفق نطاق العقد المعتمد',
+    en: 'Structural warranty according to the approved contract scope',
   },
   phone: '+966 55 612 5711',
-  mobile: '+966 50 123 4567',
+  mobile: '',
   whatsapp: '+966556125711',
   email: 'info@hardgp.com',
   address: {
-    ar: 'طريق الملك فهد، حي الصحافة، الرياض 13321، المملكة العربية السعودية',
-    en: 'King Fahd Road, Al-Sahafa District, Riyadh 13321, Saudi Arabia',
+    ar: 'طريق الأمير متعب بن عبد العزيز، حي هجر، الدمام، المملكة العربية السعودية',
+    en: 'Prince Mutaib bin Abdulaziz Road, Hajar District, Dammam, Saudi Arabia',
   },
   coordinates: {
-    lat: 24.795822,
-    lng: 46.634812,
+    lat: 26.373703,
+    lng: 50.102998,
   },
-  googleMapsUrl: 'https://www.google.com/maps/dir/?api=1&destination=24.795822,46.634812',
+  googleMapsUrl: 'https://www.google.com/maps/dir/?api=1&destination=26.373703,50.102998',
   verificationStatus: {
     isVerifiedCoordinates: true,
     buildingNumberPending: true,
-    ar: 'إحداثيات المقر الرئيسي الموثقة (حي الصحافة - 24.7958° N, 46.6348° E) [رقم المبنى والوحدة قيد الاعتماد البلدي النهائي]',
-    en: 'Verified HQ Destination (Al-Sahafa District - 24.7958° N, 46.6348° E) [Building/Suite # Pending Final Municipal Assignment]',
+    ar: 'إحداثيات المقر الرئيسي في الدمام. رقم المبنى والوحدة غير منشور حتى اعتماده.',
+    en: 'Dammam head-office coordinates. Building and suite numbers remain unpublished until confirmed.',
   },
-  easternProvinceBranch: {
-    ar: 'طريق الأمير تركي، حي الكورنيش، الخبر، المنطقة الشرقية',
-    en: 'Prince Turki Road, Corniche District, Al Khobar, Eastern Province',
-  },
-  easternCoordinates: {
-    lat: 26.288412,
-    lng: 50.210543,
-  },
-  easternGoogleMapsUrl: 'https://www.google.com/maps/dir/?api=1&destination=26.288412,50.210543',
 };
 
 export const INITIAL_PROJECTS: ConstructionProject[] = [
