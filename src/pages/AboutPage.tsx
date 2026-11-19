@@ -86,26 +86,32 @@ export function AboutPage({ onNavigate, language }: AboutPageProps) {
 
       {/* Governance & Legal Identity Card */}
       <div className="bg-[#034DA2] text-slate-100 rounded-3xl p-8 sm:p-10 border border-blue-800/60 shadow-xl space-y-6">
-        <h2 className="border-b border-slate-800 pb-6 text-2xl font-bold font-display-serif text-white">
+        <h2 className="border-b border-white/20 pb-6 text-2xl font-bold font-display-serif text-white">
           {language === 'en' ? <InterfaceText id="realestate.AboutPage.kgqvfj4" source="HARD Real Estate" /> : <InterfaceText id="realestate.AboutPage.kbrh0q0" source="هارد العقارية" />}
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-sm">
           <div className="space-y-1 p-4 bg-white/10 rounded-2xl border border-white/15">
-            <span className="text-xs text-slate-400 block">{language === 'en' ? <InterfaceText id="realestate.AboutPage.k1kp5qmi" source="FAL License | Real Estate General Authority" /> : <InterfaceText id="realestate.AboutPage.kfxs5ub" source="رخصة فال | الهيئة العامة للعقار" />}</span>
-            <bdi dir="ltr" className="font-mono font-bold text-slate-200"><LocalizedValue value="1200048912" /></bdi>
+            <span className="text-xs text-blue-100/80 block">{language === 'en' ? <InterfaceText id="realestate.AboutPage.k1kp5qmi" source="FAL License | Real Estate General Authority" /> : <InterfaceText id="realestate.AboutPage.kfxs5ub" source="رخصة فال | الهيئة العامة للعقار" />}</span>
+            <bdi dir="ltr" className="font-mono font-bold text-white"><LocalizedValue value="1200048912" /></bdi>
           </div>
 
           <div className="space-y-1 p-4 bg-white/10 rounded-2xl border border-white/15">
-            <span className="text-xs text-slate-400 block">{language === 'en' ? <InterfaceText id="realestate.AboutPage.k1mx5fby" source="Headquarters" /> : <InterfaceText id="realestate.AboutPage.k1ajuqev" source="المقر الرئيسي" />}</span>
-            <span className="font-bold text-slate-200">{language === 'en' ? <InterfaceText id="realestate.AboutPage.k1lcr57c" source="Dammam, Saudi Arabia" /> : <InterfaceText id="realestate.AboutPage.kqzmrka" source="الدمام، المملكة العربية السعودية" />}</span>
-            <span className="text-[11px] text-slate-400 block">{language === 'en' ? <InterfaceText id="realestate.AboutPage.ku3v7om" source="Prince Mutaib bin Abdulaziz Road, Hajr District" /> : <InterfaceText id="realestate.AboutPage.k1l8zqf8" source="طريق الأمير متعب بن عبد العزيز، حي هجر" />}</span>
+            <span className="text-xs text-blue-100/80 block">{language === 'en' ? 'Commercial Registration' : 'السجل التجاري'}</span>
+            <bdi dir="ltr" className="font-mono font-bold text-white"><LocalizedValue value="1111111111" /></bdi>
+            <span className="text-[11px] text-blue-100/80 block">{language === 'en' ? 'Dammam, Eastern Province' : 'الدمام، المنطقة الشرقية'}</span>
           </div>
 
           <div className="space-y-1 p-4 bg-white/10 rounded-2xl border border-white/15">
-            <span className="text-xs text-slate-400 block">{language === 'en' ? <InterfaceText id="realestate.AboutPage.kufr8gf" source="Core Jurisdiction" /> : <InterfaceText id="realestate.AboutPage.k1ivtchn" source="نطاق العمل الرئيسي" />}</span>
-            <span className="font-bold text-slate-200">{language === 'en' ? <InterfaceText id="realestate.AboutPage.kpl1125" source="Eastern Province" /> : <InterfaceText id="realestate.AboutPage.k1cw9xe4" source="المنطقة الشرقية" />}</span>
-            <span className="text-[11px] text-slate-400 block">{language === 'en' ? <InterfaceText id="realestate.AboutPage.kldi7o" source="Residential, commercial, industrial and development" /> : <InterfaceText id="realestate.AboutPage.k1kakw04" source="سكني وتجاري وصناعي وتطوير" />}</span>
+            <span className="text-xs text-blue-100/80 block">{language === 'en' ? <InterfaceText id="realestate.AboutPage.k1mx5fby" source="Headquarters" /> : <InterfaceText id="realestate.AboutPage.k1ajuqev" source="المقر الرئيسي" />}</span>
+            <span className="font-bold text-white">{language === 'en' ? <InterfaceText id="realestate.AboutPage.k1lcr57c" source="Dammam, Saudi Arabia" /> : <InterfaceText id="realestate.AboutPage.kqzmrka" source="الدمام، المملكة العربية السعودية" />}</span>
+            <span className="text-[11px] text-blue-100/80 block">{language === 'en' ? <InterfaceText id="realestate.AboutPage.ku3v7om" source="Prince Mutaib bin Abdulaziz Road, Hajr District" /> : <InterfaceText id="realestate.AboutPage.k1l8zqf8" source="طريق الأمير متعب بن عبد العزيز، حي هجر" />}</span>
+          </div>
+
+          <div className="space-y-1 p-4 bg-white/10 rounded-2xl border border-white/15">
+            <span className="text-xs text-blue-100/80 block">{language === 'en' ? <InterfaceText id="realestate.AboutPage.kufr8gf" source="Core Jurisdiction" /> : <InterfaceText id="realestate.AboutPage.k1ivtchn" source="نطاق العمل الرئيسي" />}</span>
+            <span className="font-bold text-white">{language === 'en' ? <InterfaceText id="realestate.AboutPage.kpl1125" source="Eastern Province" /> : <InterfaceText id="realestate.AboutPage.k1cw9xe4" source="المنطقة الشرقية" />}</span>
+            <span className="text-[11px] text-blue-100/80 block">{language === 'en' ? <InterfaceText id="realestate.AboutPage.kldi7o" source="Residential, commercial, industrial and development" /> : <InterfaceText id="realestate.AboutPage.k1kakw04" source="سكني وتجاري وصناعي وتطوير" />}</span>
           </div>
         </div>
       </div>
