@@ -15,7 +15,7 @@ import {
 } from '../types/businessEntities';
 import { mockFaqs, mockCertifications, mockEnhancedTestimonials } from '../data/entitiesMockData';
 import { loadPublishedArticles, loadPublishedProjects, loadPublishedProperties, type PublicProperty } from '../lib/db/hardCatalog';
-import { createPublishedProperty, archivePublishedCatalog, createPublishedProject, createPublishedArticle, updatePublishedCatalog } from '../lib/db/hardCatalogWrites';
+import { createPublishedProperty, archivePublishedCatalog, createPublishedProject, createPublishedArticle, updatePublishedCatalog, loadAdminArticles } from '../lib/db/hardCatalogWrites';
 import { SECTOR_CONTACT_DETAILS } from '../lib/sectors';
 
 interface DataContextType {
@@ -212,7 +212,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         posts,
       ] = await Promise.all([
         loadPublishedProjects().then((rows) => rows.map(({ content }) => content)),
-        loadPublishedArticles().then((rows) => rows.map(({ content }) => content)),
+        hardAdminClient.auth.getUser().then(({ data }) =>
+          data.user?.app_metadata.hard_role === 'superadmin'
+            ? loadAdminArticles()
+            : loadPublishedArticles().then((rows) => rows.map(({ content }) => content)),
+        ),
       ]);
 
       setProjects(projs);
