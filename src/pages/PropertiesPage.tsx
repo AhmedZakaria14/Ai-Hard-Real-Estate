@@ -792,7 +792,7 @@ export function PropertiesPage({
             onClick={() => setViewMode('grid')}
             className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold ${
               viewMode === 'grid'
-                ? 'bg-slate-900 text-white shadow-xs'
+                ? 'bg-[#034DA2] text-white shadow-xs'
                 : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
             }`}
             title="Grid View (3 Columns)"
@@ -804,7 +804,7 @@ export function PropertiesPage({
             onClick={() => setViewMode('list')}
             className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold ${
               viewMode === 'list'
-                ? 'bg-slate-900 text-white shadow-xs'
+                ? 'bg-[#034DA2] text-white shadow-xs'
                 : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
             }`}
             title="List View"
