@@ -194,9 +194,9 @@ export const DEFAULT_CONSTRUCTION_HQ: ConstructionOfficeLocation = {
   mobile: '',
   whatsapp: '+966556125711',
   email: 'info@hardgp.com',
-  lat: 0,
-  lng: 0,
-  googleMapsUrl: '',
+  lat: 26.373703,
+  lng: 50.102998,
+  googleMapsUrl: 'https://www.google.com/maps/dir/?api=1&destination=26.373703,50.102998',
   isHQ: true,
 };
 
