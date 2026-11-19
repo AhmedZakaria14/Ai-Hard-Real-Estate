@@ -66,7 +66,7 @@ export function ProjectDetailModal() {
   if (unknownProjectId && !selectedProjectForModal) {
     return (
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm overflow-y-auto"
+        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center overflow-hidden bg-slate-950/70 p-0 sm:p-4 backdrop-blur-sm [padding-top:env(safe-area-inset-top)] sm:[padding-top:1rem]"
         onClick={(e) => {
           if (e.target === e.currentTarget) {
             closeProjectModal();
@@ -76,7 +76,7 @@ export function ProjectDetailModal() {
         aria-modal="true"
         aria-labelledby="unknown-project-title"
       >
-        <div className="relative w-full max-w-lg bg-white border border-slate-200 rounded-3xl shadow-2xl p-6 sm:p-8 text-slate-900 text-center space-y-6 animate-in fade-in zoom-in-95 duration-200">
+        <div className="relative w-full min-w-0 max-w-lg overflow-y-auto overscroll-contain border border-slate-200 bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] text-center text-slate-900 shadow-2xl max-h-[calc(100dvh-env(safe-area-inset-top))] sm:max-h-[calc(100dvh-2rem)] rounded-t-3xl sm:rounded-3xl sm:p-8 space-y-6 animate-in fade-in zoom-in-95 duration-200">
           <ManagedButton copyScope="construction.ProjectDetailModal"
             type="button"
             onClick={closeProjectModal}
