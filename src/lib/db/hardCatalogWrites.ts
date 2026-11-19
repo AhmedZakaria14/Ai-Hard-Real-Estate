@@ -11,7 +11,7 @@ const editableFields = {
     'unitsAvailable', 'roiProjected', 'image', 'gallery', 'category', 'status', 'progressPercentage',
     'lastUpdated', 'description', 'highlights', 'featured', 'brochureUrl', 'financialMetric'],
   blog_posts: ['slug', 'title', 'excerpt', 'category', 'categoryId', 'date', 'publishedAt', 'updatedAt', 'readTime', 'author', 'authorRole',
-    'authorAvatar', 'image', 'imageAlt', 'content', 'featured', 'tags'],
+    'authorAvatar', 'image', 'imageAlt', 'content', 'featured', 'tags', 'status'],
 } as const;
 
 type EditableCollection = keyof typeof editableFields;
@@ -22,10 +22,6 @@ export async function updatePublishedCatalog<T extends { id: string }>(
   updates: Partial<T>,
 ): Promise<T> {
   assertMediaReady();
-  if (collection === 'blog_posts' && 'status' in updates && updates.status !== 'published') {
-    throw new Error('هذا المحرر يعدّل النسخة المنشورة. حفظ المسودات وإلغاء النشر غير متاحين هنا بعد.');
-  }
-
   const { data: entry, error: readError } = await hardAdminClient.from('hard_catalog')
     .select('id,content,updated_at')
     .eq('collection', collection).eq('id', id)
@@ -103,16 +99,14 @@ export async function createPublishedProject(project: Partial<Project>): Promise
 
 export async function createPublishedArticle(article: Partial<BlogPost>): Promise<BlogPost> {
   assertMediaReady();
-  if (article.status && article.status !== 'published') {
-    throw new Error('يدعم كتالوج المقالات نشر المقالات. احفظ نص المسودة خارج محرر الكتالوج إلى أن يصبح جاهزًا للنشر.');
-  }
   const id = crypto.randomUUID();
   const publishedAt = new Date(article.date || Date.now());
   if (Number.isNaN(publishedAt.valueOf())) throw new Error('أدخل تاريخ نشر صالحًا.');
   const date = article.date || publishedAt.toISOString().slice(0, 10);
+  const status = article.status ?? 'published';
   const content = {
-    ...buildPublicContent('blog_posts', id, { ...article, slug: article.slug || id, date, publishedAt: publishedAt.toISOString() }),
-    status: 'published',
+    ...buildPublicContent('blog_posts', id, { ...article, slug: article.slug || id, date, publishedAt: publishedAt.toISOString(), status }),
+    status,
   };
   const { data, error } = await hardAdminClient.from('hard_catalog')
     .insert({ collection: 'blog_posts', id, content })
@@ -128,4 +122,21 @@ export async function archivePublishedCatalog(collection: 'properties' | 'projec
     .select('id').maybeSingle();
   if (error) throw error;
   return Boolean(data);
+}
+
+
+export async function loadAdminArticles(): Promise<BlogPost[]> {
+  const { data, error } = await hardAdminClient
+    .from('hard_catalog')
+    .select('id,content,updated_at')
+    .eq('collection', 'blog_posts')
+    .is('archived_at', null)
+    .order('updated_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? [])
+    .map((entry) => entry.content as BlogPost)
+    .sort((a, b) =>
+      (Date.parse(b.publishedAt || b.date) || 0) -
+      (Date.parse(a.publishedAt || a.date) || 0),
+    );
 }
