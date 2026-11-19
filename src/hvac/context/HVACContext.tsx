@@ -309,8 +309,9 @@ export function HVACProvider({
     setBookingCopy(DEFAULT_HVAC_BOOKING_COPY);
   };
 
-  const updateServices = async (items: HVACService[]) => {
-    await Promise.all(items.map(async () => undefined));
+  const updateServices = (items: HVACService[]) => {
+    // Published HVAC services are edited through hard_sector_catalog in the admin catalog editor.
+    // This setter only mirrors an already-published list in the public context.
     setServices(items);
   };
 
