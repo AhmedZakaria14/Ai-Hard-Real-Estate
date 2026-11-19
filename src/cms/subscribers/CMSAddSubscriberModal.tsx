@@ -49,8 +49,8 @@ export const CMSAddSubscriberModal: React.FC<CMSAddSubscriberModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl max-w-lg w-full border border-slate-200 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center overflow-hidden bg-slate-950/70 p-0 sm:p-4 backdrop-blur-xs [padding-top:env(safe-area-inset-top)] sm:[padding-top:1rem]">
+      <div className="flex w-full min-w-0 max-w-lg flex-col overflow-hidden border border-slate-200 bg-white shadow-2xl max-h-[calc(100dvh-env(safe-area-inset-top))] sm:max-h-[calc(100dvh-2rem)] rounded-t-3xl sm:rounded-3xl animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div className="flex items-center gap-3">
@@ -77,7 +77,7 @@ export const CMSAddSubscriberModal: React.FC<CMSAddSubscriberModalProps> = ({
         </div>
 
         {/* Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs sm:text-sm">
+        <form onSubmit={handleSubmit} className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-4 text-sm sm:p-6">
           {/* Email */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
@@ -95,7 +95,7 @@ export const CMSAddSubscriberModal: React.FC<CMSAddSubscriberModalProps> = ({
               placeholder="e.g. investor@domain.com"
               className={`w-full px-3 py-2.5 bg-slate-50 border ${
                 error ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300 hover:border-slate-400'
-              } rounded-xl text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all`}
+              } rounded-xl text-base sm:text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all`}
             />
             {error && <p className="text-red-500 text-[11px] mt-1">{error}</p>}
           </div>
@@ -109,7 +109,7 @@ export const CMSAddSubscriberModal: React.FC<CMSAddSubscriberModalProps> = ({
             <SearchableSelect
               value={source}
               onChange={(e) => setSource(e.target.value)}
-              className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"
+              className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-base sm:text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"
             >
               <option value="Manual CMS Entry">{isAr ? 'إدخال يدوي من الإدارة (CMS)' : 'Manual CMS Entry'}</option>
               <option value="Website Footer">{isAr ? 'تذييل الموقع (Footer Form)' : 'Website Footer'}</option>
@@ -134,13 +134,13 @@ export const CMSAddSubscriberModal: React.FC<CMSAddSubscriberModalProps> = ({
                   ? 'مثال: مهتم بمشاريع الخبر تحت الإنشاء والمحافظ السكنية...'
                   : 'e.g. Interested in off-plan luxury villas and commercial yields in Al Khobar...'
               }
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-base sm:text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
         </form>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-end gap-2.5">
+        <div className="flex shrink-0 items-center justify-end gap-2.5 border-t border-slate-100 bg-slate-50 px-4 py-3 pb-[calc(.75rem+env(safe-area-inset-bottom))] sm:px-6 sm:py-4 sm:pb-4">
           <button
             type="button"
             onClick={onClose}
