@@ -128,7 +128,7 @@ export function PrivacyTermsModal({
 
         {/* TAB 2: Terms of Service Content */}
         {activeTab === 'terms' && (
-          <div className="space-y-6 text-xs sm:text-sm text-slate-700 leading-relaxed max-h-[55vh] overflow-y-auto pe-2">
+          <div className="space-y-6 text-xs sm:text-sm text-slate-700 leading-relaxed pe-0 sm:pe-2">
             {policy.termsOfService.sections.map((sec) => (
               <div key={sec.id} className="space-y-2">
                 <h3 className="font-bold text-slate-900 text-base font-display-serif flex items-center gap-2">
