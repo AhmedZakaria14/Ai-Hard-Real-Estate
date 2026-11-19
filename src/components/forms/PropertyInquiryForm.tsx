@@ -209,7 +209,7 @@ export function PropertyInquiryForm({
           {/* Post-submit Actions */}
           <div className="flex flex-col sm:flex-row gap-3 pt-1">
             <Button
-              href={`https://wa.me/966556125711?text=${encodeURIComponent(
+              href={`https://wa.me/${String(property.agent?.whatsapp || '').replace(/\D/g, '')}?text=${encodeURIComponent(
                 isAr
                   ? `مرحباً هارد للعقارات، لقد أرسلت استفساراً بخصوص "${property?.title?.ar || ''}" (رقم المرجع: ${referenceNumber}).`
                   : `Hello HARD Real Estate, I just submitted an inquiry for "${property?.title?.en || ''}" (Ref: ${referenceNumber}).`
