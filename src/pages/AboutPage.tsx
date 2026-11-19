@@ -97,12 +97,6 @@ export function AboutPage({ onNavigate, language }: AboutPageProps) {
           </div>
 
           <div className="space-y-1 p-4 bg-slate-800/60 rounded-2xl border border-slate-700/50">
-            <span className="text-xs text-slate-400 block">{language === 'en' ? <InterfaceText id="realestate.AboutPage.k1npru84" source="Commercial Registration (CR)" /> : <InterfaceText id="realestate.AboutPage.k12tkn22" source="السجل التجاري" />}</span>
-            <bdi dir="ltr" className="font-mono font-bold text-slate-200"><LocalizedValue value="1111111111" /></bdi>
-            <span className="text-[11px] text-slate-400 block">{language === 'en' ? <InterfaceText id="realestate.AboutPage.kfgbbxm" source="Dammam, Eastern Province" /> : <InterfaceText id="realestate.AboutPage.k386c7p" source="الدمام، المنطقة الشرقية" />}</span>
-          </div>
-
-          <div className="space-y-1 p-4 bg-slate-800/60 rounded-2xl border border-slate-700/50">
             <span className="text-xs text-slate-400 block">{language === 'en' ? <InterfaceText id="realestate.AboutPage.k1mx5fby" source="Headquarters" /> : <InterfaceText id="realestate.AboutPage.k1ajuqev" source="المقر الرئيسي" />}</span>
             <span className="font-bold text-slate-200">{language === 'en' ? <InterfaceText id="realestate.AboutPage.k1lcr57c" source="Dammam, Saudi Arabia" /> : <InterfaceText id="realestate.AboutPage.kqzmrka" source="الدمام، المملكة العربية السعودية" />}</span>
             <span className="text-[11px] text-slate-400 block">{language === 'en' ? <InterfaceText id="realestate.AboutPage.ku3v7om" source="Prince Mutaib bin Abdulaziz Road, Hajr District" /> : <InterfaceText id="realestate.AboutPage.k1l8zqf8" source="طريق الأمير متعب بن عبد العزيز، حي هجر" />}</span>
