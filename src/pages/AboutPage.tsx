@@ -97,6 +97,12 @@ export function AboutPage({ onNavigate, language }: AboutPageProps) {
           </div>
 
           <div className="space-y-1 p-4 bg-white/10 rounded-2xl border border-white/15">
+            <span className="text-xs text-blue-100/80 block">{language === 'en' ? 'Commercial Registration' : 'السجل التجاري'}</span>
+            <bdi dir="ltr" className="font-mono font-bold text-white"><LocalizedValue value="1111111111" /></bdi>
+            <span className="text-[11px] text-blue-100/80 block">{language === 'en' ? 'Dammam, Eastern Province' : 'الدمام، المنطقة الشرقية'}</span>
+          </div>
+
+          <div className="space-y-1 p-4 bg-white/10 rounded-2xl border border-white/15">
             <span className="text-xs text-blue-100/80 block">{language === 'en' ? <InterfaceText id="realestate.AboutPage.k1mx5fby" source="Headquarters" /> : <InterfaceText id="realestate.AboutPage.k1ajuqev" source="المقر الرئيسي" />}</span>
             <span className="font-bold text-white">{language === 'en' ? <InterfaceText id="realestate.AboutPage.k1lcr57c" source="Dammam, Saudi Arabia" /> : <InterfaceText id="realestate.AboutPage.kqzmrka" source="الدمام، المملكة العربية السعودية" />}</span>
             <span className="text-[11px] text-blue-100/80 block">{language === 'en' ? <InterfaceText id="realestate.AboutPage.ku3v7om" source="Prince Mutaib bin Abdulaziz Road, Hajr District" /> : <InterfaceText id="realestate.AboutPage.k1l8zqf8" source="طريق الأمير متعب بن عبد العزيز، حي هجر" />}</span>
