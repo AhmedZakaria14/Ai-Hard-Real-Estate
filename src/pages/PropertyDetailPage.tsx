@@ -316,7 +316,7 @@ export function PropertyDetailPage({
 
             {/* Mandatory "Chat on WhatsApp" Direct CTA */}
             <Button
-              href={`https://wa.me/966556125711?text=${encodeURIComponent(
+              href={`https://wa.me/${String(property.agent?.whatsapp || '').replace(/\D/g, '')}?text=${encodeURIComponent(
                 language === 'en'
                   ? `Hello HARD Real Estate, I'm inquiring about "${property?.title?.en || ''}" (Ref: ${property?.id || ''}).`
                   : `مرحباً هارد للعقارات، أود الاستفسار عن عقار "${property?.title?.ar || ''}" (رقم المرجع: ${property?.id || ''}).`
