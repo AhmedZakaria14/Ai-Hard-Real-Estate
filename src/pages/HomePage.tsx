@@ -412,7 +412,7 @@ export function HomePage({
                       <LocalizedValue value={spotlightProject.startingPriceSAR} />
                     </strong>
                   </div>
-                  <div className="p-3.5 bg-slate-800/80 rounded-2xl border border-slate-700">
+                  <div className="p-3.5 bg-white/10 rounded-2xl border border-white/15">
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] text-slate-400 block font-medium"><LocalizedValue value={t.projects.handover} />:</span>
                       <span className="text-[10px] text-slate-400 font-mono">
