@@ -49,7 +49,7 @@ export function ComplianceVerificationModal({
     >
       <div className="space-y-6">
         {/* Header summary banner */}
-        <div className="p-4 bg-slate-900 text-white rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-slate-800 shadow-md">
+        <div className="p-4 bg-[#034DA2] text-white rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-blue-800/60 shadow-md">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <Badge variant="primary" className="bg-blue-600 text-white border-none">
