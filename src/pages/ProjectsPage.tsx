@@ -102,7 +102,7 @@ export function ProjectsPage({
             className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 grid grid-cols-1 lg:grid-cols-12"
           >
             {/* Image side (5 cols) */}
-            <div className="lg:col-span-5 relative aspect-16/10 lg:aspect-auto bg-slate-950 overflow-hidden">
+            <div className="lg:col-span-5 relative aspect-16/10 lg:aspect-auto bg-[#034DA2] overflow-hidden">
               <ManagedImg copyScope="realestate.ProjectsPage"
                 src={project.image || project.gallery?.[0] || projectPlaceholderImage}
                 alt={getLocalizedText(project.title, language)}
@@ -116,7 +116,7 @@ export function ProjectsPage({
                 </div>
               ) : (
                 <div
-                  className="absolute top-4 start-4 bg-slate-900/90 backdrop-blur-md text-amber-300 border border-amber-500/40 text-xs px-3 py-1 rounded-full font-semibold shadow-md flex items-center gap-1.5"
+                  className="absolute top-4 start-4 bg-[#034DA2]/95 backdrop-blur-md text-amber-200 border border-white/20 text-xs px-3 py-1 rounded-full font-semibold shadow-md flex items-center gap-1.5"
                   title={project.financialMetric?.statusNote?.[language]}
                 >
                   <ShieldAlert className="w-3.5 h-3.5 text-amber-400 shrink-0" />
