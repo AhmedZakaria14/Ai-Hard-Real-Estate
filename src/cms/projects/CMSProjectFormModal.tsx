@@ -222,10 +222,10 @@ export const CMSProjectFormModal: React.FC<CMSProjectFormModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center overflow-hidden bg-slate-950/70 p-0 sm:p-4 backdrop-blur-xs [padding-top:env(safe-area-inset-top)] sm:[padding-top:1rem]">
       <div
         dir={isAr ? 'rtl' : 'ltr'}
-        className="bg-white w-full max-w-4xl rounded-3xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95 duration-200"
+        className="flex w-full min-w-0 max-w-4xl flex-col overflow-hidden border border-slate-200 bg-white shadow-2xl max-h-[calc(100dvh-env(safe-area-inset-top))] sm:max-h-[calc(100dvh-2rem)] rounded-t-3xl sm:rounded-3xl animate-in fade-in zoom-in-95 duration-200"
       >
         {/* Modal Top Header */}
         <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
@@ -280,7 +280,7 @@ export const CMSProjectFormModal: React.FC<CMSProjectFormModalProps> = ({
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:space-y-6 sm:p-6 sm:pb-6">
           {saveError && <p role="alert" className="rounded bg-red-50 p-3 text-sm text-red-700">{saveError}</p>}
           {/* TAB 1: BASIC INFO */}
           {activeTab === 'basic' && (
