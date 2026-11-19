@@ -406,7 +406,7 @@ export function HomePage({
                 )}
 
                 <div className="grid grid-cols-2 gap-3 pt-2">
-                  <div className="p-3.5 bg-slate-800/80 rounded-2xl border border-slate-700">
+                  <div className="p-3.5 bg-white/10 rounded-2xl border border-white/15">
                     <span className="text-[11px] text-slate-400 block font-medium"><LocalizedValue value={t.projects.startingFrom} />:</span>
                     <strong className="text-base sm:text-lg text-blue-400 font-display-serif">
                       <LocalizedValue value={spotlightProject.startingPriceSAR} />
