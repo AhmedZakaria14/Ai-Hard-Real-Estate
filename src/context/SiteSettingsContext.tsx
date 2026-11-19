@@ -114,11 +114,11 @@ export const DEFAULT_PORTAL_SETTINGS: PublicBrandingSettings = {
       ar: '© 2026 مجموعة هارد. جميع الحقوق محفوظة.',
       en: '© 2026 HARD Group. All rights reserved.',
     },
-    crNumber: '1010892341',
-    taxNumber: '310982341200003',
+    crNumber: '',
+    taxNumber: '',
     licenses: {
-      ar: 'مرخصة من الهيئة العامة للعقار برقم 12000189',
-      en: 'Licensed by Real Estate General Authority #12000189',
+      ar: '',
+      en: '',
     },
   },
 
