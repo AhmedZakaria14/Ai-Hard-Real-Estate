@@ -128,15 +128,21 @@ export const ConstructionProvider: React.FC<{
       ...svc,
       id: `svc-${Date.now()}`,
     };
-    setServices((prev) => [newSvc, ...prev]);
+    const next = [newSvc, ...services];
+    await saveSectorSection({ sector: 'construction', key: 'services' }, next);
+    setServices(next);
   };
 
   const updateService = async (id: string, updated: Partial<ConstructionService>) => {
-    setServices((prev) => prev.map((s) => (s.id === id ? { ...s, ...updated } : s)));
+    const next = services.map((s) => (s.id === id ? { ...s, ...updated } : s));
+    await saveSectorSection({ sector: 'construction', key: 'services' }, next);
+    setServices(next);
   };
 
   const deleteService = async (id: string) => {
-    setServices((prev) => prev.filter((s) => s.id !== id));
+    const next = services.filter((s) => s.id !== id);
+    await saveSectorSection({ sector: 'construction', key: 'services' }, next);
+    setServices(next);
   };
 
   // Hero & Company Section Content
