@@ -38,6 +38,7 @@ export function HVACBookingModal() {
     services,
     serviceAreas,
     bookingCopy,
+    operatingHours,
   } = useHVAC();
 
   const [service, setService] = useState('');
@@ -210,7 +211,8 @@ Service: ${service}
 Date: ${date} (${slot})
 City: ${cityName}`;
 
-    const url = `https://wa.me/966550641000?text=${encodeURIComponent(text)}`;
+    const whatsapp = String(operatingHours.whatsappNumber || '').replace(/\D/g, '');
+    const url = `https://wa.me/${whatsapp}?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
