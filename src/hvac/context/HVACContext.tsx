@@ -309,8 +309,30 @@ export function HVACProvider({
     setBookingCopy(DEFAULT_HVAC_BOOKING_COPY);
   };
 
-  const updateFaqItems = (items: HVACFaqItem[]) => setFaqItems(items);
-  const updateMaintenanceGuides = (items: HVACChecklistItem[]) => setMaintenanceGuides(items);
+  const updateServices = async (items: HVACService[]) => {
+    await Promise.all(items.map(async () => undefined));
+    setServices(items);
+  };
+
+  const updateGalleryItems = async (items: HVACGalleryItem[]) => {
+    await saveSectorSection({ sector: 'hvac', key: 'work_gallery' }, items);
+    setGalleryItems(items);
+  };
+
+  const updateTestimonials = async (items: HVACTestimonial[]) => {
+    await saveSectorSection({ sector: 'hvac', key: 'reviews' }, items);
+    setTestimonials(items);
+  };
+
+  const updateFaqItems = async (items: HVACFaqItem[]) => {
+    await saveSectorSection({ sector: 'hvac', key: 'faq' }, items);
+    setFaqItems(items);
+  };
+
+  const updateMaintenanceGuides = async (items: HVACChecklistItem[]) => {
+    await saveSectorSection({ sector: 'hvac', key: 'maintenance_guide' }, items);
+    setMaintenanceGuides(items);
+  };
 
   return (
     <HVACContext.Provider
@@ -320,7 +342,7 @@ export function HVACProvider({
         setLanguage,
         toggleLanguage,
         services,
-        updateServices: setServices,
+        updateServices,
         serviceAreas,
         updateServiceAreas,
         heroContent,
@@ -334,12 +356,12 @@ export function HVACProvider({
         addGalleryItem,
         updateGalleryItem,
         deleteGalleryItem,
-        updateGalleryItems: setGalleryItems,
+        updateGalleryItems,
         testimonials,
         addTestimonial,
         updateTestimonial,
         deleteTestimonial,
-        updateTestimonials: setTestimonials,
+        updateTestimonials,
         faqItems,
         updateFaqItems,
         maintenanceGuides,
