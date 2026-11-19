@@ -41,7 +41,7 @@ export function HVACHero() {
   };
 
   return (
-    <section id="hero" className="relative min-h-[640px] flex items-center overflow-hidden bg-slate-900">
+    <section id="hero" className="relative min-h-[640px] flex items-center overflow-hidden bg-[#034DA2]">
       {/* Background HVAC Field Photo with darkened overlay bg-[#0F172A]/35 */}
       <div className="absolute inset-0 z-0">
         <ManagedImg copyScope="hvac.HVACHero"
