@@ -77,8 +77,8 @@ export const T = {
       ar: 'اتصل بنا',
     },
     callPill: {
-      en: 'Call 24/7',
-      ar: 'اتصال 24/7',
+      en: 'Call Now',
+      ar: 'اتصال مباشر',
     },
     bookServiceBtn: {
       en: 'Book Service Now',
@@ -111,8 +111,8 @@ export const T = {
       ar: 'معتمد وفق الكود السعودي والمواصفات',
     },
     badge2: {
-      en: '24/7 Emergency Dispatch',
-      ar: 'مباشرة طوارئ ٢٤ ساعة',
+      en: 'Rapid Emergency Response',
+      ar: 'استجابة طوارئ سريعة',
     },
     badge3: {
       en: 'Genuine Spare Parts Guarantee',
