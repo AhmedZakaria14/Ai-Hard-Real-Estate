@@ -85,7 +85,7 @@ export function AboutPage({ onNavigate, language }: AboutPageProps) {
       </div>
 
       {/* Governance & Legal Identity Card */}
-      <div className="bg-slate-900 text-slate-100 rounded-3xl p-8 sm:p-10 border border-slate-800 shadow-xl space-y-6">
+      <div className="bg-[#034DA2] text-slate-100 rounded-3xl p-8 sm:p-10 border border-blue-800/60 shadow-xl space-y-6">
         <h2 className="border-b border-slate-800 pb-6 text-2xl font-bold font-display-serif text-white">
           {language === 'en' ? <InterfaceText id="realestate.AboutPage.kgqvfj4" source="HARD Real Estate" /> : <InterfaceText id="realestate.AboutPage.kbrh0q0" source="هارد العقارية" />}
         </h2>
@@ -272,7 +272,7 @@ export function AboutPage({ onNavigate, language }: AboutPageProps) {
       )}
 
       {/* CTA Box */}
-      <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-10 w-full space-y-5 text-center flex flex-col items-center">
+      <div className="bg-[#034DA2] text-white rounded-3xl p-8 sm:p-10 w-full space-y-5 text-center flex flex-col items-center">
         <BrandLogo size="lg" language={language} variant="light" className="max-w-full p-1 sm:p-2" />
         <h3 className="text-xl sm:text-2xl font-bold font-display-serif">
           {language === 'en' ? <InterfaceText id="realestate.AboutPage.kmka5b8" source="Ready to Work with HARD Real Estate?" /> : <InterfaceText id="realestate.AboutPage.k13opqhu" source="جاهز للبدء مع هارد للعقارات؟" />}
