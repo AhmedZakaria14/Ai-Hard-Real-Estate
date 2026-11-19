@@ -111,7 +111,7 @@ export function Footer({ onNavigate, language }: FooterProps) {
   const footerLinks = hasManagedFooter ? managedFooterLinks : fallbackFooterLinks;
 
   return (
-    <footer className="bg-slate-950 text-slate-300 border-t border-slate-900 mt-20">
+    <footer className="bg-[#034DA2] text-blue-50 border-t border-blue-700/70 mt-20">
       {/* 4-Column Layout */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
@@ -145,7 +145,7 @@ export function Footer({ onNavigate, language }: FooterProps) {
                   href={brand.socialLinks.instagram || 'https://www.instagram.com/hardgrp'}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-pink-400 hover:bg-slate-800/90 hover:border-pink-500/40 transition-all group shadow-xs"
+                  className="w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/20 hover:border-white/30 transition-all group shadow-xs"
                   aria-label="Instagram"
                   title="Instagram (@hardgrp)"
                 >
@@ -155,7 +155,7 @@ export function Footer({ onNavigate, language }: FooterProps) {
                   href={brand.socialLinks.twitter || 'https://x.com/HARDGRP'}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800/90 hover:border-slate-600 transition-all group shadow-xs"
+                  className="w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/20 hover:border-white/30 transition-all group shadow-xs"
                   aria-label="X / Twitter"
                   title="X / Twitter (@HARDGRP)"
                 >
@@ -272,7 +272,7 @@ export function Footer({ onNavigate, language }: FooterProps) {
                       placeholder={t.footer.newsletterPlaceholder}
                       value={newsletterEmail}
                       onChange={(e) => setNewsletterEmail(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 hover:border-slate-600 focus:border-blue-500 rounded-xl text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
+                      className="w-full px-3 py-2 bg-white/10 border border-white/25 hover:border-white/40 focus:border-white rounded-xl text-xs text-white placeholder-blue-100/70 focus:outline-none focus:ring-1 focus:ring-white/50 transition-all"
                     />
                   </div>
                   <Button
@@ -290,7 +290,7 @@ export function Footer({ onNavigate, language }: FooterProps) {
           </div>
         </div>
 
-        <p className="mt-12 border-t border-slate-800 pt-6 text-center text-xs text-slate-400"><LocalizedValue value={t.footer.copyright} /></p>
+        <p className="mt-12 border-t border-white/20 pt-6 text-center text-xs text-blue-100"><LocalizedValue value={t.footer.copyright} /></p>
       </div>
     </footer>
   );
