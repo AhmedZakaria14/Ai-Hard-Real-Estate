@@ -303,7 +303,7 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
         {/* Right Info: Direct Contact, Office Locations & Instant WhatsApp (5 cols) */}
         <div className="lg:col-span-5 space-y-6">
           {/* Quick Contact Box */}
-          <div className="bg-slate-900 text-white p-6 sm:p-8 rounded-3xl space-y-6 border border-slate-800">
+          <div className="bg-[#034DA2] text-white p-6 sm:p-8 rounded-3xl space-y-6 border border-blue-700/70">
             <h3 className="text-xl font-bold font-display-serif text-white">
               <LocalizedValue value={t.contact.officeLocations} />
             </h3>
@@ -357,7 +357,7 @@ export function ContactPage({ onNavigate, language }: ContactPageProps) {
             </div>
 
             {/* Direct WhatsApp Callout Button */}
-            <div className="pt-2 border-t border-slate-800">
+            <div className="pt-2 border-t border-white/20">
               <Button
                 href={'https://wa.me/' + brand.whatsappNumber.replace(/\D/g, '')}
                 target="_blank"
