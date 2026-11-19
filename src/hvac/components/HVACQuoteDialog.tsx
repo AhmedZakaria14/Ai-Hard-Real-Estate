@@ -32,6 +32,7 @@ export function HVACQuoteDialog() {
     closeQuoteDialog,
     quoteInitialData,
     serviceAreas,
+    operatingHours,
   } = useHVAC();
 
   const [fullName, setFullName] = useState('');
@@ -193,7 +194,8 @@ City: ${cityName}
 Service: ${serviceName}
 ${isUrgent ? '⚠️ Urgency: Emergency Request' : ''}`;
 
-    const url = `https://wa.me/966550641000?text=${encodeURIComponent(message)}`;
+    const whatsapp = String(operatingHours.whatsappNumber || '').replace(/\D/g, '');
+    const url = `https://wa.me/${whatsapp}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
