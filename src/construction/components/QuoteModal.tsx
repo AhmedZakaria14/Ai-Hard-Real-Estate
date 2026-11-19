@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import { useConstruction } from '../context/ConstructionContext';
 import { ConstructionProjectType, ConstructionQuoteLead } from '../types';
-import { COMPANY_CREDENTIALS } from '../data/seedData';
+import { SECTOR_CONTACT_DETAILS } from '../../lib/sectors';
 import { submitCustomerForm, FormValidationError } from '../../lib/forms/formSubmissionService';
 
 export function QuoteModal() {
@@ -147,7 +147,7 @@ function QuoteModalContent() {
       ? `السلام عليكم، تم تقديم طلب عرض سعر وتسعير مشروع لدى هارد للمقاولات برقم مرجع: ${submittedLead.referenceNumber} باسم: ${submittedLead.clientName}. نرجو التواصل لمناقشة تفاصيل العطاء.`
       : `Hello HARD Contracting Co., I submitted a quotation request with Ref Number: ${submittedLead.referenceNumber} for client: ${submittedLead.clientName}. Looking forward to discussing the project.`;
     window.open(
-      `https://wa.me/${COMPANY_CREDENTIALS.whatsapp.replace('+', '')}?text=${encodeURIComponent(msg)}`,
+      `https://wa.me/${SECTOR_CONTACT_DETAILS.construction.whatsapp.replace('+', '')}?text=${encodeURIComponent(msg)}`,
       '_blank'
     );
   };
