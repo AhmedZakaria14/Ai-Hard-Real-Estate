@@ -18,7 +18,7 @@ export function Badge({ className, variant = 'primary', children, ...props }: Ba
     outline: 'border border-slate-300 text-slate-700 bg-white/90 backdrop-blur-xs',
     success: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
     warning: 'bg-amber-50 text-amber-800 border border-amber-200',
-    dark: 'bg-slate-900 text-white shadow-xs',
+    dark: 'bg-[#034DA2] text-white shadow-xs',
     gradient: 'bg-hard-gradient text-white shadow-xs',
   };
 
