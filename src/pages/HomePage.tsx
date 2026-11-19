@@ -111,7 +111,7 @@ export function HomePage({
       {/* 1. HERO SECTION */}
       <section
         id="home-hero-section"
-        className="relative bg-slate-950 text-white min-h-[660px] sm:min-h-[720px] flex items-center overflow-visible pb-24 sm:pb-32"
+        className="relative bg-[#034DA2] text-white min-h-[660px] sm:min-h-[720px] flex items-center overflow-visible pb-24 sm:pb-32"
       >
         {/* High-End Architectural Background Image with Gradient Overlay */}
         <div className="absolute inset-0 z-0 overflow-hidden">
@@ -358,8 +358,8 @@ export function HomePage({
       {/* MASTER PROJECT SPOTLIGHT */}
       {spotlightProject && (
         <section id="project-spotlight" className="max-w-7xl mx-auto space-y-4 px-4 sm:px-6 lg:px-8">
-          <div id="project-spotlight-slide" aria-live="polite" className="bg-slate-900 text-white rounded-3xl overflow-hidden border border-slate-800 shadow-2xl grid grid-cols-1 lg:grid-cols-12">
-            <div className="lg:col-span-6 relative aspect-16/10 lg:aspect-auto overflow-hidden bg-slate-950">
+          <div id="project-spotlight-slide" aria-live="polite" className="bg-[#034DA2] text-white rounded-3xl overflow-hidden border border-blue-800/60 shadow-2xl grid grid-cols-1 lg:grid-cols-12">
+            <div className="lg:col-span-6 relative aspect-16/10 lg:aspect-auto overflow-hidden bg-[#034DA2]">
               <ManagedImg copyScope="realestate.HomePage"
                 key={spotlightProject.id}
                 src={spotlightProject.image || spotlightProject.gallery?.[0]}
@@ -374,7 +374,7 @@ export function HomePage({
                 </div>
               ) : (
                 <div
-                  className="absolute top-4 start-4 bg-slate-900/90 backdrop-blur-md text-amber-300 border border-amber-500/40 text-xs px-3 py-1.5 rounded-full font-semibold shadow-lg flex items-center gap-1.5"
+                  className="absolute top-4 start-4 bg-[#034DA2]/95 backdrop-blur-md text-amber-200 border border-white/20 text-xs px-3 py-1.5 rounded-full font-semibold shadow-lg flex items-center gap-1.5"
                   title={spotlightProject.financialMetric?.statusNote?.[language]}
                 >
                   <ShieldAlert className="w-3.5 h-3.5 text-amber-400 shrink-0" />
