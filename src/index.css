@@ -71,3 +71,13 @@ html[dir="rtl"] .font-display-serif {
 html[dir="rtl"] .font-ui-sans {
   font-family: 'Cairo', system-ui, -apple-system, sans-serif;
 }
+
+/* Mobile form safety: prevent iOS Safari focus zoom from changing modal geometry. */
+@media (max-width: 639px) {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']),
+  select,
+  textarea {
+    font-size: 16px !important;
+    max-width: 100%;
+  }
+}
