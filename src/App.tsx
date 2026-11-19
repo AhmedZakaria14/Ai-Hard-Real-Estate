@@ -2,7 +2,6 @@ import { SectorNav } from './components/layout/SectorNav';
 import { SectorQuickActions } from './components/layout/SectorQuickActions';
 import { SECTOR_CONTACT_DETAILS } from './lib/sectors';
 import { ClientStoriesSection } from './components/home/ClientStoriesSection';
-import { PublishedCompanyContent } from './components/ui/PublishedCompanyContent';
 import PublishedPageSections from './components/ui/PublishedPageSections';
 import React, { useState, useEffect } from 'react';
 import { Language, PageId, Property, PropertyFilterParams, Project } from './types';
@@ -594,10 +593,9 @@ function AppContent() {
           <PublishedPageSections page="page_realestate" language={language} />
           <ClientStoriesSection language={language} />
         </>}
-        {currentPage === 'about' && <>
+        {currentPage === 'about' && (
           <PublishedPageSections page="page_realestate_about" language={language} />
-          <PublishedCompanyContent language={language} />
-        </>}
+        )}
 
         {currentPage === 'blog' && (
           <BlogPage language={language} articleId={attemptedPath.match(/^\/(?:realestate\/)?blog\/([^/]+)\/?$/)?.[1] ?? null} />
