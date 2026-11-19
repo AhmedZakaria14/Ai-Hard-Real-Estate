@@ -48,11 +48,11 @@ export function useCustomerFormConfig(formType: CustomerFormType) {
 
 export function ConfiguredFormFields({ form, language }: { form: ReturnType<typeof useCustomerFormConfig>; language: 'ar' | 'en' }) {
   const defaults = DEFAULT_FORM_SCHEMAS[form.schema.formType];
-  const inputClass = 'w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-blue-500';
-  return <div className="space-y-4 empty:hidden">
+  const inputClass = 'w-full min-w-0 rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base sm:text-sm text-slate-900 focus:ring-2 focus:ring-blue-500';
+  return <div className="min-w-0 space-y-4 empty:hidden">
     {form.schema.title[language] !== defaults.title[language] && <h3 className="text-lg font-bold">{form.schema.title[language]}</h3>}
     {form.schema.description[language] !== defaults.description[language] && <p className="text-sm text-slate-600">{form.schema.description[language]}</p>}
-    {form.fields.map((field) => <div key={field.id} className="space-y-1.5">
+    {form.fields.map((field) => <div key={field.id} className="min-w-0 space-y-1.5">
       <label htmlFor={'custom-' + field.id} className="block text-sm font-semibold">{field.label[language]} {field.required && <span className="text-red-600">*</span>}</label>
       {field.type === 'file_attachment' ? <FileUploadZone language={language} attachments={form.attachments} onChange={form.setAttachments} />
         : field.type === 'select' ? <SearchableSelect id={'custom-' + field.id} required={field.required} className={inputClass} value={String(form.values[field.id] ?? '')} onChange={(event) => form.setValues((previous) => ({...previous, [field.id]: event.target.value}))}>
