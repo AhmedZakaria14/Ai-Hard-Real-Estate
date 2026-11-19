@@ -28,7 +28,7 @@ import { ProjectInquiryModal } from './components/modals/ProjectInquiryModal';
 import { DataProvider, useData } from './context/DataContext';
 import { PageMediaProvider } from './lib/pageMedia';
 import { TextOverrideProvider } from './context/TextOverrideContext';
-import { SiteSettingsProvider } from './context/SiteSettingsContext';
+import { SiteSettingsProvider, useSiteSettings } from './context/SiteSettingsContext';
 import { parsePropertyQueryParams, serializePropertyQueryParams } from './lib/propertyUrlParams';
 import { getPageTitle, getPageDescription, updateDocumentTitle } from './lib/pageTitles';
 import { getStoredSeoConfigs, subscribeSeoConfigs, applyPageSeoToHead } from './lib/seo/seoManager';
@@ -280,6 +280,8 @@ function AppContent() {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [propertyFilters, setPropertyFilters] = useState<PropertyFilterParams | null>(initialRoute.filters);
   const { properties } = useData();
+  const { getEffectiveSettings } = useSiteSettings();
+  const realEstateBrand = getEffectiveSettings('realestate');
 
   // Modals state
   const [bookViewingProperty, setBookViewingProperty] = useState<Property | null>(null);
@@ -618,7 +620,7 @@ function AppContent() {
       {/* Global 4-Column Footer */}
       <Footer onNavigate={handleNavigate} language={language} />
 
-      <SectorQuickActions language={language} whatsappHref={`https://wa.me/${SECTOR_CONTACT_DETAILS.realestate.whatsapp.replace(/\D/g, '')}`} />
+      <SectorQuickActions language={language} whatsappHref={`https://wa.me/${(realEstateBrand.whatsappNumber || SECTOR_CONTACT_DETAILS.realestate.whatsapp).replace(/\D/g, '')}`} />
 
       {/* Global Dialog Modals */}
       <BookViewingModal
@@ -664,13 +666,13 @@ function AppContent() {
 export default function App() {
   return (
     <ErrorBoundary>
-      <DataProvider>
-        <SiteSettingsProvider>
+      <SiteSettingsProvider>
+        <DataProvider>
           <TextOverrideProvider><PageMediaProvider>
             <AppContent />
           </PageMediaProvider></TextOverrideProvider>
-        </SiteSettingsProvider>
-      </DataProvider>
+        </DataProvider>
+      </SiteSettingsProvider>
     </ErrorBoundary>
   );
 }
