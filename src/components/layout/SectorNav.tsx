@@ -63,7 +63,7 @@ export function SectorNav({
               window.scrollTo({ top: 0, behavior: 'smooth' });
             })
           }
-          className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-3.5 py-1.5 text-xs font-bold text-white transition-colors hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-[#034DA2] px-3.5 py-1.5 text-xs font-bold text-white transition-colors hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
           aria-label={isAr ? 'الرئيسية - بوابة قطاعات هارد' : 'Home - HARD sectors portal'}
         >
           <Home className="h-4 w-4" />
