@@ -47,7 +47,7 @@ export const ArticlePreviewModal: React.FC<ArticlePreviewModalProps> = ({
         className="flex w-full min-w-0 max-w-4xl flex-col overflow-hidden border border-slate-200 bg-white shadow-2xl max-h-[calc(100dvh-env(safe-area-inset-top))] sm:max-h-[calc(100dvh-2rem)] rounded-t-3xl sm:rounded-3xl animate-in fade-in zoom-in-95 duration-200"
       >
         {/* Top Preview Banner */}
-        <div className="px-6 py-3 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+        <div className="px-6 py-3 bg-[#034DA2] text-white flex items-center justify-between border-b border-blue-800/60">
           <div className="flex items-center gap-2 text-xs">
             <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-bold border border-blue-500/30">
               <Eye className="w-3.5 h-3.5" />
@@ -140,7 +140,7 @@ export const ArticlePreviewModal: React.FC<ArticlePreviewModalProps> = ({
 
           {/* Cover Image */}
           {post.image && (
-            <div className="max-w-3xl mx-auto rounded-3xl overflow-hidden border border-slate-200 shadow-md aspect-16/9 bg-slate-900">
+            <div className="max-w-3xl mx-auto rounded-3xl overflow-hidden border border-slate-200 shadow-md aspect-16/9 bg-[#034DA2]">
               <img
                 src={post.image}
                 alt={post.title?.[language] || 'Article Banner'}
@@ -186,7 +186,7 @@ export const ArticlePreviewModal: React.FC<ArticlePreviewModalProps> = ({
 
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl hover:bg-slate-800 transition-colors"
+            className="px-4 py-2 bg-[#034DA2] text-white text-xs font-bold rounded-xl hover:bg-blue-800 transition-colors"
           >
             <LocalizedValue value={isAr ? 'إغلاق المعاينة' : 'Close Preview'} />
           </button>
