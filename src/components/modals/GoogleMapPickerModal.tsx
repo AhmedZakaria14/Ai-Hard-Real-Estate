@@ -323,7 +323,7 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-60 flex items-center justify-center p-2 sm:p-4 md:p-6 overflow-hidden">
+    <div className="fixed inset-0 z-60 flex items-end sm:items-center justify-center overflow-hidden p-0 sm:p-4 md:p-6 [padding-top:env(safe-area-inset-top)] sm:[padding-top:1rem]">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity animate-in fade-in"
@@ -336,7 +336,7 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
         role="dialog"
         aria-modal="true"
         dir={isAr ? 'rtl' : 'ltr'}
-        className="relative w-full max-w-5xl h-[88vh] sm:h-[85vh] bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 z-10 overflow-hidden flex flex-col transform transition-all animate-in zoom-in-95"
+        className="relative z-10 flex h-[calc(100dvh-env(safe-area-inset-top))] w-full min-w-0 max-w-5xl flex-col overflow-hidden border border-slate-200 bg-white shadow-2xl sm:h-[min(85dvh,56rem)] rounded-none sm:rounded-3xl transform transition-all animate-in zoom-in-95"
       >
         {/* Modal Header */}
         <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-slate-100 bg-slate-900 text-white shrink-0">
@@ -380,7 +380,7 @@ export const GoogleMapPickerModal: React.FC<GoogleMapPickerModalProps> = ({
               }
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full ps-9 pe-20 py-2 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
+              className="w-full min-w-0 ps-9 pe-20 py-2 bg-white border border-slate-300 rounded-xl text-base sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
             />
             <button
               type="submit"
