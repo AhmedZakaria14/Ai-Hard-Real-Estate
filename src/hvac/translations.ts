@@ -95,8 +95,8 @@ export const T = {
   },
   hero: {
     eyebrow: {
-      en: 'Heating · Cooling · Ventilation',
-      ar: 'التبريد · التدفئة · التهوية المركزية',
+      en: '',
+      ar: '',
     },
     headline: {
       en: 'Precision AC Maintenance & Deep Cleaning for Lasting Cooling in Saudi Climate',
@@ -211,8 +211,8 @@ export const T = {
   },
   services: {
     eyebrow: {
-      en: 'Our Specialized Capabilities',
-      ar: 'حلولنا الشاملة',
+      en: '',
+      ar: '',
     },
     title: {
       en: 'Complete HVAC Engineering & Maintenance Services',
@@ -225,8 +225,8 @@ export const T = {
   },
   whyUs: {
     eyebrow: {
-      en: 'The HARD Advantage',
-      ar: 'معايير التميز',
+      en: '',
+      ar: '',
     },
     title: {
       en: 'Why do our clients choose HARD HVAC Maintenance?',
@@ -296,8 +296,8 @@ export const T = {
   },
   gallery: {
     eyebrow: {
-      en: 'Real Field Operations',
-      ar: 'من الميدان',
+      en: '',
+      ar: '',
     },
     title: {
       en: 'Featured Job Work & Maintenance Portfolio',
@@ -448,8 +448,8 @@ export const T = {
   },
   checklist: {
     eyebrow: {
-      en: 'Preventative Care',
-      ar: 'العناية الوقائية',
+      en: '',
+      ar: '',
     },
     title: {
       en: 'Year-Round HVAC Maintenance Guide',
@@ -470,8 +470,8 @@ export const T = {
   },
   reviews: {
     eyebrow: {
-      en: 'Client Satisfaction',
-      ar: 'ثقة عملائنا',
+      en: '',
+      ar: '',
     },
     title: {
       en: 'Customer Reviews and Ratings',
@@ -484,8 +484,8 @@ export const T = {
   },
   faq: {
     eyebrow: {
-      en: 'Got Questions?',
-      ar: 'الأسئلة المتكررة',
+      en: '',
+      ar: '',
     },
     title: {
       en: 'Frequently Asked HVAC Maintenance Questions',
@@ -498,8 +498,8 @@ export const T = {
   },
   contact: {
     eyebrow: {
-      en: 'Get In Touch',
-      ar: 'تواصل معنا',
+      en: '',
+      ar: '',
     },
     title: {
       en: 'Book Maintenance or Ask a Question',
