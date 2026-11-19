@@ -95,7 +95,11 @@ function validItem(item: NavItem) {
   if (item.type === 'external') return isValidExternalUrl(item.targetPath);
   if (item.type !== 'internal') return false;
   const target = item.targetPath.trim();
-  return target.startsWith('/') && !target.startsWith('//') && !/[\\\u0000-\u001f]/.test(target);
+  if (!target.startsWith('/') || target.startsWith('//') || /[\\\u0000-\u001f]/.test(target)) return false;
+  if (target === '/') return true;
+  return !isProtectedInfrastructureRoute(target)
+    && !/^\/(?:realestate|construction|hvac|maintenance)\/(?:admin|cms)(?:\/|$)/i.test(target)
+    && !/^\/cms(?:\/|$)/i.test(target);
 }
 
 export async function getNavigationDoc(id: string): Promise<NavigationDoc | null> {
