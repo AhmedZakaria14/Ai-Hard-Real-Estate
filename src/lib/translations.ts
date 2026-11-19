@@ -314,7 +314,7 @@ export const translations = {
     blog: {
       pageTitle: 'Property Compass',
       pageSubtitle: 'In-depth coverage of market trends, sector updates, and investment returns.',
-      categories: ['All', 'Market Trends', 'Investment Guide', 'Luxury Living', 'First-Time Buyers'],
+      categories: ['All', 'Market Studies & Trends', 'Residential Property Guide', 'Investment Strategy', 'Real Estate Development', 'Real Estate Financial Solutions'],
       readArticle: 'Read Full Analysis',
       minRead: 'min read',
     },
@@ -717,8 +717,8 @@ export const translations = {
     blog: {
       pageTitle: 'بوصلة العقار',
       pageSubtitle: 'قراءات معمقة لاتجاهات السوق، وأحدث مستجدات القطاع، وتقارير العوائد الاستثمارية.',
-      categories: ['الكل', 'اتجاهات السوق', 'دليل الاستثمار', 'الحياة الفاخرة', 'المشترون لأول مرة'],
-      readArticle: 'قراءة التحليل كاملاً',
+      categories: ['الكل', 'دراسات واتجاهات السوق', 'دليل العقار السكني', 'استراتيجية الاستثمار', 'التطوير العقاري', 'الحلول المالية العقارية'],
+      readArticle: 'قراءة المقال كاملاً',
       minRead: 'دقائق للقراءة',
     },
 
