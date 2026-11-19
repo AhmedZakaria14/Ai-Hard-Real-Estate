@@ -53,7 +53,7 @@ export function HVACHero() {
           className="w-full h-full object-cover object-center"
         />
         {/* Darkened overlay strictly compliant with prompt */}
-        <div className="absolute inset-0 bg-[#034DA2]/35" />
+        <div className="absolute inset-0 bg-[#034DA2]/22" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 w-full">
