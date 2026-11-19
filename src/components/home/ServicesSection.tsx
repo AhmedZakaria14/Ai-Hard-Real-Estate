@@ -79,14 +79,14 @@ export function ServicesSection({
                   isEven ? 'lg:order-2' : 'lg:order-1'
                 }`}
               >
-                <div className="relative rounded-3xl overflow-hidden shadow-xl aspect-16/11 bg-slate-950 group">
+                <div className="relative rounded-3xl overflow-hidden shadow-xl aspect-16/11 bg-[#034DA2] group">
                   <ManagedImg copyScope="realestate.ServicesSection"
                     src={publicRealEstateImage(serviceMedia?.bgImageUrl, service.image)}
                     alt={service.title[language]}
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent opacity-60" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#034DA2]/70 via-transparent to-transparent opacity-60" />
 
                   {/* Bottom Stats Card floating over image */}
                   <div className="absolute bottom-4 start-4 end-4 bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/40 text-slate-900">
