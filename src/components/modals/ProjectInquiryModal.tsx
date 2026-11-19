@@ -228,7 +228,7 @@ export function ProjectInquiryModal({
         <form onSubmit={handleSubmit} className="space-y-4">
             <ConfiguredFormFields form={formConfig} language={language} />
           {/* Selected Project Verification Card Header */}
-          <div className="p-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-2xl shadow-sm space-y-3">
+          <div className="p-4 bg-gradient-to-r from-[#034DA2] to-blue-700 text-white rounded-2xl shadow-sm space-y-3">
             <div className="flex items-start justify-between gap-2">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
