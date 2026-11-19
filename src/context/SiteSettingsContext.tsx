@@ -124,7 +124,7 @@ export const DEFAULT_PORTAL_SETTINGS: PublicBrandingSettings = {
 
   designTokens: {
     primaryAccent: '#0284c7',
-    secondaryAccent: '#0f172a',
+    secondaryAccent: '#0369a1',
     darkBgToken: '#034DA2',
     fontFamily: 'Tajawal, Cairo, sans-serif',
   },
