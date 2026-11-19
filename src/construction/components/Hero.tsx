@@ -128,7 +128,7 @@ export function Hero() {
           <div className="lg:col-span-5">
             <div className="bg-white rounded-3xl p-3.5 sm:p-4 shadow-xl border border-sky-100 space-y-3">
               {/* Image with Tag */}
-              <div className="relative aspect-4/3 rounded-2xl overflow-hidden bg-slate-900 shadow-inner group">
+              <div className="relative aspect-4/3 rounded-2xl overflow-hidden bg-[#034DA2] shadow-inner group">
                 <ManagedImg copyScope="construction.Hero"
                   src={heroContent.bgImageUrl || constructionHeroImage}
                   alt="HARD Business Center Towers"
