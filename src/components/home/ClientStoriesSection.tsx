@@ -12,7 +12,6 @@ export function ClientStoriesSection({ language }: { language: Language }) {
 
   return <section id="testimonials-section" className="mx-auto max-w-7xl space-y-6 px-4 pb-16 pt-8 sm:px-6 lg:px-8">
     <div className="mx-auto max-w-3xl space-y-3 text-center">
-      <p className="text-sm font-semibold text-blue-700"><LocalizedValue value={copy.testimonialsTag} /></p>
       <h2 className="text-2xl font-extrabold text-slate-900 sm:text-4xl"><LocalizedValue value={copy.testimonialsSectionTitle} /></h2>
       <p className="text-sm text-slate-600"><LocalizedValue value={copy.testimonialsSectionSubtitle} /></p>
     </div>
