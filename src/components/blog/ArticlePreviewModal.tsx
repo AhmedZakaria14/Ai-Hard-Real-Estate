@@ -41,10 +41,10 @@ export const ArticlePreviewModal: React.FC<ArticlePreviewModalProps> = ({
   const slug = getBlogSlug(post, language);
 
   return (
-    <div className="fixed inset-0 z-60 overflow-y-auto bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 md:p-6">
+    <div className="fixed inset-0 z-60 flex items-end sm:items-center justify-center overflow-hidden bg-slate-950/80 p-0 sm:p-4 md:p-6 backdrop-blur-xs [padding-top:env(safe-area-inset-top)] sm:[padding-top:1rem]">
       <div
         dir={isAr ? 'rtl' : 'ltr'}
-        className="bg-white w-full max-w-4xl rounded-3xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[94vh] animate-in fade-in zoom-in-95 duration-200"
+        className="flex w-full min-w-0 max-w-4xl flex-col overflow-hidden border border-slate-200 bg-white shadow-2xl max-h-[calc(100dvh-env(safe-area-inset-top))] sm:max-h-[calc(100dvh-2rem)] rounded-t-3xl sm:rounded-3xl animate-in fade-in zoom-in-95 duration-200"
       >
         {/* Top Preview Banner */}
         <div className="px-6 py-3 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
@@ -68,7 +68,7 @@ export const ArticlePreviewModal: React.FC<ArticlePreviewModalProps> = ({
         </div>
 
         {/* Scrollable Reader Article View */}
-        <div className="flex-1 overflow-y-auto p-6 sm:p-10 space-y-8 bg-slate-50/30">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-slate-50/30 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:p-10 sm:pb-10 space-y-6 sm:space-y-8">
           {/* Header Metadata */}
           <div className="space-y-4 max-w-3xl mx-auto">
             <div className="flex items-center gap-2.5 flex-wrap">
