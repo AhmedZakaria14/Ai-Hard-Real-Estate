@@ -17,6 +17,7 @@ import { mockFaqs, mockCertifications, mockEnhancedTestimonials } from '../data/
 import { loadPublishedArticles, loadPublishedProjects, loadPublishedProperties, type PublicProperty } from '../lib/db/hardCatalog';
 import { createPublishedProperty, archivePublishedCatalog, createPublishedProject, createPublishedArticle, updatePublishedCatalog, loadAdminArticles } from '../lib/db/hardCatalogWrites';
 import { SECTOR_CONTACT_DETAILS } from '../lib/sectors';
+import { useSiteSettings } from './SiteSettingsContext';
 
 interface DataContextType {
   properties: Property[];
@@ -106,14 +107,19 @@ interface DataContextType {
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
-function withPropertyContact(content: PublicProperty): Property {
-  const { phone, whatsapp, email } = SECTOR_CONTACT_DETAILS.realestate;
+function withPropertyContact(
+  content: PublicProperty,
+  contact: { phone: string; whatsapp: string; email: string },
+): Property {
   return {
     ...content,
     agent: {
       name: { ar: 'هارد للعقارات', en: 'HARD Real Estate' },
       title: { ar: 'الاستشارات العقارية', en: 'Real Estate Advisory' },
-      phone, whatsapp, email, avatar: '',
+      phone: contact.phone,
+      whatsapp: contact.whatsapp,
+      email: contact.email,
+      avatar: '',
     },
   };
 }
@@ -123,6 +129,14 @@ function byOrder(a: { order: number }, b: { order: number }) {
 }
 
 export function DataProvider({ children }: { children: React.ReactNode }) {
+  const { getEffectiveSettings } = useSiteSettings();
+  const realEstateBrand = getEffectiveSettings('realestate');
+  const propertyContact = React.useMemo(() => ({
+    phone: realEstateBrand.supportPhone || SECTOR_CONTACT_DETAILS.realestate.phone,
+    whatsapp: realEstateBrand.whatsappNumber || SECTOR_CONTACT_DETAILS.realestate.whatsapp,
+    email: realEstateBrand.contactEmail || SECTOR_CONTACT_DETAILS.realestate.email,
+  }), [realEstateBrand.supportPhone, realEstateBrand.whatsappNumber, realEstateBrand.contactEmail]);
+
   const [properties, setProperties] = useState<Property[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
@@ -149,14 +163,14 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     try {
       const items = await loadPublishedProperties();
       if (version !== propertyReadVersion.current) return;
-      setProperties(items.map(({ content }) => withPropertyContact(content)));
+      setProperties(items.map(({ content }) => withPropertyContact(content, propertyContact)));
       setPropertyLoadStatus('ready');
     } catch (error) {
       if (version !== propertyReadVersion.current) return;
       setPropertyLoadStatus('error');
       console.error('Could not load published properties:', error);
     }
-  }, []);
+  }, [propertyContact]);
 
   useEffect(() => {
     const refreshOnFocus = () => { void refreshProperties(); };
@@ -235,14 +249,14 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   // Properties CRUD
   const addProperty = async (propertyData: Partial<Property>): Promise<Property> => {
-    const created = withPropertyContact(await createPublishedProperty(propertyData));
+    const created = withPropertyContact(await createPublishedProperty(propertyData), propertyContact);
     setProperties((previous) => [created, ...previous.filter((property) => property.id !== created.id)]);
     void refreshProperties();
     return created;
   };
 
   const updateProperty = async (id: string, updates: Partial<Property>): Promise<Property> => {
-    const updated = withPropertyContact(await updatePublishedCatalog<PublicProperty>('properties', id, updates));
+    const updated = withPropertyContact(await updatePublishedCatalog<PublicProperty>('properties', id, updates), propertyContact);
     setProperties((previous) => previous.map((property) => property.id === id ? updated : property));
     void refreshProperties();
     return updated;
