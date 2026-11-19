@@ -80,14 +80,14 @@ export const DynamicPageSectionRenderer: React.FC<DynamicPageSectionRendererProp
           case 'hero': {
             const content = section.content as HeroContent;
             return (
-              <section key={key} className="relative rounded-3xl overflow-hidden bg-slate-950 text-white min-h-[400px] sm:min-h-[480px] flex items-center shadow-2xl">
+              <section key={key} className="relative rounded-3xl overflow-hidden bg-[#034DA2] text-white min-h-[400px] sm:min-h-[480px] flex items-center shadow-2xl">
                 <ManagedImg copyScope="realestate.DynamicPageSectionRenderer"
                   src={content.bgImageUrl || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1600&q=80'}
                   alt="Hero"
                   className="absolute inset-0 w-full h-full object-cover opacity-35"
                   onError={(e: any) => { e.target.src = 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1600&q=80'; }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#034DA2] via-[#034DA2]/60 to-transparent" />
 
                 <div className="relative z-10 p-6 sm:p-12 max-w-4xl space-y-4">
                   <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 text-xs font-bold font-mono">
@@ -177,7 +177,7 @@ export const DynamicPageSectionRenderer: React.FC<DynamicPageSectionRendererProp
                 : content.items || [];
 
             return (
-              <section key={key} className="bg-gradient-to-br from-slate-900 to-slate-950 text-white rounded-3xl p-8 sm:p-12 border border-slate-800 shadow-xl space-y-8">
+              <section key={key} className="bg-gradient-to-br from-[#034DA2] to-[#034DA2] text-white rounded-3xl p-8 sm:p-12 border border-blue-800/60 shadow-xl space-y-8">
                 <div className="text-center max-w-2xl mx-auto space-y-2">
                   <h2 className="text-xl sm:text-3xl font-bold font-display-serif text-white">
                     <LocalizedValue value={isAr ? content.heading.ar : content.heading.en} />
@@ -191,7 +191,7 @@ export const DynamicPageSectionRenderer: React.FC<DynamicPageSectionRendererProp
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {displayItems.map((item: any) => (
-                    <div key={item.id} className="bg-slate-900/80 rounded-2xl p-5 border border-slate-800 text-center space-y-1.5 flex flex-col justify-between">
+                    <div key={item.id} className="bg-[#034DA2]/80 rounded-2xl p-5 border border-blue-800/60 text-center space-y-1.5 flex flex-col justify-between">
                       <div>
                         <span className="text-2xl sm:text-3xl font-black font-mono text-sky-400 block">
                           <LocalizedValue value={item.value} />
@@ -202,7 +202,7 @@ export const DynamicPageSectionRenderer: React.FC<DynamicPageSectionRendererProp
                       </div>
 
                       {item.verification?.isVerified && (
-                        <div className="pt-2 border-t border-slate-800/80 text-[10px] text-emerald-400 font-bold flex items-center justify-center gap-1">
+                        <div className="pt-2 border-t border-blue-800/60/80 text-[10px] text-emerald-400 font-bold flex items-center justify-center gap-1">
                           <ShieldCheck className="w-3 h-3 text-emerald-400" />
                           <span><LocalizedValue value={item.verification.verifierName || (isAr ? 'مدقق رسمياً' : 'Audited Claim')} /></span>
                         </div>
@@ -319,13 +319,13 @@ export const DynamicPageSectionRenderer: React.FC<DynamicPageSectionRendererProp
                       className="bg-white rounded-3xl border border-slate-200/90 overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
                     >
                       <div>
-                        <div className="h-44 relative bg-slate-900">
+                        <div className="h-44 relative bg-[#034DA2]">
                           <ManagedImg copyScope="realestate.DynamicPageSectionRenderer"
                             src={office.image || 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80'}
                             alt={isAr ? office.name.ar : office.name.en}
                             className="w-full h-full object-cover opacity-80"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#034DA2]/80 via-transparent to-transparent" />
 
                           {office.isHeadquarters && (
                             <span className="absolute top-3 start-3 px-2.5 py-1 rounded-full bg-amber-500 text-slate-950 font-bold text-[10px] shadow-md flex items-center gap-1">
@@ -741,7 +741,7 @@ export const DynamicPageSectionRenderer: React.FC<DynamicPageSectionRendererProp
             const content = section.content as CtaBannerContent;
             const bgClass =
               content.styleVariant === 'dark'
-                ? 'bg-slate-950 text-white border-slate-800'
+                ? 'bg-[#034DA2] text-white border-blue-800/60'
                 : content.styleVariant === 'accent'
                 ? 'bg-sky-700 text-white border-sky-800'
                 : 'bg-gradient-to-r from-sky-900 via-slate-900 to-sky-950 text-white border-sky-800';
@@ -794,7 +794,7 @@ export const DynamicPageSectionRenderer: React.FC<DynamicPageSectionRendererProp
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                       {img.caption && (
-                        <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-slate-950/90 to-transparent text-white text-xs font-semibold">
+                        <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-[#034DA2]/90 to-transparent text-white text-xs font-semibold">
                           <LocalizedValue value={isAr ? img.caption.ar : img.caption.en} />
                         </div>
                       )}
