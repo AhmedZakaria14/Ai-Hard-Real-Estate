@@ -64,6 +64,23 @@ function QuoteModalContent() {
   const [validationError, setValidationError] = useState('');
 
   useEffect(() => {
+    // Every new quote flow starts clean. This prevents a previous success screen,
+    // validation error, city, or uploaded filename from leaking into the next request.
+    setClientName('');
+    setPhoneNumber('');
+    setEmail('');
+    setCity('');
+    setDistrict('');
+    setProjectType('');
+    setBuiltUpArea('');
+    setBudgetRangeSAR('');
+    setTimeline('');
+    setNotes('');
+    setUploadedFileName(null);
+    setSubmittedLead(null);
+    setCopiedRef(false);
+    setValidationError('');
+
     if (quoteModalInitialData) {
       if (quoteModalInitialData.projectType && quoteModalInitialData.projectType !== 'other') {
         setProjectType(quoteModalInitialData.projectType as ConstructionProjectType);
