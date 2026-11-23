@@ -186,20 +186,22 @@ export const CMSAuth: React.FC<CMSAuthProps> = ({
                   <Lock className="w-4 h-4 text-slate-400 absolute top-3.5 start-3.5 pointer-events-none" />
                   <input
                     id="cms-admin-password"
+                    autoComplete="current-password"
                     type={showPassword ? 'text' : 'password'}
                     required
                     aria-required="true"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full ps-10 pe-11 py-2.5 bg-slate-800/90 border border-slate-700 hover:border-slate-600 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-start"
+                    className="w-full min-h-11 ps-10 pe-12 py-2.5 bg-slate-800/90 border border-slate-700 hover:border-slate-600 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-start"
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() => setShowPassword((visible) => !visible)}
                     aria-label={showPassword ? (isAr ? 'إخفاء كلمة المرور' : 'Hide password') : (isAr ? 'إظهار كلمة المرور' : 'Show password')}
-                    className="absolute top-3 end-3 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+                    aria-controls="cms-admin-password"
+                    className="absolute inset-y-0 end-0 flex w-11 items-center justify-center rounded-xl text-slate-300 transition-colors hover:bg-slate-700 hover:text-white focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blue-400 cursor-pointer"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? <EyeOff aria-hidden="true" className="size-5" /> : <Eye aria-hidden="true" className="size-5" />}
                   </button>
                 </div>
               </div>
