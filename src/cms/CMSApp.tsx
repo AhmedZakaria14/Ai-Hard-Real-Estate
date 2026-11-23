@@ -133,6 +133,8 @@ export const CMSApp: React.FC<CMSAppProps> = ({
 
   const [adminUser, setAdminUser] = useState(getAdminUser);
   const [isResolvingAuth, setIsResolvingAuth] = useState(true);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [signOutFailed, setSignOutFailed] = useState(false);
 
   useEffect(() => {
     const syncAdmin = () => {
@@ -202,8 +204,17 @@ export const CMSApp: React.FC<CMSAppProps> = ({
   );
 
   const handleLogout = async () => {
-    const { error } = await hardAdminClient.auth.signOut({ scope: 'local' });
-    if (error) console.error('Sign-out failed', error.message);
+    setIsSigningOut(true);
+    setSignOutFailed(false);
+
+    try {
+      const { error } = await hardAdminClient.auth.signOut({ scope: 'local' });
+      if (error) throw error;
+    } catch {
+      setSignOutFailed(true);
+    } finally {
+      setIsSigningOut(false);
+    }
   };
 
   // --- PROPERTIES HANDLERS ---
@@ -522,6 +533,8 @@ export const CMSApp: React.FC<CMSAppProps> = ({
       onSelectTab={setActiveTab}
       onOpenCatalog={() => openOperations('properties')}
       onLogout={handleLogout}
+      isSigningOut={isSigningOut}
+      signOutFailed={signOutFailed}
       onViewLiveSite={onReturnToSite}
       adminUser={adminUser}
       language={language}
