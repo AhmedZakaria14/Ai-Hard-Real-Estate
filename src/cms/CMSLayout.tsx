@@ -61,6 +61,8 @@ interface CMSLayoutProps {
   onSelectTab: (tab: CMSTab) => void;
   onOpenCatalog: () => void;
   onLogout: () => void;
+  isSigningOut: boolean;
+  signOutFailed: boolean;
   onViewLiveSite: () => void;
   adminUser: { name: string; email: string; role: string };
   language: Language;
@@ -73,6 +75,8 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
   onSelectTab,
   onOpenCatalog,
   onLogout,
+  isSigningOut,
+  signOutFailed,
   onViewLiveSite,
   adminUser,
   language,
@@ -80,6 +84,10 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
   children,
 }) => {
   const isAr = language === "ar";
+  const logoutLabel = isAr ? "تسجيل الخروج" : "Log Out";
+  const logoutText = isSigningOut
+    ? (isAr ? "جاري تسجيل الخروج…" : "Signing out…")
+    : logoutLabel;
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
@@ -253,6 +261,16 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
 
         <div className="flex items-center gap-2">
           <button
+            type="button"
+            onClick={onLogout}
+            disabled={isSigningOut}
+            aria-label={logoutLabel}
+            className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg px-2 text-xs font-semibold text-red-300 hover:bg-white/10 disabled:opacity-60"
+          >
+            <LogOut aria-hidden="true" className="h-4 w-4 shrink-0" />
+            <span className="hidden sm:inline">{logoutText}</span>
+          </button>
+          <button
             onClick={() => onLanguageChange(isAr ? "en" : "ar")}
             className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white/10 text-slate-200"
           >
@@ -388,14 +406,17 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
 
           {/* Logout Button */}
           <button
+            type="button"
             onClick={onLogout}
-            className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-bold text-red-400 hover:text-red-300 hover:bg-red-950/30 rounded-xl transition-colors cursor-pointer ${
+            disabled={isSigningOut}
+            aria-label={logoutLabel}
+            className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-bold text-red-400 disabled:opacity-60 hover:text-red-300 hover:bg-red-950/30 rounded-xl transition-colors cursor-pointer ${
               sidebarCollapsed ? "justify-center px-2" : ""
             }`}
           >
             <LogOut className="w-4 h-4 shrink-0" />
             {!sidebarCollapsed && (
-              <span>{isAr ? "تسجيل الخروج" : "Log Out"}</span>
+              <span>{logoutText}</span>
             )}
           </button>
         </div>
@@ -453,11 +474,25 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
               <ExternalLink className="w-3.5 h-3.5 text-slate-600" />
               <span>{isAr ? "زيارة الموقع الحي" : "Live Website"}</span>
             </button>
+            <button
+              type="button"
+              onClick={onLogout}
+              disabled={isSigningOut}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-red-200 px-3.5 py-1.5 text-xs font-bold text-red-700 transition-colors hover:bg-red-50 disabled:opacity-60"
+            >
+              <LogOut aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />
+              <span>{logoutText}</span>
+            </button>
           </div>
         </header>
 
         {/* Content Body */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+          {signOutFailed && (
+            <p role="alert" className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+              {isAr ? "تعذّر تسجيل الخروج. حاول مرة أخرى." : "Could not sign out. Try again."}
+            </p>
+          )}
           {children}
         </main>
 
