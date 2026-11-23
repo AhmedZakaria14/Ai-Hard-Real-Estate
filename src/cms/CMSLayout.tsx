@@ -241,6 +241,9 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
   return (
     <div
       dir={isAr ? "rtl" : "ltr"}
+      onKeyDown={(event) => {
+        if (event.key === "Escape") setMobileSidebarOpen(false);
+      }}
       className="min-h-screen bg-slate-900/10 flex flex-col lg:flex-row font-ui-sans selection:bg-blue-600 selection:text-white"
     >
       {/* Mobile Top Bar */}
@@ -277,23 +280,32 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
             {isAr ? "EN" : "عربي"}
           </button>
           <button
-            onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-            className="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-white/10"
+            type="button"
+            onClick={() => setMobileSidebarOpen(true)}
+            aria-label={isAr ? "فتح القائمة" : "Open menu"}
+            aria-expanded={mobileSidebarOpen}
+            aria-controls="cms-sidebar"
+            className="grid size-11 place-items-center rounded-lg text-slate-300 hover:bg-white/10 hover:text-white"
           >
-            {mobileSidebarOpen ? (
-              <X className="w-5 h-5" />
-            ) : (
-              <Menu className="w-5 h-5" />
-            )}
+            <Menu aria-hidden="true" className="size-5" />
           </button>
         </div>
       </div>
 
+      <div
+        aria-hidden="true"
+        onClick={() => setMobileSidebarOpen(false)}
+        className={`fixed inset-0 z-30 touch-none bg-slate-950/60 transition-opacity duration-200 motion-reduce:transition-none lg:hidden ${
+          mobileSidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      />
+
       {/* SIDEBAR NAVIGATION (Desktop & Mobile Drawer) */}
       <aside
-        className={`fixed lg:static top-0 bottom-0 start-0 z-40 bg-slate-950 text-slate-300 border-e border-slate-800/80 flex flex-col justify-between transition-all duration-300 ${
+        id="cms-sidebar"
+        className={`fixed inset-y-0 start-0 z-40 flex w-72 max-w-[calc(100vw-3rem)] flex-col justify-between overflow-y-auto overscroll-contain border-e border-slate-800/80 bg-slate-950 text-slate-300 shadow-2xl transition-[translate,visibility] duration-200 ease-out lg:visible lg:static lg:max-w-none lg:shrink-0 lg:overflow-visible lg:shadow-none lg:transition-[width] lg:ltr:translate-x-0 lg:rtl:translate-x-0 motion-reduce:transition-none ${
           sidebarCollapsed ? "lg:w-20" : "lg:w-72"
-        } ${mobileSidebarOpen ? "w-72 shadow-2xl block" : "hidden lg:flex"}`}
+        } ${mobileSidebarOpen ? "visible translate-x-0" : "invisible ltr:-translate-x-full rtl:translate-x-full"}`}
       >
         {/* Sidebar Top: Branding + Collapse button */}
         <div>
@@ -319,6 +331,15 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({
                 <Building className="w-5 h-5" />
               </div>
             )}
+
+            <button
+              type="button"
+              onClick={() => setMobileSidebarOpen(false)}
+              aria-label={isAr ? "إغلاق القائمة" : "Close menu"}
+              className="grid size-11 shrink-0 place-items-center rounded-lg text-slate-300 hover:bg-white/10 hover:text-white lg:hidden"
+            >
+              <X aria-hidden="true" className="size-5" />
+            </button>
 
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
